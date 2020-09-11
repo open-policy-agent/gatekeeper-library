@@ -1,0 +1,8 @@
+resources:
+  - allowedrepos
+  - containerlimits
+  - httpsonly
+  - imagedigests
+  - requiredlabels
+  - uniqueingresshost
+  - uniqueserviceselector
