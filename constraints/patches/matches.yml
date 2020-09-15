@@ -1,0 +1,16 @@
+- op: "add"
+  path: "/spec/match"
+  value:
+    excludedNamespaces:
+      - kube-system
+      - logging
+      - monitoring
+      - ingress-nginx
+      - cert-manager
+      #- alertlogic
+      - ambassador
+      - argocd
+      - kubedb
+    kinds:
+      - apiGroups: ["apps", "extensions"]
+        kinds: ["Deployment", "Pods"]

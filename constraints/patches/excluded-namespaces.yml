@@ -1,0 +1,22 @@
+- op: "add"
+  path: "/spec/match/excludedNamespaces"
+  value:
+      - kube-system
+      - logging
+      - monitoring
+      - ingress-nginx
+      - cert-manager
+      - alertlogic
+      - ambassador
+      - argocd
+      - kubedb
+      - kube-scan
+      - vault-secrets-webhook
+      - threatstack
+      - gatekeeper-system
+      - falco
+      - default
+      - external-secrets
+      - vault
+      - velero
+      - cluster-autoscaler

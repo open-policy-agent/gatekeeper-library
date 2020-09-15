@@ -1,0 +1,20 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sAllowedRepos
+metadata:
+  name: must-get-images-from-whitelisted-registry
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+#    namespaces:
+#      - "test-opa"
+  parameters:
+    repos:
+      - "gcr.io/"
+      - "docker.io/"
+      - "quay.io/"
+      #- "busybox"
+      # - "openpolicyagent/"
+      # - "falcosecurity/"
+      # - "argoproj/"

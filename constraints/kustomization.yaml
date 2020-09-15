@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - allow_repos.yaml
+
+## Transformer - Patch Resource Config using json patch
+patchesJson6902:
+  - target:
+      group: constraints.gatekeeper.sh
+      version: v1beta1
+      kind: K8sAllowedRepos
+      name: must-get-images-from-whitelisted-registry
+    path: patches/excluded-namespaces.yml
+#  - target:
+#      group: constraints.gatekeeper.sh
+#      version: v1beta1
+#      kind: K8sUniqueIngressHost
+#      name: unique-ingress-host
+#    path: patches/ingress-matches.yml
+#  - target:
+#      group: constraints.gatekeeper.sh
+#      version: v1beta1
+#      kind: K8sLivenessProbe
+#      name: liveness-probe
+#    path: patches/all-matches.yml
+#  - target:
+#      group: constraints.gatekeeper.sh
+#      version: v1beta1
+#      kind: K8sReadinessProbe
+#      name: readiness-probe
+#    path: patches/all-matches.yml

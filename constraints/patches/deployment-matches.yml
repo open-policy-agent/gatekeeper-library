@@ -1,0 +1,12 @@
+- op: "add"
+  path: "/spec/match"
+  value:
+    excludedNamespaces:
+      - kube-system
+      - logging
+      - monitoring
+      - ingress-nginx
+      - cert-manager
+    kinds:
+      - apiGroups: ["apps", "extensions"]
+        kinds: ["Deployment"]
