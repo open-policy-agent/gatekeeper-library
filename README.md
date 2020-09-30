@@ -4,7 +4,7 @@ This repository is a community-owned library of policies for the OPA Gatekeeper 
 
 ## How to use the library
 
-The easiest way to apply a policy from this library is to download and apply the `constrain.yaml` and `template.yaml` provided in each directory
+The easiest way to apply a policy from this library is to download and apply the `constraint.yaml` and `template.yaml` provided in each directory
 
 For example
 
