@@ -11,7 +11,7 @@ spec:
         openAPIV3Schema:
           properties:
             ratio:
-              type: string
+              type: integer
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
