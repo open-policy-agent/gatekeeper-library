@@ -1,0 +1,14 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: GatewayClassNamespaces
+metadata:
+  name: gatewayclassnamespaces
+spec:
+  match:
+    kinds:
+      - apiGroups: ["networking.x-k8s.io"]
+        kinds: ["Gateway"]
+  parameters:
+    gatewayClasses:
+      - name: external-lb
+        namespaces:
+        - prod
