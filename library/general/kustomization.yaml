@@ -1,10 +1,10 @@
 resources:
-    - allowedrepos
-    - block-nodeport-services
-    - containerlimits
-    - httpsonly
-    - imagedigests
-    - requiredlabels
-    - requiredprobes
-    - uniqueingresshost
-    - uniqueserviceselector
+  - allowedrepos
+  - block-nodeport-services
+  - containerlimits
+  - httpsonly
+  - imagedigests
+  - requiredlabels
+  - requiredprobes
+  - uniqueingresshost
+  - uniqueserviceselector
