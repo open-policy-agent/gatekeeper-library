@@ -1,6 +1,7 @@
 resources:
   - allow-privilege-escalation
   - apparmor
+  - capabilities
   - flexvolume-drivers
   - forbidden-sysctls
   - fsgroup
