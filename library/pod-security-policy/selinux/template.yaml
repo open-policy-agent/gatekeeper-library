@@ -73,7 +73,7 @@ spec:
             object[field]
         }
 
-        accept_context(rule, context) = true {
+        accept_context(rule, context) = false {
           rule == "RunAsAny"
         }
 

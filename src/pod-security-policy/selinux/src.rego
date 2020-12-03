@@ -2,17 +2,13 @@ package k8spspselinux
 
 # Disallow top level custom SELinux options
 violation[{"msg": msg, "details": {}}] {
-    # has_field(input.review.object.spec.securityContext, "seLinuxOptions")
     accept_context(input.parameters.seLinuxContext, input.review.object.spec.securityContext)
-    # not input_seLinuxOptions_allowed(input.review.object.spec.securityContext.seLinuxOptions)
     msg := sprintf("SELinux options is not allowed, pod: %v. Allowed options: %v", [input.review.object.metadata.name, input.parameters.allowedSELinuxOptions])
 }
 # Disallow container level custom SELinux options
 violation[{"msg": msg, "details": {}}] {
     c := input_security_context[_]
-    # has_field(c.securityContext, "seLinuxOptions")
     accept_context(input.parameters.seLinuxContext, c.securityContext)
-    # not input_seLinuxOptions_allowed(c.securityContext.seLinuxOptions)
     msg := sprintf("SELinux options is not allowed, pod: %v, container %v. Allowed options: %v", [input.review.object.metadata.name, c.name, input.parameters.allowedSELinuxOptions])
 }
 
@@ -45,7 +41,7 @@ has_field(object, field) = true {
     object[field]
 }
 
-accept_context(rule, context) = true {
+accept_context(rule, context) = false {
   rule == "RunAsAny"
 }
 
