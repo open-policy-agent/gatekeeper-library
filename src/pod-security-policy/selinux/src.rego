@@ -2,15 +2,17 @@ package k8spspselinux
 
 # Disallow top level custom SELinux options
 violation[{"msg": msg, "details": {}}] {
-    has_field(input.review.object.spec.securityContext, "seLinuxOptions")
-    not input_seLinuxOptions_allowed(input.review.object.spec.securityContext.seLinuxOptions)
+    # has_field(input.review.object.spec.securityContext, "seLinuxOptions")
+    accept_context(input.parameters.seLinuxContext, input.review.object.spec.securityContext)
+    # not input_seLinuxOptions_allowed(input.review.object.spec.securityContext.seLinuxOptions)
     msg := sprintf("SELinux options is not allowed, pod: %v. Allowed options: %v", [input.review.object.metadata.name, input.parameters.allowedSELinuxOptions])
 }
 # Disallow container level custom SELinux options
 violation[{"msg": msg, "details": {}}] {
     c := input_security_context[_]
-    has_field(c.securityContext, "seLinuxOptions")
-    not input_seLinuxOptions_allowed(c.securityContext.seLinuxOptions)
+    # has_field(c.securityContext, "seLinuxOptions")
+    accept_context(input.parameters.seLinuxContext, c.securityContext)
+    # not input_seLinuxOptions_allowed(c.securityContext.seLinuxOptions)
     msg := sprintf("SELinux options is not allowed, pod: %v, container %v. Allowed options: %v", [input.review.object.metadata.name, c.name, input.parameters.allowedSELinuxOptions])
 }
 
@@ -41,4 +43,14 @@ input_security_context[c] {
 # has_field returns whether an object has a field
 has_field(object, field) = true {
     object[field]
+}
+
+accept_context(rule, context) = true {
+  rule == "RunAsAny"
+}
+
+accept_context(rule, context) = true {
+  rule == "MustRunAs"
+  has_field(context, "seLinuxOptions")
+  not input_seLinuxOptions_allowed(context.seLinuxOptions)
 }
