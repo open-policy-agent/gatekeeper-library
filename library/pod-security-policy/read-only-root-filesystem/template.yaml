@@ -2,6 +2,8 @@ apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
   name: k8spspreadonlyrootfilesystem
+  annotations:
+    description: Requires the use of a read only root file system.
 spec:
   crd:
     spec:

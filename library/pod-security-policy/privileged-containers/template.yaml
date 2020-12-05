@@ -2,6 +2,8 @@ apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
   name: k8spspprivilegedcontainer
+  annotations:
+    description: Controls running of privileged containers.
 spec:
   crd:
     spec:

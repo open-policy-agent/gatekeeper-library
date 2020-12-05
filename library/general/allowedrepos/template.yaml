@@ -2,6 +2,9 @@ apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
   name: k8sallowedrepos
+  annotations:
+    description: Requires container images to begin with a repo string from a specified
+      list.
 spec:
   crd:
     spec:
