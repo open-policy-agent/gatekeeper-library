@@ -2,7 +2,7 @@ apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
   name: k8sexternalips
-  annotation:
+  annotations:
     description: "Restricts Services from containing externalIPs except those in a provided allowlist."
 spec:
   crd:
