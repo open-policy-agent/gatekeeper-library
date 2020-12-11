@@ -14,4 +14,7 @@ For example
 
 ## How to contribute to the library
 
-TODO.
+If you have a policy you would like to contribute to the library, please feel free to submit a pull request. Each new policy contribution should contain the following:
+* A constraint template with a `description` annotation and the parameter structure, if any, defined in `spec.crd.spec.validation.openAPIV3Schema`
+* One or more sample constraints, each with an example of an allowed (`example_allowed.yaml`) and disallowed (`example_disallowed.yaml`) resource.
+* The rego source, as `src.rego` and unit tests as `src_test.rego` in the corresponding subdirectory under `src/`

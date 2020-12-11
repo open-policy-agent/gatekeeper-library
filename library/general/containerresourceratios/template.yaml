@@ -2,6 +2,8 @@ apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
   name: k8scontainerratios
+  annotations:
+    description: Sets a maximum ratio for container resource limits to requests.
 spec:
   crd:
     spec:

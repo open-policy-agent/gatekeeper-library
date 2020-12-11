@@ -2,6 +2,8 @@ apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
   name: k8simagedigests
+  annotations:
+    description: Requires container images to contain a digest.
 spec:
   crd:
     spec:

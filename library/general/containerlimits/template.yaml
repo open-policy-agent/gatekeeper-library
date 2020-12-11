@@ -2,6 +2,9 @@ apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
   name: k8scontainerlimits
+  annotations:
+    description: Requires containers to have memory and CPU limits set and within
+      a specified maximum amount.
 spec:
   crd:
     spec:
