@@ -2,6 +2,8 @@ apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
   name: k8spspcapabilities
+  annotations:
+    description: Controls Linux capabilities.
 spec:
   crd:
     spec:
