@@ -15,8 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
-        binary=$([[ "$OSTYPE" == "darwin"* ]] && echo "opa_darwin_amd64" || echo "opa_linux_amd64")
-        sudo curl -L -o /usr/local/bin/opa https://github.com/open-policy-agent/opa/releases/download/${{ matrix.opa }}/$binary
-        sudo chmod +x /usr/local/bin/opa
-        sh test.sh
-
+          binary=$([[ "$OSTYPE" == "darwin"* ]] && echo "opa_darwin_amd64" || echo "opa_linux_amd64")
+          sudo curl -L -o /usr/local/bin/opa https://github.com/open-policy-agent/opa/releases/download/${{ matrix.opa }}/$binary
+          sudo chmod +x /usr/local/bin/opa
+          sh test.sh
