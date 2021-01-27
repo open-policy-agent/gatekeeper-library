@@ -213,7 +213,22 @@ test_user_input_container_run_as_rule_non_root_ignore_ranges {
   results := violation with input as input
   count(results) == 0
 }
-
+test_user_input_container_run_as_rule_non_root_runasnonroot_true {
+  input := {
+    "review": review(runAsNonRoot(true), [ctr("cont1", null)], null),
+    "parameters": runAsUser(rule("MustRunAsNonRoot", null))
+  }
+  results := violation with input as input
+  count(results) == 0
+}
+test_user_input_container_run_as_rule_non_root_runasnonroot_false {
+  input := {
+    "review": review(runAsNonRoot(false), [ctr("cont1", null)], null),
+    "parameters": runAsUser(rule("MustRunAsNonRoot", null))
+  }
+  results := violation with input as input
+  count(results) == 1
+}
 
 
 ## runAsGroup ##
@@ -777,6 +792,9 @@ ctr(name, context) = out {
 
 runAsUser(user) = out {
 	out = run_as_rule(user, null, null, null)
+}
+runAsNonRoot(bool) = out {
+  out = {"runAsNonRoot": bool}
 }
 runAsGroup(group) = out {
 	out = run_as_rule(null, group, null, null)
