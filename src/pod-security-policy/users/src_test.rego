@@ -103,6 +103,11 @@ test_user_one_container_run_in_range_user_upper_edge_of_range {
   results := violation with input as input
   count(results) == 0
 }
+test_user_one_container_run_in_range_seccont_runasnonroot {
+  input := { "review": review(null, [ctr("cont1", runAsNonRoot(true))], null), "parameters": user_mustrunas_100_200 }
+  results := violation with input as input
+  count(results) == 1
+}
 test_user_one_container_run_in_range_user_between_ranges {
   input := { "review": review(null, [ctr("cont1", runAsUser(200))], null), "parameters": user_mustrunas_two_ranges }
   results := violation with input as input
