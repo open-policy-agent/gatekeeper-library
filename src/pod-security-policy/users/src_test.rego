@@ -58,6 +58,31 @@ test_user_one_container_run_as_rule_non_root_user_is_root {
   results := violation with input as input
   count(results) == 1
 }
+test_user_one_container_run_as_rule_non_root_seccont_runasnonroot_user_is_not_defined {
+  input := { "review": review(null, [ctr("cont1", runAsNonRoot(true))], null), "parameters": user_mustrunasnonroot }
+  results := violation with input as input
+  count(results) == 0
+}
+test_user_one_container_run_as_rule_non_root_seccont_runasnonroot_user_is_root {
+  input := { "review": review(null, [ctr("cont1", object.union(runAsNonRoot(true),runAsUser(0)))], null), "parameters": user_mustrunasnonroot }
+  results := violation with input as input
+  count(results) == 1
+}
+test_user_one_container_run_as_rule_non_root_seccont_runasnonroot_user_is_not_root {
+  input := { "review": review(null, [ctr("cont1", object.union(runAsNonRoot(true),runAsUser(10)))], null), "parameters": user_mustrunasnonroot }
+  results := violation with input as input
+  count(results) == 0
+}
+test_user_one_container_run_as_rule_non_root_seccont_runasnonroot_is_false_user_is_not_defined {
+  input := { "review": review(null, [ctr("cont1", runAsNonRoot(false))], null), "parameters": user_mustrunasnonroot }
+  results := violation with input as input
+  count(results) == 1
+}
+test_user_one_container_run_as_rule_non_root_seccont_runasnonroot_is_false_user_is_not_root {
+  input := { "review": review(null, [ctr("cont1", object.union(runAsNonRoot(false),runAsUser(10)))], null), "parameters": user_mustrunasnonroot }
+  results := violation with input as input
+  count(results) == 0
+}
 test_user_one_container_run_in_range_user_in_range {
   input := { "review": review(null, [ctr("cont1", runAsUser(150))], null), "parameters": user_mustrunas_100_200 }
   results := violation with input as input
@@ -83,6 +108,7 @@ test_user_one_container_run_in_range_user_between_ranges {
   results := violation with input as input
   count(results) == 1
 }
+
 test_user_two_containers_run_as_rule_any {
   input := {
     "review": review(null, [ctr("cont1", runAsUser(1)), ctr("cont2", runAsUser(100))], null),
@@ -102,6 +128,22 @@ test_user_two_containers_run_as_rule_non_root_users_are_not_root {
 test_user_two_containers_run_as_rule_non_root_one_is_root {
   input := {
     "review": review(null, [ctr("cont1", runAsUser(1)), ctr("cont2", runAsUser(0))], null),
+    "parameters": user_mustrunasnonroot
+  }
+  results := violation with input as input
+  count(results) == 1
+}
+test_user_two_containers_run_as_rule_non_root_one_seccont_runasnonroot {
+  input := {
+    "review": review(null, [ctr("cont1", runAsUser(1)), ctr("cont2", runAsNonRoot(true))], null),
+    "parameters": user_mustrunasnonroot
+  }
+  results := violation with input as input
+  count(results) == 0
+}
+test_user_two_containers_run_as_rule_non_root_one_root_other_has_seccont_runasnonroot {
+  input := {
+    "review": review(null, [ctr("cont1", runAsUser(0)), ctr("cont2", runAsNonRoot(true))], null),
     "parameters": user_mustrunasnonroot
   }
   results := violation with input as input
@@ -213,21 +255,13 @@ test_user_input_container_run_as_rule_non_root_ignore_ranges {
   results := violation with input as input
   count(results) == 0
 }
-test_user_input_container_run_as_rule_non_root_runasnonroot_true {
+test_user_input_container_run_as_rule_non_root_seccont_runasnonroot_ignore_ranges {
   input := {
-    "review": review(runAsNonRoot(true), [ctr("cont1", null)], null),
-    "parameters": runAsUser(rule("MustRunAsNonRoot", null))
+    "review": review(null, [ctr("cont1", runAsNonRoot(true))], null),
+    "parameters": runAsUser(rule("MustRunAsNonRoot", [range(100, 200)]))
   }
   results := violation with input as input
   count(results) == 0
-}
-test_user_input_container_run_as_rule_non_root_runasnonroot_false {
-  input := {
-    "review": review(runAsNonRoot(false), [ctr("cont1", null)], null),
-    "parameters": runAsUser(rule("MustRunAsNonRoot", null))
-  }
-  results := violation with input as input
-  count(results) == 1
 }
 
 
