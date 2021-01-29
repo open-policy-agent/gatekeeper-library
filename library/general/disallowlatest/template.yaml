@@ -1,0 +1,43 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdisallowlatest
+  annotations:
+    description: Requires container images to contain an image tag different that "latest".
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDisallowLatest
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sdisallowlatest
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.containers[_]
+          latest := [re_match(":latest", container.image)]
+          all(latest)
+          msg := sprintf("container <%v> uses a latest image tag <%v>", [container.name, container.image])
+        }
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.containers[_]
+          tag := [re_match(":", container.image)]
+          not all(tag)
+          msg := sprintf("container <%v> didn't specify an image tag <%v>", [container.name, container.image])
+        }
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.initContainers[_]
+          latest := [re_match(":latest", container.image)]
+          all(latest)
+          msg := sprintf("initContainer <%v> uses a latest image tag <%v>", [container.name, container.image])
+        }
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.initContainers[_]
+          tag := [re_match(":", container.image)]
+          not all(tag)
+          msg := sprintf("initContainer <%v> didn't specify an image tag <%v>", [container.name, container.image])
+        }
