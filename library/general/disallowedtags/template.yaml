@@ -1,18 +1,19 @@
 apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
-  name: k8sdisallowlatest
+  name: k8sdisallowedtags
   annotations:
-    description: Requires container images to contain an image tag different that "latest".
+    description: Requires container images to have an image tag different
+      from the ones in a specified list.
 spec:
   crd:
     spec:
       names:
-        kind: K8sDisallowLatest
+        kind: K8sDisallowedTags
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
-        package k8sdisallowlatest
+        package k8sdisallowedtags
 
         violation[{"msg": msg}] {
           container := input.review.object.spec.containers[_]
