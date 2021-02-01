@@ -17,14 +17,14 @@ spec:
 
         violation[{"msg": msg}] {
           container := input_containers[_]
-          latest := [re_match(":latest", container.image)]
+          latest := [endswith(container.image, ":latest")]
           all(latest)
           msg := sprintf("container <%v> uses a latest image tag <%v>", [container.name, container.image])
         }
 
         violation[{"msg": msg}] {
           container := input_containers[_]
-          tag := [re_match(":", container.image)]
+          tag := [contains(container.image, ":")]
           not all(tag)
           msg := sprintf("container <%v> didn't specify an image tag <%v>", [container.name, container.image])
         }
