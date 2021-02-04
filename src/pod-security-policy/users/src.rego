@@ -29,8 +29,15 @@ get_user_violation(params, container) = msg {
 
 get_user_violation(params, container) = msg {
   not get_field_value("runAsUser", container, input.review)
-  params.rule != "RunAsAny"
-  msg := sprintf("Container %v is attempting to run without a required securityContext/runAsUser. Allowed runAsUser: %v", [container.name, params])
+  params.rule = "MustRunAs"
+  msg := sprintf("Container %v is attempting to run without a required securityContext/runAsUser", [container.name])
+}
+
+get_user_violation(params, container) = msg {
+  params.rule = "MustRunAsNonRoot"
+  not get_field_value("runAsUser", container, input.review)
+  not get_field_value("runAsNonRoot", container, input.review)
+  msg := sprintf("Container %v is attempting to run without a required securityContext/runAsNonRoot or securityContext/runAsUser != 0", [container.name])
 }
 
 accept_users("RunAsAny", provided_user) {true}
