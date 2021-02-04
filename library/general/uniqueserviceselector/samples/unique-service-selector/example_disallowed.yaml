@@ -1,11 +1,22 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: gatekeeper-test-service-disallowed
-  namespace: gatekeeper-system
+  name: gatekeeper-test-service-example
+  namespace: default
 spec:
   ports:
     - port: 443
   selector:
-    control-plane: controller-manager
-    controller-tools.k8s.io: "1.0"
+    key: value
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gatekeeper-test-service-disallowed
+  namespace: default
+spec:
+  ports:
+    - port: 443
+  selector:
+    key: value
