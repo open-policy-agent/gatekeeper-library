@@ -61,8 +61,9 @@ spec:
         }
 
         missing_drop_capabilities(container) {
-          must_drop := {c | c := input.parameters.requiredDropCapabilities[_]}
-          dropped := {c | c := container.securityContext.capabilities.drop[_]}
+          must_drop := {c | c := upper(input.parameters.requiredDropCapabilities[_])}
+          dropped := {c | c := upper(container.securityContext.capabilities.drop[_])}
+          not dropped["ALL"]
           count(must_drop - dropped) > 0
         }
 
