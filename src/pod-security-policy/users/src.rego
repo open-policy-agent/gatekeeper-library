@@ -88,7 +88,7 @@ get_field_value(field, container, review) = out {
 
 # If no container level exists, use pod level
 get_field_value(field, container, review) = out {
-  not get_seccontext_field(field, container)
+  not has_seccontext_field(field, container)
   review.kind.kind == "Pod"
   pod_value := get_seccontext_field(field, review.object.spec)
   out := pod_value
@@ -98,6 +98,14 @@ get_field_value(field, container, review) = out {
 is_in_range(val, ranges) = res {
   matching := {1 | val >= ranges[j].min; val <= ranges[j].max}
   res := count(matching) > 0
+}
+
+has_seccontext_field(field, obj) {
+  get_seccontext_field(field, obj)
+}
+
+has_seccontext_field(field, obj) {
+  get_seccontext_field(field, obj) == false
 }
 
 get_seccontext_field(field, obj) = out {
