@@ -2,6 +2,8 @@ apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
   name: k8suniqueingresshost
+  annotations:
+    description: Requires all Ingress hosts to be unique.
 spec:
   crd:
     spec:

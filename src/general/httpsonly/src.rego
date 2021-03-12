@@ -1,8 +1,8 @@
 package k8shttpsonly
 
 violation[{"msg": msg}] {
-  input.review.kind.kind == "Ingress"
-  re_match("^(extensions|networking.k8s.io)$", input.review.kind.group)
+  input.review.object.kind == "Ingress"
+  re_match("^(extensions|networking.k8s.io)/", input.review.object.apiVersion)
   ingress := input.review.object
   not https_complete(ingress)
   msg := sprintf("Ingress should be https. tls configuration and allow-http=false annotation are required for %v", [ingress.metadata.name])
