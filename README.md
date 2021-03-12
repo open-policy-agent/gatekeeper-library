@@ -1,16 +1,19 @@
 # OPA Gatekeeper Library
 
-This repository is a community-owned library of policies for the OPA Gatekeeper project.
+A community-owned library of policies for the OPA Gatekeeper project.
 
-## How to use the library
+## Usage
 
-The easiest way to apply a policy from this library is to download and apply the `constraint.yaml` and `template.yaml` provided in each directory
+Apply the `template.yaml` and `constraint.yaml` provided in each directory under `library/`
 
 For example
 
-    cd library/general/httpsonly/
-    kubectl apply -f constraint.yaml
-    kubectl apply -f template.yaml
+```bash
+cd library/general/httpsonly/
+kubectl apply -f template.yaml
+kubectl apply -f samples/ingress-https-only/constraint.yaml
+kubectl apply -f library/general/httpsonly/sync.yaml # optional: when GK is running with OPA cache
+```
 
 ## How to contribute to the library
 
