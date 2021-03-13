@@ -114,6 +114,12 @@ test_user_one_container_run_in_range_user_between_ranges {
   count(results) == 1
 }
 
+test_non_root_container_pod_conflict {
+  input := {"review": review({"runAsNonRoot": true}, [ctr("cont1", runAsNonRoot(false))], null), "parameters": user_mustrunasnonroot }
+  results := violation with input as input
+  count(results) == 1
+}
+
 test_user_two_containers_run_as_rule_any {
   input := {
     "review": review(null, [ctr("cont1", runAsUser(1)), ctr("cont2", runAsUser(100))], null),
