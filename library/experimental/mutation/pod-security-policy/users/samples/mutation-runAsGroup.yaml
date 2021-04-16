@@ -1,0 +1,16 @@
+apiVersion: mutations.gatekeeper.sh/v1alpha1
+kind: Assign
+metadata:
+  name: k8spsprunasgroup
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  location: "spec.containers[name:*].securityContext.runAsGroup"
+  parameters:
+    pathTests:
+    - subPath: "spec.containers[name:*].securityContext.runAsGroup"
+      condition: MustNotExist
+    assign:
+      value: 2000
