@@ -1,4 +1,4 @@
-package k8srequiredtimeoutseconds
+package k8srequiredprobetimeoutseconds
 
 test_one_ctr_no_violations {
     kind := kinds[_]

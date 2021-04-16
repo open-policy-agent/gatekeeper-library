@@ -1,0 +1,39 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequiredtimeoutseconds
+  annotations:
+    description: Requires readiness and/or liveness probes to have timeoutSeconds field
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequiredTimeoutSeconds
+      validation:
+        openAPIV3Schema:
+          properties:
+            probes:
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8srequiredprobetimeoutseconds
+
+        violation[{"msg": msg}] {
+            container := input.review.object.spec.containers[_]
+            probe := input.parameters.probes[_]
+            probe_timeout_is_missing(container, probe)
+            msg := get_violation_message(container, input.review, probe)
+        }
+
+        probe_timeout_is_missing(ctr, probe) = true {
+            ctr[probe]
+            not ctr[probe].timeoutSeconds
+        }
+
+        get_violation_message(container, review, probe) = msg {
+            msg := sprintf("Container <%v> in your <%v> <%v> has no timeoutSeconds field for probe %v", [container.name, review.kind.kind, review.object.metadata.name, probe])
+        }
+

@@ -1,4 +1,4 @@
-package k8srequiredtimeoutseconds
+package k8srequiredprobetimeoutseconds
 
 
 violation[{"msg": msg}] {
@@ -14,6 +14,6 @@ probe_timeout_is_missing(ctr, probe) = true {
 }
 
 get_violation_message(container, review, probe) = msg {
-    msg := sprintf("Container <%v> in your <%v> <%v> has no <%v>", [container.name, review.kind.kind, review.object.metadata.name, probe])
+    msg := sprintf("Container <%v> in your <%v> <%v> has no timeoutSeconds field in %v", [container.name, review.kind.kind, review.object.metadata.name, probe])
 }
 
