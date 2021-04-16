@@ -1,14 +1,14 @@
 apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
-  name: k8srequiredtimeoutseconds
+  name: k8srequiredprobetimeoutseconds
   annotations:
     description: Requires readiness and/or liveness probes to have timeoutSeconds field
 spec:
   crd:
     spec:
       names:
-        kind: K8sRequiredTimeoutSeconds
+        kind: K8sRequiredProbeTimeoutSeconds
       validation:
         openAPIV3Schema:
           properties:

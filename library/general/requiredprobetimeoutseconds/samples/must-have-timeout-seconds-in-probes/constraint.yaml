@@ -1,5 +1,5 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sRequiredTimeoutSeconds
+kind: K8sRequiredProbeTimeoutSeconds
 metadata:
   name: must-have-timeout-seconds-field-in-probes
 spec:
