@@ -1,0 +1,11 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredTimeoutSeconds
+metadata:
+  name: must-have-timeout-seconds-field-in-probes
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    probes: ["readinessProbe", "livenessProbe"]
