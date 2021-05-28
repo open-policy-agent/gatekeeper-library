@@ -1,0 +1,14 @@
+apiVersion: mutations.gatekeeper.sh/v1alpha1
+kind: AssignMetadata
+metadata:
+  name: k8spspapparmor
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+    - apiGroups: [""]
+      kinds: ["Pod"]
+  location: metadata.annotations."apparmor.security.beta.kubernetes.io/pod"
+  parameters:
+    assign:
+      value: runtime/default
