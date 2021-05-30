@@ -2,6 +2,9 @@ resources:
   - allowedrepos
   - block-nodeport-services
   - containerlimits
+  - containerresourceratios
+  - disallowedtags
+  - externalip
   - httpsonly
   - imagedigests
   - requiredlabels

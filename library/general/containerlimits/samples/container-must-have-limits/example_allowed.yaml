@@ -14,8 +14,5 @@ spec:
         - "--addr=localhost:8080"
       resources:
         limits:
-          cpu: "800m"
-          memory: "2Gi"
-        requests:
           cpu: "100m"
-          memory: "100Mi"
+          memory: "1Gi"

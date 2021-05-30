@@ -1,0 +1,55 @@
+name: CI
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ "ubuntu-latest", "macos-latest" ]
+        opa: [ "v0.24.0" ]
+    name: Unit test on ${{ matrix.os }} opa ${{ matrix.opa }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          binary=$([[ "$OSTYPE" == "darwin"* ]] && echo "opa_darwin_amd64" || echo "opa_linux_amd64")
+          sudo curl -L -o /usr/local/bin/opa https://github.com/open-policy-agent/opa/releases/download/${{ matrix.opa }}/$binary
+          sudo chmod +x /usr/local/bin/opa
+          sh test.sh
+
+  build_test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        gatekeeper: [ "release-3.3", "release-3.4" ]
+    name: "Integration test on Gatekeeper ${{ matrix.gatekeeper }}"
+    steps:
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Bootstrap integration test
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/bin
+          echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
+          make integration-bootstrap
+          make deploy GATEKEEPER_VERSION=${{ matrix.gatekeeper }}
+
+      - name: Run integration test
+        run: |
+          make test-integration
+
+      - name: Save logs
+        run: |
+          kubectl logs -n gatekeeper-system -l control-plane=controller-manager --tail=-1 > logs-controller.json
+          kubectl logs -n gatekeeper-system -l control-plane=audit-controller --tail=-1 > logs-audit.json
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: logs
+          path: |
+            logs-*.json

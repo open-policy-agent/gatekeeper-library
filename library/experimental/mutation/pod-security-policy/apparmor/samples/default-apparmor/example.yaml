@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-default-apparmor
+  labels:
+    app: nginx-default-apparmor
+spec:
+  containers:
+  - name: nginx
+    image: nginx

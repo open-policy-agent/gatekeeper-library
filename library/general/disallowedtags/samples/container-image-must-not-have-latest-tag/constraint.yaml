@@ -1,7 +1,7 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sAllowedRepos
+kind: K8sDisallowedTags
 metadata:
-  name: repo-is-openpolicyagent
+  name: container-image-must-not-have-latest-tag
 spec:
   match:
     kinds:
@@ -10,5 +10,4 @@ spec:
     namespaces:
       - "default"
   parameters:
-    repos:
-      - "openpolicyagent/"
+    tags: ["latest"]
