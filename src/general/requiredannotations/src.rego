@@ -1,6 +1,6 @@
 package k8srequiredannotations
 
-violation[{"msg": msg, "details": {"missing_annotation(s)": missing}}] {
+violation[{"msg": msg, "details": {"missing_annotations": missing}}] {
     provided := {annotation | input.review.object.metadata.annotations[annotation]}
     required := {annotation | annotation := input.parameters.annotations[_].key}
     missing := required - provided
