@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-default-privilege-escalation
+  labels:
+    app: nginx-default-privilege-escalation
+spec:
+  containers:
+  - name: nginx
+    image: nginx
