@@ -1,0 +1,56 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: gatewayclassnamespaces
+spec:
+  crd:
+    spec:
+      names:
+        kind: GatewayClassNamespaces
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          properties:
+            gatewayClasses:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    maxLength: 253
+                    minLength: 1
+                  namespaces:
+                    type: array
+                    items:
+                      type: string
+                required:
+                - value
+                - namespaces
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package gatewayclassnamespaces
+
+        has_key(x, k) {
+          _ = x[k]
+        }
+
+        list_has(namespaces, namespace) {
+          namespaces[_] = namespace
+        }
+
+        ns_allowed(params, gatewayClassName, namespace) {
+          has_key(params.gatewayClassNamespaces, gatewayClassName)
+          list_has(params.gatewayClassNamespaces[gatewayClassName], namespace)
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Gateway"
+          input.review.kind.group == "networking.x-k8s.io"
+          ns := input.review.namespace
+          gcName := input.review.object.spec.gatewayClassName
+          satisfied := [good | has_key(input.parameters, "gatewayClassNamespaces") ; good = ns_allowed(input.parameters, gcName, ns)]
+          not any(satisfied)  
+          msg := sprintf("Can not use %v GatewayClass in %v", [gcName, ns])
+        }
