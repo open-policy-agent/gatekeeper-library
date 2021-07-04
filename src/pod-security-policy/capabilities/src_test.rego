@@ -172,6 +172,11 @@ test_input_empty_drop {
    results := violation with input as input
    count(results) == 0
 }
+test_input_dropped_all {
+   input := { "review": input_init_review([cdrop(["ALL"])]), "parameters": {"requiredDropCapabilities": ["ALL"]}}
+   results := violation with input as input
+   count(results) == 0
+}
 test_input_all_dropped {
    input := { "review": input_init_review([cdrop(["one", "two"])]), "parameters": {"requiredDropCapabilities": ["one", "two"]}}
    results := violation with input as input
@@ -179,6 +184,26 @@ test_input_all_dropped {
 }
 test_input_extra_dropped {
    input := { "review": input_init_review([cdrop(["one", "two", "three"])]), "parameters": {"requiredDropCapabilities": ["one", "two"]}}
+   results := violation with input as input
+   count(results) == 0
+}
+test_input_extra_dropped_all {
+   input := { "review": input_init_review([cdrop(["one", "ALL"])]), "parameters": {"requiredDropCapabilities": ["two"]}}
+   results := violation with input as input
+   count(results) == 0
+}
+test_input_all_dropped_and_dropped_all {
+   input := { "review": input_init_review([cdrop(["ALL"]), cdrop(["one", "two"])]), "parameters": {"requiredDropCapabilities": ["one", "two"]}}
+   results := violation with input as input
+   count(results) == 0
+}
+test_input_extra_dropped_all_x2 {
+   input := { "review": input_init_review([cdrop(["ALL"]), cdrop(["ALL"])]), "parameters": {"requiredDropCapabilities": ["one", "two"]}}
+   results := violation with input as input
+   count(results) == 0
+}
+test_input_dropped_all_x2 {
+   input := { "review": input_init_review([cdrop(["ALL"]), cdrop(["ALL"])]), "parameters": {"requiredDropCapabilities": ["ALL"]}}
    results := violation with input as input
    count(results) == 0
 }
@@ -192,6 +217,11 @@ test_input_missing_drop {
    results := violation with input as input
    count(results) == 1
 }
+test_input_one_missing_dropped_all {
+   input := { "review": input_init_review([cdrop(["one"]), cdrop(["ALL"])]), "parameters": {"requiredDropCapabilities": ["two"]}}
+   results := violation with input as input
+   count(results) == 1
+}
 test_input_one_missing_drop_x2 {
    input := { "review": input_init_review([cdrop(["one"]), cdrop(["one", "two"])]), "parameters": {"requiredDropCapabilities": ["one", "two"]}}
    results := violation with input as input
@@ -199,6 +229,11 @@ test_input_one_missing_drop_x2 {
 }
 test_input_missing_drop_x2 {
    input := { "review": input_init_review([cdrop(["one"]), cdrop(["two"])]), "parameters": {"requiredDropCapabilities": ["one", "two"]}}
+   results := violation with input as input
+   count(results) == 2
+}
+test_input_missing_dropped_all_x2 {
+   input := { "review": input_init_review([cdrop(["one"]), cdrop(["two"])]), "parameters": {"requiredDropCapabilities": ["ALL"]}}
    results := violation with input as input
    count(results) == 2
 }
