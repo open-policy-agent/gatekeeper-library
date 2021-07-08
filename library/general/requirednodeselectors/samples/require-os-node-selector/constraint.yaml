@@ -1,0 +1,11 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredNodeSelectors
+metadata:
+  name: must-have-os
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    nodeSelectors: ["kubernetes.io/os"]
