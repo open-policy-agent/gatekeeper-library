@@ -1,0 +1,103 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  creationTimestamp: null
+  name: containerdenyrepo
+spec:
+  crd:
+    spec:
+      names:
+        kind: ContainerDenyRepo
+  targets:
+  - libs:
+    - |-
+      package lib.core
+
+      default is_gatekeeper = false
+
+      is_gatekeeper {
+          has_field(input, "review")
+          has_field(input.review, "object")
+      }
+
+      resource = input.review.object {
+          is_gatekeeper
+      }
+
+      resource = input {
+          not is_gatekeeper
+      }
+
+      format(msg) = {"msg": msg} {
+          true
+      }
+
+      format_with_id(msg, id) = msg_fmt {
+          msg_fmt := {
+              "msg": sprintf("%s: %s", [id, msg]),
+              "details": {"policyID": id}
+          }
+      }
+
+      apiVersion = resource.apiVersion
+      name = resource.metadata.name
+      kind = resource.kind
+      labels = resource.metadata.labels
+      annotations = resource.metadata.annotations
+
+      has_field(obj, field) {
+          not object.get(obj, field, "N_DEFINED") == "N_DEFINED"
+      }
+
+      missing_field(obj, field) = true {
+          obj[field] == ""
+      }
+
+      missing_field(obj, field) = true {
+          not has_field(obj, field)
+      }
+    - |-
+      package lib.pods
+
+      import data.lib.core
+
+      default pod = false
+
+      pod = core.resource.spec.template {
+          pod_templates := ["daemonset","deployment","job","replicaset","replicationcontroller","statefulset"]
+          lower(core.kind) == pod_templates[_]
+      }
+
+      pod = core.resource {
+          lower(core.kind) == "pod"
+      }
+
+      pod = core.resource.spec.jobTemplate.spec.template {
+          lower(core.kind) == "cronjob"
+      }
+
+      containers[container] {
+          keys = {"containers", "initContainers"}
+          all_containers = [c | keys[k]; c = pod.spec[k][_]]
+          container = all_containers[_]
+      }
+
+      volumes[volume] {
+          volume = pod.spec.volumes[_]
+      }
+    rego: |-
+      package container_deny_repo
+
+      import data.lib.core
+      import data.lib.pods
+
+      policyID := "P2001"
+
+      violation[msg] {
+          pods.containers[container]
+          satisfied := [good | repo = input.parameters.repos[_] ; good = startswith(container.image, repo)]
+          not any(satisfied)
+          msg := core.format_with_id(sprintf("%s/%s/%s/%s: Images must not come from other then only-this-repo", [core.kind, core.name, container.image, container.name]), policyID)
+      }
+    target: admission.k8s.gatekeeper.sh
+status: {}
