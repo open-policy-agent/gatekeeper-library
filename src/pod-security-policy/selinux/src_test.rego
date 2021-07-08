@@ -246,6 +246,7 @@ input_seLinuxOptions_subset = {
 }
 
 input_parameters_in_list = {
+    "seLinuxContext": "MustRunAs",
     "allowedSELinuxOptions": [{
         "level": "s0:c123,c456",
         "role": "object_r",
@@ -255,6 +256,7 @@ input_parameters_in_list = {
 }
 
 input_parameters_in_list_split_two = {
+    "seLinuxContext": "MustRunAs",
     "allowedSELinuxOptions": [{
         "level": "s0:c123,c456",
         "role": "object_r",
@@ -269,6 +271,7 @@ input_parameters_in_list_split_two = {
 }
 
 input_parameters_in_list_split_subset = {
+    "seLinuxContext": "MustRunAs",
     "allowedSELinuxOptions": [{
         "level": "s0:c123,c456",
         "role": "object_r"
@@ -279,6 +282,7 @@ input_parameters_in_list_split_subset = {
 }
 
 input_parameters_in_list_subset = {
+    "seLinuxContext": "MustRunAs",
     "allowedSELinuxOptions": [{
         "level": "s0:c123,c456",
         "role": "object_r"
@@ -286,6 +290,7 @@ input_parameters_in_list_subset = {
 }
 
 input_parameters_not_in_list = {
+    "seLinuxContext": "MustRunAs",
     "allowedSELinuxOptions": [{
         "level": "s1:c234,c567",
         "role": "sysadm_r",
@@ -296,6 +301,7 @@ input_parameters_not_in_list = {
 
 
 input_parameters_not_in_list_two = {
+    "seLinuxContext": "MustRunAs",
     "allowedSELinuxOptions": [{
         "level": "s1:c234,c567"
     }, {
@@ -304,5 +310,6 @@ input_parameters_not_in_list_two = {
 }
 
 input_parameters_empty = {
+    "seLinuxContext": "MustRunAs",
     "allowedSELinuxOptions": []
 }

@@ -8,6 +8,7 @@ spec:
       - apiGroups: [""]
         kinds: ["Pod"]
   parameters:
+    seLinuxContext: MustRunAs
     allowedSELinuxOptions:
       - level: s0:c123,c456
         role: object_r
