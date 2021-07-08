@@ -1,5 +1,36 @@
 # Forbidden Sysctls security context policy
 
-Forbidden sysctls excludes specific sysctls. You can forbid a combination of safe and unsafe sysctls in the list. To forbid setting any sysctls, use `*` on its own. If a sysctl pattern ends with a `*` character, such as `kernel.*`, it'll match `*` with rest of the sysctl.
+The forbidden sysctls constraint allows one to limit the set of kernel parameters that can be modified by pods. This is accomplished by specifying a combination of allowed and forbidden sysctls using either of two parameters: `allowedSysctls` and `forbiddenSysctls`.
 
-By default, all safe sysctls are allowed. If you wish to use unsafe sysctls, make sure to whitelist `--allowed-unsafe-sysctls` kubelet flag on each node. For example, `--allowed-unsafe-sysctls='kernel.msg*,kernel.shm.*,net.*'`.
+## Parameters
+
+`allowedSysctls`: A list of explicitly allowed sysctls. Any sysctl not in this list will be considered forbidden. '*' and trailing wildcards are supported. If unspecified, no limitations are made by this parameter.
+
+`forbiddenSysctls`: A list of explicitly denied sysctls. Any sysctl in this list will be considered forbidden. '*' and trailing wildcards are supported. If unspecified, no limitations are made by this parameter.
+
+## Examples
+
+```yaml
+parameters:
+  allowedSysctls: ['*']
+  forbiddenSysctls:
+    - kernel.msg*
+    - net.core.somaxconn
+```
+
+```yaml
+parameters:
+  allowedSysctls:
+    - kernel.shm_rmid_forced
+    - net.ipv4.ip_local_port_range
+    - net.ipv4.tcp_syncookies
+    - net.ipv4.ping_group_range
+  forbiddenSysctls: []
+```
+
+*Note*: `forbiddenSysctls` takes precedence, such that an explicitly forbidden sysctl is still forbidden even if it appears in `allowedSysctls` as well. However in practice, such overlap between the rules should be avoided.
+
+## References
+
+* [Using sysctls in a Kubernetes Cluster](https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/)
+* [Kubernetes API Reference - Sysctl](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.19/#sysctl-v1-core)

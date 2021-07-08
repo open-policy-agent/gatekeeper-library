@@ -102,6 +102,51 @@ test_input_init_sysctls_forbidden_not_in_list {
     count(results) == 0
 }
 
+test_input_sysctls_allowed_all {
+    input := { "review": input_review, "parameters": input_parameters_sysctls_allowed_all}
+    results := violation with input as input
+    count(results) == 0
+}
+
+# Empty allowedSysctls means none are allowed.
+# This is in contrast to unspecified allowedSysctls which does not
+# place any restrictions by itself.
+test_input_sysctls_allowed_empty {
+    input := { "review": input_review, "parameters": input_parameters_sysctls_allowed_empty}
+    results := violation with input as input
+    count(results) == 2
+}
+
+test_input_sysctls_allowed_exact {
+    input := { "review": input_review, "parameters": input_parameters_sysctls_allowed_exact}
+    results := violation with input as input
+    count(results) == 0
+}
+
+test_input_sysctls_allowed_wildcards {
+    input := { "review": input_review, "parameters": input_parameters_sysctls_allowed_wildcards}
+    results := violation with input as input
+    count(results) == 0
+}
+
+test_input_sysctls_some_allowed_exact {
+    input := { "review": input_review, "parameters": input_parameters_sysctls_some_allowed_exact}
+    results := violation with input as input
+    count(results) == 1
+}
+
+test_input_sysctls_some_allowed_wildcards {
+    input := { "review": input_review, "parameters": input_parameters_sysctls_some_allowed_wildcards}
+    results := violation with input as input
+    count(results) == 1
+}
+
+test_input_sysctls_allowed_and_forbidden {
+    input := { "review": input_review, "parameters": input_parameters_sysctls_allowed_and_forbidden}
+    results := violation with input as input
+    count(results) == 2
+}
+
 input_review = {
     "object": {
         "metadata": {
@@ -110,7 +155,7 @@ input_review = {
         "spec": {
             "containers": {
                 "name": "nginx",
-                "image": "nginx",
+                "image": "nginx"
             },
             "securityContext": {
                 "sysctls": [
@@ -136,7 +181,7 @@ input_init_review = {
         "spec": {
             "containers": {
                 "name": "nginx",
-                "image": "nginx",
+                "image": "nginx"
             },
             "securityContext": {
                 "sysctls": [
@@ -247,4 +292,86 @@ input_parameters_not_in_list_wildcard = {
 
 input_parameters_empty = {
     "forbiddenSysctls": []
+}
+
+input_parameters_sysctls_allowed_all = {
+    "allowedSysctls": ["*"]
+}
+
+input_parameters_sysctls_allowed_empty = {
+    "allowedSysctls": []
+}
+
+input_parameters_sysctls_allowed_wildcards = {
+    "allowedSysctls": [
+        "kernel.*",
+        "net.*"
+    ]
+}
+
+input_parameters_sysctls_allowed_exact = {
+    "allowedSysctls": [
+        "kernel.shm_rmid_forced",
+        "net.core.somaxconn"
+    ]
+}
+
+input_parameters_sysctls_some_allowed_exact = {
+    "allowedSysctls": [
+        "net.core.somaxconn"
+    ]
+}
+
+input_parameters_sysctls_some_allowed_wildcards = {
+    "allowedSysctls": [
+        "net.*"
+    ]
+}
+
+input_parameters_sysctls_allowed_and_forbidden = {
+    "allowedSysctls": [
+        "kernel.shm_rmid_forced",
+        "net.core.somaxconn"
+    ],
+    "forbiddenSysctls": [
+        "kernel.shm_rmid_forced",
+        "net.core.somaxconn"
+    ]
+}
+
+input_parameters_sysctls_allowed_wildcards = {
+    "allowedSysctls": [
+        "kernel.*",
+        "net.*"
+    ]
+}
+
+input_parameters_sysctls_allowed_exact = {
+    "allowedSysctls": [
+        "kernel.shm_rmid_forced",
+        "net.core.somaxconn"
+    ]
+}
+
+input_parameters_sysctls_some_allowed_exact = {
+    "allowedSysctls": [
+        "net.core.somaxconn"
+    ]
+}
+
+input_parameters_sysctls_some_allowed_wildcards = {
+    "allowedSysctls": [
+        "net.*"
+    ]
+}
+
+input_parameters_sysctls_allowed_and_forbidden = {
+    "allowedSysctls": [
+        "kernel.shm_rmid_forced",
+        "net.core.somaxconn"
+    ],
+    "forbiddenSysctls": [
+        "kernel.shm_rmid_forced",
+        "net.core.somaxconn"
+    ]
 }
