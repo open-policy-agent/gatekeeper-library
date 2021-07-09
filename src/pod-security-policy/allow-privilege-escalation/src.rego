@@ -7,10 +7,9 @@ violation[{"msg": msg, "details": {}}] {
 }
 
 input_allow_privilege_escalation(c) {
-    not has_field(c, "securityContext")
-}
-input_allow_privilege_escalation(c) {
-    not c.securityContext.allowPrivilegeEscalation == false
+    has_field(c, "securityContext")
+    has_field(c.securityContext, "allowPrivilegeEscalation")
+    c.securityContext.allowPrivilegeEscalation == true
 }
 input_containers[c] {
     c := input.review.object.spec.containers[_]
@@ -20,5 +19,5 @@ input_containers[c] {
 }
 # has_field returns whether an object has a field
 has_field(object, field) = true {
-    object[field]
+    _ = object[field]
 }

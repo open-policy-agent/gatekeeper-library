@@ -5,6 +5,16 @@ test_input_container_not_privilege_escalation_allowed {
     results := violation with input as input
     count(results) == 0
 }
+test_input_container_not_privilege_escalation_missing_allowed {
+    input := { "review": input_review_missing}
+    results := violation with input as input
+    count(results) == 0
+}
+test_input_container_not_privilege_escalation_empty_allowed {
+    input := { "review": input_review_empty}
+    results := violation with input as input
+    count(results) == 0
+}
 test_input_container_privilege_escalation_not_allowed {
     input := { "review": input_review_priv}
     results := violation with input as input
@@ -13,12 +23,12 @@ test_input_container_privilege_escalation_not_allowed {
 test_input_container_many_not_privilege_escalation_allowed {
     input := { "review": input_review_many}
     results := violation with input as input
-    count(results) == 2
+    count(results) == 0
 }
 test_input_container_many_mixed_privilege_escalation_not_allowed {
     input := { "review": input_review_many_mixed}
     results := violation with input as input
-    count(results) == 3
+    count(results) == 1
 }
 test_input_container_many_mixed_privilege_escalation_not_allowed_two {
     input := { "review": input_review_many_mixed_two}
@@ -33,6 +43,28 @@ input_review = {
         },
         "spec": {
             "containers": input_containers_one
+        }
+    }
+}
+
+input_review_missing = {
+    "object": {
+        "metadata": {
+            "name": "nginx"
+        },
+        "spec": {
+            "containers": input_containers_missing
+        }
+    }
+}
+
+input_review_empty = {
+    "object": {
+        "metadata": {
+            "name": "nginx"
+        },
+        "spec": {
+            "containers": input_containers_empty
         }
     }
 }
@@ -137,4 +169,18 @@ input_containers_many_mixed = [
     "securityContext": {
       "allowPrivilegeEscalation": true
     }
+}]
+
+input_containers_empty = [
+{
+    "name": "nginx",
+    "image": "nginx",
+    "securityContext": {
+    }
+}]
+
+input_containers_missing = [
+{
+    "name": "nginx",
+    "image": "nginx",
 }]
