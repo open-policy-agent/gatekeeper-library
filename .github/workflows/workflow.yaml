@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ "ubuntu-latest", "macos-latest" ]
-        opa: [ "v0.24.0" ]
+        opa: [ "v0.30.2" ]
     name: Unit test on ${{ matrix.os }} opa ${{ matrix.opa }}
     steps:
       - uses: actions/checkout@v2
