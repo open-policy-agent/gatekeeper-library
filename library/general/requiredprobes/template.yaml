@@ -11,6 +11,7 @@ spec:
         kind: K8sRequiredProbes
       validation:
         openAPIV3Schema:
+          type: object
           properties:
             probes:
               type: array

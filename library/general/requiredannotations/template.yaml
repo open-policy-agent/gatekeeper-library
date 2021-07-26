@@ -12,6 +12,7 @@ spec:
         kind: K8sRequiredAnnotations
       validation:
         openAPIV3Schema:
+          type: object
           properties:
             message:
               type: string
