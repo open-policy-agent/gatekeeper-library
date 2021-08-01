@@ -129,6 +129,18 @@ test_input_hostpath_many_not_allowed_readonly_init_containers {
     count(results) == 2
 }
 
+
+# Unit Tests
+test_path_matches {
+    path_matches("/foo", "/foo/")
+    path_matches("/foo", "/foo/r")
+    path_matches("/", "/foo")
+    not path_matches("/foo", "/fool")
+    not path_matches("/foo", "/etc/foo")
+    not path_matches("/foo", "/")
+}
+
+
 input_review = {
     "object": {
         "metadata": {
