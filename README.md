@@ -15,6 +15,9 @@ kubectl apply -f samples/ingress-https-only/constraint.yaml
 kubectl apply -f library/general/httpsonly/sync.yaml # optional: when GK is running with OPA cache
 ```
 
+Note: Some policies should only be enforced for pods targeting a specific OS.
+Refer to the [OS specific policies](./OS-specific-policies.md) page for more information.
+
 ## How to contribute to the library
 
 ### New policy
