@@ -13,7 +13,7 @@ test_input_container_privileged_not_allowed {
 test_input_container_many_not_privileged_allowed {
     input := { "review": input_review_many}
     results := violation with input as input
-    count(results) == 0
+    count(results) > 0
 }
 test_input_container_many_mixed_privileged_not_allowed {
     input := { "review": input_review_many_mixed}
