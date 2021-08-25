@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-default-add-capabilities
+  labels:
+    app: nginx-default-add-capabilities
+spec:
+  containers:
+  - name: nginx
+    image: nginx

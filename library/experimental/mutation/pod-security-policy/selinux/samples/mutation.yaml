@@ -1,0 +1,20 @@
+apiVersion: mutations.gatekeeper.sh/v1alpha1
+kind: Assign
+metadata:
+  name: k8spspselinux
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  location: spec.containers[name:*].securityContext.seLinuxOptions
+  parameters:
+    pathTests:
+    - subPath: spec.containers[name:*].securityContext.seLinuxOptions
+      condition: MustNotExist
+    assign:
+      value:
+        level: s1:c234,c567
+        user: sysadm_u
+        role: sysadm_r
+        type: svirt_lxc_net_t

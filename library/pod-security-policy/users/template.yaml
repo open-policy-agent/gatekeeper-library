@@ -11,6 +11,7 @@ spec:
         kind: K8sPSPAllowedUsers
       validation:
         openAPIV3Schema:
+          type: object
           properties:
             runAsUser:
               type: object
