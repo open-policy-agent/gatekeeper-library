@@ -29,7 +29,7 @@ violation[{"msg": msg}] {
   input.review.kind.version == "v1"
   input.review.kind.group == ""
   input_selector := flatten_selector(input.review.object)
-  other := data.inventory.namespace[namespace][_][_][name]
+  other := data.inventory.namespace[namespace][_]["Service"][name]
   not identical(other, input.review)
   other_selector := flatten_selector(other)
   input_selector == other_selector
