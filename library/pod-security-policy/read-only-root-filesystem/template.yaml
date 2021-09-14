@@ -3,7 +3,11 @@ kind: ConstraintTemplate
 metadata:
   name: k8spspreadonlyrootfilesystem
   annotations:
-    description: Requires the use of a read only root file system.
+    description: >-
+      Requires the use of a read-only root file system by pod containers.
+      Corresponds to the `readOnlyRootFilesystem` field in a
+      PodSecurityPolicy. For more information, see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
 spec:
   crd:
     spec:

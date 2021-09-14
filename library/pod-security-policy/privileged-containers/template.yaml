@@ -3,7 +3,11 @@ kind: ConstraintTemplate
 metadata:
   name: k8spspprivilegedcontainer
   annotations:
-    description: Controls running of privileged containers.
+    description: >-
+      Controls the ability of any container to enable privileged mode.
+      Corresponds to the `privileged` field in a PodSecurityPolicy. For more
+      information, see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#privileged
 spec:
   crd:
     spec:
