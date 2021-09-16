@@ -9,7 +9,7 @@ violation[{"msg": msg}] {
 violation[{"msg": msg}] {
   container := input.review.object.spec.containers[_]
   missing_drop_capabilities(container)
-  msg := sprintf("container <%v> is not dropping all required capabilities. Container must drop all of %v", [container.name, input.parameters.requiredDropCapabilities])
+  msg := sprintf("container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
 }
 
 
@@ -23,7 +23,7 @@ violation[{"msg": msg}] {
 violation[{"msg": msg}] {
   container := input.review.object.spec.initContainers[_]
   missing_drop_capabilities(container)
-  msg := sprintf("init container <%v> is not dropping all required capabilities. Container must drop all of %v", [container.name, input.parameters.requiredDropCapabilities])
+  msg := sprintf("init container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
 }
 
 
@@ -36,8 +36,10 @@ has_disallowed_capabilities(container) {
 
 missing_drop_capabilities(container) {
   must_drop := {c | c := input.parameters.requiredDropCapabilities[_]}
+  all := {"ALL"}
   dropped := {c | c := container.securityContext.capabilities.drop[_]}
   count(must_drop - dropped) > 0
+  count(all - dropped) > 0
 }
 
 get_default(obj, param, _default) = out {
