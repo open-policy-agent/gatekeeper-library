@@ -28,16 +28,18 @@ violation[{"msg": msg}] {
 
 
 has_disallowed_capabilities(container) {
-  allowed := {c | c := input.parameters.allowedCapabilities[_]}
+  allowed := {c | c := lower(input.parameters.allowedCapabilities[_])}
   not allowed["*"]
-  capabilities := {c | c := container.securityContext.capabilities.add[_]}
+  capabilities := {c | c := lower(container.securityContext.capabilities.add[_])}
+
   count(capabilities - allowed) > 0
 }
 
 missing_drop_capabilities(container) {
-  must_drop := {c | c := input.parameters.requiredDropCapabilities[_]}
+  must_drop := {c | c := lower(input.parameters.requiredDropCapabilities[_])}
   all := {"all"}
   dropped := {c | c := lower(container.securityContext.capabilities.drop[_])}
+
   count(must_drop - dropped) > 0
   count(all - dropped) > 0
 }
