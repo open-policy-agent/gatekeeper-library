@@ -36,8 +36,8 @@ has_disallowed_capabilities(container) {
 
 missing_drop_capabilities(container) {
   must_drop := {c | c := input.parameters.requiredDropCapabilities[_]}
-  all := {"ALL"}
-  dropped := {c | c := container.securityContext.capabilities.drop[_]}
+  all := {"all"}
+  dropped := {c | c := lower(container.securityContext.capabilities.drop[_])}
   count(must_drop - dropped) > 0
   count(all - dropped) > 0
 }
