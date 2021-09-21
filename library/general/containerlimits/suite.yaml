@@ -1,0 +1,13 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+tests:
+- name: allowed-repos
+  template: template.yaml
+  constraint: samples/container-must-have-limits/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/container-must-have-limits/example_allowed.yaml
+  - name: example-disallowed
+    object: samples/container-must-have-limits/example_disallowed.yaml
+    assertions:
+    - violations: yes
