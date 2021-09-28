@@ -17,6 +17,11 @@ spec:
         # Schema for the `parameters` field
         openAPIV3Schema:
           type: object
+          description: >-
+            Controls the allowed `procMount` types for the container. Corresponds to
+            the `allowedProcMountTypes` field in a PodSecurityPolicy. For more
+            information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#allowedprocmounttypes
           properties:
             procMount:
               type: string

@@ -17,6 +17,11 @@ spec:
         # Schema for the `parameters` field
         openAPIV3Schema:
           type: object
+          description: >-
+            Controls the allowlist of FlexVolume drivers. Corresponds to the
+            `allowedFlexVolumes` field in PodSecurityPolicy. For more information,
+            see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#flexvolume-drivers
           properties:
             allowedFlexVolumes:
               type: array

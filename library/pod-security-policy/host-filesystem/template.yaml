@@ -17,6 +17,11 @@ spec:
         # Schema for the `parameters` field
         openAPIV3Schema:
           type: object
+          description: >-
+            Controls usage of the host filesystem. Corresponds to the
+            `allowedHostPaths` field in a PodSecurityPolicy. For more information,
+            see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
           properties:
             allowedHostPaths:
               type: array

@@ -17,6 +17,11 @@ spec:
         # Schema for the `parameters` field
         openAPIV3Schema:
           type: object
+          description: >-
+            Defines an allow-list of seLinuxOptions configurations for pod
+            containers. Corresponds to a PodSecurityPolicy requiring SELinux configs.
+            For more information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#selinux
           properties:
             allowedSELinuxOptions:
               type: array

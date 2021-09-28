@@ -17,6 +17,11 @@ spec:
         # Schema for the `parameters` field
         openAPIV3Schema:
           type: object
+          description: >-
+            Controls the seccomp profile used by containers. Corresponds to the
+            `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on
+            a PodSecurityPolicy. For more information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccomp
           properties:
             allowedProfiles:
               type: array
