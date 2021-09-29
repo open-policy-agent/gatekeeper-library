@@ -1,7 +1,7 @@
 kind: Suite
 apiVersion: test.gatekeeper.sh/v1alpha1
 tests:
-- name: allowed-repos
+- name: block-nodeport-services
   template: template.yaml
   constraint: samples/block-node-port/constraint.yaml
   cases:

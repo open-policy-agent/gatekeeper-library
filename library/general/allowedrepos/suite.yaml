@@ -7,6 +7,8 @@ tests:
   cases:
   - name: example-allowed
     object: samples/repo-must-be-openpolicyagent/example_allowed.yaml
+    assertions:
+    - violations: no
   - name: example-disallowed
     object: samples/repo-must-be-openpolicyagent/example_disallowed.yaml
     assertions:
