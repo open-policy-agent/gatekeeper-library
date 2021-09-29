@@ -242,6 +242,11 @@ test_input_drop_literal_all_with_all_param {
    results := violation with input as input
    count(results) == 0
 }
+test_input_drop_literal_with_all_param {
+   input := { "review": input_init_review([cdrop(["one"])]), "parameters": {"requiredDropCapabilities": ["one", "ALL"]}}
+   results := violation with input as input
+   count(results) == 1
+}
 test_input_drop_literal_all_x2 {
    input := { "review": input_init_review([cdrop(["ALL", "two"])]), "parameters": {"requiredDropCapabilities": ["one", "two"]}}
    results := violation with input as input
