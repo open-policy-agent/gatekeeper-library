@@ -3,7 +3,10 @@ kind: ConstraintTemplate
 metadata:
   name: k8scontainerratios
   annotations:
-    description: Sets a maximum ratio for container resource limits to requests.
+    description: >-
+      Sets a maximum ratio for container resource limits to requests.
+
+      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
 spec:
   crd:
     spec:
@@ -13,6 +16,10 @@ spec:
         openAPIV3Schema:
           type: object
           properties:
+            type: object
+            description: >-
+              The maximum allowed ratio of `resources.limits` to
+              `resources.requests` on a container.
             ratio:
               type: string
   targets:
