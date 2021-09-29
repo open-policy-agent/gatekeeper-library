@@ -103,6 +103,26 @@ test_input_drop_undefined_x2 {
    results := violation with input as input
    count(results) == 2
 }
+test_input_drop_literal_all {
+   input := { "review": input_review([cdrop(["ALL"])]), "parameters": {"requiredDropCapabilities": ["one", "two"]}}
+   results := violation with input as input
+   count(results) == 0
+}
+test_input_drop_literal_all_lower {
+   input := { "review": input_review([cdrop(["all"])]), "parameters": {"requiredDropCapabilities": ["one", "two"]}}
+   results := violation with input as input
+   count(results) == 0
+}
+test_input_drop_literal_all_with_all_param {
+   input := { "review": input_review([cdrop(["ALL"])]), "parameters": {"requiredDropCapabilities": ["one", "ALL"]}}
+   results := violation with input as input
+   count(results) == 0
+}
+test_input_drop_literal_all_x2 {
+   input := { "review": input_review([cdrop(["ALL", "two"])]), "parameters": {"requiredDropCapabilities": ["one", "two"]}}
+   results := violation with input as input
+   count(results) == 0
+}
 
 # init containers
 test_input_all_allowed {
@@ -207,6 +227,32 @@ test_input_drop_undefined_x2 {
    results := violation with input as input
    count(results) == 2
 }
+test_input_drop_literal_all {
+   input := { "review": input_init_review([cdrop(["ALL"])]), "parameters": {"requiredDropCapabilities": ["one", "two"]}}
+   results := violation with input as input
+   count(results) == 0
+}
+test_input_drop_literal_all_lower {
+   input := { "review": input_init_review([cdrop(["all"])]), "parameters": {"requiredDropCapabilities": ["one", "two"]}}
+   results := violation with input as input
+   count(results) == 0
+}
+test_input_drop_literal_all_with_all_param {
+   input := { "review": input_init_review([cdrop(["ALL"])]), "parameters": {"requiredDropCapabilities": ["one", "ALL"]}}
+   results := violation with input as input
+   count(results) == 0
+}
+test_input_drop_literal_with_all_param {
+   input := { "review": input_init_review([cdrop(["one"])]), "parameters": {"requiredDropCapabilities": ["one", "ALL"]}}
+   results := violation with input as input
+   count(results) == 1
+}
+test_input_drop_literal_all_x2 {
+   input := { "review": input_init_review([cdrop(["ALL", "two"])]), "parameters": {"requiredDropCapabilities": ["one", "two"]}}
+   results := violation with input as input
+   count(results) == 0
+}
+
 
 input_review(containers) = output {
     cs := [o | c := containers[i]; o := inject_name(i, c)]
