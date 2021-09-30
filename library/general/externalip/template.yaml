@@ -21,7 +21,6 @@ spec:
               type: array
               description: "An allow-list of external IP addresses."
               items:
-                description: "A single IP address."
                 type: string
   targets:
     - target: admission.k8s.gatekeeper.sh

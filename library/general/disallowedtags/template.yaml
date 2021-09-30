@@ -5,7 +5,7 @@ metadata:
   annotations:
     description: >-
       Requires container images to have an image tag different from the ones in
-      a specified list.
+      the specified list.
 
       https://kubernetes.io/docs/concepts/containers/images/#image-names
 spec:
