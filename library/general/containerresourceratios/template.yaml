@@ -17,11 +17,11 @@ spec:
           type: object
           properties:
             type: object
-            description: >-
-              The maximum allowed ratio of `resources.limits` to
-              `resources.requests` on a container.
             ratio:
               type: string
+              description: >-
+                The maximum allowed ratio of `resources.limits` to
+                `resources.requests` on a container.
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
