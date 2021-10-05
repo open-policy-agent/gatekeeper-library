@@ -14,7 +14,6 @@ spec:
       names:
         kind: K8sPSPPrivilegedContainer
       validation:
-        # Schema for the `parameters` field
         openAPIV3Schema:
           description: >-
             Controls the ability of any container to enable privileged mode.
