@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         os: [ "ubuntu-latest", "macos-latest" ]
-        opa: [ "v0.30.2" ]
+        opa: [ "v0.33.1" ]
     name: Unit test on ${{ matrix.os }} opa ${{ matrix.opa }}
     steps:
       - uses: actions/checkout@v2
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        gatekeeper: [ "release-3.4", "release-3.5" ]
+        gatekeeper: [ "release-3.5", "release-3.6" ]
     name: "Integration test on Gatekeeper ${{ matrix.gatekeeper }}"
     steps:
       - name: Check out code into the Go module directory
