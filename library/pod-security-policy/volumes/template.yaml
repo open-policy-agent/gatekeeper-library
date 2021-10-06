@@ -3,7 +3,11 @@ kind: ConstraintTemplate
 metadata:
   name: k8spspvolumetypes
   annotations:
-    description: Controls usage of volume types.
+    description: >-
+      Restricts mountable volume types to those specified by the user.
+      Corresponds to the `volumes` field in a PodSecurityPolicy. For more
+      information, see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
 spec:
   crd:
     spec:
@@ -13,8 +17,14 @@ spec:
         # Schema for the `parameters` field
         openAPIV3Schema:
           type: object
+          description: >-
+            Restricts mountable volume types to those specified by the user.
+            Corresponds to the `volumes` field in a PodSecurityPolicy. For more
+            information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
           properties:
             volumes:
+              description: "`volumes` is an array of volume types. All volume types can be enabled using `*`."
               type: array
               items:
                 type: string
