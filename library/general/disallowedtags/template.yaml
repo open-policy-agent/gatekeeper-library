@@ -3,8 +3,11 @@ kind: ConstraintTemplate
 metadata:
   name: k8sdisallowedtags
   annotations:
-    description: Requires container images to have an image tag different
-      from the ones in a specified list.
+    description: >-
+      Requires container images to have an image tag different from the ones in
+      the specified list.
+
+      https://kubernetes.io/docs/concepts/containers/images/#image-names
 spec:
   crd:
     spec:
@@ -17,6 +20,7 @@ spec:
           properties:
             tags:
               type: array
+              description: Disallowed container image tags.
               items:
                 type: string
   targets:
