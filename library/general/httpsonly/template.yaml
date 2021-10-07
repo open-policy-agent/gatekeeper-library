@@ -3,8 +3,15 @@ kind: ConstraintTemplate
 metadata:
   name: k8shttpsonly
   annotations:
-    description: Requires Ingress resources to be HTTPS only; TLS configuration should
-      be set and `kubernetes.io/ingress.allow-http` annotation equals false.
+    description: >-
+      Requires Ingress resources to be HTTPS only.
+
+      Ingress resources must:
+      - include a valid TLS configuration
+      - include the `kubernetes.io/ingress.allow-http` annotation, set to
+        `false`.
+
+      https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
 spec:
   crd:
     spec:
