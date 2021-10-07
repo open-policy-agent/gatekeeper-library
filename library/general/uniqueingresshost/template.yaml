@@ -3,7 +3,11 @@ kind: ConstraintTemplate
 metadata:
   name: k8suniqueingresshost
   annotations:
-    description: Requires all Ingress hosts to be unique.
+    description: >-
+      Requires all Ingress rule hosts to be unique.
+      
+      Does not handle hostname wildcards:
+      https://kubernetes.io/docs/concepts/services-networking/ingress/
 spec:
   crd:
     spec:
@@ -27,5 +31,6 @@ spec:
           re_match("^(extensions|networking.k8s.io)/.+$", otherapiversion)
           other.spec.rules[_].host == host
           not identical(other, input.review)
-          msg := sprintf("ingress host conflicts with an existing ingress <%v>", [host])
+          msg := sprintf("Ingress host conflicts with an existing Ingress <%v>", [host])
         }
+

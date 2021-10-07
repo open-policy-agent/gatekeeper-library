@@ -3,8 +3,11 @@ kind: ConstraintTemplate
 metadata:
   name: k8scontainerlimits
   annotations:
-    description: Requires containers to have memory and CPU limits set and within
-      a specified maximum amount.
+    description: >-
+      Requires containers to have memory and CPU limits set and constrains
+      limits to be within the specified maximum values.
+
+      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
 spec:
   crd:
     spec:
@@ -16,8 +19,10 @@ spec:
           type: object
           properties:
             cpu:
+              description: "The maximum allowed cpu limit on a Pod, exclusive."
               type: string
             memory:
+              description: "The maximum allowed memory limit on a Pod, exclusive."
               type: string
   targets:
     - target: admission.k8s.gatekeeper.sh

@@ -3,7 +3,16 @@ kind: ConstraintTemplate
 metadata:
   name: k8sblockendpointeditdefaultrole
   annotations:
-    description: "ClusterRole/system:aggregate-to-edit should not allow endpoint edit permissions due to CVE-2021-25740, Endpoint & EndpointSlice permissions allow cross-Namespace forwarding, https://github.com/kubernetes/kubernetes/issues/103675"
+    description: >-
+      Many Kubernetes installations by default have a system:aggregate-to-edit
+      ClusterRole which does not properly restrict access to editing Endpoints.
+      This ConstraintTemplate forbids the system:aggregate-to-edit ClusterRole
+      from granting permission to create/patch/update Endpoints.
+      
+      ClusterRole/system:aggregate-to-edit should not allow
+      Endpoint edit permissions due to CVE-2021-25740, Endpoint & EndpointSlice
+      permissions allow cross-Namespace forwarding,
+      https://github.com/kubernetes/kubernetes/issues/103675
 spec:
   crd:
     spec:
