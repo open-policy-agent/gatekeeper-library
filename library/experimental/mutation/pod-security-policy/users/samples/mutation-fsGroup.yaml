@@ -1,0 +1,16 @@
+apiVersion: mutations.gatekeeper.sh/v1alpha1
+kind: Assign
+metadata:
+  name: k8spspfsGroup
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  location: "spec.securityContext.fsGroup"
+  parameters:
+    pathTests:
+    - subPath: "spec.securityContext.fsGroup"
+      condition: MustNotExist
+    assign:
+      value: 3000
