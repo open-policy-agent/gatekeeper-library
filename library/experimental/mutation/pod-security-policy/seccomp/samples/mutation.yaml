@@ -10,8 +10,5 @@ spec:
       kinds: ["Pod"]
   location: metadata.annotations."seccomp.security.alpha.kubernetes.io/pod"
   parameters:
-    pathTests:
-    - subPath: metadata.annotations."seccomp.security.alpha.kubernetes.io/pod"
-      condition: MustNotExist
     assign:
       value: runtime/default
