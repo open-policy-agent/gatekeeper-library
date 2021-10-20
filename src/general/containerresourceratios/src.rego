@@ -214,7 +214,7 @@ general_violation[{"msg": msg, "field": field}] {
   cpu_limits := canonify_cpu(cpu_limits_orig)
   cpu_requests_orig := container.resources.requests.cpu
   cpu_requests := canonify_cpu(cpu_requests_orig)
-  cpu_ratio := input.parameters.ratio
+  cpu_ratio := object.get(input.parameters, "cpuRatio", input.parameters.ratio)
   to_number(cpu_limits) > to_number(cpu_ratio) * to_number(cpu_requests)
   msg := sprintf("container <%v> cpu limit <%v> is higher than the maximum allowed ratio of <%v>", [container.name, cpu_limits_orig, cpu_ratio])
 }
