@@ -6,7 +6,7 @@ metadata:
     description: >-
       Controls usage of host network namespace by pod containers. Specific
       ports must be specified. Corresponds to the `hostNetwork` and
-      `hostPorts` feilds in a PodSecurityPolicy. For more information, see
+      `hostPorts` fields in a PodSecurityPolicy. For more information, see
       https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
 spec:
   crd:
@@ -20,7 +20,7 @@ spec:
           description: >-
             Controls usage of host network namespace by pod containers. Specific
             ports must be specified. Corresponds to the `hostNetwork` and
-            `hostPorts` feilds in a PodSecurityPolicy. For more information, see
+            `hostPorts` fields in a PodSecurityPolicy. For more information, see
             https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
           properties:
             hostNetwork:
