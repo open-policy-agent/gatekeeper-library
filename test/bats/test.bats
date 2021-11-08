@@ -90,6 +90,12 @@ setup() {
           fi
         done
 
+        for inventory in "$sample"/example_inventory*.yaml; do
+          run kubectl apply -f "$inventory"
+          assert_match 'created' "$output"
+          assert_success
+        done
+
         for disallowed in "$sample"/example_disallowed*.yaml; do
           if [[ -e "$disallowed" ]]; then
             # apply resource

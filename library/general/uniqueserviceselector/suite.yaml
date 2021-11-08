@@ -12,6 +12,6 @@ tests:
   - name: example-disallowed
     object: samples/unique-service-selector/example_disallowed.yaml
     inventory:
-    - samples/unique-service-selector/example_disallowed-inventory.yaml
+    - samples/unique-service-selector/example_inventory_disallowed.yaml
     assertions:
     - violations: yes
