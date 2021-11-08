@@ -8,7 +8,11 @@ spec:
     image: nginx:1.7.9
     ports:
     - containerPort: 80
-    livenessProbe: {}
+    livenessProbe:
+      # tcpSocket:
+      #   port: 80
+      # initialDelaySeconds: 5
+      # periodSeconds: 10
     volumeMounts:
     - mountPath: /tmp/cache
       name: cache-volume
