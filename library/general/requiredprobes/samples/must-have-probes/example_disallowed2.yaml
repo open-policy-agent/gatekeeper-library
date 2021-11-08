@@ -8,7 +8,12 @@ spec:
     image: nginx:1.7.9
     ports:
     - containerPort: 80
-    readinessProbe: {}
+    readinessProbe:
+    # httpGet:
+    #   path: /
+    #   port: 80
+    # initialDelaySeconds: 5
+    # periodSeconds: 10
     livenessProbe:
       tcpSocket:
         port: 80
@@ -26,6 +31,11 @@ spec:
         port: 8080
       initialDelaySeconds: 5
       periodSeconds: 10
+    # livenessProbe:
+    #   tcpSocket:
+    #     port: 8080
+    #   initialDelaySeconds: 5
+    #   periodSeconds: 10
   volumes:
   - name: cache-volume
     emptyDir: {}
