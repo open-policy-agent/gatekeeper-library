@@ -91,10 +91,11 @@ setup() {
         done
 
         for inventory in "$sample"/example_inventory*.yaml; do
-          echo "Inventory: $inventory"
-          run kubectl apply -f "$inventory"
-          assert_match 'created' "$output"
-          assert_success
+          if [[ -e "$inventory" ]] then
+            run kubectl apply -f "$inventory"
+            assert_match 'created' "$output"
+            assert_success
+          fi
         done
 
         for disallowed in "$sample"/example_disallowed*.yaml; do
