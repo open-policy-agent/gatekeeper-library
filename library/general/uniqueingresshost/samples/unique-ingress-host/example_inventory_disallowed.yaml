@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: ingress-host-example
-  namespace: foo
+  namespace: default
 spec:
   rules:
   - host: example-host.example.com

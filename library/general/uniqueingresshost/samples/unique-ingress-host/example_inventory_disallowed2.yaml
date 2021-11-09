@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: ingress-host-example2
-  namespace: foo
+  namespace: default
 spec:
   rules:
   - host: example-host.example.com
