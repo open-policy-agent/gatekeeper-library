@@ -5,7 +5,7 @@ metadata:
   namespace: default
 spec:
   rules:
-  - host: example-host.example.com
+  - host: example-host2.example.com
     http:
       paths:
       - backend:

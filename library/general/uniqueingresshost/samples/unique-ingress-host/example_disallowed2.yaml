@@ -5,13 +5,13 @@ metadata:
   namespace: default
 spec:
   rules:
-  - host: example-host.example.com
+  - host: example-host2.example.com
     http:
       paths:
       - backend:
           serviceName: nginx
           servicePort: 80
-  - host: example-host1.example.com
+  - host: example-host3.example.com
     http:
       paths:
       - backend:
