@@ -8,8 +8,7 @@ violation[{"msg": msg, "details": {}}] {
 }
 
 input_apparmor_allowed(container, metadata) {
-    metadata.annotations[key] == input.parameters.allowedProfiles[_]
-    key == sprintf("container.apparmor.security.beta.kubernetes.io/%v", [container.name])
+    get_annotation_for(container, metadata) == input.parameters.allowedProfiles[_]
 }
 
 input_containers[c] {
@@ -17,4 +16,12 @@ input_containers[c] {
 }
 input_containers[c] {
     c := input.review.object.spec.initContainers[_]
+}
+
+get_annotation_for(container, metadata) = out {
+    out = metadata.annotations[sprintf("container.apparmor.security.beta.kubernetes.io/%v", [container.name])]
+}
+get_annotation_for(container, metadata) = out {
+    not metadata.annotations[sprintf("container.apparmor.security.beta.kubernetes.io/%v", [container.name])]
+    out = "runtime/default"
 }
