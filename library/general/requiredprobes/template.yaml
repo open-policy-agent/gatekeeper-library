@@ -14,10 +14,12 @@ spec:
           type: object
           properties:
             probes:
+              description: "A list of probes that are required (ex: `readinessProbe`)"
               type: array
               items:
                 type: string
             probeTypes:
+              description: "The probe must define a field listed in `probeType` in order to satisfy the constraint (ex. `tcpSocket` satisfies `['tcpSocket', 'exec']`)"
               type: array
               items:
                 type: string
