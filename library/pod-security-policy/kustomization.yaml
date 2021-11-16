@@ -8,6 +8,7 @@ resources:
   - host-filesystem
   - host-namespaces
   - host-network-ports
+  - hostprocess-containers
   - privileged-containers
   - proc-mount
   - read-only-root-filesystem
