@@ -30,6 +30,14 @@ uninstall:
 test-integration:
 	bats -t test/bats/test.bats
 
-.PHONY: test
-test:
+.PHONY: test-gator
+test-gator:
 	gator test ./...
+
+.PHONY: test-gator-dockerized
+test-gator-dockerized: __build-gator
+	docker run -it -v $(shell pwd):/gatekeeper-library gator-container test ./...
+
+.PHONY: build-gator
+__build-gator:
+	docker build -f build/gator/Dockerfile -t gator-container .
