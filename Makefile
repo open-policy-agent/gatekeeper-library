@@ -29,3 +29,7 @@ uninstall:
 
 test-integration:
 	bats -t test/bats/test.bats
+
+.PHONY: test
+test:
+	gator test ./...

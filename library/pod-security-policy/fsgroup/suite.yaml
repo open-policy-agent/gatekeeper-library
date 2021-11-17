@@ -1,0 +1,11 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+tests:
+  - name: fsgroup
+    template: template.yaml
+    constraint: samples/psp-fsgroup/constraint.yaml
+    cases:
+      - name: example-disallowed
+        object: samples/psp-fsgroup/example_disallowed.yaml
+        assertions:
+          - violations: yes
