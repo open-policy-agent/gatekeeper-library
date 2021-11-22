@@ -9,3 +9,7 @@ tests:
         object: samples/psp-forbidden-sysctls/example_disallowed.yaml
         assertions:
           - violations: yes
+      - name: example-allowed
+        object: samples/psp-forbidden-sysctls/example_allowed.yaml
+        assertions:
+          - violations: no

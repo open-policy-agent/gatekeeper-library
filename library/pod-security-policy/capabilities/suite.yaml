@@ -9,3 +9,7 @@ tests:
         object: samples/capabilities-demo/example_disallowed.yaml
         assertions:
           - violations: yes
+      - name: example-allowed
+        object: samples/capabilities-demo/example_allowed.yaml
+        assertions:
+          - violations: no

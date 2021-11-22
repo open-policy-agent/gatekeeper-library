@@ -9,3 +9,7 @@ tests:
         object: samples/psp-host-filesystem/example_disallowed.yaml
         assertions:
           - violations: yes
+      - name: example-allowed
+        object: samples/psp-host-filesystem/example_allowed.yaml
+        assertions:
+          - violations: no

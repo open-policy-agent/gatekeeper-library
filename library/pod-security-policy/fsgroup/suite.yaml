@@ -9,3 +9,7 @@ tests:
         object: samples/psp-fsgroup/example_disallowed.yaml
         assertions:
           - violations: yes
+      - name: example-allowed
+        object: samples/psp-fsgroup/example_allowed.yaml
+        assertions:
+          - violations: no
