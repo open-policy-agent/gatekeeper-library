@@ -40,6 +40,18 @@ kubectl apply -f samples/ingress-https-only/constraint.yaml
 kubectl apply -f library/general/httpsonly/sync.yaml # optional: when GK is running with OPA cache
 ```
 
+## Testing
+
+The `suite.yaml` files define test cases for each ConstraintTemplate in the library.
+Changes to gatekeeper-library ConstraintTemplates may be tested with the gator CLI:
+
+```
+gatekeeper-library$ gator test ./...
+```
+
+The gator CLI may be downloaded from the Gatekeeper
+[releases page](https://github.com/open-policy-agent/gatekeeper/releases).
+
 ## How to contribute to the library
 
 ### New policy
