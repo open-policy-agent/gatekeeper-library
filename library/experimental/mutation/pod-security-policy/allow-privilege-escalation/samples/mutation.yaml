@@ -1,0 +1,33 @@
+apiVersion: mutations.gatekeeper.sh/v1alpha1
+kind: Assign
+metadata:
+  name: k8spspdefaultallowprivilegeescalation
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  location: "spec.containers[name:*].securityContext.allowPrivilegeEscalation"
+  parameters:
+    pathTests:
+    - subPath: "spec.containers[name:*].securityContext.allowPrivilegeEscalation"
+      condition: MustNotExist
+    assign:
+      value: false
+---
+apiVersion: mutations.gatekeeper.sh/v1alpha1
+kind: Assign
+metadata:
+  name: k8spspdefaultallowprivilegeescalation-init
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  location: "spec.initContainers[name:*].securityContext.allowPrivilegeEscalation"
+  parameters:
+    pathTests:
+    - subPath: "spec.initContainers[name:*].securityContext.allowPrivilegeEscalation"
+      condition: MustNotExist
+    assign:
+      value: false

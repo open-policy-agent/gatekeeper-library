@@ -1,0 +1,16 @@
+# Pods which have specified neither runAsNonRoot nor runAsUser settings will be mutated to set runAsNonRoot=true
+# thus requiring a defined non-zero numeric USER directive in the container.
+# https://kubernetes.io/docs/concepts/policy/pod-security-policy/#users-and-groups
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-run-as-root
+  labels:
+    app: nginx-run-as-root
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      runAsUser: 0
+      runAsNonRoot: false

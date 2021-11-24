@@ -1,0 +1,33 @@
+apiVersion: mutations.gatekeeper.sh/v1alpha1
+kind: Assign
+metadata:
+  name: k8spsprunasnonroot
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  location: "spec.containers[name:*].securityContext.runAsNonRoot"
+  parameters:
+    pathTests:
+      - subPath: "spec.containers[name:*].securityContext.runAsNonRoot"
+        condition: MustNotExist
+    assign:
+      value: true
+---
+apiVersion: mutations.gatekeeper.sh/v1alpha1
+kind: Assign
+metadata:
+  name: k8spsprunasnonroot-init
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  location: "spec.initContainers[name:*].securityContext.runAsNonRoot"
+  parameters:
+    pathTests:
+      - subPath: "spec.initContainers[name:*].securityContext.runAsNonRoot"
+        condition: MustNotExist
+    assign:
+      value: true

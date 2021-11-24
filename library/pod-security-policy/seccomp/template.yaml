@@ -2,6 +2,12 @@ apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
   name: k8spspseccomp
+  annotations:
+    description: >-
+      Controls the seccomp profile used by containers. Corresponds to the
+      `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on
+      a PodSecurityPolicy. For more information, see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccomp
 spec:
   crd:
     spec:
@@ -10,9 +16,16 @@ spec:
       validation:
         # Schema for the `parameters` field
         openAPIV3Schema:
+          type: object
+          description: >-
+            Controls the seccomp profile used by containers. Corresponds to the
+            `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on
+            a PodSecurityPolicy. For more information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccomp
           properties:
             allowedProfiles:
               type: array
+              description: "An array of allowed profile values for seccomp annotations on Pods."
               items:
                 type: string
   targets:

@@ -2,6 +2,9 @@ apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
   name: k8sallowedrepos
+  annotations:
+    description: >- 
+      Requires container images to begin with a string from the specified list.
 spec:
   crd:
     spec:
@@ -10,8 +13,10 @@ spec:
       validation:
         # Schema for the `parameters` field
         openAPIV3Schema:
+          type: object
           properties:
             repos:
+              description: The list of prefixes a container image is allowed to have.
               type: array
               items:
                 type: string

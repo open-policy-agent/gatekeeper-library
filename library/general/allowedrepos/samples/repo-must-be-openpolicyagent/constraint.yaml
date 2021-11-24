@@ -11,4 +11,4 @@ spec:
       - "default"
   parameters:
     repos:
-      - "openpolicyagent"
+      - "openpolicyagent/"

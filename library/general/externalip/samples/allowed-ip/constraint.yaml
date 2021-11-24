@@ -1,0 +1,12 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sExternalIPs
+metadata:
+  name: external-ips
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Service"]
+  parameters:
+    allowedIPs:
+      - "203.0.113.0"

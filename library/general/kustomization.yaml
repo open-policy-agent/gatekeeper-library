@@ -1,9 +1,15 @@
 resources:
   - allowedrepos
+  - block-endpoint-edit-default-role
   - block-nodeport-services
   - containerlimits
+  - containerresourceratios
+  - disallowedtags
+  - externalip
   - httpsonly
   - imagedigests
+  - replicalimits
+  - requiredannotations
   - requiredlabels
   - requiredprobes
   - uniqueingresshost

@@ -2,6 +2,12 @@ apiVersion: templates.gatekeeper.sh/v1beta1
 kind: ConstraintTemplate
 metadata:
   name: k8spsphostnetworkingports
+  annotations:
+    description: >-
+      Controls usage of host network namespace by pod containers. Specific
+      ports must be specified. Corresponds to the `hostNetwork` and
+      `hostPorts` fields in a PodSecurityPolicy. For more information, see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
 spec:
   crd:
     spec:
@@ -10,12 +16,21 @@ spec:
       validation:
         # Schema for the `parameters` field
         openAPIV3Schema:
+          type: object
+          description: >-
+            Controls usage of host network namespace by pod containers. Specific
+            ports must be specified. Corresponds to the `hostNetwork` and
+            `hostPorts` fields in a PodSecurityPolicy. For more information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
           properties:
             hostNetwork:
+              description: "Determines if the policy allows the use of HostNetwork in the pod spec."
               type: boolean
             min:
+              description: "The start of the allowed port range, inclusive."
               type: integer
             max:
+              description: "The end of the allowed port range, inclusive."
               type: integer
   targets:
     - target: admission.k8s.gatekeeper.sh
