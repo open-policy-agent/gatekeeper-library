@@ -9,7 +9,23 @@ tests:
     object: samples/repo-must-be-openpolicyagent/example_allowed.yaml
     assertions:
     - violations: no
-  - name: example-disallowed
-    object: samples/repo-must-be-openpolicyagent/example_disallowed.yaml
+  - name: container-disallowed
+    object: samples/repo-must-be-openpolicyagent/disallowed_container.yaml
     assertions:
     - violations: yes
+      message: container
+  - name: initcontainer-disallowed
+    object: samples/repo-must-be-openpolicyagent/disallowed_initcontainer.yaml
+    assertions:
+    - violations: 1
+      message: initContainer
+    - violations: 0
+      message: container
+  - name: both-disallowed
+    object: samples/repo-must-be-openpolicyagent/disallowed_both.yaml
+    assertions:
+    - violations: 2
+    - message: initContainer
+      violations: 1
+    - message: container
+      violations: 1
