@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: gatekeeper-test-service-disallowed
+  name: gatekeeper-test-service-example
   namespace: default
 spec:
   ports:
