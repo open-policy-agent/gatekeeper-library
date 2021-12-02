@@ -4,8 +4,8 @@ metadata:
   name: k8srequiredlabels
   annotations:
     description: >-
-    Requires resources to contain specified labels, with values matching
-    provided regular expressions.
+      Requires resources to contain specified labels, with values matching
+      provided regular expressions.
 spec:
   crd:
     spec:
@@ -20,19 +20,19 @@ spec:
             labels:
               type: array
               description: >-
-              A list of labels and values the object must specify.
+                A list of labels and values the object must specify.
               items:
                 type: object
                 properties:
                   key:
                     type: string
                     description: >-
-                    The required label.
+                      The required label.
                   allowedRegex:
                     type: string
                     description: >-
-                    A regular expression the label's value must match. The value
-                    must contain at least one match for the regular expression.
+                      A regular expression the label's value must match. The value
+                      must contain at least one match for the regular expression.
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
