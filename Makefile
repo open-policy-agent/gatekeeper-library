@@ -4,6 +4,7 @@ KUBERNETES_VERSION ?= 1.21.2
 KUSTOMIZE_VERSION ?= 3.7.0
 GATEKEEPER_VERSION ?= release-3.5
 BATS_VERSION ?= 1.3.0
+GATOR_VERSION ?= 3.7.0
 
 integration-bootstrap:
 	# Download and install kind
@@ -40,4 +41,4 @@ test-gator-dockerized: __build-gator
 
 .PHONY: build-gator
 __build-gator:
-	docker build -f build/gator/Dockerfile -t gator-container .
+	docker build --build-arg GATOR_VERSION=$(GATOR_VERSION) -f build/gator/Dockerfile -t gator-container .
