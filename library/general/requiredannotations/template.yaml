@@ -33,6 +33,7 @@ spec:
                     description: >-
                       A regular expression the annotation's value must match. The value
                       must contain at least one match for the regular expression.
+                      If unset, or set to empty string, matches all values.
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
