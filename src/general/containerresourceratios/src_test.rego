@@ -225,6 +225,38 @@ test_input_violations_mem_Ei {
     count(results) == 1
 }
 
+## cpuRatio tests
+
+test_input_no_violations_int_cpu_ratio_1 {
+    input := {"review": review([ctr("a", 5, 10, 5, 10)]), "parameters": {"ratio": 1, "cpuRatio": 1}}
+    results := violation with input as input
+    trace(sprintf("results - <%v>", [results]))
+    count(results) == 0
+}
+
+test_input_violations_int_cpu_ratio_1 {
+    input := {"review": review([ctr("a", 30, 15, 5, 10)]), "parameters": {"ratio": 10, "cpuRatio": 1}}
+    results := violation with input as input
+    trace(sprintf("results - <%v>", [results]))
+    count(results) == 1
+}
+
+
+test_input_no_violation_int_cpu_ratio_2 {
+    input := {"review": review([ctr("a", 5, 20, 5, 10)]), "parameters": {"ratio": 1, "cpuRatio": 2}}
+    results := violation with input as input
+    trace(sprintf("results - <%v>", [results]))
+    count(results) == 0
+}
+
+
+test_input_violation_int_cpu_ratio_2 {
+    input := {"review": review([ctr("a", 5, 21, 5, 10)]), "parameters": {"ratio": 1, "cpuRatio": 2}}
+    results := violation with input as input
+    trace(sprintf("results - <%v>", [results]))
+    count(results) == 1
+}
+
 review(containers) = output {
   output = {
     "object": {
