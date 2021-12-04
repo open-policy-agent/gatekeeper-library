@@ -97,6 +97,12 @@ test_input_seLinux_options_many_not_allowed_not_in_list {
     count(results) == 1
 }
 
+test_input_seLinux_options_many_not_allowed_not_in_list_but_exempt {
+    input := { "review": input_review_many, "parameters": input_parameters_exempt}
+    results := violation with input as input
+    count(results) == 0
+}
+
 test_input_seLinux_options_many_not_allowed_not_in_list_two {
     input := { "review": input_review_many, "parameters": input_parameters_not_in_list_two}
     results := violation with input as input
@@ -286,6 +292,16 @@ input_parameters_in_list_subset = {
 }
 
 input_parameters_not_in_list = {
+    "allowedSELinuxOptions": [{
+        "level": "s1:c234,c567",
+        "role": "sysadm_r",
+        "type": "svirt_lxc_net_t",
+        "user": "sysadm_u"
+    }]
+}
+
+input_parameters_exempt = {
+    "exemptImagePrefixes": ["nginx"],
     "allowedSELinuxOptions": [{
         "level": "s1:c234,c567",
         "role": "sysadm_r",

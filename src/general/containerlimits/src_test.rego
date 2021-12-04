@@ -179,6 +179,11 @@ test_input_violations_mem_Ei {
     results := violation with input as input
     count(results) == 1
 }
+test_input_violations_mem_Ei_with_exemption {
+    input := {"review": review([ctr("a", "1Ei", "2")]), "parameters": {"exemptImagePrefixes": ["nginx"], "memory": "1Pi", "cpu": "4"}}
+    results := violation with input as input
+    count(results) == 0
+}
 
 review(containers) = output {
   output = {
@@ -203,5 +208,5 @@ init_review(containers) = output {
 }
 
 ctr(name, mem, cpu) = out {
-  out = {"name": name, "resources": {"limits": {"memory": mem, "cpu": cpu}}}
+  out = {"name": name, "image": "nginx", "resources": {"limits": {"memory": mem, "cpu": cpu}}}
 }

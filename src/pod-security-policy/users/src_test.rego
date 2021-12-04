@@ -113,6 +113,11 @@ test_user_one_container_run_in_range_user_between_ranges {
   results := violation with input as input
   count(results) == 1
 }
+test_user_one_container_run_in_range_user_between_ranges_but_exempt {
+  input := { "review": review(null, [ctr("cont1", runAsUser(200))], null), "parameters": object.union(user_mustrunas_two_ranges, {"exemptImagePrefixes": ["nginx"]}) }
+  results := violation with input as input
+  count(results) == 0
+}
 
 test_non_root_container_pod_conflict {
   input := {"review": review({"runAsNonRoot": true}, [ctr("cont1", runAsNonRoot(false))], null), "parameters": user_mustrunasnonroot }
@@ -830,7 +835,7 @@ review(context, containers, initContainers) = out {
 }
 
 ctr(name, context) = out {
-  name_obj := { "name": name }
+  name_obj := { "name": name, "image": "nginx" }
   sec := obj_if_exists("securityContext", context)
   out = object.union(name_obj, sec)
 }

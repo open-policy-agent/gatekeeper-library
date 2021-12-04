@@ -23,6 +23,13 @@ spec:
             information, see
             https://kubernetes.io/docs/concepts/policy/pod-security-policy/#allowedprocmounttypes
           properties:
+            exemptImagePrefixes:
+              description: >-
+                Any container that uses an image that matches a prefix in this list will be excluded
+                from enforcement.
+              type: array
+              items:
+                type: string
             procMount:
               type: string
               description: >-
@@ -38,8 +45,11 @@ spec:
       rego: |
         package k8spspprocmount
 
+        import data.lib.exempt_container.is_exempt
+
         violation[{"msg": msg, "details": {}}] {
             c := input_containers[_]
+            not is_exempt(c)
             allowedProcMount := get_allowed_proc_mount(input)
             not input_proc_mount_type_allowed(allowedProcMount, c)
             msg := sprintf("ProcMount type is not allowed, container: %v. Allowed procMount types: %v", [c.name, allowedProcMount])
@@ -84,3 +94,13 @@ spec:
         valid_proc_mount(str) {
             lower(str) == "unmasked"
         }
+      libs:
+        - |
+          package lib.exempt_container
+
+          is_exempt(container) {
+            exempt_image_prefixes := object.get(object.get(input, "parameters", {}), "exemptImagePrefixes", [])
+            img := container.image
+            prefix := exempt_image_prefixes[_]
+            startswith(img, prefix)
+          }

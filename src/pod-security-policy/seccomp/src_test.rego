@@ -175,6 +175,12 @@ test_input_init_seccomp_pod_container_annotation_mixed_not_allowed {
     count(results) == 2
 }
 
+test_input_init_seccomp_pod_container_annotation_mixed_not_allowed_but_exempt {
+    input := { "review": input_review_init_pod_container_mixed, "parameters": input_parameters_exempt}
+    results := violation with input as input
+    count(results) == 0
+}
+
 input_review_pod_single = {
     "object": {
         "metadata": {
@@ -382,6 +388,13 @@ input_parameters_in_list = {
 }
 
 input_parameters_not_in_list = {
+    "allowedProfiles": [
+        "unconfined"
+    ]
+}
+
+input_parameters_exempt = {
+    "exemptImagePrefixes": ["nginx"],
     "allowedProfiles": [
         "unconfined"
     ]

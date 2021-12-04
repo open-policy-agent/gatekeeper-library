@@ -22,6 +22,13 @@ spec:
             `fsGroup` fields in a PodSecurityPolicy. For more information, see
             https://kubernetes.io/docs/concepts/policy/pod-security-policy/#users-and-groups
           properties:
+            exemptImagePrefixes:
+              description: >-
+                Any container that uses an image that matches a prefix in this list will be excluded
+                from enforcement.
+              type: array
+              items:
+                type: string
             runAsUser:
               type: object
               description: "Controls which user ID values are allowed in a Pod or container-level SecurityContext."
@@ -123,10 +130,13 @@ spec:
       rego: |
         package k8spspallowedusers
 
+        import data.lib.exempt_container.is_exempt
+
         violation[{"msg": msg}] {
           fields := ["runAsUser", "runAsGroup", "supplementalGroups", "fsGroup"]
           field := fields[_]
           container := input_containers[_]
+          not is_exempt(container)
           msg := get_type_violation(field, container)
         }
 
@@ -241,3 +251,13 @@ spec:
         input_containers[c] {
           c := input.review.object.spec.initContainers[_]
         }
+      libs:
+        - |
+          package lib.exempt_container
+
+          is_exempt(container) {
+            exempt_image_prefixes := object.get(object.get(input, "parameters", {}), "exemptImagePrefixes", [])
+            img := container.image
+            prefix := exempt_image_prefixes[_]
+            startswith(img, prefix)
+          }

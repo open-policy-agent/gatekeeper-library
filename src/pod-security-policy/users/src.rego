@@ -1,9 +1,12 @@
 package k8spspallowedusers
 
+import data.lib.exempt_container.is_exempt
+
 violation[{"msg": msg}] {
   fields := ["runAsUser", "runAsGroup", "supplementalGroups", "fsGroup"]
   field := fields[_]
   container := input_containers[_]
+  not is_exempt(container)
   msg := get_type_violation(field, container)
 }
 

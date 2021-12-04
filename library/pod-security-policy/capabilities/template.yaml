@@ -23,6 +23,13 @@ spec:
             PodSecurityPolicy. For more information, see
             https://kubernetes.io/docs/concepts/policy/pod-security-policy/#capabilities
           properties:
+            exemptImagePrefixes:
+              description: >-
+                Any container that uses an image that matches a prefix in this list will be excluded
+                from enforcement.
+              type: array
+              items:
+                type: string
             allowedCapabilities:
               type: array
               description: "A list of Linux capabilities that can be added to a container."
@@ -38,14 +45,18 @@ spec:
       rego: |
         package capabilities
 
+        import data.lib.exempt_container.is_exempt
+
         violation[{"msg": msg}] {
           container := input.review.object.spec.containers[_]
+          not is_exempt(container)
           has_disallowed_capabilities(container)
           msg := sprintf("container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
         }
 
         violation[{"msg": msg}] {
           container := input.review.object.spec.containers[_]
+          not is_exempt(container)
           missing_drop_capabilities(container)
           msg := sprintf("container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
         }
@@ -54,12 +65,14 @@ spec:
 
         violation[{"msg": msg}] {
           container := input.review.object.spec.initContainers[_]
+          not is_exempt(container)
           has_disallowed_capabilities(container)
           msg := sprintf("init container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
         }
 
         violation[{"msg": msg}] {
           container := input.review.object.spec.initContainers[_]
+          not is_exempt(container)
           missing_drop_capabilities(container)
           msg := sprintf("init container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
         }
@@ -91,3 +104,13 @@ spec:
           not obj[param] == false
           out = _default
         }
+      libs:
+        - |
+          package lib.exempt_container
+
+          is_exempt(container) {
+            exempt_image_prefixes := object.get(object.get(input, "parameters", {}), "exemptImagePrefixes", [])
+            img := container.image
+            prefix := exempt_image_prefixes[_]
+            startswith(img, prefix)
+          }
