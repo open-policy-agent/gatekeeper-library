@@ -10,7 +10,5 @@ spec:
       image: nginx
   securityContext:
     sysctls:
-      - name: kernel.msgmax
-        value: "65536"
       - name: net.core.somaxconn
         value: "1024"
