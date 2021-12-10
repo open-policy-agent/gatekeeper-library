@@ -126,7 +126,7 @@ canonify_mem(orig) = new {
   not is_number(orig)
   suffix := get_suffix(orig)
   raw := replace(orig, suffix, "")
-  re_match("^[0-9]+$", raw)
+  re_match("^[0-9]+(\\.[0-9]+)?$", raw)
   new := to_number(raw) * mem_multiple(suffix)
 }
 
