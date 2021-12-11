@@ -6,9 +6,9 @@ spec:
   selector:
     app: MyApp
   ports:
-    - name: http
-      protocol: TCP
-      port: 80
-      targetPort: 8080
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8080
   externalIPs:
     - 1.1.1.1

@@ -4,6 +4,7 @@ KUBERNETES_VERSION ?= 1.21.2
 KUSTOMIZE_VERSION ?= 3.7.0
 GATEKEEPER_VERSION ?= release-3.5
 BATS_VERSION ?= 1.3.0
+GATOR_VERSION ?= 3.7.0
 
 integration-bootstrap:
 	# Download and install kind
@@ -29,3 +30,15 @@ uninstall:
 
 test-integration:
 	bats -t test/bats/test.bats
+
+.PHONY: test-gator
+test-gator:
+	gator test ./...
+
+.PHONY: test-gator-dockerized
+test-gator-dockerized: __build-gator
+	docker run -it -v $(shell pwd):/gatekeeper-library gator-container test ./...
+
+.PHONY: build-gator
+__build-gator:
+	docker build --build-arg GATOR_VERSION=$(GATOR_VERSION) -f build/gator/Dockerfile -t gator-container .
