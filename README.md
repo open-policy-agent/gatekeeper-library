@@ -22,7 +22,7 @@ resources:
 
 Then define your constraints in a file called `constraints.yaml` in the same directory. Example constraints can be found in the "samples" folders.
 
-You can install everything with `kustomize build . | kubectl apply -f -`.
+You can install everything with `kustomize --reorder none build . | kubectl apply -f -`.
 
 More information can be found in the [kustomization documentation](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/).
 
