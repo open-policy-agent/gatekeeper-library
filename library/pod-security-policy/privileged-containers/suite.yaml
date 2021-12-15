@@ -1,5 +1,7 @@
 kind: Suite
 apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: privileged-containers
 tests:
 - name: privileged-containers-disallowed
   template: template.yaml

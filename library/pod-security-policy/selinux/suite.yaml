@@ -1,5 +1,7 @@
 kind: Suite
 apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: selinux
 tests:
 - name: require-matching-selinux-options
   template: template.yaml

@@ -1,5 +1,7 @@
 kind: Suite
 apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: host-network-ports
 tests:
 - name: use-of-host-networking-ports-blocked
   template: template.yaml

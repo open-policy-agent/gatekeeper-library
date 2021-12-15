@@ -1,5 +1,7 @@
 kind: Suite
 apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: forbidden-sysctls
 tests:
   - name: forbidden-sysctls
     template: template.yaml
