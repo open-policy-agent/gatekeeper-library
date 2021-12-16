@@ -1,5 +1,7 @@
 kind: Suite
 apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: block-endpoint-edit-default-role
 tests:
 - name: block-endpoint-default-role
   template: template.yaml

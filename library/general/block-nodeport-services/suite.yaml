@@ -1,5 +1,7 @@
 kind: Suite
 apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: block-nodeport-services
 tests:
 - name: block-nodeport-services
   template: template.yaml

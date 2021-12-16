@@ -1,5 +1,7 @@
 kind: Suite
 apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: apparmor
 tests:
   - name: apparmor
     template: template.yaml

@@ -1,0 +1,17 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: volumes
+tests:
+- name: host-path-disallowed
+  template: template.yaml
+  constraint: samples/psp-volume-types/constraint.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/psp-volume-types/example_disallowed.yaml
+    assertions:
+    - violations: yes
+  - name: example-allowed
+    object: samples/psp-volume-types/example_allowed.yaml
+    assertions:
+    - violations: no
