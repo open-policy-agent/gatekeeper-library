@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: non-wildcard-ingress
+spec:
+  rules:
+  - host: 'myservice.example.com'
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: example
+            port:
+              number: 80
