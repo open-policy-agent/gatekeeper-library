@@ -14,4 +14,4 @@ tests:
   - name: example-disallowed
     object: samples/block-wildcard-ingress/example_disallowed.yaml
     assertions:
-    - violations: 4
+    - violations: 3

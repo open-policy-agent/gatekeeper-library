@@ -21,9 +21,6 @@ spec:
           object.get(input.review.object.spec.rules[_], "host", "") == ""
         }
         is_wildcard = true {
-          object.get(input.review.object.spec.rules[_], "host", "") == "_"
-        }
-        is_wildcard = true {
           contains(object.get(input.review.object.spec.rules[_], "host", ""), "*")
         }
 

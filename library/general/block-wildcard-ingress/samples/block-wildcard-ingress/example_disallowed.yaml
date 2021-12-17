@@ -24,17 +24,6 @@ spec:
             name: example
             port:
               number: 80
-  # Some clients display the host as '_' when it's blank, but I don't think this is a valid hostname anyway
-  - host: '_'
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: example
-            port:
-              number: 80
   # Omitted host field counts as a wildcard too
   - http:
       paths:
