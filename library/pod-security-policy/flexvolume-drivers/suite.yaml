@@ -1,5 +1,7 @@
 kind: Suite
 apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: flexvolume-drivers
 tests:
   - name: flexvolume-drivers
     template: template.yaml

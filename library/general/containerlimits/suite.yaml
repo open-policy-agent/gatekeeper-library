@@ -1,5 +1,7 @@
 kind: Suite
 apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: containerlimits
 tests:
 - name: container-limits
   template: template.yaml
