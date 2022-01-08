@@ -180,7 +180,7 @@ test_input_violations_mem_Ei {
     count(results) == 1
 }
 test_input_violations_mem_Ei_with_exemption {
-    input := {"review": review([ctr("a", "1Ei", "2")]), "parameters": {"exemptImagePrefixes": ["nginx"], "memory": "1Pi", "cpu": "4"}}
+    input := {"review": review([ctr("a", "1Ei", "2")]), "parameters": {"exemptImages": ["nginx"], "memory": "1Pi", "cpu": "4"}}
     results := violation with input as input
     count(results) == 0
 }

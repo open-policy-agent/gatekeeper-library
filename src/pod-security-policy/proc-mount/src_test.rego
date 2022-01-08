@@ -186,6 +186,6 @@ input_parameters_unmasked = {
 }
 
 input_parameters_exempt = {
-     "exemptImagePrefixes": ["nginx"],
+     "exemptImages": ["nginx"],
      "procMount": "Default"
 }

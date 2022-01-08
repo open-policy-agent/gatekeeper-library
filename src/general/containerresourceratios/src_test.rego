@@ -225,7 +225,7 @@ test_input_violations_mem_Ei {
     count(results) == 1
 }
 test_input_violations_mem_Ei_with_exemption {
-    input := {"review": review([ctr("a", "1Ei", "2", "1Pi", "1")]), "parameters": {"exemptImagePrefixes": ["nginx"], "ratio": "4"}}
+    input := {"review": review([ctr("a", "1Ei", "2", "1Pi", "1")]), "parameters": {"exemptImages": ["nginx"], "ratio": "4"}}
     results := violation with input as input
     count(results) == 0
 }
@@ -262,7 +262,7 @@ test_input_violation_int_cpu_ratio_2 {
     count(results) == 1
 }
 test_input_violation_int_cpu_ratio_2_with_exemption {
-    input := {"review": review([ctr("a", 5, 21, 5, 10)]), "parameters": {"exemptImagePrefixes": ["nginx"], "ratio": 1, "cpuRatio": 2}}
+    input := {"review": review([ctr("a", 5, 21, 5, 10)]), "parameters": {"exemptImages": ["nginx"], "ratio": 1, "cpuRatio": 2}}
     results := violation with input as input
     trace(sprintf("results - <%v>", [results]))
     count(results) == 0

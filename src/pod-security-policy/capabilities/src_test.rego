@@ -62,7 +62,7 @@ test_input_disallowed_x2 {
     count(results) == 2
 }
 test_input_disallowed_x2_but_exempt {
-    input := { "review": input_review([cadd(["three"]), cadd(["three", "two"])]), "parameters": {"allowedCapabilities": ["one", "two"], "exemptImagePrefixes": ["nginx"]}}
+    input := { "review": input_review([cadd(["three"]), cadd(["three", "two"])]), "parameters": {"allowedCapabilities": ["one", "two"], "exemptImages": ["nginx"]}}
     results := violation with input as input
     count(results) == 0
 }
@@ -109,7 +109,7 @@ test_input_drop_undefined_x2 {
    count(results) == 2
 }
 test_input_drop_undefined_x2_but_exempt {
-   input := { "review": input_review([cadd([]), cadd([])]), "parameters": {"requiredDropCapabilities": ["one", "two"], "exemptImagePrefixes": ["nginx"]}}
+   input := { "review": input_review([cadd([]), cadd([])]), "parameters": {"requiredDropCapabilities": ["one", "two"], "exemptImages": ["nginx"]}}
    results := violation with input as input
    count(results) == 0
 }
@@ -196,7 +196,7 @@ test_input_disallowed_x2 {
     count(results) == 2
 }
 test_input_disallowed_x2_but_exempt {
-    input := { "review": input_init_review([cadd(["three"]), cadd(["three", "two"])]), "parameters": {"allowedCapabilities": ["one", "two"], "exemptImagePrefixes": ["nginx"]}}
+    input := { "review": input_init_review([cadd(["three"]), cadd(["three", "two"])]), "parameters": {"allowedCapabilities": ["one", "two"], "exemptImages": ["nginx"]}}
     results := violation with input as input
     count(results) == 0
 }
@@ -243,7 +243,7 @@ test_input_drop_undefined_x2 {
    count(results) == 2
 }
 test_input_drop_undefined_x2_but_exempt {
-   input := { "review": input_init_review([cadd([]), cadd([])]), "parameters": {"requiredDropCapabilities": ["one", "two"], "exemptImagePrefixes": ["nginx"]}}
+   input := { "review": input_init_review([cadd([]), cadd([])]), "parameters": {"requiredDropCapabilities": ["one", "two"], "exemptImages": ["nginx"]}}
    results := violation with input as input
    count(results) == 0
 }

@@ -36,7 +36,7 @@ test_input_denied_mixed_container {
     count(results) == 1
 }
 test_input_denied_mixed_container_with_exemption {
-    input := { "review": input_review(array.concat(input_container_allowed, input_container_denied)), "parameters": {"exemptImagePrefixes": ["denied/"]} }
+    input := { "review": input_review(array.concat(input_container_allowed, input_container_denied)), "parameters": {"exemptImages": ["denied/*"]} }
     results := violation with input as input
     count(results) == 0
 }
@@ -78,7 +78,7 @@ test_input_init_denied_mixed_container {
     count(results) == 1
 }
 test_input_init_denied_mixed_container_with_exemption {
-    input := { "review": input_init_review(array.concat(input_container_allowed, input_container_denied)), "parameters": {"exemptImagePrefixes": ["denied/"]} }
+    input := { "review": input_init_review(array.concat(input_container_allowed, input_container_denied)), "parameters": {"exemptImages": ["denied/*"]} }
     results := violation with input as input
     count(results) == 0
 }

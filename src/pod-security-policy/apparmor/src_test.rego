@@ -156,7 +156,7 @@ input_parameters_empty = {
 
 input_parameters_exempt_container = {
     "allowedProfiles": [],
-    "exemptImagePrefixes": "nginx"
+    "exemptImages": "nginx"
 }
 
 input_parameters_in_list = {

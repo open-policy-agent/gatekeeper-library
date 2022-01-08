@@ -11,7 +11,7 @@ test_input_container_privilege_escalation_not_allowed {
     count(results) == 1
 }
 test_input_one_container_with_exemption {
-    input := { "review": input_review_priv, "parameters": {"exemptImagePrefixes": ["one/"]}}
+    input := { "review": input_review_priv, "parameters": {"exemptImages": ["one/*"]}}
     results := violation with input as input
     count(results) == 0
 }
@@ -26,12 +26,12 @@ test_input_container_many_mixed_privilege_escalation_not_allowed {
     count(results) == 3
 }
 test_input_container_many_mixed_privilege_escalation_not_allowed_one_exempted {
-    input := { "review": input_review_many_mixed, "parameters": {"exemptImagePrefixes": ["one/"]}}
+    input := { "review": input_review_many_mixed, "parameters": {"exemptImages": ["one/*"]}}
     results := violation with input as input
     count(results) == 2
 }
 test_input_container_many_mixed_privilege_escalation_not_allowed_all_exempted {
-    input := { "review": input_review_many_mixed, "parameters": {"exemptImagePrefixes": ["one/", "two/", "three/"]}}
+    input := { "review": input_review_many_mixed, "parameters": {"exemptImages": ["one/*", "two/*", "three/*"]}}
     results := violation with input as input
     count(results) == 0
 }

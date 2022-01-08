@@ -167,7 +167,7 @@ input_parameters_ports_no_hostnetwork = {
 }
 
 input_parameters_exempt = {
-    "exemptImagePrefixes": ["nginx"], 
+    "exemptImages": ["nginx"], 
     "hostNetwork": true,
     "min": 80,
     "max": 9000

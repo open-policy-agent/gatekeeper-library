@@ -301,7 +301,7 @@ input_parameters_not_in_list = {
 }
 
 input_parameters_exempt = {
-    "exemptImagePrefixes": ["nginx"],
+    "exemptImages": ["nginx"],
     "allowedSELinuxOptions": [{
         "level": "s1:c234,c567",
         "role": "sysadm_r",

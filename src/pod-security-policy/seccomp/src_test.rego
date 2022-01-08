@@ -394,7 +394,7 @@ input_parameters_not_in_list = {
 }
 
 input_parameters_exempt = {
-    "exemptImagePrefixes": ["nginx"],
+    "exemptImages": ["nginx"],
     "allowedProfiles": [
         "unconfined"
     ]
