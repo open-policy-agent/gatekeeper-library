@@ -1,9 +1,12 @@
 package k8spspseccomp
 
+import data.lib.exempt_container.is_exempt
+
 violation[{"msg": msg, "details": {}}] {
     metadata := input.review.object.metadata
     not input_wildcard_allowed(metadata)
     container := input_containers[_]
+    not is_exempt(container)
     not input_container_allowed(metadata, container)
     msg := sprintf("Seccomp profile is not allowed, pod: %v, container: %v, Allowed profiles: %v", [metadata.name, container.name, input.parameters.allowedProfiles])
 }

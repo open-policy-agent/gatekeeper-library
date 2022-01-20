@@ -1,13 +1,17 @@
 package capabilities
 
+import data.lib.exempt_container.is_exempt
+
 violation[{"msg": msg}] {
   container := input.review.object.spec.containers[_]
+  not is_exempt(container)
   has_disallowed_capabilities(container)
   msg := sprintf("container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
 }
 
 violation[{"msg": msg}] {
   container := input.review.object.spec.containers[_]
+  not is_exempt(container)
   missing_drop_capabilities(container)
   msg := sprintf("container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
 }
@@ -16,12 +20,14 @@ violation[{"msg": msg}] {
 
 violation[{"msg": msg}] {
   container := input.review.object.spec.initContainers[_]
+  not is_exempt(container)
   has_disallowed_capabilities(container)
   msg := sprintf("init container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
 }
 
 violation[{"msg": msg}] {
   container := input.review.object.spec.initContainers[_]
+  not is_exempt(container)
   missing_drop_capabilities(container)
   msg := sprintf("init container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
 }

@@ -35,6 +35,11 @@ test_input_denied_mixed_container {
     results := violation with input as input
     count(results) == 1
 }
+test_input_denied_mixed_container_with_exemption {
+    input := { "review": input_review(array.concat(input_container_allowed, input_container_denied)), "parameters": {"exemptImages": ["denied/*"]} }
+    results := violation with input as input
+    count(results) == 0
+}
 
 # init containers
 test_input_init_allowed_container {
@@ -71,6 +76,11 @@ test_input_init_denied_mixed_container {
     input := { "review": input_init_review(array.concat(input_container_allowed, input_container_denied)) }
     results := violation with input as input
     count(results) == 1
+}
+test_input_init_denied_mixed_container_with_exemption {
+    input := { "review": input_init_review(array.concat(input_container_allowed, input_container_denied)), "parameters": {"exemptImages": ["denied/*"]} }
+    results := violation with input as input
+    count(results) == 0
 }
 
 input_review(containers) = output {

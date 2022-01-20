@@ -6,6 +6,12 @@ test_input_apparmor_allowed_empty {
     count(results) == 1
 }
 
+test_input_apparmor_allowed_empty_but_exempted {
+    input := { "review": input_review_container, "parameters": input_parameters_exempt_container}
+    results := violation with input as input
+    count(results) == 1
+}
+
 test_input_apparmor_not_allowed_no_annotation_empty {
     input := { "review": input_review_no_annotation, "parameters": input_parameters_empty}
     results := violation with input as input
@@ -146,6 +152,11 @@ two_containers = [{
 
 input_parameters_empty = {
     "allowedProfiles": []
+}
+
+input_parameters_exempt_container = {
+    "allowedProfiles": [],
+    "exemptImages": "nginx"
 }
 
 input_parameters_in_list = {

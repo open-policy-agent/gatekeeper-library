@@ -35,6 +35,11 @@ test_input_container_many_mixed_proc_mount_not_allowed_two {
     results := violation with input as input
     count(results) == 2
 }
+test_input_container_many_mixed_proc_mount_not_allowed_two_but_exempt {
+    input := { "review": input_review_many_mixed_two, "parameters": input_parameters_exempt}
+    results := violation with input as input
+    count(results) == 0
+}
 test_input_container_proc_mount_case_insensitive {
     input := { "review": input_review, "parameters": input_parameters_default_lower}
     results := violation with input as input
@@ -178,4 +183,9 @@ input_parameters_default_lower = {
 
 input_parameters_unmasked = {
      "procMount": "Unmasked"
+}
+
+input_parameters_exempt = {
+     "exemptImages": ["nginx"],
+     "procMount": "Default"
 }

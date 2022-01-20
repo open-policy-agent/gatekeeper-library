@@ -1,7 +1,10 @@
 package k8spspreadonlyrootfilesystem
 
+import data.lib.exempt_container.is_exempt
+
 violation[{"msg": msg, "details": {}}] {
     c := input_containers[_]
+    not is_exempt(c)
     input_read_only_root_fs(c)
     msg := sprintf("only read-only root filesystem container is allowed: %v", [c.name])
 }
