@@ -6,7 +6,13 @@ test_blank_subject_clusterrolebinding {
     count(results) == 0
 }
 
-test_non_anonymous_clusterrolebinding {
+test_authenticated_group_clusterrolebinding {
+    input := {"review": clusterrolebinding([{"name": "system:authenticated", "kind": "Group"}], "role-2"), "parameters": {"allowedRoles": ["role-1"]}}
+    results := violation with input as input
+    count(results) == 0
+}
+
+test_non_anonymous_user_clusterrolebinding {
     input := {"review": clusterrolebinding([{"name": "user-1", "kind": "User"}], "role-2"), "parameters": {"allowedRoles": ["role-1"]}}
     results := violation with input as input
     count(results) == 0
