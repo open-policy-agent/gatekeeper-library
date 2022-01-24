@@ -3,7 +3,11 @@ kind: ConstraintTemplate
 metadata:
   name: k8spspapparmor
   annotations:
-    description: Controls the AppArmor profile used by containers.
+    description: >-
+      Configures an allow-list of AppArmor profiles for use by containers.
+      This corresponds to specific annotations applied to a PodSecurityPolicy.
+      For information on AppArmor, see
+      https://kubernetes.io/docs/tutorials/clusters/apparmor/
 spec:
   crd:
     spec:
@@ -13,8 +17,24 @@ spec:
         # Schema for the `parameters` field
         openAPIV3Schema:
           type: object
+          description: >-
+            Configures an allow-list of AppArmor profiles for use by containers.
+            This corresponds to specific annotations applied to a PodSecurityPolicy.
+            For information on AppArmor, see
+            https://kubernetes.io/docs/tutorials/clusters/apparmor/
           properties:
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
+              type: array
+              items:
+                type: string
             allowedProfiles:
+              description: "An array of AppArmor profiles. Examples: `runtime/default`, `unconfined`."
               type: array
               items:
                 type: string
@@ -23,16 +43,18 @@ spec:
       rego: |
         package k8spspapparmor
 
+        import data.lib.exempt_container.is_exempt
+
         violation[{"msg": msg, "details": {}}] {
             metadata := input.review.object.metadata
             container := input_containers[_]
+            not is_exempt(container)
             not input_apparmor_allowed(container, metadata)
             msg := sprintf("AppArmor profile is not allowed, pod: %v, container: %v. Allowed profiles: %v", [input.review.object.metadata.name, container.name, input.parameters.allowedProfiles])
         }
 
         input_apparmor_allowed(container, metadata) {
-            metadata.annotations[key] == input.parameters.allowedProfiles[_]
-            key == sprintf("container.apparmor.security.beta.kubernetes.io/%v", [container.name])
+            get_annotation_for(container, metadata) == input.parameters.allowedProfiles[_]
         }
 
         input_containers[c] {
@@ -41,3 +63,32 @@ spec:
         input_containers[c] {
             c := input.review.object.spec.initContainers[_]
         }
+
+        get_annotation_for(container, metadata) = out {
+            out = metadata.annotations[sprintf("container.apparmor.security.beta.kubernetes.io/%v", [container.name])]
+        }
+        get_annotation_for(container, metadata) = out {
+            not metadata.annotations[sprintf("container.apparmor.security.beta.kubernetes.io/%v", [container.name])]
+            out = "runtime/default"
+        }
+      libs:
+        - |
+          package lib.exempt_container
+
+          is_exempt(container) {
+              exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+              img := container.image
+              exemption := exempt_images[_]
+              _matches_exemption(img, exemption)
+          }
+
+          _matches_exemption(img, exemption) {
+              not endswith(exemption, "*")
+              exemption == img
+          }
+
+          _matches_exemption(img, exemption) {
+              endswith(exemption, "*")
+              prefix := trim_suffix(exemption, "*")
+              startswith(img, prefix)
+          }

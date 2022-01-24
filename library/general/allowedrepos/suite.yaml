@@ -1,0 +1,33 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: allowedrepos
+tests:
+- name: allowed-repos
+  template: template.yaml
+  constraint: samples/repo-must-be-openpolicyagent/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/repo-must-be-openpolicyagent/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: container-disallowed
+    object: samples/repo-must-be-openpolicyagent/disallowed_container.yaml
+    assertions:
+    - violations: yes
+      message: container
+  - name: initcontainer-disallowed
+    object: samples/repo-must-be-openpolicyagent/disallowed_initcontainer.yaml
+    assertions:
+    - violations: 1
+      message: initContainer
+    - violations: 0
+      message: container
+  - name: both-disallowed
+    object: samples/repo-must-be-openpolicyagent/disallowed_both.yaml
+    assertions:
+    - violations: 2
+    - message: initContainer
+      violations: 1
+    - message: container
+      violations: 1

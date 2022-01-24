@@ -3,7 +3,10 @@ kind: ConstraintTemplate
 metadata:
   name: k8spspforbiddensysctls
   annotations:
-    description: Controls the `sysctl` profile used by containers.
+    description: >-
+      Controls the `sysctl` profile used by containers. Corresponds to the
+      `forbiddenSysctls` field in a PodSecurityPolicy. For more information,
+      see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
 spec:
   crd:
     spec:
@@ -13,9 +16,14 @@ spec:
         # Schema for the `parameters` field
         openAPIV3Schema:
           type: object
+          description: >-
+            Controls the `sysctl` profile used by containers. Corresponds to the
+            `forbiddenSysctls` field in a PodSecurityPolicy. For more information,
+            see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
           properties:
             forbiddenSysctls:
               type: array
+              description: "A disallow-list of sysctls. `*` forbids all sysctls."
               items:
                 type: string
   targets:

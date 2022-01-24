@@ -1,0 +1,17 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: httpsonly
+tests:
+- name: block-endpoint-default-role
+  template: template.yaml
+  constraint: samples/ingress-https-only/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/ingress-https-only/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/ingress-https-only/example_disallowed.yaml
+    assertions:
+    - violations: yes

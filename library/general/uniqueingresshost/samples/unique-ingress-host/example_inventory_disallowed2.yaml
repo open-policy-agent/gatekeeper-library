@@ -1,0 +1,13 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-host-example2
+  namespace: default
+spec:
+  rules:
+  - host: example-host2.example.com
+    http:
+      paths:
+      - backend:
+          serviceName: nginx
+          servicePort: 80

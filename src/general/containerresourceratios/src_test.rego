@@ -224,6 +224,49 @@ test_input_violations_mem_Ei {
     results := violation with input as input
     count(results) == 1
 }
+test_input_violations_mem_Ei_with_exemption {
+    input := {"review": review([ctr("a", "1Ei", "2", "1Pi", "1")]), "parameters": {"exemptImages": ["nginx"], "ratio": "4"}}
+    results := violation with input as input
+    count(results) == 0
+}
+
+## cpuRatio tests
+
+test_input_no_violations_int_cpu_ratio_1 {
+    input := {"review": review([ctr("a", 5, 10, 5, 10)]), "parameters": {"ratio": 1, "cpuRatio": 1}}
+    results := violation with input as input
+    trace(sprintf("results - <%v>", [results]))
+    count(results) == 0
+}
+
+test_input_violations_int_cpu_ratio_1 {
+    input := {"review": review([ctr("a", 30, 15, 5, 10)]), "parameters": {"ratio": 10, "cpuRatio": 1}}
+    results := violation with input as input
+    trace(sprintf("results - <%v>", [results]))
+    count(results) == 1
+}
+
+
+test_input_no_violation_int_cpu_ratio_2 {
+    input := {"review": review([ctr("a", 5, 20, 5, 10)]), "parameters": {"ratio": 1, "cpuRatio": 2}}
+    results := violation with input as input
+    trace(sprintf("results - <%v>", [results]))
+    count(results) == 0
+}
+
+
+test_input_violation_int_cpu_ratio_2 {
+    input := {"review": review([ctr("a", 5, 21, 5, 10)]), "parameters": {"ratio": 1, "cpuRatio": 2}}
+    results := violation with input as input
+    trace(sprintf("results - <%v>", [results]))
+    count(results) == 1
+}
+test_input_violation_int_cpu_ratio_2_with_exemption {
+    input := {"review": review([ctr("a", 5, 21, 5, 10)]), "parameters": {"exemptImages": ["nginx"], "ratio": 1, "cpuRatio": 2}}
+    results := violation with input as input
+    trace(sprintf("results - <%v>", [results]))
+    count(results) == 0
+}
 
 review(containers) = output {
   output = {
@@ -248,5 +291,5 @@ init_review(containers) = output {
 }
 
 ctr(name, mem_limits, cpu_limits, mem_requests, cpu_requests) = out {
-  out = {"name": name, "resources": {"limits": {"memory": mem_limits, "cpu": cpu_limits},"requests": {"memory": mem_requests, "cpu": cpu_requests}}}
+  out = {"name": name, "image": "nginx", "resources": {"limits": {"memory": mem_limits, "cpu": cpu_limits},"requests": {"memory": mem_requests, "cpu": cpu_requests}}}
 }

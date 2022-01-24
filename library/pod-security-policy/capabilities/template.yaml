@@ -3,7 +3,11 @@ kind: ConstraintTemplate
 metadata:
   name: k8spspcapabilities
   annotations:
-    description: Controls Linux capabilities.
+    description: >-
+      Controls Linux capabilities on containers. Corresponds to the
+      `allowedCapabilities` and `requiredDropCapabilities` fields in a
+      PodSecurityPolicy. For more information, see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#capabilities
 spec:
   crd:
     spec:
@@ -13,13 +17,30 @@ spec:
         # Schema for the `parameters` field
         openAPIV3Schema:
           type: object
+          description: >-
+            Controls Linux capabilities on containers. Corresponds to the
+            `allowedCapabilities` and `requiredDropCapabilities` fields in a
+            PodSecurityPolicy. For more information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#capabilities
           properties:
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
+              type: array
+              items:
+                type: string
             allowedCapabilities:
               type: array
+              description: "A list of Linux capabilities that can be added to a container."
               items:
                 type: string
             requiredDropCapabilities:
               type: array
+              description: "A list of Linux capabilities that are required to be dropped from a container."
               items:
                 type: string
   targets:
@@ -27,44 +48,54 @@ spec:
       rego: |
         package capabilities
 
+        import data.lib.exempt_container.is_exempt
+
         violation[{"msg": msg}] {
           container := input.review.object.spec.containers[_]
+          not is_exempt(container)
           has_disallowed_capabilities(container)
           msg := sprintf("container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
         }
 
         violation[{"msg": msg}] {
           container := input.review.object.spec.containers[_]
+          not is_exempt(container)
           missing_drop_capabilities(container)
-          msg := sprintf("container <%v> is not dropping all required capabilities. Container must drop all of %v", [container.name, input.parameters.requiredDropCapabilities])
+          msg := sprintf("container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
         }
 
 
 
         violation[{"msg": msg}] {
           container := input.review.object.spec.initContainers[_]
+          not is_exempt(container)
           has_disallowed_capabilities(container)
           msg := sprintf("init container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
         }
 
         violation[{"msg": msg}] {
           container := input.review.object.spec.initContainers[_]
+          not is_exempt(container)
           missing_drop_capabilities(container)
-          msg := sprintf("init container <%v> is not dropping all required capabilities. Container must drop all of %v", [container.name, input.parameters.requiredDropCapabilities])
+          msg := sprintf("init container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
         }
 
 
         has_disallowed_capabilities(container) {
-          allowed := {c | c := input.parameters.allowedCapabilities[_]}
+          allowed := {c | c := lower(input.parameters.allowedCapabilities[_])}
           not allowed["*"]
-          capabilities := {c | c := container.securityContext.capabilities.add[_]}
+          capabilities := {c | c := lower(container.securityContext.capabilities.add[_])}
+
           count(capabilities - allowed) > 0
         }
 
         missing_drop_capabilities(container) {
-          must_drop := {c | c := input.parameters.requiredDropCapabilities[_]}
-          dropped := {c | c := container.securityContext.capabilities.drop[_]}
+          must_drop := {c | c := lower(input.parameters.requiredDropCapabilities[_])}
+          all := {"all"}
+          dropped := {c | c := lower(container.securityContext.capabilities.drop[_])}
+
           count(must_drop - dropped) > 0
+          count(all - dropped) > 0
         }
 
         get_default(obj, param, _default) = out {
@@ -76,3 +107,24 @@ spec:
           not obj[param] == false
           out = _default
         }
+      libs:
+        - |
+          package lib.exempt_container
+
+          is_exempt(container) {
+              exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+              img := container.image
+              exemption := exempt_images[_]
+              _matches_exemption(img, exemption)
+          }
+
+          _matches_exemption(img, exemption) {
+              not endswith(exemption, "*")
+              exemption == img
+          }
+
+          _matches_exemption(img, exemption) {
+              endswith(exemption, "*")
+              prefix := trim_suffix(exemption, "*")
+              startswith(img, prefix)
+          }

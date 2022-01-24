@@ -1,5 +1,7 @@
 package k8scontainerratios
 
+import data.lib.exempt_container.is_exempt
+
 missing(obj, field) = true {
   not obj[field]
 }
@@ -126,7 +128,7 @@ canonify_mem(orig) = new {
   not is_number(orig)
   suffix := get_suffix(orig)
   raw := replace(orig, suffix, "")
-  re_match("^[0-9]+$", raw)
+  re_match("^[0-9]+(\\.[0-9]+)?$", raw)
   new := to_number(raw) * mem_multiple(suffix)
 }
 
@@ -140,6 +142,7 @@ violation[{"msg": msg}] {
 
 general_violation[{"msg": msg, "field": field}] {
   container := input.review.object.spec[field][_]
+  not is_exempt(container)
   cpu_orig := container.resources.limits.cpu
   not canonify_cpu(cpu_orig)
   msg := sprintf("container <%v> cpu limit <%v> could not be parsed", [container.name, cpu_orig])
@@ -147,6 +150,7 @@ general_violation[{"msg": msg, "field": field}] {
 
 general_violation[{"msg": msg, "field": field}] {
   container := input.review.object.spec[field][_]
+  not is_exempt(container)
   mem_orig := container.resources.limits.memory
   not canonify_mem(mem_orig)
   msg := sprintf("container <%v> memory limit <%v> could not be parsed", [container.name, mem_orig])
@@ -154,6 +158,7 @@ general_violation[{"msg": msg, "field": field}] {
 
 general_violation[{"msg": msg, "field": field}] {
   container := input.review.object.spec[field][_]
+  not is_exempt(container)
   cpu_orig := container.resources.requests.cpu
   not canonify_cpu(cpu_orig)
   msg := sprintf("container <%v> cpu request <%v> could not be parsed", [container.name, cpu_orig])
@@ -161,6 +166,7 @@ general_violation[{"msg": msg, "field": field}] {
 
 general_violation[{"msg": msg, "field": field}] {
   container := input.review.object.spec[field][_]
+  not is_exempt(container)
   mem_orig := container.resources.requests.memory
   not canonify_mem(mem_orig)
   msg := sprintf("container <%v> memory request <%v> could not be parsed", [container.name, mem_orig])
@@ -168,59 +174,68 @@ general_violation[{"msg": msg, "field": field}] {
 
 general_violation[{"msg": msg, "field": field}] {
   container := input.review.object.spec[field][_]
+  not is_exempt(container)
   not container.resources
   msg := sprintf("container <%v> has no resource limits", [container.name])
 }
 
 general_violation[{"msg": msg, "field": field}] {
   container := input.review.object.spec[field][_]
+  not is_exempt(container)
   not container.resources.limits
   msg := sprintf("container <%v> has no resource limits", [container.name])
 }
 
 general_violation[{"msg": msg, "field": field}] {
   container := input.review.object.spec[field][_]
+  not is_exempt(container)
   missing(container.resources.limits, "cpu")
   msg := sprintf("container <%v> has no cpu limit", [container.name])
 }
 
 general_violation[{"msg": msg, "field": field}] {
   container := input.review.object.spec[field][_]
+  not is_exempt(container)
   missing(container.resources.limits, "memory")
   msg := sprintf("container <%v> has no memory limit", [container.name])
 }
 
 general_violation[{"msg": msg, "field": field}] {
   container := input.review.object.spec[field][_]
+  not is_exempt(container)
   not container.resources.requests
   msg := sprintf("container <%v> has no resource requests", [container.name])
 }
 
 general_violation[{"msg": msg, "field": field}] {
   container := input.review.object.spec[field][_]
+  not is_exempt(container)
   missing(container.resources.requests, "cpu")
   msg := sprintf("container <%v> has no cpu request", [container.name])
 }
 
 general_violation[{"msg": msg, "field": field}] {
   container := input.review.object.spec[field][_]
+  not is_exempt(container)
   missing(container.resources.requests, "memory")
   msg := sprintf("container <%v> has no memory request", [container.name])
 }
 
 general_violation[{"msg": msg, "field": field}] {
   container := input.review.object.spec[field][_]
+  not is_exempt(container)
   cpu_limits_orig := container.resources.limits.cpu
   cpu_limits := canonify_cpu(cpu_limits_orig)
   cpu_requests_orig := container.resources.requests.cpu
   cpu_requests := canonify_cpu(cpu_requests_orig)
-  cpu_ratio := input.parameters.ratio
+  cpu_ratio := object.get(input.parameters, "cpuRatio", input.parameters.ratio)
   to_number(cpu_limits) > to_number(cpu_ratio) * to_number(cpu_requests)
   msg := sprintf("container <%v> cpu limit <%v> is higher than the maximum allowed ratio of <%v>", [container.name, cpu_limits_orig, cpu_ratio])
 }
 
 general_violation[{"msg": msg, "field": field}] {
   container := input.review.object.spec[field][_]
+  not is_exempt(container)
   mem_limits_orig := container.resources.limits.memory
   mem_requests_orig := container.resources.requests.memory
   mem_limits := canonify_mem(mem_limits_orig)

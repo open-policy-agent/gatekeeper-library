@@ -1,0 +1,21 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: disallowedtags
+tests:
+- name: block-endpoint-default-role
+  template: template.yaml
+  constraint: samples/container-image-must-not-have-latest-tag/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/container-image-must-not-have-latest-tag/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/container-image-must-not-have-latest-tag/example_disallowed.yaml
+    assertions:
+    - violations: yes
+  - name: example-disallowed2
+    object: samples/container-image-must-not-have-latest-tag/example_disallowed2.yaml
+    assertions:
+    - violations: yes

@@ -1,0 +1,17 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: host-filesystem
+tests:
+  - name: host-filesystem
+    template: template.yaml
+    constraint: samples/psp-host-filesystem/constraint.yaml
+    cases:
+      - name: example-disallowed
+        object: samples/psp-host-filesystem/example_disallowed.yaml
+        assertions:
+          - violations: yes
+      - name: example-allowed
+        object: samples/psp-host-filesystem/example_allowed.yaml
+        assertions:
+          - violations: no

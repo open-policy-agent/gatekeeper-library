@@ -6,9 +6,11 @@ metadata:
     app: nginx-forbidden-sysctls
 spec:
   containers:
-  - name: nginx
-    image: nginx
+    - name: nginx
+      image: nginx
   securityContext:
     sysctls:
-    - name: kernel.msgmax
-      value: "65536"
+      - name: kernel.msgmax
+        value: "65536"
+      - name: net.core.somaxconn
+        value: "1024"

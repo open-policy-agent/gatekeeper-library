@@ -3,7 +3,11 @@ kind: ConstraintTemplate
 metadata:
   name: k8spspselinuxv2
   annotations:
-    description: Controls the SELinux context of the container.
+    description: >-
+      Defines an allow-list of seLinuxOptions configurations for pod
+      containers. Corresponds to a PodSecurityPolicy requiring SELinux configs.
+      For more information, see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#selinux
 spec:
   crd:
     spec:
@@ -13,24 +17,47 @@ spec:
         # Schema for the `parameters` field
         openAPIV3Schema:
           type: object
+          description: >-
+            Defines an allow-list of seLinuxOptions configurations for pod
+            containers. Corresponds to a PodSecurityPolicy requiring SELinux configs.
+            For more information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#selinux
           properties:
-            allowedSELinuxOptions:
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
               type: array
               items:
+                type: string
+            allowedSELinuxOptions:
+              type: array
+              description: "An allow-list of SELinux options configurations."
+              items:
                 type: object
+                description: "An allowed configuration of SELinux options for a pod container."
                 properties:
                   level:
-                      type: string
+                    type: string
+                    description: "An SELinux level."
                   role:
-                      type: string
+                    type: string
+                    description: "An SELinux role."
                   type:
-                      type: string
+                    type: string
+                    description: "An SELinux type."
                   user:
-                      type: string
+                    type: string
+                    description: "An SELinux user."
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package k8spspselinux
+
+        import data.lib.exempt_container.is_exempt
 
         # Disallow top level custom SELinux options
         violation[{"msg": msg, "details": {}}] {
@@ -41,6 +68,7 @@ spec:
         # Disallow container level custom SELinux options
         violation[{"msg": msg, "details": {}}] {
             c := input_security_context[_]
+            not is_exempt(c)
             has_field(c.securityContext, "seLinuxOptions")
             not input_seLinuxOptions_allowed(c.securityContext.seLinuxOptions)
             msg := sprintf("SELinux options is not allowed, pod: %v, container %v. Allowed options: %v", [input.review.object.metadata.name, c.name, input.parameters.allowedSELinuxOptions])
@@ -74,3 +102,24 @@ spec:
         has_field(object, field) = true {
             object[field]
         }
+      libs:
+        - |
+          package lib.exempt_container
+
+          is_exempt(container) {
+              exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+              img := container.image
+              exemption := exempt_images[_]
+              _matches_exemption(img, exemption)
+          }
+
+          _matches_exemption(img, exemption) {
+              not endswith(exemption, "*")
+              exemption == img
+          }
+
+          _matches_exemption(img, exemption) {
+              endswith(exemption, "*")
+              prefix := trim_suffix(exemption, "*")
+              startswith(img, prefix)
+          }

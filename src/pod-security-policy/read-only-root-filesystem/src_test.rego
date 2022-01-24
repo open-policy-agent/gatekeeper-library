@@ -20,6 +20,11 @@ test_input_container_many_mixed_readonlyrootfilesystem_not_allowed_two {
     results := violation with input as input
     count(results) == 3
 }
+test_input_container_many_mixed_readonlyrootfilesystem_not_allowed_two_but_exempt {
+    input := { "review": input_review_many_mixed_two, "parameters": {"exemptImages": ["nginx"]} }
+    results := violation with input as input
+    count(results) == 0
+}
 
 input_review = {
     "object": {

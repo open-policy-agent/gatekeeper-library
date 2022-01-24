@@ -1,0 +1,17 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: selinux
+tests:
+- name: require-matching-selinux-options
+  template: template.yaml
+  constraint: samples/psp-selinux-v2/constraint.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/psp-selinux-v2/example_disallowed.yaml
+    assertions:
+    - violations: yes
+  - name: example-allowed
+    object: samples/psp-selinux-v2/example_allowed.yaml
+    assertions:
+    - violations: no

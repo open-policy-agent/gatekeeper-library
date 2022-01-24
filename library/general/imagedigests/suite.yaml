@@ -1,0 +1,17 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: imagedigests
+tests:
+- name: block-endpoint-default-role
+  template: template.yaml
+  constraint: samples/container-image-must-have-digest/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/container-image-must-have-digest/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/container-image-must-have-digest/example_disallowed.yaml
+    assertions:
+    - violations: yes

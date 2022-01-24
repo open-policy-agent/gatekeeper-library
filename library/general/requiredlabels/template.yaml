@@ -3,15 +3,15 @@ kind: ConstraintTemplate
 metadata:
   name: k8srequiredlabels
   annotations:
-    description: Requires all resources to contain a specified label with a value
-      matching a provided regular expression.
+    description: >-
+      Requires resources to contain specified labels, with values matching
+      provided regular expressions.
 spec:
   crd:
     spec:
       names:
         kind: K8sRequiredLabels
       validation:
-        # Schema for the `parameters` field
         openAPIV3Schema:
           type: object
           properties:
@@ -19,13 +19,21 @@ spec:
               type: string
             labels:
               type: array
+              description: >-
+                A list of labels and values the object must specify.
               items:
                 type: object
                 properties:
                   key:
                     type: string
+                    description: >-
+                      The required label.
                   allowedRegex:
                     type: string
+                    description: >-
+                      If specified, a regular expression the annotation's value
+                      must match. The value must contain at least one match for
+                      the regular expression.
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |

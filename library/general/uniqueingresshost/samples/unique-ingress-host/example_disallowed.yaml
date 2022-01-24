@@ -1,21 +1,8 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: ingress-host-example
-spec:
-  rules:
-  - host: example-host.example.com
-    http:
-      paths:
-      - backend:
-          serviceName: nginx
-          servicePort: 80
-
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
   name: ingress-host-disallowed
+  namespace: default
 spec:
   rules:
   - host: example-host.example.com
@@ -23,10 +10,4 @@ spec:
       paths:
       - backend:
           serviceName: nginx
-          servicePort: 80
-  - host: example-host1.example.com
-    http:
-      paths:
-      - backend:
-          serviceName: nginx2
           servicePort: 80

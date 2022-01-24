@@ -159,6 +159,11 @@ test_input_violations_mem_Gi {
     results := violation with input as input
     count(results) == 1
 }
+test_input_violations_decimal_mem_Gi {
+    input := {"review": review([ctr("a", "1Gi", "2")]), "parameters": {"memory": "1.5Mi", "cpu": "4"}}
+    results := violation with input as input
+    count(results) == 1
+}
 test_input_violations_mem_Ti {
     input := {"review": review([ctr("a", "1Ti", "2")]), "parameters": {"memory": "1Gi", "cpu": "4"}}
     results := violation with input as input
@@ -173,6 +178,11 @@ test_input_violations_mem_Ei {
     input := {"review": review([ctr("a", "1Ei", "2")]), "parameters": {"memory": "1Pi", "cpu": "4"}}
     results := violation with input as input
     count(results) == 1
+}
+test_input_violations_mem_Ei_with_exemption {
+    input := {"review": review([ctr("a", "1Ei", "2")]), "parameters": {"exemptImages": ["nginx"], "memory": "1Pi", "cpu": "4"}}
+    results := violation with input as input
+    count(results) == 0
 }
 
 review(containers) = output {
@@ -198,5 +208,5 @@ init_review(containers) = output {
 }
 
 ctr(name, mem, cpu) = out {
-  out = {"name": name, "resources": {"limits": {"memory": mem, "cpu": cpu}}}
+  out = {"name": name, "image": "nginx", "resources": {"limits": {"memory": mem, "cpu": cpu}}}
 }
