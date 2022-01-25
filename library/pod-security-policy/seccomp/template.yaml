@@ -42,45 +42,89 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package k8spspseccomp
-
+        
         import data.lib.exempt_container.is_exempt
-
-        violation[{"msg": msg, "details": {}}] {
-            metadata := input.review.object.metadata
-            not input_wildcard_allowed(metadata)
-            container := input_containers[_]
+        
+        container_annotation_key_prefix = "container.seccomp.security.alpha.kubernetes.io/"
+        
+        pod_annotation_key = "seccomp.security.alpha.kubernetes.io/pod"
+        
+        violation[{"msg": msg}] {
+            not input_wildcard_allowed
+            container := input_containers[name]
             not is_exempt(container)
-            not input_container_allowed(metadata, container)
-            msg := sprintf("Seccomp profile is not allowed, pod: %v, container: %v, Allowed profiles: %v", [metadata.name, container.name, input.parameters.allowedProfiles])
+            result := get_profile(container)
+            not allowed_profile(result.profile)
+            msg := sprintf("Seccomp profile '%v' is not allowed for container '%v'. Found at: %v. Allowed profiles: %v", [result.profile, name, result.location, input.parameters.allowedProfiles])
         }
-
-        input_wildcard_allowed(metadata) {
+        
+        input_wildcard_allowed {
             input.parameters.allowedProfiles[_] == "*"
         }
-
-        input_container_allowed(metadata, container) {
-            not get_container_profile(metadata, container)
-            metadata.annotations["seccomp.security.alpha.kubernetes.io/pod"] == input.parameters.allowedProfiles[_]
-        }
-
-        input_container_allowed(metadata, container) {
-            profile := get_container_profile(metadata, container)
+        
+        allowed_profile(profile) {
             profile == input.parameters.allowedProfiles[_]
         }
-
-        get_container_profile(metadata, container) = profile {
-            value := metadata.annotations[key]
-            startswith(key, "container.seccomp.security.alpha.kubernetes.io/")
-            [prefix, name] := split(key, "/")
-            name == container.name
-            profile = value
+        
+        # Container profile as defined in pod annotation
+        get_profile(container) = {"profile": profile, "location": location} {
+            not has_annotation(get_container_annotation_key(container.name))
+            profile := input.review.object.metadata.annotations[pod_annotation_key]
+            location := sprintf("annotation %v", [pod_annotation_key])
         }
-
-        input_containers[c] {
-            c := input.review.object.spec.containers[_]
+        
+        # Container profile as defined in container annotation
+        get_profile(container) = {"profile": profile, "location": location} {
+            container_annotation := get_container_annotation_key(container.name)
+            has_annotation(container_annotation)
+            profile := input.review.object.metadata.annotations[container_annotation]
+            location := sprintf("annotation %v", [container_annotation])
         }
-        input_containers[c] {
-            c := input.review.object.spec.initContainers[_]
+        
+        # Container profile as defined in pods securityContext
+        get_profile(container) = {"profile": profile, "location": location} {
+            not has_securitycontext_container(container)
+            profile := input.review.object.spec.securityContext.seccompProfile.type
+            location := "pod securityContext"
+        }
+        
+        # Container profile as defined in containers securityContext
+        get_profile(container) = {"profile": profile, "location": location} {
+            has_securitycontext_container(container)
+            profile := container.securityContext.seccompProfile.type
+            location := "container securityContext"
+        }
+        
+        # Container profile missing
+        get_profile(container) = {"profile": "not configured", "location": "no explicit profile found"} {
+            not has_annotation(get_container_annotation_key(container.name))
+            not has_annotation(pod_annotation_key)
+            not has_securitycontext_pod
+            not has_securitycontext_container(container)
+        }
+        
+        has_annotation(annotation) {
+            input.review.object.metadata.annotations[annotation]
+        }
+        
+        has_securitycontext_pod {
+            input.review.object.spec.securityContext.seccompProfile
+        }
+        
+        has_securitycontext_container(container) {
+            container.securityContext.seccompProfile
+        }
+        
+        get_container_annotation_key(name) = annotation {
+            annotation := concat("", [container_annotation_key_prefix, name])
+        }
+        
+        input_containers[container.name] = container {
+            container := input.review.object.spec.containers[_]
+        }
+        
+        input_containers[container.name] = container {
+            container := input.review.object.spec.initContainers[_]
         }
       libs:
         - |
