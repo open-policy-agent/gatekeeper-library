@@ -328,6 +328,61 @@ test_input_seccomp_pod_initcontainer_mixed_not_allowed {
 	count(results) == 2
 }
 
+# Both annotation and securityContext based seccomp mixed
+test_input_both_seccomp_pod_context_container_annotation {
+	input := {"review": get_object(container_annotation, context_unconfined, single_container, {}), "parameters": input_parameter_in_list}
+	results := violation with input as input
+	count(results) == 0
+}
+
+test_input_both_seccomp_pod_annotation_container_context {
+	input := {"review": get_object(pod_annotation_unconfined, {}, single_container_sc, {}), "parameters": input_parameter_in_list}
+	results := violation with input as input
+	count(results) == 0
+}
+
+test_input_both_seccomp_pod_context_and_annotation {
+	input := {"review": get_object(pod_annotation, context_runtimedefault, single_container, {}), "parameters": input_parameter_in_list}
+	results := violation with input as input
+	count(results) == 0
+}
+
+test_input_both_seccomp_container_context_and_annotation {
+	input := {"review": get_object(container_annotation, {}, single_container_sc, {}), "parameters": input_parameter_in_list}
+	results := violation with input as input
+	count(results) == 0
+}
+
+test_input_both_seccomp_pod_context_container_annotation_not_allowed {
+	input := {"review": get_object(container_annotation, context_unconfined, single_container, {}), "parameters": input_parameters_not_in_list}
+	results := violation with input as input
+	count(results) == 1
+}
+
+test_input_both_seccomp_pod_annotation_container_context_not_allowed {
+	input := {"review": get_object(pod_annotation_unconfined, {}, single_container_sc, {}), "parameters": input_parameters_not_in_list}
+	results := violation with input as input
+	count(results) == 1
+}
+
+test_input_both_seccomp_pod_context_and_annotation_not_allowed {
+	input := {"review": get_object(pod_annotation, context_runtimedefault, single_container, {}), "parameters": input_parameters_not_in_list}
+	results := violation with input as input
+	count(results) == 1
+}
+
+test_input_both_seccomp_container_context_and_annotation_not_allowed {
+	input := {"review": get_object(container_annotation, {}, single_container_sc, {}), "parameters": input_parameters_not_in_list}
+	results := violation with input as input
+	count(results) == 1
+}
+
+test_input_both_seccomp_pod_context_container_annotation_multiple_mixed {
+	input := {"review": get_object(container_annotation, context_unconfined, multiple_containers_sc_missing, {}), "parameters": input_parameter_in_list}
+	results := violation with input as input
+	count(results) == 1
+}
+
 # Create Review Object
 get_object(annotations, podcontext, containers, initcontainers) = {"object": {
 	"metadata": {
@@ -404,6 +459,8 @@ multiple_containers_sc_missing = [
 
 # Test Annotations
 pod_annotation = {"seccomp.security.alpha.kubernetes.io/pod": "runtime/default"}
+
+pod_annotation_unconfined = {"seccomp.security.alpha.kubernetes.io/pod": "unconfined"}
 
 pod_container_annotations = {
 	"seccomp.security.alpha.kubernetes.io/pod": "runtime/default",
