@@ -18,14 +18,19 @@ spec:
         openAPIV3Schema:
           type: object
           properties:
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
+              type: array
+              items:
+                type: string
             tags:
               type: array
               description: Disallowed container image tags.
-              items:
-                type: string
-            allowedImages:
-              type: array
-              description: Allowed container images.
               items:
                 type: string
   targets:
@@ -33,8 +38,11 @@ spec:
       rego: |
         package k8sdisallowedtags
 
+        import data.lib.exempt_container.is_exempt
+
         violation[{"msg": msg}] {
             container := input_containers[_]
+            not is_exempt(container)
             tags := [forbid | tag = input.parameters.tags[_] ; forbid = endswith(container.image, concat(":", ["", tag]))]
             any(tags)
             msg := sprintf("container <%v> uses a disallowed tag <%v>; disallowed tags are %v", [container.name, container.image, input.parameters.tags])
@@ -42,6 +50,7 @@ spec:
 
         violation[{"msg": msg}] {
             container := input_containers[_]
+            not is_exempt(container)
             tag := [contains(container.image, ":")]
             not all(tag)
             msg := sprintf("container <%v> didn't specify an image tag <%v>", [container.name, container.image])
@@ -53,3 +62,24 @@ spec:
         input_containers[c] {
             c := input.review.object.spec.initContainers[_]
         }
+      libs:
+        - |
+          package lib.exempt_container
+
+          is_exempt(container) {
+              exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+              img := container.image
+              exemption := exempt_images[_]
+              _matches_exemption(img, exemption)
+          }
+
+          _matches_exemption(img, exemption) {
+              not endswith(exemption, "*")
+              exemption == img
+          }
+
+          _matches_exemption(img, exemption) {
+              endswith(exemption, "*")
+              prefix := trim_suffix(exemption, "*")
+              startswith(img, prefix)
+          }

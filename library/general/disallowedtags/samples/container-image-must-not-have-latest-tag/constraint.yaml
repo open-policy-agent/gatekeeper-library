@@ -11,4 +11,4 @@ spec:
       - "default"
   parameters:
     tags: ["latest"]
-    allowedImages: ["openpolicyagent/opa-exp:latest", "openpolicyagent/opa-exp2:latest"]
+    exemptImages: ["openpolicyagent/opa-exp:latest", "openpolicyagent/opa-exp2:latest"]
