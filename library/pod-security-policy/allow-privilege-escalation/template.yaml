@@ -60,7 +60,7 @@ spec:
         # has_field returns whether an object has a field
         has_field(object, field) = true {
             object[field]
-        } 
+        }
       libs:
         - |
           package lib.exempt_container

@@ -8,7 +8,7 @@ metadata:
       Selectors are considered the same if they have identical keys and values.
       Selectors may share a key/value pair so long as there is at least one
       distinct key/value pair between them.
-      
+
       https://kubernetes.io/docs/concepts/services-networking/service/#defining-a-service
 spec:
   crd:

@@ -64,12 +64,12 @@ spec:
         }
 
         input_container_allowed(metadata, container) {
-          profile := get_container_profile(metadata, container)
-          profile == input.parameters.allowedProfiles[_]
+            profile := get_container_profile(metadata, container)
+            profile == input.parameters.allowedProfiles[_]
         }
 
         get_container_profile(metadata, container) = profile {
-          value := metadata.annotations[key]
+            value := metadata.annotations[key]
             startswith(key, "container.seccomp.security.alpha.kubernetes.io/")
             [prefix, name] := split(key, "/")
             name == container.name

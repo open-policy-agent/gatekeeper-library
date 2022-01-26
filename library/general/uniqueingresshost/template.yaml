@@ -31,6 +31,5 @@ spec:
           re_match("^(extensions|networking.k8s.io)/.+$", otherapiversion)
           other.spec.rules[_].host == host
           not identical(other, input.review)
-          msg := sprintf("Ingress host conflicts with an existing Ingress <%v>", [host])
+          msg := sprintf("ingress host conflicts with an existing ingress <%v>", [host])
         }
-

@@ -19,4 +19,3 @@ value_within_range(range, value) {
     range.min_replicas <= value
     range.max_replicas >= value
 }
-

@@ -59,4 +59,3 @@ get_default(obj, param, _default) = out {
   not obj[param] == false
   out = _default
 }
-
