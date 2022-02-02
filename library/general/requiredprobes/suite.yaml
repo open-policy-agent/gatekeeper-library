@@ -18,4 +18,4 @@ tests:
   - name: example-disallowed2
     object: samples/must-have-probes/example_disallowed2.yaml
     assertions:
-    - violations: yes
+    - violations: no # JULIAN
