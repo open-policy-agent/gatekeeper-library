@@ -38,7 +38,7 @@ test-gator:
 
 .PHONY: test-gator-dockerized
 test-gator-dockerized: __build-gator
-	docker run -it -v $(shell pwd):/gatekeeper-library gator-container test ./...
+	docker run -i -v $(shell pwd):/gatekeeper-library gator-container test ./...
 
 .PHONY: build-gator
 __build-gator:
