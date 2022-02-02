@@ -77,3 +77,10 @@ jobs:
       - name: Run script
         run: |
           make require-suites
+  gator-verify:
+    runs-on: ubuntu-latest
+    name: "Verify assertions in suite.yaml files"
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          make test-gator-dockerized
