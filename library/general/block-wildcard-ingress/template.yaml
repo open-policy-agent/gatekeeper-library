@@ -12,22 +12,22 @@ spec:
         kind: K8sBlockWildcardIngress
   targets:
     - target: admission.k8s.gatekeeper.sh
-      # Try it out: https://play.openpolicyagent.org/p/Cfw0Ycx7OB
+      # Try it out: https://play.openpolicyagent.org/p/IMrH4CFosB
       rego: |
         package K8sBlockWildcardIngress
 
         # This is how you express logical OR: https://www.openpolicyagent.org/docs/latest/#logical-or
-        is_wildcard = true {
-          object.get(input.review.object.spec.rules[_], "host", "") == ""
+        contains_wildcard(hostname) = true {
+          hostname == ""
         }
-        is_wildcard = true {
-          contains(object.get(input.review.object.spec.rules[_], "host", ""), "*")
+        contains_wildcard(hostname) = true {
+          contains(hostname, "*")
         }
-
 
         violation[{"msg": msg}] {
           input.review.kind.kind == "Ingress"
-          hostname := object.get(input.review.object.spec.rules[_], "host", null)
-          is_wildcard
+          # object.get is required to detect omitted host fields
+          hostname := object.get(input.review.object.spec.rules[_], "host", "")
+          contains_wildcard(hostname)
           msg := sprintf("Hostname '%v' is not allowed since it counts as a wildcard, which can be used to intercept traffic from other applications.", [hostname])
         }

@@ -14,18 +14,9 @@ spec:
             name: example
             port:
               number: 80
-  - host: ''
+  # Extra test to ensure the rule still detects invalid hosts in files containing valid hosts
+  - host: 'valid.example.com'
     http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: example
-            port:
-              number: 80
-  # Omitted host field counts as a wildcard too
-  - http:
       paths:
       - pathType: Prefix
         path: "/"

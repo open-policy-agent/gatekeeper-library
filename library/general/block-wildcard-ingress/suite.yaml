@@ -11,7 +11,15 @@ tests:
     object: samples/block-wildcard-ingress/example_allowed.yaml
     assertions:
     - violations: 0
-  - name: example-disallowed
-    object: samples/block-wildcard-ingress/example_disallowed.yaml
+  - name: blank-host
+    object: samples/block-wildcard-ingress/disallowed/blank_host.yaml
     assertions:
-    - violations: 3
+    - violations: 1
+  - name: host-omitted
+    object: samples/block-wildcard-ingress/disallowed/host_omitted.yaml
+    assertions:
+    - violations: 1
+  - name: wildcard-host
+    object: samples/block-wildcard-ingress/disallowed/wildcard_host.yaml
+    assertions:
+    - violations: 1
