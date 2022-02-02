@@ -57,3 +57,7 @@ generate:
 		echo "Generating $${lib_dir}/template.yaml"; \
 		gomplate -f $${src_dir}/constraint.tmpl > $${lib_dir}/template.yaml; \
 	done
+
+.PHONY: require-suites
+require-suites:
+	./scripts/require-suites.sh
