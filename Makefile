@@ -42,3 +42,7 @@ test-gator-dockerized: __build-gator
 .PHONY: build-gator
 __build-gator:
 	docker build --build-arg GATOR_VERSION=$(GATOR_VERSION) -f build/gator/Dockerfile -t gator-container .
+
+.PHONY: require-suites
+require-suites:
+	./scripts/require-suites.sh
