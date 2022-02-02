@@ -41,6 +41,10 @@ jobs:
         run: |
           make test-integration
 
+      - name: Run gator test
+        run: |
+          make test-gator-dockerized
+
       - name: Save logs
         run: |
           kubectl logs -n gatekeeper-system -l control-plane=controller-manager --tail=-1 > logs-controller.json
