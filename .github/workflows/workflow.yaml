@@ -69,3 +69,11 @@ jobs:
           name: logs
           path: |
             logs-*.json
+  require_suites:
+    runs-on: ubuntu-latest
+    name: "Require a suite.yaml file alongside every template.yaml"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run script
+        run: |
+          make require-suites
