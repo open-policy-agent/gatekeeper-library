@@ -1,0 +1,25 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: block-wildcard-ingress
+tests:
+- name: block-wildcard-ingress
+  template: template.yaml
+  constraint: samples/block-wildcard-ingress/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/block-wildcard-ingress/example_allowed.yaml
+    assertions:
+    - violations: 0
+  - name: blank-host
+    object: samples/block-wildcard-ingress/disallowed/blank_host.yaml
+    assertions:
+    - violations: 1
+  - name: host-omitted
+    object: samples/block-wildcard-ingress/disallowed/host_omitted.yaml
+    assertions:
+    - violations: 1
+  - name: wildcard-host
+    object: samples/block-wildcard-ingress/disallowed/wildcard_host.yaml
+    assertions:
+    - violations: 1
