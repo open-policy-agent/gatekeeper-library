@@ -27,14 +27,12 @@ allowed_profile(profile) {
 get_profile(container) = {"profile": profile, "location": location} {
 	not has_securitycontext_container(container)
 	not has_annotation(get_container_annotation_key(container.name))
-	not has_securitycontext_pod
 	profile := input.review.object.metadata.annotations[pod_annotation_key]
 	location := sprintf("annotation %v", [pod_annotation_key])
 }
 
 # Container profile as defined in container annotation
 get_profile(container) = {"profile": profile, "location": location} {
-	not has_securitycontext_container(container)
 	container_annotation := get_container_annotation_key(container.name)
 	has_annotation(container_annotation)
 	profile := input.review.object.metadata.annotations[container_annotation]
@@ -45,12 +43,14 @@ get_profile(container) = {"profile": profile, "location": location} {
 get_profile(container) = {"profile": profile, "location": location} {
 	not has_securitycontext_container(container)
 	not has_annotation(get_container_annotation_key(container.name))
+	not has_annotation(pod_annotation_key)
 	profile := input.review.object.spec.securityContext.seccompProfile.type
 	location := "pod securityContext"
 }
 
 # Container profile as defined in containers securityContext
 get_profile(container) = {"profile": profile, "location": location} {
+    not has_annotation(get_container_annotation_key(container.name))
 	has_securitycontext_container(container)
 	profile := container.securityContext.seccompProfile.type
 	location := "container securityContext"
