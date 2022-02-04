@@ -50,7 +50,7 @@ get_profile(container) = {"profile": profile, "location": location} {
 
 # Container profile as defined in containers securityContext
 get_profile(container) = {"profile": profile, "location": location} {
-    not has_annotation(get_container_annotation_key(container.name))
+	not has_annotation(get_container_annotation_key(container.name))
 	has_securitycontext_container(container)
 	profile := container.securityContext.seccompProfile.type
 	location := "container securityContext"
