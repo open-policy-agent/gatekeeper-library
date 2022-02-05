@@ -37,7 +37,6 @@ spec:
                 The maximum allowed ratio of `resources.limits.cpu` to
                 `resources.requests.cpu` on a container. If not specified,
                 equal to `ratio`.
-
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |

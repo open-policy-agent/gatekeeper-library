@@ -19,7 +19,7 @@ package k8spspallowedusers
 #     - omits "ranges" field if <rule-ranges> is null
 #   range(<min-val>, <max-val>)
 #     - Returns a range object with  { "min": <min-val>, "max": <max-val> }
-# Wrap rule in runAsUser, or 
+# Wrap rule in runAsUser, or
 
 ## Other Functions ##
 # run_as_rule("runAsUser" value, "runAsGroup" value, "supplementalGroups" value, "fsGroup" value)
@@ -841,19 +841,19 @@ ctr(name, context) = out {
 }
 
 runAsUser(user) = out {
-	out = run_as_rule(user, null, null, null)
+  out = run_as_rule(user, null, null, null)
 }
 runAsNonRoot(bool) = out {
   out = {"runAsNonRoot": bool}
 }
 runAsGroup(group) = out {
-	out = run_as_rule(null, group, null, null)
+  out = run_as_rule(null, group, null, null)
 }
 supplementalGroups(supplemental) = out {
-	out = run_as_rule(null, null, supplemental, null)
+  out = run_as_rule(null, null, supplemental, null)
 }
 fsGroup(fsgroup) = out {
-	out = run_as_rule(null, null, null, fsgroup)
+  out = run_as_rule(null, null, null, fsgroup)
 }
 run_as_rule(user, group, supplemental, fsgroup) = out {
   user_obj := obj_if_exists("runAsUser", user)

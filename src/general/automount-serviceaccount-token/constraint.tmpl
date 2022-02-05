@@ -1,0 +1,20 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8spspautomountserviceaccounttokenpod
+  annotations:
+    description: >-
+      Controls the ability of any Pod to enable automountServiceAccountToken.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPAutomountServiceAccountTokenPod
+      validation:
+        openAPIV3Schema:
+          description: >-
+            Controls the ability of any Pod to enable automountServiceAccountToken.
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ file.Read "src/general/automount-serviceaccount-token/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}

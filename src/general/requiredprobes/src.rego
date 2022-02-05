@@ -28,4 +28,3 @@ probe_field_empty(ctr, probe) = true {
 get_violation_message(container, review, probe) = msg {
     msg := sprintf("Container <%v> in your <%v> <%v> has no <%v>", [container.name, review.kind.kind, review.object.metadata.name, probe])
 }
-

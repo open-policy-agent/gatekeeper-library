@@ -9,7 +9,7 @@ violation[{"msg": msg}] {
   input.review.kind.kind == "Ingress"
   re_match("^(extensions|networking.k8s.io)$", input.review.kind.group)
   host := input.review.object.spec.rules[_].host
-  other := data.inventory.namespace[ns][otherapiversion]["Ingress"][name]
+  other := data.inventory.namespace[_][otherapiversion]["Ingress"][name]
   re_match("^(extensions|networking.k8s.io)/.+$", otherapiversion)
   other.spec.rules[_].host == host
   not identical(other, input.review)

@@ -1,0 +1,28 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sexternalips
+  annotations:
+    description: >-
+      Restricts Service externalIPs to an allowed list of IP addresses.
+
+      https://kubernetes.io/docs/concepts/services-networking/service/#external-ips
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sExternalIPs
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          properties:
+            allowedIPs:
+              type: array
+              description: "An allow-list of external IP addresses."
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ file.Read "src/general/externalip/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
