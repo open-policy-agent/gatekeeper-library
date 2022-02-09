@@ -46,6 +46,10 @@ input_wildcard_allowed_files {
 	input.parameters.allowedLocalhostFiles[_] == "*"
 }
 
+input_wildcard_allowed_files {
+	"localhost/*" == input.parameters.allowedProfiles[_]
+}
+
 # Simple allowed Profiles
 allowed_profile(profile, file, allowed) {
 	not startswith(lower(profile), "localhost")
