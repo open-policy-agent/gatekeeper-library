@@ -438,6 +438,18 @@ test_input_translation_seccomp_context_match_allowed_annotation {
 	count(results) == 0
 }
 
+test_input_translation_seccomp_context_localhost_allowed_annotation {
+	input := {"review": get_object({}, context_localhost1, single_container, {}), "parameters": input_parameters_annotation}
+	results := violation with input as input
+	count(results) == 0
+}
+
+test_input_translation_seccomp_context_localhost_allowed_annotation_missing {
+	input := {"review": get_object({}, context_localhost, single_container, {}), "parameters": input_parameters_annotation}
+	results := violation with input as input
+	count(results) == 1
+}
+
 # Create Review Object
 get_object(annotations, podcontext, containers, initcontainers) = {"object": {
 	"metadata": {
@@ -547,6 +559,8 @@ container_annotations_mixed = {
 # Test securityContexts
 context_localhost = {"seccompProfile": {"type": "Localhost", "localhostProfile": "profile.json"}}
 
+context_localhost1 = {"seccompProfile": {"type": "Localhost", "localhostProfile": "profile1.json"}}
+
 context_runtimedefault = {"seccompProfile": {"type": "RuntimeDefault"}}
 
 context_unconfined = {"seccompProfile": {"type": "Unconfined"}}
@@ -602,19 +616,11 @@ input_parameters_sc = {
 }
 
 input_parameters_sc_localhost_wildcard_file = {
-	"allowedProfiles": [
-		"Localhost",
-	],
-	"allowedLocalhostFiles": [
-		"*"
-	],
+	"allowedProfiles": ["Localhost"],
+	"allowedLocalhostFiles": ["*"],
 }
 
-input_parameters_sc_localhost_no_file = {
-	"allowedProfiles": [
-		"Localhost",
-	]
-}
+input_parameters_sc_localhost_no_file = {"allowedProfiles": ["Localhost"]}
 
 allowed_full_translated = {
 	"Localhost", "localhost/profile1.json", "localhost/profile2.json",

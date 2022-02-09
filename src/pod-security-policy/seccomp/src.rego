@@ -29,13 +29,13 @@ violation[{"msg": msg}] {
 }
 
 get_message(profile, file, name, location, allowed_profiles) = message {
-  not profile == "Localhost"
-  message := sprintf("Seccomp profile '%v' is not allowed for container '%v'. Found at: %v. Allowed profiles: %v", [profile, name, location, allowed_profiles])
+	not profile == "Localhost"
+	message := sprintf("Seccomp profile '%v' is not allowed for container '%v'. Found at: %v. Allowed profiles: %v", [profile, name, location, allowed_profiles])
 }
 
 get_message(profile, file, name, location, allowed_profiles) = message {
-  profile == "Localhost"
-  message := sprintf("Seccomp profile '%v' with file '%v' is not allowed for container '%v'. Found at: %v. Allowed profiles: %v", [profile, file, name, location, allowed_profiles])
+	profile == "Localhost"
+	message := sprintf("Seccomp profile '%v' with file '%v' is not allowed for container '%v'. Found at: %v. Allowed profiles: %v", [profile, file, name, location, allowed_profiles])
 }
 
 input_wildcard_allowed_profiles {
@@ -48,7 +48,7 @@ input_wildcard_allowed_files {
 
 # Simple allowed Profiles
 allowed_profile(profile, file, allowed) {
-    not startswith(lower(profile), "localhost")
+	not startswith(lower(profile), "localhost")
 	profile == allowed[_]
 }
 
@@ -57,7 +57,8 @@ allowed_profile(profile, file, allowed) {
 	profile == "Localhost"
 	not input_wildcard_allowed_files
 	profile == allowed[_]
-	file == input.parameters.allowedLocalhostFiles[_]
+	allowed_files := {x | x := object.get(input.parameters, "allowedLocalhostFiles", [])[_]} | get_annotation_localhost_files
+	file == allowed_files[_]
 }
 
 # seccomp Localhost with wildcard
@@ -77,6 +78,13 @@ allowed_profile(profile, file, allowed) {
 allowed_profile(profile, file, allowed) {
 	startswith(profile, "localhost/")
 	profile == allowed[_]
+}
+
+# Localhost files from annotation scheme
+get_annotation_localhost_files[file] {
+	profile := input.parameters.allowedProfiles[_]
+	startswith(profile, "localhost/")
+	file := split(profile, "/")[1]
 }
 
 # The profiles explicitly in the list
