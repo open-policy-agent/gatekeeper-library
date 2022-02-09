@@ -237,6 +237,12 @@ test_input_seccomp_pod_localhost_allowed_annotation_wildcard_file {
 	count(results) == 0
 }
 
+test_input_seccomp_pod_localhost_allowed_both_wildcard_file {
+	input := {"review": get_object({}, context_localhost, single_container, {}), "parameters": input_parameters_localhost_wildcard_both}
+	results := violation with input as input
+	count(results) == 0
+}
+
 test_input_seccomp_not_allowed_not_configured {
 	input := {"review": get_object({}, {}, single_container, {}), "parameters": input_parameter_in_list}
 	results := violation with input as input
@@ -577,6 +583,8 @@ input_parameters_empty = {"allowedProfiles": []}
 input_parameters_wildcard = {"allowedProfiles": ["*"]}
 
 input_parameters_localhost_wildcard = {"allowedProfiles": ["localhost/*"]}
+
+input_parameters_localhost_wildcard_both = {"allowedProfiles": ["localhost/*"], "allowedLocalhostFiles": ["*"]}
 
 input_parameter_in_list = {"allowedProfiles": [
 	"runtime/default",
