@@ -44,19 +44,13 @@ test-gator-dockerized: __build-gator
 __build-gator:
 	docker build --build-arg GATOR_VERSION=$(GATOR_VERSION) -f build/gator/Dockerfile -t gator-container .
 
-.PHONY: gomplate
-gomplate:
-	curl -o ${GITHUB_WORKSPACE}/bin/gomplate -sSL https://github.com/hairyhenderson/gomplate/releases/download/v${GOMPLATE_VERSION}/gomplate_linux-amd64
-	chmod +x ${GITHUB_WORKSPACE}/bin/gomplate
-
 .PHONY: generate
-generate:
-	@for tmpl in $(shell find src -name 'constraint.tmpl'); do \
-		src_dir=$$(dirname $${tmpl}); \
-		lib_dir=library/$${src_dir#src/}; \
-		echo "Generating $${lib_dir}/template.yaml"; \
-		gomplate -f $${src_dir}/constraint.tmpl > $${lib_dir}/template.yaml; \
-	done
+generate: __build-gomplate
+	docker run -v $(shell pwd):/gatekeeper-library gomplate-container ./scripts/generate.sh
+
+.PHONY: __build-gomplate
+__build-gomplate:
+	docker build --build-arg GOMPLATE_VERSION=$(GOMPLATE_VERSION) -f build/gomplate/Dockerfile -t gomplate-container .
 
 .PHONY: require-suites
 require-suites:
