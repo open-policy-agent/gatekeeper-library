@@ -213,6 +213,24 @@ test_input_seccomp_pod_multiple_not_allowed_not_in_list {
 	count(results) == 2
 }
 
+test_input_seccomp_pod_localhost_allowed_wrong_file {
+	input := {"review": get_object({}, context_localhost, single_container, {}), "parameters": input_parameters_sc}
+	results := violation with input as input
+	count(results) == 1
+}
+
+test_input_seccomp_pod_localhost_allowed_no_specified_file {
+	input := {"review": get_object({}, context_localhost, single_container, {}), "parameters": input_parameters_sc_localhost_no_file}
+	results := violation with input as input
+	count(results) == 1
+}
+
+test_input_seccomp_pod_localhost_allowed_wildcard_file {
+	input := {"review": get_object({}, context_localhost, single_container, {}), "parameters": input_parameters_sc_localhost_wildcard_file}
+	results := violation with input as input
+	count(results) == 0
+}
+
 test_input_seccomp_not_allowed_not_configured {
 	input := {"review": get_object({}, {}, single_container, {}), "parameters": input_parameter_in_list}
 	results := violation with input as input
@@ -383,6 +401,43 @@ test_input_both_seccomp_pod_context_container_annotation_multiple_mixed {
 	count(results) == 1
 }
 
+# Testing translation between annotation and securityContext
+test_translation_seccomp_allowed_annotation_all {
+	input := {"parameters": input_parameters_annotation}
+	output := get_allowed_profiles with input as input
+	output == allowed_full_translated
+}
+
+test_translation_seccomp_allowed_context_all {
+	input := {"parameters": input_parameters_sc}
+	output := get_allowed_profiles with input as input
+	output == allowed_full_translated
+}
+
+test_translation_seccomp_allowed_context_localhost_wildcard_file {
+	input := {"parameters": input_parameters_sc_localhost_wildcard_file}
+	output := get_allowed_profiles with input as input
+	output == {"Localhost", "localhost/*"}
+}
+
+test_translation_seccomp_allowed_context_localhost_no_file {
+	input := {"parameters": input_parameters_sc_localhost_no_file}
+	output := get_allowed_profiles with input as input
+	output == {"Localhost"}
+}
+
+test_input_translation_seccomp_annotation_match_allowed_context {
+	input := {"review": get_object(container_annotation, {}, single_container, {}), "parameters": input_parameters_sc}
+	results := violation with input as input
+	count(results) == 0
+}
+
+test_input_translation_seccomp_context_match_allowed_annotation {
+	input := {"review": get_object({}, {}, single_container_sc, {}), "parameters": input_parameters_annotation}
+	results := violation with input as input
+	count(results) == 0
+}
+
 # Create Review Object
 get_object(annotations, podcontext, containers, initcontainers) = {"object": {
 	"metadata": {
@@ -469,11 +524,11 @@ pod_container_annotations = {
 
 pod_container_annotations_mixed = {
 	"seccomp.security.alpha.kubernetes.io/pod": "runtime/default",
-	"container.seccomp.security.alpha.kubernetes.io/nginx": "docker/default",
+	"container.seccomp.security.alpha.kubernetes.io/nginx": "localhost/profile.json",
 }
 
 pod_container_annotations_mixed_rev = {
-	"seccomp.security.alpha.kubernetes.io/pod": "docker/default",
+	"seccomp.security.alpha.kubernetes.io/pod": "localhost/profile.json",
 	"container.seccomp.security.alpha.kubernetes.io/nginx": "runtime/default",
 }
 
@@ -486,11 +541,11 @@ container_annotations = {
 
 container_annotations_mixed = {
 	"container.seccomp.security.alpha.kubernetes.io/nginx": "runtime/default",
-	"container.seccomp.security.alpha.kubernetes.io/nginx2": "docker/default",
+	"container.seccomp.security.alpha.kubernetes.io/nginx2": "localhost/profile.json",
 }
 
 # Test securityContexts
-context_localhost = {"seccompProfile": {"type": "Localhost"}}
+context_localhost = {"seccompProfile": {"type": "Localhost", "localhostProfile": "profile.json"}}
 
 context_runtimedefault = {"seccompProfile": {"type": "RuntimeDefault"}}
 
@@ -506,12 +561,15 @@ input_parameter_in_list = {"allowedProfiles": [
 	"RuntimeDefault",
 ]}
 
-input_parameters_in_list = {"allowedProfiles": [
-	"runtime/default",
-	"RuntimeDefault",
-	"docker/default",
-	"Localhost",
-]}
+input_parameters_in_list = {
+	"allowedProfiles": [
+		"runtime/default",
+		"RuntimeDefault",
+		"docker/default",
+		"Localhost",
+	],
+	"allowedLocalhostFiles": ["profile.json"],
+}
 
 input_parameters_not_in_list = {"allowedProfiles": [
 	"unconfined",
@@ -521,4 +579,45 @@ input_parameters_not_in_list = {"allowedProfiles": [
 input_parameters_exempt = {
 	"exemptImages": ["nginx"],
 	"allowedProfiles": ["unconfined"],
+}
+
+input_parameters_annotation = {"allowedProfiles": [
+	"runtime/default",
+	"docker/default",
+	"localhost/profile1.json",
+	"localhost/profile2.json",
+	"unconfined",
+]}
+
+input_parameters_sc = {
+	"allowedProfiles": [
+		"RuntimeDefault",
+		"Localhost",
+		"Unconfined",
+	],
+	"allowedLocalhostFiles": [
+		"profile1.json",
+		"profile2.json",
+	],
+}
+
+input_parameters_sc_localhost_wildcard_file = {
+	"allowedProfiles": [
+		"Localhost",
+	],
+	"allowedLocalhostFiles": [
+		"*"
+	],
+}
+
+input_parameters_sc_localhost_no_file = {
+	"allowedProfiles": [
+		"Localhost",
+	]
+}
+
+allowed_full_translated = {
+	"Localhost", "localhost/profile1.json", "localhost/profile2.json",
+	"RuntimeDefault", "docker/default", "runtime/default",
+	"Unconfined", "unconfined",
 }
