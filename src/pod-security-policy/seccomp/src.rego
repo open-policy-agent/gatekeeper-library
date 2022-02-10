@@ -88,7 +88,7 @@ allowed_profile(profile, file, allowed) {
 get_annotation_localhost_files[file] {
 	profile := input.parameters.allowedProfiles[_]
 	startswith(profile, "localhost/")
-	file := split(profile, "/")[1]
+	file := replace(profile, "localhost/", "")
 }
 
 # The profiles explicitly in the list
