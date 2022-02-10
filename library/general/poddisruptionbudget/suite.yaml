@@ -1,0 +1,53 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: poddisruptionbudget
+tests:
+- name: pod-disruption-budget
+  template: template.yaml
+  constraint: samples/poddisruptionbudget/constraint.yaml
+  cases:
+  - name: example-allowed-min-available
+    object: samples/poddisruptionbudget/example_allowed_min_available.yaml
+    inventory:
+    - samples/poddisruptionbudget/example_inventory_deployment.yaml
+    assertions:
+    - violations: no
+  - name: example-allowed-max-unavailable
+    object: samples/poddisruptionbudget/example_allowed_max_unavailable.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed-min-available
+    object: samples/poddisruptionbudget/example_disallowed_min_available.yaml
+    inventory:
+    - samples/poddisruptionbudget/example_inventory_deployment.yaml
+    assertions:
+    - violations: yes
+  - name: example-disallowed-max-unavailable
+    object: samples/poddisruptionbudget/example_disallowed_max_unavailable.yaml
+    assertions:
+    - violations: yes
+  - name: example-deployment-with-pdb-allowed-min-available
+    object: samples/poddisruptionbudget/example_inventory_deployment.yaml
+    inventory:
+    - samples/poddisruptionbudget/example_allowed_min_available.yaml
+    assertions:
+    - violations: no
+  - name: example-deployment-with-pdb-allowed-max-unavailable
+    object: samples/poddisruptionbudget/example_inventory_deployment.yaml
+    inventory:
+    - samples/poddisruptionbudget/example_allowed_max_unavailable.yaml
+    assertions:
+    - violations: no
+  - name: example-deployment-with-pdb-disallowed-min-available
+    object: samples/poddisruptionbudget/example_inventory_deployment.yaml
+    inventory:
+    - samples/poddisruptionbudget/example_disallowed_min_available.yaml
+    assertions:
+    - violations: yes
+  - name: example-deployment-with-pdb-disallowed-max-unavailable
+    object: samples/poddisruptionbudget/example_inventory_deployment.yaml
+    inventory:
+    - samples/poddisruptionbudget/example_disallowed_max_unavailable.yaml
+    assertions:
+    - violations: yes
