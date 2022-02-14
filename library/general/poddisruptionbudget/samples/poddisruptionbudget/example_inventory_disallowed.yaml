@@ -1,10 +1,11 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: nginx-pdb
+  name: inventory-nginx-pdb-disallowed
   namespace: default
 spec:
-  maxUnavailable: 1
+  minAvailable: 3
   selector:
     matchLabels:
       app: nginx
+      example: disallowed-deployment

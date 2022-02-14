@@ -6,18 +6,6 @@ metadata:
 spec:
   sync:
     syncOnly:
-      - group: "apps"
-        version: "v1"
-        kind: "Deployment"
-      - group: "apps"
-        version: "v1"
-        kind: "ReplicaSet"
-      - group: "apps"
-        version: "v1"
-        kind: "StatefulSet"
       - group: "policy"
         version: "v1"
         kind: "PodDisruptionBudget"
-      - group: ""
-        version: "v1"
-        kind: "ReplicationController"

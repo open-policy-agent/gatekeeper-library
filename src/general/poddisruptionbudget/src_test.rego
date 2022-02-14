@@ -19,20 +19,6 @@ test_input_pdb_1_max_unavailable {
   count(results) == 0
 }
 
-test_input_pdb_1_min_available_deployment_1_replica {
-  input := {"review": input_pdb_min_available(1)}
-  inv := inv_deployment(1)
-  results := violation with input as input with data.inventory as inv
-  count(results) == 1
-}
-
-test_input_pdb_1_min_available_deployment_2_replicas {
-  input := {"review": input_pdb_min_available(1)}
-  inv := inv_deployment(2)
-  results := violation with input as input with data.inventory as inv
-  count(results) == 0
-}
-
 test_input_deployment_1_replica_pdb_1_min_available {
   input := {"review": input_deployment(1)}
   inv := inv_pdb_min_available(1)
@@ -54,7 +40,7 @@ test_input_deployment_pdb_0_max_unavailable {
   count(results) == 1
 }
 
-test_input_deployment_pdb_0_max_unavailable {
+test_input_deployment_pdb_1_max_unavailable {
   input := {"review": input_deployment(2)}
   inv := inv_pdb_max_unavailable(1)
   results := violation with input as input with data.inventory as inv
@@ -106,13 +92,6 @@ deployment(replicas) = output {
   }
 }
 
-input_pdb_min_available(min_available) = output {
-  output := {
-    "kind": {"kind": "PodDisruptionBudget"},
-    "object": pdb_min_available(min_available),
-  }
-}
-
 input_pdb_max_unavailable(max_unavailable) = output {
   output := {
     "kind": {"kind": "PodDisruptionBudget"},
@@ -139,9 +118,4 @@ inv_pdb_min_available(min_available) = output {
 inv_pdb_max_unavailable(max_unavailable) = output {
   pdb = pdb_max_unavailable(max_unavailable)
   output := inventory(pdb)
-}
-
-inv_deployment(replicas) = output {
-  deploy = deployment(replicas)
-  output := inventory(deploy)
 }
