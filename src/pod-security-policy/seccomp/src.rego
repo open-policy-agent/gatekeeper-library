@@ -140,7 +140,6 @@ get_profile(container) = {"profile": profile, "file": "", "location": location} 
 # Container profile as defined in pods securityContext
 get_profile(container) = {"profile": profile, "file": file, "location": location} {
 	not has_securitycontext_container(container)
-	not has_annotation(get_container_annotation_key(container.name))
 	profile := input.review.object.spec.securityContext.seccompProfile.type
 	file := object.get(input.review.object.spec.securityContext.seccompProfile, "localhostProfile", "")
 	location := "pod securityContext"

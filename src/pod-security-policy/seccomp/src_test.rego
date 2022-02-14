@@ -360,7 +360,7 @@ test_input_seccomp_pod_initcontainer_mixed_not_allowed {
 
 # Both annotation and securityContext based seccomp mixed
 test_input_both_seccomp_pod_context_container_annotation {
-	input := {"review": get_object(container_annotation, context_unconfined, single_container, {}), "parameters": input_parameter_in_list}
+	input := {"review": get_object(container_annotation_unconfined, context_runtimedefault, single_container, {}), "parameters": input_parameter_in_list}
 	results := violation with input as input
 	count(results) == 0
 }
@@ -379,12 +379,6 @@ test_input_both_seccomp_pod_context_and_annotation {
 
 test_input_both_seccomp_container_context_and_annotation {
 	input := {"review": get_object(container_annotation, {}, single_container_sc, {}), "parameters": input_parameter_in_list}
-	results := violation with input as input
-	count(results) == 0
-}
-
-test_input_both_seccomp_pod_context_container_annotation {
-	input := {"review": get_object(container_annotation, context_unconfined, single_container, {}), "parameters": input_parameters_not_in_list}
 	results := violation with input as input
 	count(results) == 0
 }
@@ -557,6 +551,8 @@ pod_container_annotations_mixed_rev = {
 }
 
 container_annotation = {"container.seccomp.security.alpha.kubernetes.io/nginx": "runtime/default"}
+
+container_annotation_unconfined = {"container.seccomp.security.alpha.kubernetes.io/nginx": "unconfined"}
 
 container_annotations = {
 	"container.seccomp.security.alpha.kubernetes.io/nginx": "runtime/default",
