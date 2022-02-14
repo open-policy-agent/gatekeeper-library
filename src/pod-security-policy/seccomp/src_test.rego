@@ -383,10 +383,10 @@ test_input_both_seccomp_container_context_and_annotation {
 	count(results) == 0
 }
 
-test_input_both_seccomp_pod_context_container_annotation_not_allowed {
+test_input_both_seccomp_pod_context_container_annotation {
 	input := {"review": get_object(container_annotation, context_unconfined, single_container, {}), "parameters": input_parameters_not_in_list}
 	results := violation with input as input
-	count(results) == 1
+	count(results) == 0
 }
 
 test_input_both_seccomp_pod_annotation_container_context_not_allowed {
