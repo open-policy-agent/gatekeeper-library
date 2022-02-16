@@ -35,9 +35,32 @@ spec:
                 type: string
             allowedProfiles:
               type: array
-              description: "An array of allowed profile values for seccomp annotations on Pods."
+              description: >-
+                An array of allowed profile values for seccomp on Pods/Containers.
+
+                Can use the annotation naming scheme: `runtime/default`, `docker/default`, `unconfined` and/or
+                `localhost/some-profile.json`. The item `localhost/*` will allow any localhost based profile.
+
+                Can also use the securityContext naming scheme: `RuntimeDefault`, `Unconfined`
+                and/or `Localhost`. For securityContext `Localhost`, use the parameter `allowedLocalhostProfiles`
+                to list the allowed profile JSON files.
+
+                The policy code will translate between the two schemes so it is not necessary to use both.
+
+                Putting a `*` in this array allows all Profiles to be used.
+
+                This field is required since with an empty list this policy will block all workloads.
               items:
                 type: string
+            allowedLocalhostFiles:
+              type: array
+              description: >-
+                When using securityContext naming scheme for seccomp and including `Localhost` this array holds
+                the allowed profile JSON files.
+
+                Putting a `*` in this array will allows all JSON files to be used.
+
+                This field is required to allow `Localhost` in securityContext as with an empty list it will block.
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |

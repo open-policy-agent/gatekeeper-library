@@ -8,15 +8,15 @@ tests:
   constraint: samples/psp-seccomp/constraint.yaml
   cases:
   - name: example-disallowed-global
-    object: samples/psp-seccomp/example_disallowed.yaml
+    object: samples/psp-seccomp/example_disallowed2.yaml
     assertions:
     - violations: 1
-      message: "Seccomp profile is not allowed"
+      message: "Seccomp profile 'unconfined' is not allowed for container 'nginx'. Found at: annotation seccomp.security.alpha.kubernetes.io/pod"
   - name: example-disallowed-container
     object: samples/psp-seccomp/example_disallowed.yaml
     assertions:
     - violations: 1
-      message: "Seccomp profile is not allowed"
+      message: "Seccomp profile 'unconfined' is not allowed for container 'nginx'. Found at: annotation container.seccomp.security.alpha.kubernetes.io/nginx"
   - name: example-allowed-container
     object: samples/psp-seccomp/example_allowed.yaml
     assertions:
