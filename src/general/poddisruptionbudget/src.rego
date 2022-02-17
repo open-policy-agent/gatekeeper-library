@@ -36,13 +36,17 @@ violation[{"msg": msg}] {
 }
 
 valid_pdb_min_available(obj, pdb) {
-  # default to -1 if minAvailable is not set so valid_pdb_min_available is always true for objects with >= 0 replicas
+  # default to -1 if minAvailable is not set so valid_pdb_min_available is always true
+  # for objects with >= 0 replicas. If minAvailable defaults to >= 0, objects with
+  # replicas field might violate this constraint if they are equal to the default set here
   min_available := object.get(pdb.spec, "minAvailable", -1)
   obj.spec.replicas > min_available
 }
 
 valid_pdb_max_unavailable(pdb) {
-  # default to 1 if maxUnavailable is not set so valid_pdb_max_unavailable always returns true
+  # default to 1 if maxUnavailable is not set so valid_pdb_max_unavailable always returns true.
+  # If maxUnavailable defaults to 0, it violates this constraint because all pods needs to be
+  # available and no pods can be evicted voluntarily
   max_unavailable := object.get(pdb.spec, "maxUnavailable", 1)
   max_unavailable > 0
 }
