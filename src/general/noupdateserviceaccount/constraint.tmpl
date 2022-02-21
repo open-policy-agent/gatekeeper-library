@@ -1,0 +1,26 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: noupdateserviceaccount
+  annotations:
+    description: "Blocks updating the service account on resources that abstract over Pods. This policy is ignored in audit mode."
+spec:
+  crd:
+    spec:
+      names:
+        kind: NoUpdateServiceAccount
+      validation:
+        openAPIV3Schema:
+          properties:
+            allowedGroups:
+              description: Groups that should be allowed to bypass the policy.
+              type: array
+              items: string
+            allowedUsers:
+              description: Users that should be allowed to bypass the policy.
+              type: array
+              items: string
+  targets:
+  - target: admission.k8s.gatekeeper.sh
+    rego: |
+{{ file.Read "src/general/noupdateserviceaccount/src.rego" | strings.Indent 6 | strings.TrimSuffix "\n" }}
