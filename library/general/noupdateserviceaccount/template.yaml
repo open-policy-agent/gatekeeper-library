@@ -1,4 +1,4 @@
-apiVersion: templates.gatekeeper.sh/v1beta1
+apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: noupdateserviceaccount
@@ -11,6 +11,7 @@ spec:
         kind: NoUpdateServiceAccount
       validation:
         openAPIV3Schema:
+          type: object
           properties:
             allowedGroups:
               description: Groups that should be allowed to bypass the policy.
