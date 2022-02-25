@@ -16,11 +16,13 @@ spec:
             allowedGroups:
               description: Groups that should be allowed to bypass the policy.
               type: array
-              items: string
+              items:
+                type: string
             allowedUsers:
               description: Users that should be allowed to bypass the policy.
               type: array
-              items: string
+              items:
+                type: string
   targets:
   - target: admission.k8s.gatekeeper.sh
     rego: |
