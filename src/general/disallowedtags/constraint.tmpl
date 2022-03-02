@@ -18,6 +18,15 @@ spec:
         openAPIV3Schema:
           type: object
           properties:
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
+              type: array
+              items:
+                type: string
             tags:
               type: array
               description: Disallowed container image tags.
@@ -27,3 +36,7 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
 {{ file.Read "src/general/disallowedtags/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
+      libs:
+        - |
+{{ file.Read "src/general/containerlimits/lib_exempt_container.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+

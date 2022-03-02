@@ -92,6 +92,21 @@ test_input_denied_mixed_container_latest {
     results := violation with input as input
     count(results) == 1
 }
+test_input_denied_mixed_container_with_some_exempt_image {
+    input := { "review": input_init_review(array.concat(input_container_exempt, input_container_denied_latest)), "parameters": {"tags": ["latest", "testing"], "exemptImages": ["exempt:latest"]}}
+    results := violation with input as input
+    count(results) == 2
+}
+test_input_denied_dual_container_with_all_exempt_image {
+    input := { "review": input_init_review(array.concat(input_container_exempt, input_container_denied_latest)), "parameters": {"tags": ["latest", "testing"], "exemptImages": ["exempt:latest", "exempt:testing"]}}
+    results := violation with input as input
+    count(results) == 1
+}
+test_input_allowed_dual_container_with_exempt_image {
+    input := { "review": input_init_review(input_container_exempt), "parameters": {"tags": ["latest", "testing"], "exemptImages": ["exempt:latest", "exempt:testing"]}}
+    results := violation with input as input
+    count(results) == 0
+}
 
 input_review(containers) = output {
     output = {
@@ -152,4 +167,12 @@ input_container_dual_allowed = [
 {
     "name": "other",
     "image": "other:2.0.0",
+}]
+input_container_exempt = [
+{
+    "name": "exempt",
+    "image": "exempt:latest",
+}, {
+    "name": "exempt",
+    "image": "exempt:testing",
 }]
