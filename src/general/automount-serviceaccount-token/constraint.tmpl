@@ -1,4 +1,4 @@
-apiVersion: templates.gatekeeper.sh/v1beta1
+apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8spspautomountserviceaccounttokenpod
@@ -12,6 +12,7 @@ spec:
         kind: K8sPSPAutomountServiceAccountTokenPod
       validation:
         openAPIV3Schema:
+          type: object
           description: >-
             Controls the ability of any Pod to enable automountServiceAccountToken.
   targets:

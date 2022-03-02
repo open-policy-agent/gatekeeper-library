@@ -1,4 +1,4 @@
-apiVersion: templates.gatekeeper.sh/v1beta1
+apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8spspreadonlyrootfilesystem
@@ -16,6 +16,7 @@ spec:
       validation:
         # Schema for the `parameters` field
         openAPIV3Schema:
+          type: object
           description: >-
             Requires the use of a read-only root file system by pod containers.
             Corresponds to the `readOnlyRootFilesystem` field in a

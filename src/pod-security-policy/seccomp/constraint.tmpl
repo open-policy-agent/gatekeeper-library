@@ -1,4 +1,4 @@
-apiVersion: templates.gatekeeper.sh/v1beta1
+apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8spspseccomp
@@ -61,6 +61,8 @@ spec:
                 Putting a `*` in this array will allows all JSON files to be used.
 
                 This field is required to allow `Localhost` in securityContext as with an empty list it will block.
+              items:
+                type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |

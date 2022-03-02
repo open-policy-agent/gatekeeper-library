@@ -1,4 +1,4 @@
-apiVersion: templates.gatekeeper.sh/v1beta1
+apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8spspprivilegedcontainer
@@ -15,6 +15,7 @@ spec:
         kind: K8sPSPPrivilegedContainer
       validation:
         openAPIV3Schema:
+          type: object
           description: >-
             Controls the ability of any container to enable privileged mode.
             Corresponds to the `privileged` field in a PodSecurityPolicy. For more
