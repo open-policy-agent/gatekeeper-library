@@ -1,4 +1,4 @@
-apiVersion: templates.gatekeeper.sh/v1beta1
+apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8spspallowprivilegeescalationcontainer
@@ -15,6 +15,7 @@ spec:
         kind: K8sPSPAllowPrivilegeEscalationContainer
       validation:
         openAPIV3Schema:
+          type: object
           description: >-
             Controls restricting escalation to root privileges. Corresponds to the
             `allowPrivilegeEscalation` field in a PodSecurityPolicy. For more

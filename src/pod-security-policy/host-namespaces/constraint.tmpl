@@ -1,4 +1,4 @@
-apiVersion: templates.gatekeeper.sh/v1beta1
+apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8spsphostnamespace
@@ -16,6 +16,7 @@ spec:
       validation:
         # Schema for the `parameters` field
         openAPIV3Schema:
+          type: object
           description: >-
             Disallows sharing of host PID and IPC namespaces by pod containers.
             Corresponds to the `hostPID` and `hostIPC` fields in a PodSecurityPolicy.
