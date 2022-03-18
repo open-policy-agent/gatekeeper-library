@@ -8,6 +8,7 @@ resources:
   - externalip
   - httpsonly
   - imagedigests
+  - poddisruptionbudget
   - replicalimits
   - requiredannotations
   - requiredlabels
