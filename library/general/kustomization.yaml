@@ -1,13 +1,19 @@
 resources:
   - allowedrepos
+  - automount-serviceaccount-token
   - block-endpoint-edit-default-role
   - block-nodeport-services
+  - block-wildcard-ingress
   - containerlimits
+  - containerrequests
   - containerresourceratios
+  - disallowanonymous
   - disallowedtags
   - externalip
   - httpsonly
   - imagedigests
+  - noupdateserviceaccount
+  - poddisruptionbudget
   - replicalimits
   - requiredannotations
   - requiredlabels
