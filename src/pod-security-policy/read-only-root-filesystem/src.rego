@@ -22,6 +22,9 @@ input_containers[c] {
 input_containers[c] {
     c := input.review.object.spec.initContainers[_]
 }
+input_containers[c] {
+    c := input.review.object.spec.ephemeralContainers[_]
+}
 
 # has_field returns whether an object has a field
 has_field(object, field) = true {

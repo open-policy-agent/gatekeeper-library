@@ -26,6 +26,10 @@ input_containers[c] {
     c := input.review.object.spec.initContainers[_]
     c.securityContext.procMount
 }
+input_containers[c] {
+    c := input.review.object.spec.ephemeralContainers[_]
+    c.securityContext.procMount
+}
 
 get_allowed_proc_mount(arg) = out {
     not arg.parameters
