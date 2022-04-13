@@ -28,13 +28,24 @@ spec:
               type: array
               items:
                 type: string
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
+              type: array
+              items:
+                type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package k8spspvolumetypes
 
+        import data.lib.exempt_container.is_exempt
+
         violation[{"msg": msg, "details": {}}] {
-            volume_fields := {x | input.review.object.spec.volumes[_][x]; x != "name"}
+            volume_fields := {x | mounted_volumes[_][x]; x != "name"}
             field := volume_fields[_]
             not input_volume_type_allowed(field)
             msg := sprintf("The volume type %v is not allowed, pod: %v. Allowed volume types: %v", [field, input.review.object.metadata.name, input.parameters.volumes])
@@ -45,6 +56,42 @@ spec:
             input.parameters.volumes[_] == "*"
         }
 
+        mounted_volumes[volumes] {
+            container := input_containers[_]
+            not is_exempt(container)
+            volumeNames := {x | x := container.volumeMounts[_].name}
+            volumes := {x | x := input.review.object.spec.volumes[_]; x.name == volumeNames[_]}[_]
+        }
+
         input_volume_type_allowed(field) {
             field == input.parameters.volumes[_]
         }
+
+        input_containers[c] {
+            c := input.review.object.spec.containers[_]
+        }
+        input_containers[c] {
+            c := input.review.object.spec.initContainers[_]
+        }
+      libs:
+        - |
+          package lib.exempt_container
+
+          is_exempt(container) {
+              exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+              img := container.image
+              exemption := exempt_images[_]
+              _matches_exemption(img, exemption)
+          }
+
+          _matches_exemption(img, exemption) {
+              not endswith(exemption, "*")
+              exemption == img
+          }
+
+          _matches_exemption(img, exemption) {
+              endswith(exemption, "*")
+              prefix := trim_suffix(exemption, "*")
+              startswith(img, prefix)
+          }
+

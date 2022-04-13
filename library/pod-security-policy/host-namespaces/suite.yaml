@@ -11,6 +11,10 @@ tests:
         object: samples/psp-host-namespace/example_allowed.yaml
         assertions:
           - violations: no
+      - name: example-exeption-allowed
+        object: samples/psp-host-namespace/example-exeption-allowed.yaml
+        assertions:
+          - violations: no
       - name: example-disallowed
         object: samples/psp-host-namespace/example_disallowed.yaml
         assertions:

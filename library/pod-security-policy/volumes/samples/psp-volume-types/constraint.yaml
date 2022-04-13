@@ -18,3 +18,4 @@ spec:
     - persistentVolumeClaim
     #- hostPath #required for allowedHostPaths
     - flexVolume #required for allowedFlexVolumes
+    exemptImages: ["exception.azurecr.io/exception*"]

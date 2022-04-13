@@ -1,5 +1,7 @@
 package k8spsphostfilesystem
 
+import data.lib.exempt_container.is_exempt
+
 violation[{"msg": msg, "details": {}}] {
     volume := input_hostpath_volumes[_]
     allowedPaths := get_allowed_paths(input)
@@ -73,8 +75,15 @@ any_not_equal_upto(a, b, n) {
 }
 
 input_hostpath_volumes[v] {
-    v := input.review.object.spec.volumes[_]
+    v := mounted_volumes[_]
     has_field(v, "hostPath")
+}
+
+mounted_volumes[volumes] {
+    container := input_containers[_]
+    not is_exempt(container)
+    volumeNames := {x | x := container.volumeMounts[_].name}
+    volumes := {x | x := input.review.object.spec.volumes[_]; x.name == volumeNames[_]}[_]
 }
 
 # has_field returns whether an object has a field

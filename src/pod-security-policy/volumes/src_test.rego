@@ -49,6 +49,12 @@ test_input_volume_type_allowed_not_in_list {
     count(results) == 1
 }
 
+test_input_volume_type_allowed_not_in_list_exception {
+    input := { "review": input_review, "parameters": input_parameters_not_in_list_image_exception}
+    results := violation with input as input
+    count(results) == 0
+}
+
 test_input_volume_type_allowed_in_list_many_volumes {
     input := { "review": input_review_many, "parameters": input_parameters_in_list}
     results := violation with input as input
@@ -59,6 +65,12 @@ test_input_volume_type_allowed_not_all_in_list_many_volumes {
     input := { "review": input_review_many, "parameters": input_parameters_not_in_list}
     results := violation with input as input
     count(results) == 2
+}
+
+test_input_volume_type_allowed_not_all_in_list_many_volumes_exception {
+    input := { "review": input_review_many, "parameters": input_parameters_not_in_list_image_exception}
+    results := violation with input as input
+    count(results) == 0
 }
 
 test_input_volume_type_allowed_in_list_many_volumes_mixed {
@@ -73,9 +85,9 @@ input_review = {
             "name": "nginx"
         },
         "spec": {
-            "containers": input_containers,
+            "containers": input_containers_nginx,
             "volumes": input_volumes
-      }
+        }
     }
 }
 
@@ -102,7 +114,7 @@ input_review_no_volumes = {
     }
 }
 
-input_containers = [
+input_containers_nginx = [
 {
     "name": "nginx",
     "image": "nginx",
@@ -188,4 +200,12 @@ input_parameters_not_in_list = {
          "configMap",
          "secret"
     ]
+}
+
+input_parameters_not_in_list_image_exception = {
+     "volumes": [
+         "configMap",
+         "secret"
+    ],
+    "exemptImages": [ "nginx" ]
 }

@@ -15,3 +15,7 @@ tests:
     object: samples/psp-volume-types/example_allowed.yaml
     assertions:
     - violations: no
+  - name: example-exception-allowed
+    object: samples/psp-volume-types/example-exception-allowed.yaml
+    assertions:
+    - violations: no

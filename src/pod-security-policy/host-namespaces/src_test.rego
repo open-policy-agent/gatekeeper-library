@@ -20,6 +20,11 @@ test_input_hostnamespace_both_not_allowed {
     results := violation with input as input
     count(results) > 0
 }
+test_input_hostnamespace_both_not_allowed_exception {
+    input := { "review": input_review_hostnamespace_both, "parameters": {"exemptImages":["nginx"]}}
+    results := violation with input as input
+    count(results) == 0
+}
 
 input_review = {
     "object": {
@@ -27,7 +32,7 @@ input_review = {
             "name": "nginx"
         },
         "spec": {
-            "containers": input_containers
+            "containers": input_containers_nginx
       }
     }
 }
@@ -38,7 +43,7 @@ input_review_hostPID = {
         },
         "spec": {
             "hostPID": true,
-            "containers": input_containers
+            "containers": input_containers_nginx
       }
     }
 }
@@ -50,7 +55,7 @@ input_review_hostIPC = {
         },
         "spec": {
             "hostIPC": true,
-            "containers": input_containers
+            "containers": input_containers_nginx
       }
     }
 }
@@ -63,11 +68,11 @@ input_review_hostnamespace_both = {
 
             "hostPID": true,
             "hostIPC": true,
-            "containers": input_containers
+            "containers": input_containers_nginx
       }
     }
 }
-input_containers = [
+input_containers_nginx = [
 {
     "name": "nginx",
     "image": "nginx"

@@ -5,6 +5,11 @@ test_input_hostpath_block_all {
     results := violation with input as input
     count(results) == 1
 }
+test_input_hostpath_allow_all {
+    input := { "review": input_review, "parameters": {"allowedHostPaths": [{"pathPrefix": "/"}]}}
+    results := violation with input as input
+    count(results) == 0
+}
 test_input_hostpath_block_all_null_params {
     input := { "review": input_review, "parameters": null }
     results := violation with input as input
@@ -55,6 +60,11 @@ test_input_hostpath_many_not_allowed_readonly {
     results := violation with input as input
     count(results) == 2
 }
+test_input_hostpath_many_not_allowed_readonly_image_exception {
+    input := { "review": input_review_many, "parameters": inject_exemptImages(input_parameters_not_in_list)}
+    results := violation with input as input
+    count(results) == 0
+}
 test_input_hostpath_allowed_writable_allowed {
     input := { "review": input_review_writable, "parameters": input_parameters_in_list_writable}
     results := violation with input as input
@@ -74,6 +84,11 @@ test_input_hostpath_allowed_not_writable {
     input := { "review": input_review, "parameters": input_parameters_in_list}
     results := violation with input as input
     count(results) == 1
+}
+test_input_hostpath_allowed_not_writable_image_exclude {
+    input := { "review": input_review, "parameters": inject_exemptImages(input_parameters_in_list)}
+    results := violation with input as input
+    count(results) == 0
 }
 test_input_hostpath_allowed_is_writable {
     input := { "review": input_review, "parameters": input_parameters_in_list_writable}
@@ -149,7 +164,7 @@ input_review = {
         "spec": {
             "containers": input_containers_one,
             "volumes": input_volumes
-      }
+        }
     }
 }
 
@@ -441,4 +456,19 @@ input_parameters_in_list_mixed_writable = {
     {
         "pathPrefix": "/foo"
     }]
+}
+
+inject_exemptImages(obj) = out {
+    keys := {k | obj[k]}
+    all_keys := keys | {"exemptImages"}
+    out := {k: v | k := all_keys[_]; v:= get_default(obj, k, ["nginx"])}
+}
+get_default(obj, param, _default) = out {
+	out = obj[param]
+}
+
+get_default(obj, param, _default) = out {
+    not obj[param]
+    not obj[param] == false
+    out = _default
 }
