@@ -11,4 +11,3 @@ spec:
     allowedHostPaths:
     - readOnly: true
       pathPrefix: "/foo"
-    exemptImages: ["exception.azurecr.io/exception*"]

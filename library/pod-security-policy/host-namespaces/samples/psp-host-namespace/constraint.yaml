@@ -7,5 +7,3 @@ spec:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
-  parameters:
-    exemptImages: ["exception.azurecr.io/exception*"]
