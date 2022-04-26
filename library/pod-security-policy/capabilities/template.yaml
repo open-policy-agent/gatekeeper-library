@@ -13,6 +13,9 @@ spec:
     spec:
       names:
         kind: K8sPSPCapabilities
+        listKind: K8sPSPCapabilities
+        plural: k8spspcapabilities
+        singular: k8spspcapabilities
       validation:
         # Schema for the `parameters` field
         openAPIV3Schema:
@@ -31,6 +34,16 @@ spec:
                 It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
                 in order to avoid unexpectedly exempting images from an untrusted repository.
               type: array
+              items:
+                type: string
+            initContainerAllowedCapabilities:
+              type: array
+              description: "A list of Linux capabilities that can be added to an initContainer."
+              items:
+                type: string
+            initContainerRequiredDropCapabilities:
+              type: array
+              description: "A list of Linux capabilities that are required to be dropped from an initContainer."
               items:
                 type: string
             allowedCapabilities:
@@ -54,7 +67,7 @@ spec:
           container := input.review.object.spec.containers[_]
           not is_exempt(container)
           has_disallowed_capabilities(container)
-          msg := sprintf("container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
+          msg := sprintf("container <%v> has a disallowed capability <%v>. Allowed capabilities are %v", [container.name, container.securityContext.capabilities.add, get_default(input.parameters, "allowedCapabilities", "NONE")])
         }
 
         violation[{"msg": msg}] {
@@ -70,14 +83,14 @@ spec:
           container := input.review.object.spec.initContainers[_]
           not is_exempt(container)
           has_disallowed_capabilities(container)
-          msg := sprintf("init container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
+          msg := sprintf("init container <%v> has a disallowed capability <%v>. Allowed capabilities are %v", [container.name, container.securityContext.capabilities.add, get_default(input.parameters, "initContainerAllowedCapabilities", "NONE")])
         }
 
         violation[{"msg": msg}] {
           container := input.review.object.spec.initContainers[_]
           not is_exempt(container)
           missing_drop_capabilities(container)
-          msg := sprintf("init container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
+          msg := sprintf("container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.initContainerRequiredDropCapabilities])
         }
 
 

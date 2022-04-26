@@ -10,5 +10,7 @@ spec:
     namespaces:
       - "default"
   parameters:
+    initContainerAllowedCapabilities: []
+    initContainerRequiredDropCapabilities: []
     allowedCapabilities: ["something"]
     requiredDropCapabilities: ["must_drop"]
