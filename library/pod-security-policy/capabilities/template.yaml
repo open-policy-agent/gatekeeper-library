@@ -67,7 +67,7 @@ spec:
           container := input.review.object.spec.containers[_]
           not is_exempt(container)
           has_disallowed_capabilities(container)
-          msg := sprintf("container <%v> has a disallowed capability <%v>. Allowed capabilities are %v", [container.name, container.securityContext.capabilities.add, get_default(input.parameters, "allowedCapabilities", "NONE")])
+          msg := sprintf("container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
         }
 
         violation[{"msg": msg}] {
@@ -83,7 +83,7 @@ spec:
           container := input.review.object.spec.initContainers[_]
           not is_exempt(container)
           has_disallowed_capabilities(container)
-          msg := sprintf("init container <%v> has a disallowed capability <%v>. Allowed capabilities are %v", [container.name, container.securityContext.capabilities.add, get_default(input.parameters, "initContainerAllowedCapabilities", "NONE")])
+          msg := sprintf("init container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "initContainerAllowedCapabilities", "NONE")])
         }
 
         violation[{"msg": msg}] {
