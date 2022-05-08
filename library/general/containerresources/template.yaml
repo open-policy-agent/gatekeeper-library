@@ -32,11 +32,17 @@ spec:
               description: "A list of limits that should be enforced (cpu, memory or both)."
               items:
                 type: string
+                enum:
+                - cpu
+                - memory
             requests:
               type: array
               description: "A list of requests that should be enforced (cpu, memory or both)."
               items:
                 type: string
+                enum:
+                - cpu
+                - memory
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
