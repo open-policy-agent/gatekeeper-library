@@ -26,8 +26,10 @@ tests:
   - name: both-disallowed
     object: samples/repo-must-be-openpolicyagent/disallowed_both.yaml
     assertions:
-    - violations: 2
+    - violations: 3
     - message: initContainer
       violations: 1
     - message: container
+      violations: 1
+    - message: ephemeralContainer
       violations: 1

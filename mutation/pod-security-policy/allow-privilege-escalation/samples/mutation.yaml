@@ -35,7 +35,7 @@ spec:
 apiVersion: mutations.gatekeeper.sh/v1alpha1
 kind: Assign
 metadata:
-  name: k8spspdefaultallowprivilegeescalation-init
+  name: k8spspdefaultallowprivilegeescalation-ephemeral
 spec:
   applyTo:
   - groups: [""]

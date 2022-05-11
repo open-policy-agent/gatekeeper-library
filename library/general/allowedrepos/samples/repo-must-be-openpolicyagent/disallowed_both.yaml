@@ -17,3 +17,10 @@ spec:
         limits:
           cpu: "100m"
           memory: "30Mi"
+  ephemeralContainers:
+    - name: nginx
+      image: nginx
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "30Mi"
