@@ -1,7 +1,7 @@
 KIND_VERSION ?= 0.11.1
 # note: k8s version pinned since KIND image availability lags k8s releases
 KUBERNETES_VERSION ?= 1.21.2
-KUSTOMIZE_VERSION ?= 3.7.0
+KUSTOMIZE_VERSION ?= 4.5.4
 GATEKEEPER_VERSION ?= release-3.5
 BATS_VERSION ?= 1.3.0
 GATOR_VERSION ?= 3.7.1
