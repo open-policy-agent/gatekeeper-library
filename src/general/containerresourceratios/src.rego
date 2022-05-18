@@ -140,6 +140,8 @@ violation[{"msg": msg}] {
   general_violation[{"msg": msg, "field": "initContainers"}]
 }
 
+# Ephemeral containers not checked as it is not possible to set field.
+
 general_violation[{"msg": msg, "field": field}] {
   container := input.review.object.spec[field][_]
   not is_exempt(container)

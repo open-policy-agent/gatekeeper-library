@@ -40,6 +40,10 @@ input_security_context[c] {
     c := input.review.object.spec.initContainers[_]
     has_field(c.securityContext, "seLinuxOptions")
 }
+input_security_context[c] {
+    c := input.review.object.spec.ephemeralContainers[_]
+    has_field(c.securityContext, "seLinuxOptions")
+}
 
 # has_field returns whether an object has a field
 has_field(object, field) = true {

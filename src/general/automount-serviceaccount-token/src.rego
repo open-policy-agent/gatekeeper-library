@@ -25,6 +25,8 @@ input_containers[c] {
     c := input.review.object.spec.initContainers[_]
 }
 
+# Ephemeral containers not checked as it is not possible to set field.
+
 has_key(x, k) {
     _ = x[k]
 }

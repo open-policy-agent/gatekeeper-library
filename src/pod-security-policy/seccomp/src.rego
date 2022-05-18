@@ -184,3 +184,7 @@ input_containers[container.name] = container {
 input_containers[container.name] = container {
     container := input.review.object.spec.initContainers[_]
 }
+
+input_containers[container.name] = container {
+    container := input.review.object.spec.ephemeralContainers[_]
+}
