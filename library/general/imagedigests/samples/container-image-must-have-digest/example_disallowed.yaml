@@ -4,7 +4,7 @@ metadata:
   name: opa-disallowed
 spec:
   initContainers:
-    - name: opa
+    - name: opainit
       image: openpolicyagent/opa:0.9.2
       args:
         - "run"
@@ -17,10 +17,10 @@ spec:
         - "run"
         - "--server"
         - "--addr=localhost:8080"
-  ephemeralContainers:
-    - name: opa
-      image: openpolicyagent/opa:0.9.2
-      args:
-        - "run"
-        - "--server"
-        - "--addr=localhost:8080"
+  # ephemeralContainers:
+  #   - name: opa
+  #     image: openpolicyagent/opa:0.9.2
+  #     args:
+  #       - "run"
+  #       - "--server"
+  #       - "--addr=localhost:8080"
