@@ -17,6 +17,20 @@ setup() {
   kubectl config set-context --current --namespace default
 }
 
+@test "all policies are listed in kustomization.yaml" {
+  pushd library/general/
+  kustomize edit add resource $(find ./ -type d -maxdepth 1 -mindepth 1 -exec basename {} \;)
+  run git diff --quiet kustomization.yaml
+  assert_success
+  popd
+
+  pushd library/pod-security-policy/
+  kustomize edit add resource $(find ./ -type d -maxdepth 1 -mindepth 1 -exec basename {} \;)
+  run git diff --quiet kustomization.yaml
+  assert_success
+  popd
+}
+
 @test "gatekeeper-controller-manager is running" {
   wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl -n gatekeeper-system wait --for=condition=Ready --timeout=60s pod -l control-plane=controller-manager"
 }
