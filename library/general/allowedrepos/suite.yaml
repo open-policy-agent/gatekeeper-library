@@ -24,12 +24,20 @@ tests:
     - violations: 0
       message: container
   - name: both-disallowed
-    object: samples/repo-must-be-openpolicyagent/example_disallowed_both.yaml #disallowed_all.yaml
+    object: samples/repo-must-be-openpolicyagent/example_disallowed_both.yaml
     assertions:
-    - violations: 2 #3
+    - violations: 2
     - message: initContainer
       violations: 1
     - message: container
       violations: 1
-    # - message: ephemeralContainer
-    #   violations: 1
+  - name: all-disallowed
+    object: samples/repo-must-be-openpolicyagent/disallowed_all.yaml
+    assertions:
+    - violations: 3
+    - message: initContainer
+      violations: 1
+    - message: container
+      violations: 1
+    - message: ephemeralContainer
+      violations: 1
