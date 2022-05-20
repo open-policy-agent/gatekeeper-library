@@ -15,7 +15,7 @@ tests:
         object: samples/psp-host-filesystem/example_allowed.yaml
         assertions:
           - violations: no
-      - name: example-disallowed-ephemeral
-        object: samples/psp-host-filesystem/example_disallowed_ephemeral.yaml
+      - name: disallowed-ephemeral
+        object: samples/psp-host-filesystem/disallowed_ephemeral.yaml
         assertions:
           - violations: yes
