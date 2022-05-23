@@ -1,7 +1,7 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sRequiredResources
 metadata:
-  name: container-must-have-limits-and-requests
+  name: no-enforcements
 spec:
   match:
     kinds:
