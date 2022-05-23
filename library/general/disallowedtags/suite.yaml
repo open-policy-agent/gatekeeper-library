@@ -24,7 +24,7 @@ tests:
     assertions:
     - violations: yes
   - name: single-disallowed-tag-ephemeral
-    object: samples/container-image-must-not-have-latest-tag/example_disallowed_tag_ephemeral.yaml
+    object: samples/container-image-must-not-have-latest-tag/disallowed_tag_ephemeral.yaml
     assertions:
     - violations: yes
   - name: some-disallow-tags
