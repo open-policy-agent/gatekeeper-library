@@ -31,3 +31,8 @@ input_containers[c] {
     c := input.review.object.spec.initContainers[_]
     not is_exempt(c)
 }
+
+input_containers[c] {
+    c := input.review.object.spec.ephemeralContainers[_]
+    not is_exempt(c)
+}

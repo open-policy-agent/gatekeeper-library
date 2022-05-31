@@ -15,3 +15,7 @@ tests:
     object: samples/psp-readonlyrootfilesystem/example_allowed.yaml
     assertions:
     - violations: no
+  - name: disallowed-ephemeral
+    object: samples/psp-readonlyrootfilesystem/disallowed_ephemeral.yaml
+    assertions:
+    - violations: yes

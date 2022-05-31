@@ -15,3 +15,7 @@ tests:
         object: samples/psp-allow-privilege-escalation-container/example_disallowed.yaml
         assertions:
           - violations: yes
+      - name: disallowed-ephemeral
+        object: samples/psp-allow-privilege-escalation-container/disallowed_ephemeral.yaml
+        assertions:
+          - violations: yes

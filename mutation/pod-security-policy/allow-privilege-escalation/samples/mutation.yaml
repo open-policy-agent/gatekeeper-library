@@ -31,3 +31,20 @@ spec:
       condition: MustNotExist
     assign:
       value: false
+---
+apiVersion: mutations.gatekeeper.sh/v1alpha1
+kind: Assign
+metadata:
+  name: k8spspdefaultallowprivilegeescalation-ephemeral
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  location: "spec.ephemeralContainers[name:*].securityContext.allowPrivilegeEscalation"
+  parameters:
+    pathTests:
+    - subPath: "spec.ephemeralContainers[name:*].securityContext.allowPrivilegeEscalation"
+      condition: MustNotExist
+    assign:
+      value: false

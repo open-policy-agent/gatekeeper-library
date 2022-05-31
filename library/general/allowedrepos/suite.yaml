@@ -12,22 +12,32 @@ tests:
     assertions:
     - violations: no
   - name: container-disallowed
-    object: samples/repo-must-be-openpolicyagent/disallowed_container.yaml
+    object: samples/repo-must-be-openpolicyagent/example_disallowed_container.yaml
     assertions:
     - violations: yes
       message: container
   - name: initcontainer-disallowed
-    object: samples/repo-must-be-openpolicyagent/disallowed_initcontainer.yaml
+    object: samples/repo-must-be-openpolicyagent/example_disallowed_initcontainer.yaml
     assertions:
     - violations: 1
       message: initContainer
     - violations: 0
       message: container
   - name: both-disallowed
-    object: samples/repo-must-be-openpolicyagent/disallowed_both.yaml
+    object: samples/repo-must-be-openpolicyagent/example_disallowed_both.yaml
     assertions:
     - violations: 2
     - message: initContainer
       violations: 1
     - message: container
+      violations: 1
+  - name: all-disallowed
+    object: samples/repo-must-be-openpolicyagent/disallowed_all.yaml
+    assertions:
+    - violations: 3
+    - message: initContainer
+      violations: 1
+    - message: container
+      violations: 1
+    - message: ephemeralContainer
       violations: 1

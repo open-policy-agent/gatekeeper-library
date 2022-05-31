@@ -23,6 +23,10 @@ tests:
     object: samples/container-image-must-not-have-latest-tag/example_disallowed_tag.yaml
     assertions:
     - violations: yes
+  - name: single-disallowed-tag-ephemeral
+    object: samples/container-image-must-not-have-latest-tag/disallowed_tag_ephemeral.yaml
+    assertions:
+    - violations: yes
   - name: some-disallow-tags
     object: samples/container-image-must-not-have-latest-tag/example_some_disallowed_tags.yaml
     assertions:

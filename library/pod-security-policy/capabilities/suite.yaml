@@ -15,3 +15,7 @@ tests:
         object: samples/capabilities-demo/example_allowed.yaml
         assertions:
           - violations: no
+      - name: disallowed-ephemeral
+        object: samples/capabilities-demo/disallowed_ephemeral.yaml
+        assertions:
+          - violations: yes

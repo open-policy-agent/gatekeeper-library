@@ -20,6 +20,9 @@ input_containers[c] {
 input_containers[c] {
     c := input.review.object.spec.initContainers[_]
 }
+input_containers[c] {
+    c := input.review.object.spec.ephemeralContainers[_]
+}
 
 get_annotation_for(container, metadata) = out {
     out = metadata.annotations[sprintf("container.apparmor.security.beta.kubernetes.io/%v", [container.name])]

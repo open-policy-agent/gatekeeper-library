@@ -15,3 +15,7 @@ tests:
     object: samples/psp-proc-mount/example_allowed.yaml
     assertions:
     - violations: no
+  - name: disallowed-ephemeral
+    object: samples/psp-proc-mount/disallowed_ephemeral.yaml
+    assertions:
+    - violations: yes

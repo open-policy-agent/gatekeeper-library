@@ -14,4 +14,18 @@ tests:
   - name: example-disallowed
     object: samples/container-image-must-have-digest/example_disallowed.yaml
     assertions:
-    - violations: yes
+    - violations: 2
+    - message: initContainer
+      violations: 1
+    - message: container
+      violations: 1
+  - name: disallowed-all
+    object: samples/container-image-must-have-digest/disallowed_all.yaml
+    assertions:
+    - violations: 3
+    - message: initContainer
+      violations: 1
+    - message: container
+      violations: 1
+    - message: ephemeralContainer
+      violations: 1

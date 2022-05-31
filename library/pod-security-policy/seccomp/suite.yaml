@@ -25,3 +25,8 @@ tests:
     object: samples/psp-seccomp/example_allowed2.yaml
     assertions:
     - violations: no
+  - name: disallowed-ephemeral
+    object: samples/psp-seccomp/disallowed_ephemeral.yaml
+    assertions:
+    - violations: 1
+      message: "Seccomp profile 'unconfined' is not allowed for container 'nginx'. Found at: annotation container.seccomp.security.alpha.kubernetes.io/nginx"

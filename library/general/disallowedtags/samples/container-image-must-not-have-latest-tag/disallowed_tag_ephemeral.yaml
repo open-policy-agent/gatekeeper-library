@@ -1,18 +1,18 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: opa-disallowed
+  name: opa-disallowed-ephemeral
 spec:
-  initContainers:
-    - name: opainit
+  containers:
+    - name: opa
       image: openpolicyagent/opa:0.9.2
       args:
         - "run"
         - "--server"
         - "--addr=localhost:8080"
-  containers:
+  ephemeralContainers:
     - name: opa
-      image: openpolicyagent/opa:0.9.2
+      image: openpolicyagent/opa:latest
       args:
         - "run"
         - "--server"
