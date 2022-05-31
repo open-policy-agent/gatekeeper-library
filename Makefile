@@ -19,9 +19,9 @@ integration-bootstrap:
 	# Download and install yq
 	sudo snap install yq
 	# Check for existing kind cluster
-	if [ $$(kind get clusters) ]; then kind delete cluster; fi
+	if [ $$(${GITHUB_WORKSPACE}/bin/kind get clusters) ]; then ${GITHUB_WORKSPACE}/bin/kind delete cluster; fi
 	# Create a new kind cluster
-	TERM=dumb kind create cluster --image kindest/node:v${KUBERNETES_VERSION} --config=test/kind_config.yaml
+	TERM=dumb ${GITHUB_WORKSPACE}/bin/kind create cluster --image kindest/node:v${KUBERNETES_VERSION} --wait 5m --config=test/kind_config.yaml
 
 deploy:
 	kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper/${GATEKEEPER_VERSION}/deploy/gatekeeper.yaml
