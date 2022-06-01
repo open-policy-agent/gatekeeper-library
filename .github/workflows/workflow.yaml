@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        gatekeeper: [ "release-3.6", "release-3.7" ]
+        gatekeeper: [ "release-3.7", "release-3.8" ]
     name: "Integration test on Gatekeeper ${{ matrix.gatekeeper }}"
     steps:
       - name: Check out code into the Go module directory
@@ -78,4 +78,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
-          make test-gator-dockerized
+          make verify-gator-dockerized
