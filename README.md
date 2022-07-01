@@ -46,7 +46,7 @@ The `suite.yaml` files define test cases for each ConstraintTemplate in the libr
 Changes to gatekeeper-library ConstraintTemplates may be tested with the gator CLI:
 
 ```
-gatekeeper-library$ gator test ./...
+gatekeeper-library$ gator verify ./...
 ```
 
 The gator CLI may be downloaded from the Gatekeeper
