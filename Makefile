@@ -1,10 +1,11 @@
+docker := docker #You can build with podman by doing: make docker=podman
 KIND_VERSION ?= 0.14.0
 # note: k8s version pinned since KIND image availability lags k8s releases
 KUBERNETES_VERSION ?= 1.24.0
 KUSTOMIZE_VERSION ?= 4.5.5
 GATEKEEPER_VERSION ?= release-3.8
 BATS_VERSION ?= 1.3.0
-GATOR_VERSION ?= 3.8.1
+GATOR_VERSION ?= 3.9.0
 GOMPLATE_VERSION ?= 3.10.0
 
 integration-bootstrap:
@@ -38,19 +39,19 @@ verify-gator:
 
 .PHONY: verify-gator-dockerized
 verify-gator-dockerized: __build-gator
-	docker run -i -v $(shell pwd):/gatekeeper-library gator-container verify ./...
+	$(docker) run -i -v $(shell pwd):/gatekeeper-library gator-container verify ./...
 
 .PHONY: build-gator
 __build-gator:
-	docker build --build-arg GATOR_VERSION=$(GATOR_VERSION) -f build/gator/Dockerfile -t gator-container .
+	$(docker) build --build-arg GATOR_VERSION=$(GATOR_VERSION) -f build/gator/Dockerfile -t gator-container .
 
 .PHONY: generate
 generate: __build-gomplate
-	docker run -v $(shell pwd):/gatekeeper-library gomplate-container ./scripts/generate.sh
+	$(docker) run -v $(shell pwd):/gatekeeper-library gomplate-container ./scripts/generate.sh
 
 .PHONY: __build-gomplate
 __build-gomplate:
-	docker build --build-arg GOMPLATE_VERSION=$(GOMPLATE_VERSION) -f build/gomplate/Dockerfile -t gomplate-container .
+	$(docker) build --build-arg GOMPLATE_VERSION=$(GOMPLATE_VERSION) -f build/gomplate/Dockerfile -t gomplate-container .
 
 .PHONY: require-suites
 require-suites:
