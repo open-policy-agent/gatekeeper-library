@@ -11,6 +11,6 @@ pending, and requires deleting the StatefulSet and any PVCs it has created along
 with redeploying the workload in order to fix. Blocking it up front makes it
 much easier to fix before there is a mess to clean up.
 
-There is a known limitation with this constraint. It only functions properly
+**WARNING** This constraint only functions properly
 on gatekeeper version 3.9 or above.
 
