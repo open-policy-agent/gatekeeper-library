@@ -21,3 +21,6 @@ spec:
       - group: "policy"
         version: "v1"
         kind: "PodDisruptionBudget"
+      - group: "storage.k8s.io"
+        version: "v1"
+        kind: "StorageClass"

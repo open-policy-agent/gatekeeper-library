@@ -1,0 +1,25 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sstorageclass
+  annotations:
+    description: >-
+      Requires storage classes to be specified when used. Only gatekeeper 3.9+ is supported.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sStorageClass
+      validation:
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Requires storage classes to be specified when used.
+          properties:
+            includeStorageClassesInMessage:
+              type: boolean
+              default: true
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ file.Read "src/general/storageclass/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}

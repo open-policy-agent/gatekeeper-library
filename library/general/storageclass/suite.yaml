@@ -1,0 +1,38 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: storageclass
+tests:
+- name: storageclass
+  template: template.yaml
+  constraint: samples/storageclass/constraint.yaml
+  cases:
+  - name: example-allowed-pvc
+    object: samples/storageclass/example_allowed_pvc.yaml
+    inventory:
+    - samples/storageclass/example_inventory_allowed_storageclass.yaml
+    assertions:
+    - violations: no
+  - name: example-allowed-ss
+    object: samples/storageclass/example_allowed_ss.yaml
+    inventory:
+    - samples/storageclass/example_inventory_allowed_storageclass.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed-pvc-badname
+    object: samples/storageclass/example_disallowed_pvc_badname.yaml
+    assertions:
+    - violations: yes
+  - name: example-disallowed-ssvct-badnamename
+    object: samples/storageclass/example_disallowed_ssvct_badnamename.yaml
+    assertions:
+    - violations: yes
+  - name: example-disallowed-pvc-nonamename
+    object: samples/storageclass/example_disallowed_pvc_nonamename.yaml
+    assertions:
+    - violations: yes
+  - name: example-disallowed-ssvct-nonamename
+    object: samples/storageclass/example_disallowed_ssvct_nonamename.yaml
+    assertions:
+    - violations: yes
+
