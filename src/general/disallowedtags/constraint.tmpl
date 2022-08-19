@@ -3,6 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8sdisallowedtags
   annotations:
+    metadata.gatekeeper.sh/title: "Disallow tags"
     description: >-
       Requires container images to have an image tag different from the ones in
       the specified list.

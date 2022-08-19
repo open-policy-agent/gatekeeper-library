@@ -3,6 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8spspallowedusers
   annotations:
+    metadata.gatekeeper.sh/title: "Allowed Users"
     description: >-
       Controls the user and group IDs of the container and some volumes.
       Corresponds to the `runAsUser`, `runAsGroup`, `supplementalGroups`, and

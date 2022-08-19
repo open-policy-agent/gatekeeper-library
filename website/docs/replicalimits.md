@@ -1,0 +1,149 @@
+---
+id: replicalimits
+title: Kubernetes Replica Limits
+---
+
+# Kubernetes Replica Limits
+
+## Description
+Requires that objects with the field `spec.replicas` (Deployments, ReplicaSets, etc.) specify a number of replicas within defined ranges.
+
+## Template
+```yaml
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sreplicalimits
+  annotations:
+    metadata.gatekeeper.sh/title : "Kubernetes Replica Limits"
+    description: >-
+      Requires that objects with the field `spec.replicas` (Deployments,
+      ReplicaSets, etc.) specify a number of replicas within defined ranges.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sReplicaLimits
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          properties:
+            ranges:
+              type: array
+              description: Allowed ranges for numbers of replicas.  Values are inclusive.
+              items:
+                type: object
+                description: A range of allowed replicas.  Values are inclusive.
+                properties:
+                  min_replicas:
+                    description: The minimum number of replicas allowed, inclusive.
+                    type: integer
+                  max_replicas:
+                    description: The maximum number of replicas allowed, inclusive.
+                    type: integer
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sreplicalimits
+
+        deployment_name = input.review.object.metadata.name
+
+        violation[{"msg": msg}] {
+            spec := input.review.object.spec
+            not input_replica_limit(spec)
+            msg := sprintf("The provided number of replicas is not allowed for deployment: %v. Allowed ranges: %v", [deployment_name, input.parameters])
+        }
+
+        input_replica_limit(spec) {
+            provided := input.review.object.spec.replicas
+            count(input.parameters.ranges) > 0
+            range := input.parameters.ranges[_]
+            value_within_range(range, provided)
+        }
+
+        value_within_range(range, value) {
+            range.min_replicas <= value
+            range.max_replicas >= value
+        }
+```
+
+## Examples
+<details>
+<summary>replicalimits</summary><blockquote>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sReplicaLimits
+metadata:
+  name: replica-limits
+spec:
+  match:
+    kinds:
+      - apiGroups: ["apps"]
+        kinds: ["Deployment"]
+  parameters:
+    ranges:
+    - min_replicas: 3
+      max_replicas: 50
+```
+
+</details>
+<details>
+<summary>example_allowed</summary>
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: allowed-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+```
+
+</details>
+<details>
+<summary>example_disallowed</summary>
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: disallowed-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 100
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+```
+
+</details>
+
+
+</blockquote></details>

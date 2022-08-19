@@ -3,6 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8spspfsgroup
   annotations:
+    metadata.gatekeeper.sh/title: "FS Group"
     description: >-
       Controls allocating an FSGroup that owns the Pod's volumes. Corresponds
       to the `fsGroup` field in a PodSecurityPolicy. For more information, see

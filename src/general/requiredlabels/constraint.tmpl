@@ -3,6 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8srequiredlabels
   annotations:
+    metadata.gatekeeper.sh/title: "Kubernetes Required Labels"
     description: >-
       Requires resources to contain specified labels, with values matching
       provided regular expressions.

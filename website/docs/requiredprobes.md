@@ -1,0 +1,214 @@
+---
+id: requiredprobes
+title: Kubernetes Required Probes
+---
+
+# Kubernetes Required Probes
+
+## Description
+Requires Pods to have readiness and/or liveness probes.
+
+## Template
+```yaml
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequiredprobes
+  annotations:
+    metadata.gatekeeper.sh/title: "Kubernetes Required Probes"
+    description: Requires Pods to have readiness and/or liveness probes.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequiredProbes
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            probes:
+              description: "A list of probes that are required (ex: `readinessProbe`)"
+              type: array
+              items:
+                type: string
+            probeTypes:
+              description: "The probe must define a field listed in `probeType` in order to satisfy the constraint (ex. `tcpSocket` satisfies `['tcpSocket', 'exec']`)"
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8srequiredprobes
+
+        probe_type_set = probe_types {
+            probe_types := {type | type := input.parameters.probeTypes[_]}
+        }
+
+        violation[{"msg": msg}] {
+            container := input.review.object.spec.containers[_]
+            probe := input.parameters.probes[_]
+            probe_is_missing(container, probe)
+            msg := get_violation_message(container, input.review, probe)
+        }
+
+        probe_is_missing(ctr, probe) = true {
+            not ctr[probe]
+        }
+
+        probe_is_missing(ctr, probe) = true {
+            probe_field_empty(ctr, probe)
+        }
+
+        probe_field_empty(ctr, probe) = true {
+            probe_fields := {field | ctr[probe][field]}
+            diff_fields := probe_type_set - probe_fields
+            count(diff_fields) == count(probe_type_set)
+        }
+
+        get_violation_message(container, review, probe) = msg {
+            msg := sprintf("Container <%v> in your <%v> <%v> has no <%v>", [container.name, review.kind.kind, review.object.metadata.name, probe])
+        }
+```
+
+## Examples
+<details>
+<summary>must-have-probes</summary><blockquote>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredProbes
+metadata:
+  name: must-have-probes
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    probes: ["readinessProbe", "livenessProbe"]
+    probeTypes: ["tcpSocket", "httpGet", "exec"]
+```
+
+</details>
+<details>
+<summary>example_allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod1
+spec:
+  containers:
+  - name: tomcat
+    image: tomcat
+    ports:
+    - containerPort: 8080
+    livenessProbe:
+      tcpSocket:
+        port: 80
+      initialDelaySeconds: 5
+      periodSeconds: 10
+    readinessProbe:
+      tcpSocket:
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 10
+  volumes:
+  - name: cache-volume
+    emptyDir: {}
+```
+
+</details>
+<details>
+<summary>example_disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod1
+spec:
+  containers:
+  - name: nginx-1
+    image: nginx:1.7.9
+    ports:
+    - containerPort: 80
+    livenessProbe:
+      # tcpSocket:
+      #   port: 80
+      # initialDelaySeconds: 5
+      # periodSeconds: 10
+    volumeMounts:
+    - mountPath: /tmp/cache
+      name: cache-volume
+  - name: tomcat
+    image: tomcat
+    ports:
+    - containerPort: 8080
+    readinessProbe:
+      tcpSocket:
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 10
+  volumes:
+  - name: cache-volume
+    emptyDir: {}
+```
+
+</details>
+<details>
+<summary>example_disallowed2</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod2
+spec:
+  containers:
+  - name: nginx-1
+    image: nginx:1.7.9
+    ports:
+    - containerPort: 80
+    readinessProbe:
+    # httpGet:
+    #   path: /
+    #   port: 80
+    # initialDelaySeconds: 5
+    # periodSeconds: 10
+    livenessProbe:
+      tcpSocket:
+        port: 80
+      initialDelaySeconds: 5
+      periodSeconds: 10
+    volumeMounts:
+    - mountPath: /tmp/cache
+      name: cache-volume
+  - name: tomcat
+    image: tomcat
+    ports:
+    - containerPort: 8080
+    readinessProbe:
+      tcpSocket:
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 10
+    # livenessProbe:
+    #   tcpSocket:
+    #     port: 8080
+    #   initialDelaySeconds: 5
+    #   periodSeconds: 10
+  volumes:
+  - name: cache-volume
+    emptyDir: {}
+```
+
+</details>
+
+
+</blockquote></details>

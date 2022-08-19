@@ -1,0 +1,160 @@
+---
+id: volumes
+title: Volume Types
+---
+
+# Volume Types
+
+## Description
+Restricts mountable volume types to those specified by the user. Corresponds to the `volumes` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
+
+## Template
+```yaml
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8spspvolumetypes
+  annotations:
+    metadata.gatekeeper.sh/title : "Volume Types"
+    description: >-
+      Restricts mountable volume types to those specified by the user.
+      Corresponds to the `volumes` field in a PodSecurityPolicy. For more
+      information, see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPVolumeTypes
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Restricts mountable volume types to those specified by the user.
+            Corresponds to the `volumes` field in a PodSecurityPolicy. For more
+            information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
+          properties:
+            volumes:
+              description: "`volumes` is an array of volume types. All volume types can be enabled using `*`."
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8spspvolumetypes
+
+        violation[{"msg": msg, "details": {}}] {
+            volume_fields := {x | input.review.object.spec.volumes[_][x]; x != "name"}
+            field := volume_fields[_]
+            not input_volume_type_allowed(field)
+            msg := sprintf("The volume type %v is not allowed, pod: %v. Allowed volume types: %v", [field, input.review.object.metadata.name, input.parameters.volumes])
+        }
+
+        # * may be used to allow all volume types
+        input_volume_type_allowed(field) {
+            input.parameters.volumes[_] == "*"
+        }
+
+        input_volume_type_allowed(field) {
+            field == input.parameters.volumes[_]
+        }
+```
+
+## Examples
+<details>
+<summary>psp-volume-types</summary><blockquote>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPVolumeTypes
+metadata:
+  name: psp-volume-types
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    volumes:
+    # - "*" # * may be used to allow all volume types
+    - configMap
+    - emptyDir
+    - projected
+    - secret
+    - downwardAPI
+    - persistentVolumeClaim
+    #- hostPath #required for allowedHostPaths
+    - flexVolume #required for allowedFlexVolumes
+```
+
+</details>
+<details>
+<summary>example_allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-volume-types-allowed
+  labels:
+    app: nginx-volume-types
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    volumeMounts:
+    - mountPath: /cache
+      name: cache-volume
+  - name: nginx2
+    image: nginx
+    volumeMounts:
+    - mountPath: /cache2
+      name: demo-vol
+  volumes:
+  - name: cache-volume
+    emptyDir: {}
+  - name: demo-vol
+    emptyDir: {}
+```
+
+</details>
+<details>
+<summary>example_disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-volume-types-disallowed
+  labels:
+    app: nginx-volume-types
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    volumeMounts:
+    - mountPath: /cache
+      name: cache-volume
+  - name: nginx2
+    image: nginx
+    volumeMounts:
+    - mountPath: /cache2
+      name: demo-vol
+  volumes:
+  - name: cache-volume
+    hostPath:
+      path: /tmp # directory location on host
+  - name: demo-vol
+    emptyDir: {}
+```
+
+</details>
+
+
+</blockquote></details>

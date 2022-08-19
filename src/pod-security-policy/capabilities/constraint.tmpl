@@ -3,6 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8spspcapabilities
   annotations:
+    metadata.gatekeeper.sh/title: "Capabilities"
     description: >-
       Controls Linux capabilities on containers. Corresponds to the
       `allowedCapabilities` and `requiredDropCapabilities` fields in a

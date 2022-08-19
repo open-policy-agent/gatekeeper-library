@@ -3,6 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8spsphostfilesystem
   annotations:
+    metadata.gatekeeper.sh/title: "Host Filesystem"
     description: >-
       Controls usage of the host filesystem. Corresponds to the
       `allowedHostPaths` field in a PodSecurityPolicy. For more information,
