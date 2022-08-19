@@ -35,7 +35,7 @@ spec:
         }
 
         violation[{"msg": msg}] {
-          count(data.inventory.cluster["storage.k8s.io/v1"]["StorageClass"]) == 0
+          not data.inventory.cluster["storage.k8s.io/v1"]["StorageClass"]
           msg := sprintf("StorageClasses not synced. Gatekeeper may be misconfigured. Please have a cluster-admin consult the documentation.", [])
         }
 
