@@ -3,7 +3,6 @@ package k8sstorageclass
 test_input_denied_no_datasync {
     input := { "review": input_review_pvc_name("fast"), "parameters": { "includeStorageClassesInMessage": true } }
     results := violation with input as input with data.inventory as inv_nosync
-    count(results) == 2
     results[result]
     contains(result.msg, "misconfigured")
 }
@@ -19,6 +18,11 @@ test_input_allowed_pvc_slow {
 }
 test_input_denied_pvc_bad_storageclassname {
     input := { "review": input_review_pvc_name("other"), "parameters": { "includeStorageClassesInMessage": true } }
+    results := violation with input as input with data.inventory as inv
+    count(results) == 1
+}
+test_input_denied_pvc_bad_storageclassname_excludestorageclassesinmessage {
+    input := { "review": input_review_pvc_name("other"), "parameters": { "includeStorageClassesInMessage": false } }
     results := violation with input as input with data.inventory as inv
     count(results) == 1
 }

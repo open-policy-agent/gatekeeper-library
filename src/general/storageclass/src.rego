@@ -20,7 +20,6 @@ storageclass_found(name) {
 }
 
 violation[{"msg": pvc_storageclass_badname_msg}] {
-  input.parameters.includeStorageClassesInMessage == true
   is_pvc(input.review.object)
   not storageclass_found(input.review.object.spec.storageClassName)
 }
