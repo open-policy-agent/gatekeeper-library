@@ -11,7 +11,7 @@ is_statefulset(obj) {
 }
 
 violation[{"msg": msg}] {
-  count(data.inventory.cluster["storage.k8s.io/v1"]["StorageClass"]) == 0
+  not data.inventory.cluster["storage.k8s.io/v1"]["StorageClass"]
   msg := sprintf("StorageClasses not synced. Gatekeeper may be misconfigured. Please have a cluster-admin consult the documentation.", [])
 }
 
@@ -20,7 +20,6 @@ storageclass_found(name) {
 }
 
 violation[{"msg": pvc_storageclass_badname_msg}] {
-  input.parameters.includeStorageClassesInMessage == true
   is_pvc(input.review.object)
   not storageclass_found(input.review.object.spec.storageClassName)
 }
