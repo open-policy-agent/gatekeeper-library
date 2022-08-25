@@ -60,6 +60,12 @@ setup() {
   wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl get validatingwebhookconfigurations.admissionregistration.k8s.io gatekeeper-validating-webhook-configuration"
 }
 
+@test "unset default storageclasses so tests function properly" {
+  kubectl get storageclass --no-headers=true -o custom-columns=":metadata.name" | while read line; do
+    kubectl annotate storageclass $line storageclass.kubernetes.io/is-default-class-
+  done
+}
+
 @test "applying sync config" {
   kubectl apply -f ${BATS_TESTS_DIR}/sync.yaml
 }
@@ -79,6 +85,8 @@ setup() {
     if [ -d "$policy" ]; then
       local policy_group=$(basename "$(dirname "$policy")")
       local template_name=$(basename "$policy")
+      # Skip storageclass test until gatekeeper 3.8 is unsupported
+      [ "$template_name" == "storageclass" ] && continue
       echo "running integration test against policy group: $policy_group, constraint template: $template_name"
       # apply template
       wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl apply -k $policy"
@@ -90,6 +98,14 @@ setup() {
         local name=$(yq e .metadata.name "$sample"/constraint.yaml)
         wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "constraint_enforced $kind $name"
 
+        for inventory in "$sample"/example_inventory*.yaml; do
+          if [[ -e "$inventory" ]]; then
+            run kubectl apply -f "$inventory"
+            assert_match 'created' "$output"
+            assert_success
+          fi
+        done
+
         for allowed in "$sample"/example_allowed*.yaml; do
           if [[ -e "$allowed" ]]; then
             # apply resource
@@ -98,14 +114,6 @@ setup() {
             assert_success
             # delete resource
             kubectl delete --ignore-not-found -f "$allowed"
-          fi
-        done
-
-        for inventory in "$sample"/example_inventory*.yaml; do
-          if [[ -e "$inventory" ]]; then
-            run kubectl apply -f "$inventory"
-            assert_match 'created' "$output"
-            assert_success
           fi
         done
 
