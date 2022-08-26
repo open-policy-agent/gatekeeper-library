@@ -4,7 +4,7 @@ metadata:
   name: k8sstorageclass
   annotations:
     description: >-
-      Requires storage classes to be specified when used. Only gatekeeper 3.9+ is supported.
+      Requires storage classes to be specified when used. Only Gatekeeper 3.9+ is supported.
 spec:
   crd:
     spec:
@@ -35,7 +35,7 @@ spec:
         }
 
         violation[{"msg": msg}] {
-          count(data.inventory.cluster["storage.k8s.io/v1"]["StorageClass"]) == 0
+          not data.inventory.cluster["storage.k8s.io/v1"]["StorageClass"]
           msg := sprintf("StorageClasses not synced. Gatekeeper may be misconfigured. Please have a cluster-admin consult the documentation.", [])
         }
 
@@ -44,7 +44,6 @@ spec:
         }
 
         violation[{"msg": pvc_storageclass_badname_msg}] {
-          input.parameters.includeStorageClassesInMessage == true
           is_pvc(input.review.object)
           not storageclass_found(input.review.object.spec.storageClassName)
         }
