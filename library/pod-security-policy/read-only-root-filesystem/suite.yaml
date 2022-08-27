@@ -3,7 +3,7 @@ apiVersion: test.gatekeeper.sh/v1alpha1
 metadata:
   name: read-only-root-filesystem
 tests:
-- name: 
+- name: require-read-only-root-filesystem
   template: template.yaml
   constraint: samples/psp-readonlyrootfilesystem/constraint.yaml
   cases:
