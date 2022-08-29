@@ -117,11 +117,12 @@ spec:
               prefix := trim_suffix(exemption, "*")
               startswith(img, prefix)
           }
+
 ```
 
 ## Examples
 <details>
-<summary>psp-host-network-ports</summary><blockquote>
+<summary>use-of-host-networking-ports-blocked</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -140,11 +141,35 @@ spec:
     hostNetwork: true
     min: 80
     max: 9000
+
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-host-networking-ports-disallowed
+  labels:
+    app: nginx-host-networking-ports
+spec:
+  hostNetwork: true
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 9001
+      hostPort: 9001
+
 ```
 
 </details>
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -161,32 +186,12 @@ spec:
     ports:
     - containerPort: 9000
       hostPort: 80
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-host-networking-ports-disallowed
-  labels:
-    app: nginx-host-networking-ports
-spec:
-  hostNetwork: true
-  containers:
-  - name: nginx
-    image: nginx
-    ports:
-    - containerPort: 9001
-      hostPort: 9001
-```
-
-</details>
-<details>
-<summary>disallowed_ephemeral</summary>
+<summary>disallowed-ephemeral</summary>
 
 ```yaml
 apiVersion: v1
@@ -203,6 +208,7 @@ spec:
     ports:
     - containerPort: 9001
       hostPort: 9001
+
 ```
 
 </details>

@@ -91,11 +91,12 @@ spec:
               prefix := trim_suffix(exemption, "*")
               startswith(img, prefix)
           }
+
 ```
 
 ## Examples
 <details>
-<summary>psp-privileged-container</summary><blockquote>
+<summary>privileged-containers-disallowed</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -111,11 +112,33 @@ spec:
       - apiGroups: [""]
         kinds: ["Pod"]
     excludedNamespaces: ["kube-system"]
+
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-privileged-disallowed
+  labels:
+    app: nginx-privileged
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      privileged: true
+
 ```
 
 </details>
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -130,30 +153,12 @@ spec:
     image: nginx
     securityContext:
       privileged: false
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-privileged-disallowed
-  labels:
-    app: nginx-privileged
-spec:
-  containers:
-  - name: nginx
-    image: nginx
-    securityContext:
-      privileged: true
-```
-
-</details>
-<details>
-<summary>disallowed_ephemeral</summary>
+<summary>disallowed-ephemeral</summary>
 
 ```yaml
 apiVersion: v1
@@ -168,6 +173,7 @@ spec:
     image: nginx
     securityContext:
       privileged: true
+
 ```
 
 </details>

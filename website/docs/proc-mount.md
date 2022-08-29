@@ -135,11 +135,12 @@ spec:
               prefix := trim_suffix(exemption, "*")
               startswith(img, prefix)
           }
+
 ```
 
 ## Examples
 <details>
-<summary>psp-proc-mount</summary><blockquote>
+<summary>default-proc-mount-required</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -156,11 +157,33 @@ spec:
         kinds: ["Pod"]
   parameters:
     procMount: Default
+
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-proc-mount-disallowed
+  labels:
+    app: nginx-proc-mount
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      procMount: Unmasked #Default
+
 ```
 
 </details>
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -175,30 +198,12 @@ spec:
     image: nginx
     securityContext:
       procMount: Default
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-proc-mount-disallowed
-  labels:
-    app: nginx-proc-mount
-spec:
-  containers:
-  - name: nginx
-    image: nginx
-    securityContext:
-      procMount: Unmasked #Default
-```
-
-</details>
-<details>
-<summary>disallowed_ephemeral</summary>
+<summary>disallowed-ephemeral</summary>
 
 ```yaml
 apiVersion: v1
@@ -213,6 +218,7 @@ spec:
     image: nginx
     securityContext:
       procMount: Unmasked #Default
+
 ```
 
 </details>

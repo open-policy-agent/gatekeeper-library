@@ -102,11 +102,12 @@ spec:
         has_field(object, field) = true {
             object[field]
         }
+
 ```
 
 ## Examples
 <details>
-<summary>psp-fsgroup</summary><blockquote>
+<summary>fsgroup</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -126,35 +127,13 @@ spec:
     ranges:
     - min: 1
       max: 1000
+
 ```
 
 </details>
-<details>
-<summary>example_allowed</summary>
 
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: fsgroup-disallowed
-spec:
-  securityContext:
-    fsGroup: 500 # directory will have group ID 500
-  volumes:
-    - name: fsgroup-demo-vol
-      emptyDir: {}
-  containers:
-    - name: fsgroup-demo
-      image: busybox
-      command: ["sh", "-c", "sleep 1h"]
-      volumeMounts:
-        - name: fsgroup-demo-vol
-          mountPath: /data/demo
-```
-
-</details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -174,6 +153,32 @@ spec:
     volumeMounts:
     - name: fsgroup-demo-vol
       mountPath: /data/demo
+
+```
+
+</details>
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fsgroup-disallowed
+spec:
+  securityContext:
+    fsGroup: 500 # directory will have group ID 500
+  volumes:
+    - name: fsgroup-demo-vol
+      emptyDir: {}
+  containers:
+    - name: fsgroup-demo
+      image: busybox
+      command: ["sh", "-c", "sleep 1h"]
+      volumeMounts:
+        - name: fsgroup-demo-vol
+          mountPath: /data/demo
+
 ```
 
 </details>

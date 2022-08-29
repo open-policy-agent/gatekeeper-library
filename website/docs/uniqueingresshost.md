@@ -47,11 +47,12 @@ spec:
           not identical(other, input.review)
           msg := sprintf("ingress host conflicts with an existing ingress <%v>", [host])
         }
+
 ```
 
 ## Examples
 <details>
-<summary>unique-ingress-host</summary><blockquote>
+<summary>block-endpoint-default-role</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -66,11 +67,13 @@ spec:
     kinds:
       - apiGroups: ["extensions", "networking.k8s.io"]
         kinds: ["Ingress"]
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -100,11 +103,12 @@ spec:
             name: nginx2
             port:
               number: 80
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -124,11 +128,12 @@ spec:
             name: nginx
             port:
               number: 80
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed2</summary>
+<summary>example-disallowed2</summary>
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -158,54 +163,7 @@ spec:
             name: nginx2
             port:
               number: 80
-```
 
-</details>
-<details>
-<summary>example_inventory_disallowed2</summary>
-
-```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: ingress-host-example2
-  namespace: default
-spec:
-  rules:
-  - host: example-host2.example.com
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: nginx
-            port:
-              number: 80
-```
-
-</details>
-<details>
-<summary>example_inventory_disallowed</summary>
-
-```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: ingress-host-example
-  namespace: default
-spec:
-  rules:
-  - host: example-host.example.com
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: nginx
-            port:
-              number: 80
 ```
 
 </details>

@@ -95,11 +95,12 @@ spec:
               prefix := trim_suffix(exemption, "*")
               startswith(img, prefix)
           }
+
 ```
 
 ## Examples
 <details>
-<summary>container-image-must-have-digest</summary><blockquote>
+<summary>block-endpoint-default-role</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -116,11 +117,13 @@ spec:
         kinds: ["Pod"]
     namespaces:
       - "default"
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -135,11 +138,39 @@ spec:
         - "run"
         - "--server"
         - "--addr=localhost:8080"
+
 ```
 
 </details>
 <details>
-<summary>disallowed_all</summary>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-disallowed
+spec:
+  initContainers:
+    - name: opainit
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+
+```
+
+</details>
+<details>
+<summary>disallowed-all</summary>
 
 ```yaml
 apiVersion: v1
@@ -168,32 +199,7 @@ spec:
         - "run"
         - "--server"
         - "--addr=localhost:8080"
-```
 
-</details>
-<details>
-<summary>example_disallowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: opa-disallowed
-spec:
-  initContainers:
-    - name: opainit
-      image: openpolicyagent/opa:0.9.2
-      args:
-        - "run"
-        - "--server"
-        - "--addr=localhost:8080"
-  containers:
-    - name: opa
-      image: openpolicyagent/opa:0.9.2
-      args:
-        - "run"
-        - "--server"
-        - "--addr=localhost:8080"
 ```
 
 </details>

@@ -68,11 +68,12 @@ spec:
           not re_match(expected.allowedRegex, value)
           msg := sprintf("Annotation <%v: %v> does not satisfy allowed regex: %v", [key, value, expected.allowedRegex])
         }
+
 ```
 
 ## Examples
 <details>
-<summary>all-must-have-certain-set-of-annotations</summary><blockquote>
+<summary>block-endpoint-default-role</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -92,15 +93,17 @@ spec:
     annotations:
       - key: a8r.io/owner
         # Matches email address or github user
-        allowedRegex: ^([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}|[a-z]{1,39})$
+        allowedRegex: ^([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}|[a-z]{1,39})$
       - key: a8r.io/runbook
         # Matches urls including or not http/https
-        allowedRegex: ^(http://www.|https://www.|http://|https://)?[a-z0-9]+([-.]{1}[a-z0-9]+)*.[a-z]{2,5}(:[0-9]{1,5})?(/.*)?$
+        allowedRegex: ^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -117,11 +120,12 @@ spec:
     targetPort: 8080
   selector:
     app: foo
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -135,6 +139,7 @@ spec:
     targetPort: 8080
   selector:
     app: foo
+
 ```
 
 </details>

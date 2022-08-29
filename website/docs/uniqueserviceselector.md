@@ -69,11 +69,12 @@ spec:
           input_selector == other_selector
           msg := sprintf("same selector as service <%v> in namespace <%v>", [name, namespace])
         }
+
 ```
 
 ## Examples
 <details>
-<summary>unique-service-selector</summary><blockquote>
+<summary>block-endpoint-default-role</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -85,11 +86,13 @@ metadata:
   name: unique-service-selector
   labels:
     owner: admin.agilebank.demo
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -102,11 +105,12 @@ spec:
     - port: 443
   selector:
     key: other-value
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -119,23 +123,7 @@ spec:
     - port: 443
   selector:
     key: value
-```
 
-</details>
-<details>
-<summary>example_inventory_disallowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: gatekeeper-test-service-example
-  namespace: default
-spec:
-  ports:
-    - port: 443
-  selector:
-    key: value
 ```
 
 </details>

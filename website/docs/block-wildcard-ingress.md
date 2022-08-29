@@ -43,6 +43,7 @@ spec:
           contains_wildcard(hostname)
           msg := sprintf("Hostname '%v' is not allowed since it counts as a wildcard, which can be used to intercept traffic from other applications.", [hostname])
         }
+
 ```
 
 ## Examples
@@ -62,11 +63,13 @@ spec:
     kinds:
       - apiGroups: ["extensions", "networking.k8s.io"]
         kinds: ["Ingress"]
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -85,34 +88,12 @@ spec:
             name: example
             port:
               number: 80
+
 ```
 
 </details>
 <details>
-<summary>example_host_omitted_disallowed</summary>
-
-```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: wildcard-ingress
-spec:
-  rules:
-  # Omitted host field counts as a wildcard too
-  - http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: example
-            port:
-              number: 80
-```
-
-</details>
-<details>
-<summary>example_blank_host_disallowed</summary>
+<summary>blank-host</summary>
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -131,11 +112,36 @@ spec:
             name: example
             port:
               number: 80
+
 ```
 
 </details>
 <details>
-<summary>example_wildcard_host_disallowed</summary>
+<summary>host-omitted</summary>
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wildcard-ingress
+spec:
+  rules:
+  # Omitted host field counts as a wildcard too
+  - http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: example
+            port:
+              number: 80
+
+```
+
+</details>
+<details>
+<summary>wildcard-host</summary>
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -165,6 +171,7 @@ spec:
             name: example
             port:
               number: 80
+
 ```
 
 </details>

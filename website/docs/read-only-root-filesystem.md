@@ -102,11 +102,12 @@ spec:
               prefix := trim_suffix(exemption, "*")
               startswith(img, prefix)
           }
+
 ```
 
 ## Examples
 <details>
-<summary>psp-readonlyrootfilesystem</summary><blockquote>
+<summary>require-read-only-root-filesystem</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -121,11 +122,33 @@ spec:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
+
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-readonlyrootfilesystem-disallowed
+  labels:
+    app: nginx-readonlyrootfilesystem
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      readOnlyRootFilesystem: false
+
 ```
 
 </details>
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -140,30 +163,12 @@ spec:
     image: nginx
     securityContext:
       readOnlyRootFilesystem: true
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-readonlyrootfilesystem-disallowed
-  labels:
-    app: nginx-readonlyrootfilesystem
-spec:
-  containers:
-  - name: nginx
-    image: nginx
-    securityContext:
-      readOnlyRootFilesystem: false
-```
-
-</details>
-<details>
-<summary>disallowed_ephemeral</summary>
+<summary>disallowed-ephemeral</summary>
 
 ```yaml
 apiVersion: v1
@@ -178,6 +183,7 @@ spec:
     image: nginx
     securityContext:
       readOnlyRootFilesystem: false
+
 ```
 
 </details>

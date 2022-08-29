@@ -140,11 +140,12 @@ spec:
               prefix := trim_suffix(exemption, "*")
               startswith(img, prefix)
           }
+
 ```
 
 ## Examples
 <details>
-<summary>psp-selinux-v2</summary><blockquote>
+<summary>require-matching-selinux-options</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -165,11 +166,37 @@ spec:
         role: object_r
         type: svirt_sandbox_file_t
         user: system_u
+
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+    name: nginx-selinux-disallowed
+    labels:
+        app: nginx-selinux
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      seLinuxOptions:
+        level: s1:c234,c567
+        user: sysadm_u
+        role: sysadm_r
+        type: svirt_lxc_net_t
+
 ```
 
 </details>
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -188,34 +215,12 @@ spec:
         role: object_r
         type: svirt_sandbox_file_t
         user: system_u
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-    name: nginx-selinux-disallowed
-    labels:
-        app: nginx-selinux
-spec:
-  containers:
-  - name: nginx
-    image: nginx
-    securityContext:
-      seLinuxOptions:
-        level: s1:c234,c567
-        user: sysadm_u
-        role: sysadm_r
-        type: svirt_lxc_net_t
-```
-
-</details>
-<details>
-<summary>disallowed_ephemeral</summary>
+<summary>disallowed-ephemeral</summary>
 
 ```yaml
 apiVersion: v1
@@ -234,6 +239,7 @@ spec:
         user: sysadm_u
         role: sysadm_r
         type: svirt_lxc_net_t
+
 ```
 
 </details>

@@ -66,11 +66,12 @@ spec:
             range.min_replicas <= value
             range.max_replicas >= value
         }
+
 ```
 
 ## Examples
 <details>
-<summary>replicalimits</summary><blockquote>
+<summary>block-endpoint-default-role</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -89,11 +90,13 @@ spec:
     ranges:
     - min_replicas: 3
       max_replicas: 50
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: apps/v1
@@ -115,11 +118,12 @@ spec:
         image: nginx:1.14.2
         ports:
         - containerPort: 80
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: apps/v1
@@ -141,6 +145,7 @@ spec:
         image: nginx:1.14.2
         ports:
         - containerPort: 80
+
 ```
 
 </details>

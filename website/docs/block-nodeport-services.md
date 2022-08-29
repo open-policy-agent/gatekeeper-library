@@ -36,11 +36,12 @@ spec:
           input.review.object.spec.type == "NodePort"
           msg := "User is not allowed to create service of type NodePort"
         }
+
 ```
 
 ## Examples
 <details>
-<summary>block-node-port</summary><blockquote>
+<summary>block-nodeport-services</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -55,12 +56,13 @@ spec:
     kinds:
       - apiGroups: [""]
         kinds: ["Service"]
+
 ```
 
 </details>
 
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -73,6 +75,7 @@ spec:
     - port: 80
       targetPort: 80
       nodePort: 30007
+
 ```
 
 </details>

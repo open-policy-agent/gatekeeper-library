@@ -112,11 +112,12 @@ spec:
               prefix := trim_suffix(exemption, "*")
               startswith(img, prefix)
           }
+
 ```
 
 ## Examples
 <details>
-<summary>container-must-have-cpu-requests-memory-limits-and-requests</summary><blockquote>
+<summary>container-limits-and-requests</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -125,7 +126,7 @@ spec:
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sRequiredResources
 metadata:
-  name: container-must-have-cpu-requests-memory-limits-and-requests
+  name: container-must-have-limits-and-requests
 spec:
   match:
     kinds:
@@ -133,13 +134,16 @@ spec:
         kinds: ["Pod"]
   parameters:
     limits:
+      - cpu
       - memory
     requests:
       - cpu
       - memory
+
 ```
 
 </details>
+
 <details>
 <summary>limits-and-requests-defined-allowed</summary>
 
@@ -165,52 +169,8 @@ spec:
         requests:
           cpu: "100m"
           memory: "1Gi"
-```
 
-</details>
-<details>
-<summary>only-memory-limits-defined-disallowed</summary>
 
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: opa-disallowed
-  labels:
-    owner: me.agilebank.demo
-spec:
-  containers:
-    - name: opa
-      image: openpolicyagent/opa:0.9.2
-      args:
-        - "run"
-        - "--server"
-        - "--addr=localhost:8080"
-      resources:
-        limits:
-          memory: "2Gi"
-```
-
-</details>
-<details>
-<summary>empty-resources-disallowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: opa-disallowed
-  labels:
-    owner: me.agilebank.demo
-spec:
-  containers:
-    - name: opa
-      image: openpolicyagent/opa:0.9.2
-      args:
-        - "run"
-        - "--server"
-        - "--addr=localhost:8080"
-      resources: {}
 ```
 
 </details>
@@ -236,87 +196,7 @@ spec:
         requests:
           cpu: "100m"
           memory: "2Gi"
-```
 
-</details>
-
-
-</blockquote></details>
-<details>
-<summary>container-must-have-limits-and-requests</summary><blockquote>
-
-<details>
-<summary>constraint</summary>
-
-```yaml
-apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sRequiredResources
-metadata:
-  name: container-must-have-limits-and-requests
-spec:
-  match:
-    kinds:
-      - apiGroups: [""]
-        kinds: ["Pod"]
-  parameters:
-    limits:
-      - cpu
-      - memory
-    requests:
-      - cpu
-      - memory
-```
-
-</details>
-<details>
-<summary>limits-and-requests-defined-allowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: opa-allowed
-  labels:
-    owner: me.agilebank.demo
-spec:
-  containers:
-    - name: opa
-      image: openpolicyagent/opa:0.9.2
-      args:
-        - "run"
-        - "--server"
-        - "--addr=localhost:8080"
-      resources:
-        limits:
-          cpu: "100m"
-          memory: "1Gi"
-        requests:
-          cpu: "100m"
-          memory: "1Gi"
-```
-
-</details>
-<details>
-<summary>only-memory-limits-defined-disallowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: opa-disallowed
-  labels:
-    owner: me.agilebank.demo
-spec:
-  containers:
-    - name: opa
-      image: openpolicyagent/opa:0.9.2
-      args:
-        - "run"
-        - "--server"
-        - "--addr=localhost:8080"
-      resources:
-        limits:
-          memory: "2Gi"
 ```
 
 </details>
@@ -343,11 +223,12 @@ spec:
           cpu: "100m"
         limits:
           memory: "2Gi"
+
 ```
 
 </details>
 <details>
-<summary>only-requests-defined-disallowed</summary>
+<summary>only-memory-limits-defined-disallowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -365,17 +246,16 @@ spec:
         - "--server"
         - "--addr=localhost:8080"
       resources:
-        requests:
-          cpu: "100m"
+        limits:
           memory: "2Gi"
+
 ```
 
 </details>
 
 
-</blockquote></details>
-<details>
-<summary>no-enforcements</summary><blockquote>
+</blockquote></details><details>
+<summary>container-cpu-requests-memory-limits-and-requests</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -384,15 +264,23 @@ spec:
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sRequiredResources
 metadata:
-  name: no-enforcements
+  name: container-must-have-cpu-requests-memory-limits-and-requests
 spec:
   match:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
+  parameters:
+    limits:
+      - memory
+    requests:
+      - cpu
+      - memory
+
 ```
 
 </details>
+
 <details>
 <summary>limits-and-requests-defined-allowed</summary>
 
@@ -418,6 +306,239 @@ spec:
         requests:
           cpu: "100m"
           memory: "1Gi"
+
+
+```
+
+</details>
+<details>
+<summary>only-cpu-requests-and-memory-limits-and-requests-defined-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-disallowed
+  labels:
+    owner: me.agilebank.demo
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      resources:
+        limits:
+          memory: "2Gi"
+        requests:
+          cpu: "100m"
+          memory: "2Gi"
+
+```
+
+</details>
+<details>
+<summary>only-requests-defined-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-disallowed
+  labels:
+    owner: me.agilebank.demo
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "2Gi"
+
+```
+
+</details>
+<details>
+<summary>only-memory-limits-defined-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-disallowed
+  labels:
+    owner: me.agilebank.demo
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      resources:
+        limits:
+          memory: "2Gi"
+
+```
+
+</details>
+<details>
+<summary>empty-resources-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-disallowed
+  labels:
+    owner: me.agilebank.demo
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      resources: {}
+
+```
+
+</details>
+
+
+</blockquote></details><details>
+<summary>no-enforcements</summary><blockquote>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredResources
+metadata:
+  name: no-enforcements
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+
+```
+
+</details>
+
+<details>
+<summary>limits-and-requests-defined-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-allowed
+  labels:
+    owner: me.agilebank.demo
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "1Gi"
+        requests:
+          cpu: "100m"
+          memory: "1Gi"
+
+
+```
+
+</details>
+<details>
+<summary>only-requests-defined-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-disallowed
+  labels:
+    owner: me.agilebank.demo
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "2Gi"
+
+```
+
+</details>
+<details>
+<summary>only-cpu-requests-and-memory-limits-defined-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-disallowed
+  labels:
+    owner: me.agilebank.demo
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      resources:
+        requests:
+          cpu: "100m"
+        limits:
+          memory: "2Gi"
+
+```
+
+</details>
+<details>
+<summary>empty-resources-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-disallowed
+  labels:
+    owner: me.agilebank.demo
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      resources: {}
+
 ```
 
 </details>

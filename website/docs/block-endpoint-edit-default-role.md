@@ -7,7 +7,7 @@ title: Kubernetes Block Endpoint Edit Default Role
 
 ## Description
 Many Kubernetes installations by default have a system:aggregate-to-edit ClusterRole which does not properly restrict access to editing Endpoints. This ConstraintTemplate forbids the system:aggregate-to-edit ClusterRole from granting permission to create/patch/update Endpoints.
-ClusterRole/system:aggregate-to-edit should not allow Endpoint edit permissions due to CVE-2021-25740, Endpoint %DESCRIPTION% EndpointSlice permissions allow cross-Namespace forwarding, https://github.com/kubernetes/kubernetes/issues/103675
+ClusterRole/system:aggregate-to-edit should not allow Endpoint edit permissions due to CVE-2021-25740, Endpoint & EndpointSlice permissions allow cross-Namespace forwarding, https://github.com/kubernetes/kubernetes/issues/103675
 
 ## Template
 ```yaml
@@ -24,7 +24,7 @@ metadata:
       from granting permission to create/patch/update Endpoints.
 
       ClusterRole/system:aggregate-to-edit should not allow
-      Endpoint edit permissions due to CVE-2021-25740, Endpoint %TEMPLATE% EndpointSlice
+      Endpoint edit permissions due to CVE-2021-25740, Endpoint & EndpointSlice
       permissions allow cross-Namespace forwarding,
       https://github.com/kubernetes/kubernetes/issues/103675
 spec:
@@ -59,11 +59,12 @@ spec:
         hasEditVerb(verbs) {
             "update" == verbs[_]
         }
+
 ```
 
 ## Examples
 <details>
-<summary>block-endpoint-edit-default-role</summary><blockquote>
+<summary>block-endpoint-default-role</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -78,11 +79,13 @@ spec:
     kinds:
       - apiGroups: ["rbac.authorization.k8s.io"]
         kinds: ["ClusterRole"]
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -223,11 +226,12 @@ rules:
   - deletecollection
   - patch
   - update
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -309,6 +313,7 @@ rules:
   - deletecollection
   - patch
   - update
+
 ```
 
 </details>

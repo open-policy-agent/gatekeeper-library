@@ -77,7 +77,7 @@ spec:
         canonify_cpu(orig) = new {
           not is_number(orig)
           not endswith(orig, "m")
-          re_match("^[0-9]+(\.[0-9]+)?$", orig)
+          re_match("^[0-9]+(\\.[0-9]+)?$", orig)
           new := to_number(orig) * 1000
         }
 
@@ -174,7 +174,7 @@ spec:
           not is_number(orig)
           suffix := get_suffix(orig)
           raw := replace(orig, suffix, "")
-          re_match("^[0-9]+(\.[0-9]+)?$", raw)
+          re_match("^[0-9]+(\\.[0-9]+)?$", raw)
           new := to_number(raw) * mem_multiple(suffix)
         }
 
@@ -274,11 +274,12 @@ spec:
               prefix := trim_suffix(exemption, "*")
               startswith(img, prefix)
           }
+
 ```
 
 ## Examples
 <details>
-<summary>container-must-have-requests</summary><blockquote>
+<summary>container-requests</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -296,11 +297,13 @@ spec:
   parameters:
     cpu: "200m"
     memory: "1Gi"
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -321,11 +324,12 @@ spec:
         requests:
           cpu: "100m"
           memory: "1Gi"
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -346,6 +350,7 @@ spec:
         requests:
           cpu: "100m"
           memory: "2Gi"
+
 ```
 
 </details>

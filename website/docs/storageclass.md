@@ -6,7 +6,7 @@ title: Storage Class
 # Storage Class
 
 ## Description
-Requires storage classes to be specified when used. Only gatekeeper 3.9+ is supported.
+Requires storage classes to be specified when used. Only Gatekeeper 3.9+ is supported.
 
 ## Template
 ```yaml
@@ -17,7 +17,7 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "Storage Class"
     description: >-
-      Requires storage classes to be specified when used. Only gatekeeper 3.9+ is supported.
+      Requires storage classes to be specified when used. Only Gatekeeper 3.9+ is supported.
 spec:
   crd:
     spec:
@@ -48,7 +48,7 @@ spec:
         }
 
         violation[{"msg": msg}] {
-          count(data.inventory.cluster["storage.k8s.io/v1"]["StorageClass"]) == 0
+          not data.inventory.cluster["storage.k8s.io/v1"]["StorageClass"]
           msg := sprintf("StorageClasses not synced. Gatekeeper may be misconfigured. Please have a cluster-admin consult the documentation.", [])
         }
 
@@ -57,7 +57,6 @@ spec:
         }
 
         violation[{"msg": pvc_storageclass_badname_msg}] {
-          input.parameters.includeStorageClassesInMessage == true
           is_pvc(input.review.object)
           not storageclass_found(input.review.object.spec.storageClassName)
         }
@@ -123,6 +122,7 @@ spec:
         )
 
         #FIXME pod generic ephemeral might be good to validate some day too.
+
 ```
 
 ## Examples
@@ -146,32 +146,19 @@ spec:
         kinds: ["StatefulSet"]
   parameters:
     includeStorageClassesInMessage: true
+
 ```
 
 </details>
+
 <details>
-<summary>example_inventory_allowed_storageclass</summary>
+<summary>example-allowed-pvc</summary>
 
 ```yaml
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: somestorageclass
-provisioner: foo
-parameters:
-allowVolumeExpansion: true
-```
-
-</details>
-<details>
-<summary>example_disallowed_pvc_nonamename</summary>
-
-```yaml
----
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: nostorageclass
+  name: ok
 spec:
   accessModes:
     - ReadWriteOnce
@@ -179,27 +166,29 @@ spec:
   resources:
     requests:
       storage: 8Gi
+  storageClassName: somestorageclass
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed_ssvct_nonamename</summary>
+<summary>example-allowed-ss</summary>
 
 ```yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: novolumeclaimstorageclass
+  name: volumeclaimstorageclass
 spec:
   selector:
     matchLabels:
-      app: novolumeclaimstorageclass
-  serviceName: novolumeclaimstorageclass
+      app: volumeclaimstorageclass
+  serviceName: volumeclaimstorageclass
   replicas: 1
   template:
     metadata:
       labels:
-        app: novolumeclaimstorageclass
+        app: volumeclaimstorageclass
     spec:
       containers:
       - name: main
@@ -212,14 +201,36 @@ spec:
       name: data
     spec:
       accessModes: ["ReadWriteOnce"]
+      storageClassName: "somestorageclass"
       resources:
         requests:
           storage: 1Gi
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed_ssvct_badnamename</summary>
+<summary>example-disallowed-pvc-badname</summary>
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: badstorageclass
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 8Gi
+  storageClassName: badstorageclass
+
+```
+
+</details>
+<details>
+<summary>example-disallowed-ssvct-badnamename</summary>
 
 ```yaml
 apiVersion: apps/v1
@@ -252,17 +263,19 @@ spec:
       resources:
         requests:
           storage: 1Gi
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed_pvc_badname</summary>
+<summary>example-disallowed-pvc-nonamename</summary>
 
 ```yaml
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: badstorageclass
+  name: nostorageclass
 spec:
   accessModes:
     - ReadWriteOnce
@@ -270,7 +283,44 @@ spec:
   resources:
     requests:
       storage: 8Gi
-  storageClassName: badstorageclass
+
+```
+
+</details>
+<details>
+<summary>example-disallowed-ssvct-nonamename</summary>
+
+```yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: novolumeclaimstorageclass
+spec:
+  selector:
+    matchLabels:
+      app: novolumeclaimstorageclass
+  serviceName: novolumeclaimstorageclass
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: novolumeclaimstorageclass
+    spec:
+      containers:
+      - name: main
+        image: k8s.gcr.io/nginx-slim:0.8
+        volumeMounts:
+        - name: data
+          mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi
+
 ```
 
 </details>

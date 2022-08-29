@@ -1,8 +1,14 @@
 name: CI
 on:
   push:
+    paths-ignore:
+      - ".github/workflows/website.yaml"
+      - "website/**"
     branches: [master]
   pull_request:
+    paths-ignore:
+      - ".github/workflows/website.yaml"
+      - "website/**"
     branches: [master]
 jobs:
   generate:

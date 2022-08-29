@@ -108,11 +108,12 @@ spec:
               prefix := trim_suffix(exemption, "*")
               startswith(img, prefix)
           }
+
 ```
 
 ## Examples
 <details>
-<summary>psp-apparmor</summary><blockquote>
+<summary>apparmor</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -130,11 +131,13 @@ spec:
   parameters:
     allowedProfiles:
     - runtime/default
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -150,11 +153,12 @@ spec:
   containers:
   - name: nginx
     image: nginx
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -170,11 +174,12 @@ spec:
   containers:
   - name: nginx
     image: nginx
+
 ```
 
 </details>
 <details>
-<summary>disallowed_ephemeral</summary>
+<summary>disallowed-ephemeral</summary>
 
 ```yaml
 apiVersion: v1
@@ -190,6 +195,7 @@ spec:
   ephemeralContainers:
   - name: nginx
     image: nginx
+
 ```
 
 </details>

@@ -99,11 +99,13 @@ spec:
               prefix := trim_suffix(exemption, "*")
               startswith(img, prefix)
           }
+
+
 ```
 
 ## Examples
 <details>
-<summary>container-image-must-not-have-latest-tag</summary><blockquote>
+<summary>block-endpoint-default-role</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -123,12 +125,85 @@ spec:
   parameters:
     tags: ["latest"]
     exemptImages: ["openpolicyagent/opa-exp:latest", "openpolicyagent/opa-exp2:latest"]
+
 ```
 
 </details>
 
 <details>
-<summary>example_disallowed_tag</summary>
+<summary>allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-allowed
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+
+```
+
+</details>
+<details>
+<summary>exempt-images-with-disallowed-tags</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-exempt-allowed
+spec:
+  containers:
+    - name: opa-exp
+      image: openpolicyagent/opa-exp:latest
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+    - name: opa-init
+      image: openpolicyagent/init:v1
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+    - name: opa-exp2
+      image: openpolicyagent/opa-exp2:latest
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+
+```
+
+</details>
+<details>
+<summary>no-tag</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-disallowed
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+
+```
+
+</details>
+<details>
+<summary>single-disallowed-tag</summary>
 
 ```yaml
 apiVersion: v1
@@ -143,11 +218,12 @@ spec:
         - "run"
         - "--server"
         - "--addr=localhost:8080"
+
 ```
 
 </details>
 <details>
-<summary>disallowed_tag_ephemeral</summary>
+<summary>single-disallowed-tag-ephemeral</summary>
 
 ```yaml
 apiVersion: v1
@@ -169,11 +245,12 @@ spec:
         - "run"
         - "--server"
         - "--addr=localhost:8080"
+
 ```
 
 </details>
 <details>
-<summary>example_some_disallowed_tags</summary>
+<summary>some-disallow-tags</summary>
 
 ```yaml
 apiVersion: v1
@@ -206,37 +283,7 @@ spec:
         - "run"
         - "--server"
         - "--addr=localhost:8080"
-```
 
-</details>
-<details>
-<summary>example_exempt_image_w_disallowed_tag</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: opa-exempt-allowed
-spec:
-  containers:
-    - name: opa-exp
-      image: openpolicyagent/opa-exp:latest
-      args:
-        - "run"
-        - "--server"
-        - "--addr=localhost:8080"
-    - name: opa-init
-      image: openpolicyagent/init:v1
-      args:
-        - "run"
-        - "--server"
-        - "--addr=localhost:8080"
-    - name: opa-exp2
-      image: openpolicyagent/opa-exp2:latest
-      args:
-        - "run"
-        - "--server"
-        - "--addr=localhost:8080"
 ```
 
 </details>

@@ -69,11 +69,12 @@ spec:
         get_violation_message(container, review, probe) = msg {
             msg := sprintf("Container <%v> in your <%v> <%v> has no <%v>", [container.name, review.kind.kind, review.object.metadata.name, probe])
         }
+
 ```
 
 ## Examples
 <details>
-<summary>must-have-probes</summary><blockquote>
+<summary>block-endpoint-default-role</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -91,11 +92,13 @@ spec:
   parameters:
     probes: ["readinessProbe", "livenessProbe"]
     probeTypes: ["tcpSocket", "httpGet", "exec"]
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -121,11 +124,12 @@ spec:
   volumes:
   - name: cache-volume
     emptyDir: {}
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -158,11 +162,12 @@ spec:
   volumes:
   - name: cache-volume
     emptyDir: {}
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed2</summary>
+<summary>example-disallowed2</summary>
 
 ```yaml
 apiVersion: v1
@@ -206,6 +211,7 @@ spec:
   volumes:
   - name: cache-volume
     emptyDir: {}
+
 ```
 
 </details>

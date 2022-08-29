@@ -54,7 +54,7 @@ spec:
         userGroups := object.get(userInfo, "groups", [])
         groups := {g | g := userGroups[_]}
         allowed := {g | g := allowedGroups[_]}
-        intersection := groups %TEMPLATE% allowed
+        intersection := groups & allowed
         count(intersection) > 0
       }
 
@@ -113,6 +113,7 @@ spec:
         not get_service_account(input.review.oldObject)
         msg := "missing serviceAccountName field in oldObject under review"
       }
+
 ```
 
 ## Examples
@@ -156,11 +157,13 @@ spec:
   parameters:
     allowedGroups: []
     allowedUsers: []
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 # Note: The gator tests currently require exactly one object per example file.
@@ -194,6 +197,7 @@ spec:
         - /bin/bash
         - -c
         - sleep 99999
+
 ```
 
 </details>

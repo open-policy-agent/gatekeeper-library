@@ -80,11 +80,12 @@ spec:
           def_msg := sprintf("Label <%v: %v> does not satisfy allowed regex: %v", [key, value, expected.allowedRegex])
           msg := get_message(input.parameters, def_msg)
         }
+
 ```
 
 ## Examples
 <details>
-<summary>all-must-have-owner</summary><blockquote>
+<summary>block-endpoint-default-role</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -104,11 +105,13 @@ spec:
     labels:
       - key: owner
         allowedRegex: "^[a-zA-Z]+.agilebank.demo$"
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -117,17 +120,19 @@ metadata:
   name: allowed-namespace
   labels:
     owner: user.agilebank.demo
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: v1
 kind: Namespace
 metadata:
   name: disallowed-namespace
+
 ```
 
 </details>

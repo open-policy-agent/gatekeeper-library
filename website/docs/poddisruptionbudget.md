@@ -84,11 +84,12 @@ spec:
           max_unavailable := object.get(pdb.spec, "maxUnavailable", 1)
           max_unavailable > 0
         }
+
 ```
 
 ## Examples
 <details>
-<summary>poddisruptionbudget</summary><blockquote>
+<summary>pod-disruption-budget</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -107,29 +108,113 @@ spec:
         kinds: ["PodDisruptionBudget"]
       - apiGroups: [""]
         kinds: ["ReplicationController"]
+
 ```
 
 </details>
+
 <details>
-<summary>example_inventory_allowed1</summary>
+<summary>example-allowed-pdb</summary>
 
 ```yaml
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: inventory-nginx-pdb-allowed-1
+  name: nginx-pdb-allowed
   namespace: default
 spec:
-  minAvailable: 2
+  maxUnavailable: 1
   selector:
     matchLabels:
-      app: nginx
-      example: allowed-deployment-1
+      foo: bar
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed_deployment</summary>
+<summary>example-disallowed-pdb</summary>
+
+```yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: nginx-pdb-disallowed
+  namespace: default
+spec:
+  maxUnavailable: 0
+  selector:
+    matchLabels:
+      foo: bar
+
+```
+
+</details>
+<details>
+<summary>example-allowed-min-available</summary>
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment-allowed-1
+  namespace: default
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+      example: allowed-deployment-1
+  template:
+    metadata:
+      labels:
+        app: nginx
+        example: allowed-deployment-1
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+
+```
+
+</details>
+<details>
+<summary>example-allowed-max-unavailable</summary>
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment-allowed-2
+  namespace: default
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+      example: allowed-deployment-2
+  template:
+    metadata:
+      labels:
+        app: nginx
+        example: allowed-deployment-2
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+
+```
+
+</details>
+<details>
+<summary>example-disallowed-min-available</summary>
 
 ```yaml
 apiVersion: apps/v1
@@ -156,41 +241,7 @@ spec:
         image: nginx:1.14.2
         ports:
         - containerPort: 80
-```
 
-</details>
-<details>
-<summary>example_disallowed_pdb</summary>
-
-```yaml
-apiVersion: policy/v1
-kind: PodDisruptionBudget
-metadata:
-  name: nginx-pdb-disallowed
-  namespace: default
-spec:
-  maxUnavailable: 0
-  selector:
-    matchLabels:
-      foo: bar
-```
-
-</details>
-<details>
-<summary>example_inventory_disallowed</summary>
-
-```yaml
-apiVersion: policy/v1
-kind: PodDisruptionBudget
-metadata:
-  name: inventory-nginx-pdb-disallowed
-  namespace: default
-spec:
-  minAvailable: 3
-  selector:
-    matchLabels:
-      app: nginx
-      example: disallowed-deployment
 ```
 
 </details>

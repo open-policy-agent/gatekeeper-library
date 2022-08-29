@@ -62,11 +62,12 @@ spec:
         forbidden_sysctl(sysctl) {
             startswith(sysctl, trim(input.parameters.forbiddenSysctls[_], "*"))
         }
+
 ```
 
 ## Examples
 <details>
-<summary>psp-forbidden-sysctls</summary><blockquote>
+<summary>forbidden-sysctls</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -85,32 +86,13 @@ spec:
     forbiddenSysctls:
     # - "*" # * may be used to forbid all sysctls
     - kernel.*
+
 ```
 
 </details>
-<details>
-<summary>example_allowed</summary>
 
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-forbidden-sysctls-disallowed
-  labels:
-    app: nginx-forbidden-sysctls
-spec:
-  containers:
-    - name: nginx
-      image: nginx
-  securityContext:
-    sysctls:
-      - name: net.core.somaxconn
-        value: "1024"
-```
-
-</details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -129,6 +111,29 @@ spec:
         value: "65536"
       - name: net.core.somaxconn
         value: "1024"
+
+```
+
+</details>
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-forbidden-sysctls-disallowed
+  labels:
+    app: nginx-forbidden-sysctls
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+  securityContext:
+    sysctls:
+      - name: net.core.somaxconn
+        value: "1024"
+
 ```
 
 </details>

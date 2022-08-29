@@ -58,11 +58,12 @@ spec:
           not any(satisfied)
           msg := sprintf("ephemeralContainer <%v> has an invalid image repo <%v>, allowed repos are %v", [container.name, container.image, input.parameters.repos])
         }
+
 ```
 
 ## Examples
 <details>
-<summary>repo-must-be-openpolicyagent</summary><blockquote>
+<summary>allowed-repos</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -82,11 +83,13 @@ spec:
   parameters:
     repos:
       - "openpolicyagent/"
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -105,11 +108,90 @@ spec:
         limits:
           cpu: "100m"
           memory: "30Mi"
+
 ```
 
 </details>
 <details>
-<summary>disallowed_all</summary>
+<summary>container-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-disallowed
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "30Mi"
+
+```
+
+</details>
+<details>
+<summary>initcontainer-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-disallowed
+spec:
+  initContainers:
+    - name: nginxinit
+      image: nginx
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "30Mi"
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "30Mi"
+
+```
+
+</details>
+<details>
+<summary>both-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-disallowed
+spec:
+  initContainers:
+  - name: nginxinit
+    image: nginx
+    resources:
+      limits:
+        cpu: "100m"
+        memory: "30Mi"
+  containers:
+    - name: nginx
+      image: nginx
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "30Mi"
+
+```
+
+</details>
+<details>
+<summary>all-disallowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -138,81 +220,7 @@ spec:
         limits:
           cpu: "100m"
           memory: "30Mi"
-```
 
-</details>
-<details>
-<summary>example_disallowed_both</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-disallowed
-spec:
-  initContainers:
-  - name: nginxinit
-    image: nginx
-    resources:
-      limits:
-        cpu: "100m"
-        memory: "30Mi"
-  containers:
-    - name: nginx
-      image: nginx
-      resources:
-        limits:
-          cpu: "100m"
-          memory: "30Mi"
-```
-
-</details>
-<details>
-<summary>example_disallowed_container</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-disallowed
-spec:
-  containers:
-    - name: nginx
-      image: nginx
-      resources:
-        limits:
-          cpu: "100m"
-          memory: "30Mi"
-```
-
-</details>
-<details>
-<summary>example_disallowed_initcontainer</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-disallowed
-spec:
-  initContainers:
-    - name: nginxinit
-      image: nginx
-      resources:
-        limits:
-          cpu: "100m"
-          memory: "30Mi"
-  containers:
-    - name: opa
-      image: openpolicyagent/opa:0.9.2
-      args:
-        - "run"
-        - "--server"
-        - "--addr=localhost:8080"
-      resources:
-        limits:
-          cpu: "100m"
-          memory: "30Mi"
 ```
 
 </details>

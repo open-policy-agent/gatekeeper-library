@@ -52,11 +52,12 @@ spec:
           count(ingress.spec.tls) > 0
           ingress.metadata.annotations["kubernetes.io/ingress.allow-http"] == "false"
         }
+
 ```
 
 ## Examples
 <details>
-<summary>ingress-https-only</summary><blockquote>
+<summary>block-endpoint-default-role</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -71,11 +72,13 @@ spec:
     kinds:
       - apiGroups: ["extensions", "networking.k8s.io"]
         kinds: ["Ingress"]
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -97,11 +100,12 @@ spec:
               name: nginx
               port:
                 number: 80
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -120,6 +124,7 @@ spec:
               name: nginx
               port:
                 number: 80
+
 ```
 
 </details>

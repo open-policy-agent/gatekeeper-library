@@ -290,11 +290,12 @@ spec:
               prefix := trim_suffix(exemption, "*")
               startswith(img, prefix)
           }
+
 ```
 
 ## Examples
 <details>
-<summary>psp-seccomp</summary><blockquote>
+<summary>default-seccomp-required</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -313,68 +314,13 @@ spec:
     allowedProfiles:
     - runtime/default
     - docker/default
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-seccomp-allowed
-  annotations:
-    container.seccomp.security.alpha.kubernetes.io/nginx: runtime/default
-  labels:
-    app: nginx-seccomp
-spec:
-  containers:
-  - name: nginx
-    image: nginx
-```
-
-</details>
-<details>
-<summary>example_disallowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-seccomp-disallowed
-  annotations:
-    container.seccomp.security.alpha.kubernetes.io/nginx: unconfined
-  labels:
-    app: nginx-seccomp
-spec:
-  containers:
-  - name: nginx
-    image: nginx
-```
-
-</details>
-<details>
-<summary>disallowed_ephemeral</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-seccomp-disallowed
-  annotations:
-    container.seccomp.security.alpha.kubernetes.io/nginx: unconfined
-  labels:
-    app: nginx-seccomp
-spec:
-  ephemeralContainers:
-  - name: nginx
-    image: nginx
-```
-
-</details>
-<details>
-<summary>example_disallowed2</summary>
+<summary>example-disallowed-global</summary>
 
 ```yaml
 apiVersion: v1
@@ -389,6 +335,87 @@ spec:
   containers:
   - name: nginx
     image: nginx
+
+```
+
+</details>
+<details>
+<summary>example-disallowed-container</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-disallowed
+  annotations:
+    container.seccomp.security.alpha.kubernetes.io/nginx: unconfined
+  labels:
+    app: nginx-seccomp
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+</details>
+<details>
+<summary>example-allowed-container</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-allowed
+  annotations:
+    container.seccomp.security.alpha.kubernetes.io/nginx: runtime/default
+  labels:
+    app: nginx-seccomp
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+</details>
+<details>
+<summary>example-allowed-global</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-allowed2
+  annotations:
+    seccomp.security.alpha.kubernetes.io/pod: runtime/default
+  labels:
+    app: nginx-seccomp
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+</details>
+<details>
+<summary>disallowed-ephemeral</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-disallowed
+  annotations:
+    container.seccomp.security.alpha.kubernetes.io/nginx: unconfined
+  labels:
+    app: nginx-seccomp
+spec:
+  ephemeralContainers:
+  - name: nginx
+    image: nginx
+
 ```
 
 </details>

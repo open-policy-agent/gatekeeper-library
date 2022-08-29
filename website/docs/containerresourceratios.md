@@ -184,7 +184,7 @@ spec:
           not is_number(orig)
           suffix := get_suffix(orig)
           raw := replace(orig, suffix, "")
-          re_match("^[0-9]+(\.[0-9]+)?$", raw)
+          re_match("^[0-9]+(\\.[0-9]+)?$", raw)
           new := to_number(raw) * mem_multiple(suffix)
         }
 
@@ -323,92 +323,12 @@ spec:
               prefix := trim_suffix(exemption, "*")
               startswith(img, prefix)
           }
+
 ```
 
 ## Examples
 <details>
-<summary>container-must-meet-memory-and-cpu-ratio</summary><blockquote>
-
-<details>
-<summary>constraint</summary>
-
-```yaml
-apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sContainerRatios
-metadata:
-  name: container-must-meet-memory-and-cpu-ratio
-spec:
-  match:
-    kinds:
-      - apiGroups: [""]
-        kinds: ["Pod"]
-  parameters:
-    ratio: "1"
-    cpuRatio: "10"
-```
-
-</details>
-<details>
-<summary>example_allowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: opa-allowed
-  labels:
-    owner: me.agilebank.demo
-spec:
-  containers:
-    - name: opa
-      image: openpolicyagent/opa:0.9.2
-      args:
-        - "run"
-        - "--server"
-        - "--addr=localhost:8080"
-      resources:
-        limits:
-          cpu: "4"
-          memory: "2Gi"
-        requests:
-          cpu: "1"
-          memory: "2Gi"
-```
-
-</details>
-<details>
-<summary>example_disallowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: opa-disallowed
-  labels:
-    owner: me.agilebank.demo
-spec:
-  containers:
-    - name: opa
-      image: openpolicyagent/opa:0.9.2
-      args:
-        - "run"
-        - "--server"
-        - "--addr=localhost:8080"
-      resources:
-        limits:
-          cpu: "4"
-          memory: "2Gi"
-        requests:
-          cpu: "100m"
-          memory: "2Gi"
-```
-
-</details>
-
-
-</blockquote></details>
-<details>
-<summary>container-must-meet-ratio</summary><blockquote>
+<summary>memory-ratio-only</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -425,11 +345,13 @@ spec:
         kinds: ["Pod"]
   parameters:
     ratio: "2"
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -453,11 +375,12 @@ spec:
         requests:
           cpu: "100m"
           memory: "100Mi"
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -481,6 +404,91 @@ spec:
         requests:
           cpu: "100m"
           memory: "100Mi"
+
+```
+
+</details>
+
+
+</blockquote></details><details>
+<summary>memory-and-cpu-ratios</summary><blockquote>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sContainerRatios
+metadata:
+  name: container-must-meet-memory-and-cpu-ratio
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    ratio: "1"
+    cpuRatio: "10"
+
+```
+
+</details>
+
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-allowed
+  labels:
+    owner: me.agilebank.demo
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      resources:
+        limits:
+          cpu: "4"
+          memory: "2Gi"
+        requests:
+          cpu: "1"
+          memory: "2Gi"
+
+```
+
+</details>
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-disallowed
+  labels:
+    owner: me.agilebank.demo
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      resources:
+        limits:
+          cpu: "4"
+          memory: "2Gi"
+        requests:
+          cpu: "100m"
+          memory: "2Gi"
+
 ```
 
 </details>

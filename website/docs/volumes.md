@@ -61,11 +61,12 @@ spec:
         input_volume_type_allowed(field) {
             field == input.parameters.volumes[_]
         }
+
 ```
 
 ## Examples
 <details>
-<summary>psp-volume-types</summary><blockquote>
+<summary>host-path-disallowed</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -91,41 +92,13 @@ spec:
     - persistentVolumeClaim
     #- hostPath #required for allowedHostPaths
     - flexVolume #required for allowedFlexVolumes
+
 ```
 
 </details>
-<details>
-<summary>example_allowed</summary>
 
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-volume-types-allowed
-  labels:
-    app: nginx-volume-types
-spec:
-  containers:
-  - name: nginx
-    image: nginx
-    volumeMounts:
-    - mountPath: /cache
-      name: cache-volume
-  - name: nginx2
-    image: nginx
-    volumeMounts:
-    - mountPath: /cache2
-      name: demo-vol
-  volumes:
-  - name: cache-volume
-    emptyDir: {}
-  - name: demo-vol
-    emptyDir: {}
-```
-
-</details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -152,6 +125,38 @@ spec:
       path: /tmp # directory location on host
   - name: demo-vol
     emptyDir: {}
+
+```
+
+</details>
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-volume-types-allowed
+  labels:
+    app: nginx-volume-types
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    volumeMounts:
+    - mountPath: /cache
+      name: cache-volume
+  - name: nginx2
+    image: nginx
+    volumeMounts:
+    - mountPath: /cache2
+      name: demo-vol
+  volumes:
+  - name: cache-volume
+    emptyDir: {}
+  - name: demo-vol
+    emptyDir: {}
+
 ```
 
 </details>

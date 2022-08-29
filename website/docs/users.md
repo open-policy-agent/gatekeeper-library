@@ -291,11 +291,12 @@ spec:
               prefix := trim_suffix(exemption, "*")
               startswith(img, prefix)
           }
+
 ```
 
 ## Examples
 <details>
-<summary>psp-pods-allowed-user-ranges</summary><blockquote>
+<summary>users-and-groups-together</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -331,11 +332,38 @@ spec:
       ranges:
         - min: 100
           max: 200
+
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-users-disallowed
+  labels:
+    app: nginx-users
+spec:
+  securityContext:
+    supplementalGroups:
+      - 250
+    fsGroup: 250
+  containers:
+    - name: nginx
+      image: nginx
+      securityContext:
+        runAsUser: 250
+        runAsGroup: 250
+
 ```
 
 </details>
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -355,35 +383,12 @@ spec:
       securityContext:
         runAsUser: 199
         runAsGroup: 199
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-users-disallowed
-  labels:
-    app: nginx-users
-spec:
-  securityContext:
-    supplementalGroups:
-      - 250
-    fsGroup: 250
-  containers:
-    - name: nginx
-      image: nginx
-      securityContext:
-        runAsUser: 250
-        runAsGroup: 250
-```
-
-</details>
-<details>
-<summary>disallowed_ephemeral</summary>
+<summary>disallowed-ephemeral</summary>
 
 ```yaml
 apiVersion: v1
@@ -403,6 +408,7 @@ spec:
       securityContext:
         runAsUser: 250
         runAsGroup: 250
+
 ```
 
 </details>

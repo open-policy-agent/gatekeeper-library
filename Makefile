@@ -8,6 +8,9 @@ BATS_VERSION ?= 1.3.0
 GATOR_VERSION ?= 3.9.0
 GOMPLATE_VERSION ?= 3.10.0
 
+REPO_ROOT := $(shell git rev-parse --show-toplevel)
+WEBSITE_SCRIPT_DIR := $(REPO_ROOT)/scripts/website
+
 integration-bootstrap:
 	# Download and install kind
 	curl -L https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-amd64 --output ${GITHUB_WORKSPACE}/bin/kind && chmod +x ${GITHUB_WORKSPACE}/bin/kind
@@ -56,3 +59,7 @@ __build-gomplate:
 .PHONY: require-suites
 require-suites:
 	./scripts/require-suites.sh
+
+.PHONY: generate-website-docs
+generate-website-docs:
+	cd $(WEBSITE_SCRIPT_DIR); go run generate.go

@@ -74,7 +74,7 @@ spec:
           container := input.review.object.spec.containers[_]
           not is_exempt(container)
           missing_drop_capabilities(container)
-          msg := sprintf("container <%v> is not dropping all required capabilities. Container must drop all of %v or "ALL"", [container.name, input.parameters.requiredDropCapabilities])
+          msg := sprintf("container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
         }
 
 
@@ -90,7 +90,7 @@ spec:
           container := input.review.object.spec.initContainers[_]
           not is_exempt(container)
           missing_drop_capabilities(container)
-          msg := sprintf("init container <%v> is not dropping all required capabilities. Container must drop all of %v or "ALL"", [container.name, input.parameters.requiredDropCapabilities])
+          msg := sprintf("init container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
         }
 
 
@@ -106,7 +106,7 @@ spec:
           container := input.review.object.spec.ephemeralContainers[_]
           not is_exempt(container)
           missing_drop_capabilities(container)
-          msg := sprintf("ephemeral container <%v> is not dropping all required capabilities. Container must drop all of %v or "ALL"", [container.name, input.parameters.requiredDropCapabilities])
+          msg := sprintf("ephemeral container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
         }
 
 
@@ -157,11 +157,12 @@ spec:
               prefix := trim_suffix(exemption, "*")
               startswith(img, prefix)
           }
+
 ```
 
 ## Examples
 <details>
-<summary>capabilities-demo</summary><blockquote>
+<summary>capabilities</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -181,11 +182,41 @@ spec:
   parameters:
     allowedCapabilities: ["something"]
     requiredDropCapabilities: ["must_drop"]
+
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-disallowed
+  labels:
+    owner: me.agilebank.demo
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      securityContext:
+        capabilities:
+          add: ["disallowedcapability"]
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "30Mi"
 ```
 
 </details>
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -210,39 +241,12 @@ spec:
         limits:
           cpu: "100m"
           memory: "30Mi"
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: opa-disallowed
-  labels:
-    owner: me.agilebank.demo
-spec:
-  containers:
-    - name: opa
-      image: openpolicyagent/opa:0.9.2
-      args:
-        - "run"
-        - "--server"
-        - "--addr=localhost:8080"
-      securityContext:
-        capabilities:
-          add: ["disallowedcapability"]
-      resources:
-        limits:
-          cpu: "100m"
-          memory: "30Mi"
-```
-
-</details>
-<details>
-<summary>disallowed_ephemeral</summary>
+<summary>disallowed-ephemeral</summary>
 
 ```yaml
 apiVersion: v1
@@ -266,6 +270,7 @@ spec:
         limits:
           cpu: "100m"
           memory: "30Mi"
+
 ```
 
 </details>

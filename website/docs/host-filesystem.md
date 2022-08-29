@@ -145,11 +145,12 @@ spec:
         input_containers[c] {
             c := input.review.object.spec.ephemeralContainers[_]
         }
+
 ```
 
 ## Examples
 <details>
-<summary>psp-host-filesystem</summary><blockquote>
+<summary>host-filesystem</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -168,11 +169,39 @@ spec:
     allowedHostPaths:
     - readOnly: true
       pathPrefix: "/foo"
+
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-host-filesystem
+  labels:
+    app: nginx-host-filesystem-disallowed
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    volumeMounts:
+    - mountPath: /cache
+      name: cache-volume
+      readOnly: true
+  volumes:
+  - name: cache-volume
+    hostPath:
+      path: /tmp # directory location on host
+
 ```
 
 </details>
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -193,36 +222,12 @@ spec:
     - name: cache-volume
       hostPath:
         path: /foo/bar
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-host-filesystem
-  labels:
-    app: nginx-host-filesystem-disallowed
-spec:
-  containers:
-  - name: nginx
-    image: nginx
-    volumeMounts:
-    - mountPath: /cache
-      name: cache-volume
-      readOnly: true
-  volumes:
-  - name: cache-volume
-    hostPath:
-      path: /tmp # directory location on host
-```
-
-</details>
-<details>
-<summary>disallowed_ephemeral</summary>
+<summary>disallowed-ephemeral</summary>
 
 ```yaml
 apiVersion: v1
@@ -243,6 +248,7 @@ spec:
   - name: cache-volume
     hostPath:
       path: /tmp # directory location on host
+
 ```
 
 </details>

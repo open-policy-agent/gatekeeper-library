@@ -63,6 +63,7 @@ spec:
         has_key(x, k) {
             _ = x[k]
         }
+
 ```
 
 ## Examples
@@ -83,11 +84,13 @@ spec:
       - apiGroups: [""]
         kinds: ["Pod"]
     excludedNamespaces: ["kube-system"]
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -101,11 +104,12 @@ spec:
   containers:
   - name: nginx
     image: nginx
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -119,6 +123,7 @@ spec:
   containers:
   - name: nginx
     image: nginx
+
 ```
 
 </details>

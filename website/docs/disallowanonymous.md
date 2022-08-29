@@ -57,11 +57,12 @@ spec:
         review(subject) = true {
           subject.name == "system:anonymous"
         }
+
 ```
 
 ## Examples
 <details>
-<summary>no-anonymous-bindings</summary><blockquote>
+<summary>disallow-anonymous</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -81,11 +82,13 @@ spec:
   parameters:
     allowedRoles: 
       - cluster-role-1
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -103,11 +106,12 @@ subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group
   name: system:unauthenticated
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -125,6 +129,7 @@ subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group
   name: system:unauthenticated
+
 ```
 
 </details>

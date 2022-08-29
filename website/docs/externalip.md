@@ -50,11 +50,12 @@ spec:
           count(forbiddenIPs) > 0
           msg := sprintf("service has forbidden external IPs: %v", [forbiddenIPs])
         }
+
 ```
 
 ## Examples
 <details>
-<summary>allowed-ip</summary><blockquote>
+<summary>block-endpoint-default-role</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -72,11 +73,13 @@ spec:
   parameters:
     allowedIPs:
       - "203.0.113.0"
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -93,11 +96,12 @@ spec:
       targetPort: 8080
   externalIPs:
     - 203.0.113.0
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -114,6 +118,7 @@ spec:
     targetPort: 8080
   externalIPs:
     - 1.1.1.1
+
 ```
 
 </details>

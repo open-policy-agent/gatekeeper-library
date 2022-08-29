@@ -99,11 +99,12 @@ spec:
               prefix := trim_suffix(exemption, "*")
               startswith(img, prefix)
           }
+
 ```
 
 ## Examples
 <details>
-<summary>psp-allow-privilege-escalation-container</summary><blockquote>
+<summary>allow-privilege-escalation</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -118,11 +119,13 @@ spec:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -137,11 +140,12 @@ spec:
     image: nginx
     securityContext:
       allowPrivilegeEscalation: false
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -156,11 +160,12 @@ spec:
     image: nginx
     securityContext:
       allowPrivilegeEscalation: true
+
 ```
 
 </details>
 <details>
-<summary>disallowed_ephemeral</summary>
+<summary>disallowed-ephemeral</summary>
 
 ```yaml
 apiVersion: v1
@@ -175,6 +180,7 @@ spec:
     image: nginx
     securityContext:
       allowPrivilegeEscalation: true
+
 ```
 
 </details>

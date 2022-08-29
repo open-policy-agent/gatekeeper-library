@@ -16,6 +16,7 @@ module.exports = {
         'allowedrepos',
         'automount-serviceaccount-token',
         'block-endpoint-edit-default-role',
+        "block-loadbalancer-services",
         'block-nodeport-services',
         'block-wildcard-ingress',
         'containerlimits',

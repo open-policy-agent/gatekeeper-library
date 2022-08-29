@@ -69,11 +69,12 @@ spec:
         has_field(object, field) = true {
             object[field]
         }
+
 ```
 
 ## Examples
 <details>
-<summary>psp-flexvolume-drivers</summary><blockquote>
+<summary>flexvolume-drivers</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -92,11 +93,13 @@ spec:
     allowedFlexVolumes: #[]
     - driver: "example/lvm"
     - driver: "example/cifs"
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -117,11 +120,12 @@ spec:
   - name: test-volume
     flexVolume:
       driver: "example/lvm"
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -142,6 +146,7 @@ spec:
   - name: test-volume
     flexVolume:
       driver: "example/testdriver" #"example/lvm"
+
 ```
 
 </details>

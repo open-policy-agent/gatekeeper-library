@@ -51,11 +51,12 @@ spec:
         input_share_hostnamespace(o) {
             o.spec.hostIPC
         }
+
 ```
 
 ## Examples
 <details>
-<summary>psp-host-namespace</summary><blockquote>
+<summary>host-namespace</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -70,11 +71,13 @@ spec:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
+
 ```
 
 </details>
+
 <details>
-<summary>example_allowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -89,11 +92,12 @@ spec:
   containers:
   - name: nginx
     image: nginx
+
 ```
 
 </details>
 <details>
-<summary>example_disallowed</summary>
+<summary>example-disallowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -108,6 +112,7 @@ spec:
   containers:
   - name: nginx
     image: nginx
+
 ```
 
 </details>
