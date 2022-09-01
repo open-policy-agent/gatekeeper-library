@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: allowed
+  namespace: default
+spec:
+  containers:
+    - name: bitnami-nginx
+      image: docker.io/bitnami/nginx:1.22.0
+    - name: busybox
+      image: docker.io/busybox:stable

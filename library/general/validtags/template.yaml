@@ -1,0 +1,58 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8svalidtags
+  annotations:
+    description: >-
+      Requires container images to have a tag, and forbids the latest tag.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sValidTags
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8svalidtags
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.containers[_]
+          satisfied := [bad | bad = re_match(":latest", container.image)]
+          any(satisfied)
+          msg := sprintf("Container '%v'. Image '%v' with an invalid 'latest' tag.", [container.name, container.image])
+        }
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.containers[_]
+          satisfied := [good | good = re_match(":[\\w][\\w.-_]{0,127}", container.image)]
+          not any(satisfied)
+          msg := sprintf("Container '%v'. Image '%v' without a tag.", [container.name, container.image])
+        }
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.initContainers[_]
+          satisfied := [bad | bad = re_match(":latest", container.image)]
+          any(satisfied)
+          msg := sprintf("InitContainer '%v'. Image '%v' with an invalid 'latest' tag.", [container.name, container.image])
+        }
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.initContainers[_]
+          satisfied := [good | good = re_match(":[\\w][\\w.-_]{0,127}", container.image)]
+          not any(satisfied)
+          msg := sprintf("InitContainer '%v'. Image '%v' without a tag.", [container.name, container.image])
+        }
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.ephemeralContainers[_]
+          satisfied := [bad | bad = re_match(":latest", container.image)]
+          any(satisfied)
+          msg := sprintf("EphemeralContainer '%v'. Image '%v' with an invalid 'latest' tag.", [container.name, container.image])
+        }
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.ephemeralContainers[_]
+          satisfied := [good | good = re_match(":[\\w][\\w.-_]{0,127}", container.image)]
+          not any(satisfied)
+          msg := sprintf("EphemeralContainer '%v'. Image '%v' without a tag.", [container.name, container.image])
+        }
