@@ -142,11 +142,15 @@ func main() {
 		panic(err)
 	}
 
-	os.WriteFile(
+	err = os.WriteFile(
 		filepath.Join(rootDir, "website/docs/intro.md"),
 		[]byte(strings.Replace(string(readmeTemplateContent), "%CONTENT%", string(readmeContent), 1)),
 		0644,
 	)
+	if err != nil {
+		fmt.Println("error while updating README.md")
+		panic(err)
+	}
 
 	//update PSP README.md
 	fmt.Println("Updating PSP README.md")
@@ -158,13 +162,17 @@ func main() {
 
 	pspReadmeContent, err := os.ReadFile(filepath.Join(rootDir, "library/pod-security-policy/README.md"))
 	if err != nil {
-		fmt.Println("error while reading README.md")
+		fmt.Println("error while reading psp README.md")
 		panic(err)
 	}
 
-	os.WriteFile(
-		filepath.Join(rootDir, "website/docs/pod-security-policy/pspintro.md"),
+	err = os.WriteFile(
+		filepath.Join(rootDir, "website/docs/pspintro.md"),
 		[]byte(strings.Replace(string(pspReadmeTemplateContent), "%CONTENT%", string(pspReadmeContent), 1)),
 		0644,
 	)
+	if err != nil {
+		fmt.Println("error while updating psp README.md")
+		panic(err)
+	}
 }

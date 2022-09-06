@@ -16,7 +16,7 @@ An adminstrator can control the following by setting the field in PSP or by depl
 | Usage of the host filesystem                      | `allowedHostPaths`                                                          | [host-filesystem](host-filesystem)                       |
 | White list of Flexvolume drivers                  | `allowedFlexVolumes`                                                        | [flexvolume-drivers](flexvolume-drivers)                 |
 | Requiring the use of a read only root file system | `readOnlyRootFilesystem`                                                    | [read-only-root-filesystem](read-only-root-filesystem)   |
-| The user and group IDs of the container           | `runAsUser`, `runAsGroup`, `supplementalGroups`, `fsgroup`                             | [users](users)<sup>\*</sup>
+| The user and group IDs of the container           | `runAsUser`, `runAsGroup`, `supplementalGroups`, `fsgroup`                             | [users](users)
 | Restricting escalation to root privileges         | `allowPrivilegeEscalation`, `defaultAllowPrivilegeEscalation`               | [allow-privilege-escalation](allow-privilege-escalation) |
 | Linux capabilities                                | `defaultAddCapabilities`, `requiredDropCapabilities`, `allowedCapabilities` | [capabilities](capabilities)
 | The SELinux context of the container              | `seLinux`                                                                   | [seLinux](selinux)                                       |
@@ -24,5 +24,3 @@ An adminstrator can control the following by setting the field in PSP or by depl
 | The AppArmor profile used by containers           | annotations                                                                 | [apparmor](apparmor)                                     |
 | The seccomp profile used by containers            | annotations                                                                 | [seccomp](seccomp)                                       |
 | The sysctl profile used by containers             | `forbiddenSysctls`,`allowedUnsafeSysctls`                                   | [forbidden-sysctls](forbidden-sysctls)                   |
-
-<sup>\*</sup> For PSP rules that apply default value or mutations, Gatekeeper v3 currently cannot apply mutation.
