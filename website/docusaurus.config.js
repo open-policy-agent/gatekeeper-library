@@ -9,7 +9,7 @@ const config = {
   title: 'Gatekeeper Library',
   tagline: 'Policy Controller for Kubernetes',
   url: 'https://open-policy-agent.github.io',
-  baseUrl: '/gatekeeper-library/',
+  baseUrl: '/gatekeeper-library/website/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
