@@ -3,6 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8spspselinuxv2
   annotations:
+    metadata.gatekeeper.sh/title: "SELinux V2"
     description: >-
       Defines an allow-list of seLinuxOptions configurations for pod
       containers. Corresponds to a PodSecurityPolicy requiring SELinux configs.

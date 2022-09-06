@@ -3,6 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8spspflexvolumes
   annotations:
+    metadata.gatekeeper.sh/title: "FlexVolumes"
     description: >-
       Controls the allowlist of FlexVolume drivers. Corresponds to the
       `allowedFlexVolumes` field in PodSecurityPolicy. For more information,

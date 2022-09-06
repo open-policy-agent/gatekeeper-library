@@ -3,6 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8suniqueserviceselector
   annotations:
+    metadata.gatekeeper.sh/title: "Unique Service Selector"
     description: >-
       Requires Services to have unique selectors within a namespace.
       Selectors are considered the same if they have identical keys and values.

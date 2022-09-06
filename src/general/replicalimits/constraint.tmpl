@@ -3,6 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8sreplicalimits
   annotations:
+    metadata.gatekeeper.sh/title : "Kubernetes Replica Limits"
     description: >-
       Requires that objects with the field `spec.replicas` (Deployments,
       ReplicaSets, etc.) specify a number of replicas within defined ranges.

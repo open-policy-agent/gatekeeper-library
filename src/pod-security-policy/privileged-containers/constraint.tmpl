@@ -3,6 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8spspprivilegedcontainer
   annotations:
+    metadata.gatekeeper.sh/title: "Privileged Container"
     description: >-
       Controls the ability of any container to enable privileged mode.
       Corresponds to the `privileged` field in a PodSecurityPolicy. For more

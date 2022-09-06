@@ -3,6 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8shttpsonly
   annotations:
+    metadata.gatekeeper.sh/title: "HTTPS only"
     description: >-
       Requires Ingress resources to be HTTPS only.  Ingress resources must
       include the `kubernetes.io/ingress.allow-http` annotation, set to `false`.

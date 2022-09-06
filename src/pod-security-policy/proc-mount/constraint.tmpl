@@ -3,6 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8spspprocmount
   annotations:
+    metadata.gatekeeper.sh/title: "Proc Mount"
     description: >-
       Controls the allowed `procMount` types for the container. Corresponds to
       the `allowedProcMountTypes` field in a PodSecurityPolicy. For more

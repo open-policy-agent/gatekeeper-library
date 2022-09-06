@@ -3,6 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8scontainerratios
   annotations:
+    metadata.gatekeeper.sh/title : "Kubernetes Container Ratios"
     description: >-
       Sets a maximum ratio for container resource limits to requests.
 
