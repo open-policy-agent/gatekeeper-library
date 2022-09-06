@@ -3,6 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8suniqueingresshost
   annotations:
+    metadata.gatekeeper.sh/title: "Unique Ingress Host"
     description: >-
       Requires all Ingress rule hosts to be unique.
 

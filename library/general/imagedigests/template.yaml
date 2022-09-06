@@ -3,6 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8simagedigests
   annotations:
+    metadata.gatekeeper.sh/title: "Image Digests"
     description: >-
       Requires container images to contain a digest.
 

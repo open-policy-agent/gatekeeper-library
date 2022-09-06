@@ -3,6 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8spspallowprivilegeescalationcontainer
   annotations:
+    metadata.gatekeeper.sh/title: "Allow Privilege Escalation in Container"
     description: >-
       Controls restricting escalation to root privileges. Corresponds to the
       `allowPrivilegeEscalation` field in a PodSecurityPolicy. For more
