@@ -1,9 +1,9 @@
 ---
 id: containerrequests
-title: Kubernetes Container Requests
+title: Container Requests
 ---
 
-# Kubernetes Container Requests
+# Container Requests
 
 ## Description
 Requires containers to have memory and CPU requests set and constrains requests to be within the specified maximum values.
@@ -16,7 +16,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8scontainerrequests
   annotations:
-    metadata.gatekeeper.sh/title : "Kubernetes Container Requests"
+    metadata.gatekeeper.sh/title: "Container Requests"
     description: >-
       Requires containers to have memory and CPU requests set and constrains
       requests to be within the specified maximum values.

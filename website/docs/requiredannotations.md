@@ -1,9 +1,9 @@
 ---
 id: requiredannotations
-title: Kubernetes Required Annotations
+title: Required Annotations
 ---
 
-# Kubernetes Required Annotations
+# Required Annotations
 
 ## Description
 Requires resources to contain specified annotations, with values matching provided regular expressions.
@@ -15,7 +15,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8srequiredannotations
   annotations:
-    metadata.gatekeeper.sh/title : "Kubernetes Required Annotations"
+    metadata.gatekeeper.sh/title: "Required Annotations"
     description: >-
       Requires resources to contain specified annotations, with values matching
       provided regular expressions.

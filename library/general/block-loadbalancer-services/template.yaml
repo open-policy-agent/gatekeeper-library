@@ -3,7 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8sblockloadbalancer
   annotations:
-    metadata.gatekeeper.sh/title : "Block Services with type LoadBalancer"
+    metadata.gatekeeper.sh/title: "Block Services with type LoadBalancer"
     description: >-
       Disallows all Services with type LoadBalancer.
 

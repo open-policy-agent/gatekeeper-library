@@ -16,7 +16,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8sblocknodeport
   annotations:
-    metadata.gatekeeper.sh/title : "Block NodePort"
+    metadata.gatekeeper.sh/title: "Block NodePort"
     description: >-
       Disallows all Services with type NodePort.
 
