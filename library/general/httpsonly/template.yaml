@@ -5,12 +5,10 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "HTTPS only"
     description: >-
-      Requires Ingress resources to be HTTPS only.
-
-      Ingress resources must:
-      - include a valid TLS configuration
-      - include the `kubernetes.io/ingress.allow-http` annotation, set to
-        `false`.
+      Requires Ingress resources to be HTTPS only.  Ingress resources must
+      include the `kubernetes.io/ingress.allow-http` annotation, set to `false`.
+      By default a valid TLS {} configuration is required, this can be made
+      optional by setting the `tlsOptional` parameter to `true`.
 
       https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
 spec:
@@ -18,6 +16,21 @@ spec:
     spec:
       names:
         kind: K8sHttpsOnly
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Requires Ingress resources to be HTTPS only.  Ingress resources must
+            include the `kubernetes.io/ingress.allow-http` annotation, set to
+            `false`. By default a valid TLS {} configuration is required, this
+            can be made optional by setting the `tlsOptional` parameter to
+            `true`.
+          properties:
+            tlsOptional:
+              type: boolean
+              description: "When set to `true` the TLS {} is optional, defaults
+              to false."
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
@@ -28,11 +41,38 @@ spec:
           re_match("^(extensions|networking.k8s.io)/", input.review.object.apiVersion)
           ingress := input.review.object
           not https_complete(ingress)
+          not tls_is_optional(ingress)
           msg := sprintf("Ingress should be https. tls configuration and allow-http=false annotation are required for %v", [ingress.metadata.name])
+        }
+
+        violation[{"msg": msg}] {
+          input.review.object.kind == "Ingress"
+          re_match("^(extensions|networking.k8s.io)/", input.review.object.apiVersion)
+          ingress := input.review.object
+          not annotation_complete(ingress)
+          not tls_not_optional(ingress)
+          msg := sprintf("Ingress should be https. The allow-http=false annotation is required for %v", [ingress.metadata.name])
         }
 
         https_complete(ingress) = true {
           ingress.spec["tls"]
           count(ingress.spec.tls) > 0
           ingress.metadata.annotations["kubernetes.io/ingress.allow-http"] == "false"
+        }
+
+        annotation_complete(ingress) = true {
+          ingress.metadata.annotations["kubernetes.io/ingress.allow-http"] == "false"
+        }
+
+        tls_is_optional(ingress) = true {
+          parameters := object.get(input, "parameters", {})
+          tlsOptional := object.get(parameters, "tlsOptional", false)
+          is_boolean(tlsOptional)
+          true == tlsOptional
+        }
+
+        tls_not_optional(ingress) = true {
+          parameters := object.get(input, "parameters", {})
+          tlsOptional := object.get(parameters, "tlsOptional", false)
+          true != tlsOptional
         }

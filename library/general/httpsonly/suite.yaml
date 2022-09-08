@@ -3,7 +3,7 @@ apiVersion: test.gatekeeper.sh/v1alpha1
 metadata:
   name: httpsonly
 tests:
-- name: block-endpoint-default-role
+- name: tls-required
   template: template.yaml
   constraint: samples/ingress-https-only/constraint.yaml
   cases:
@@ -13,5 +13,17 @@ tests:
     - violations: no
   - name: example-disallowed
     object: samples/ingress-https-only/example_disallowed.yaml
+    assertions:
+    - violations: yes
+- name: tls-optional
+  template: template.yaml
+  constraint: samples/ingress-https-only-tls-optional/constraint.yaml
+  cases:
+  - name: example-allowed-tls-optional
+    object: samples/ingress-https-only-tls-optional/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed-tls-optional
+    object: samples/ingress-https-only-tls-optional/example_disallowed.yaml
     assertions:
     - violations: yes

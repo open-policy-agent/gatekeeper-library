@@ -35,6 +35,32 @@ test_missing_all {
     results := violation with input as input
     count(results) == 1
 }
+test_tls_optional_missing_tls {
+    input := {"review": review_ingress(annotation("false"), {}), "parameters": {"tlsOptional": true}}
+    results := violation with input as input
+    count(results) == 0
+}
+test_tls_optional_empty_tls {
+    input := {"review": review_ingress(annotation("false"), empty_tls), "parameters": {"tlsOptional": true}}
+    results := violation with input as input
+    count(results) == 0
+}
+test_tls_optional_with_tls {
+    input := {"review": review_ingress(annotation("false"), tls), "parameters": {"tlsOptional": true}}
+    results := violation with input as input
+    count(results) == 0
+}
+test_tls_optional_true_annotation {
+    input := {"review": review_ingress(annotation("true"), {}), "parameters": {"tlsOptional": true}}
+    results := violation with input as input
+    count(results) == 1
+}
+test_tls_optional_missing_annotation {
+    input := {"review": review_ingress({}, {}), "parameters": {"tlsOptional": true}}
+    results := violation with input as input
+    count(results) == 1
+}
+
 
 review_ingress(annotationVal, tlsVal) = out {
   out = {
