@@ -1,11 +1,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress-demo-allowed
+  name: ingress-demo-allowed-tls-optional
   annotations:
     kubernetes.io/ingress.allow-http: "false"
 spec:
-  tls: [{}]
   rules:
     - host: example-host.example.com
       http:
