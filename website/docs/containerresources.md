@@ -1,9 +1,9 @@
 ---
 id: containerresources
-title: Kubernetes Required Resources
+title: Required Resources
 ---
 
-# Kubernetes Required Resources
+# Required Resources
 
 ## Description
 Requires containers to have defined resources set.
@@ -16,7 +16,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8srequiredresources
   annotations:
-    metadata.gatekeeper.sh/title: "Kubernetes Required Resources"
+    metadata.gatekeeper.sh/title: "Required Resources"
     description: >-
       Requires containers to have defined resources set.
 

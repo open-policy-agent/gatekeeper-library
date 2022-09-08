@@ -1,9 +1,9 @@
 ---
 id: requiredprobes
-title: Kubernetes Required Probes
+title: Required Probes
 ---
 
-# Kubernetes Required Probes
+# Required Probes
 
 ## Description
 Requires Pods to have readiness and/or liveness probes.
@@ -15,7 +15,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8srequiredprobes
   annotations:
-    metadata.gatekeeper.sh/title: "Kubernetes Required Probes"
+    metadata.gatekeeper.sh/title: "Required Probes"
     description: Requires Pods to have readiness and/or liveness probes.
 spec:
   crd:
