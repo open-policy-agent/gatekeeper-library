@@ -1,9 +1,9 @@
 ---
 id: block-endpoint-edit-default-role
-title: Kubernetes Block Endpoint Edit Default Role
+title: Block Endpoint Edit Default Role
 ---
 
-# Kubernetes Block Endpoint Edit Default Role
+# Block Endpoint Edit Default Role
 
 ## Description
 Many Kubernetes installations by default have a system:aggregate-to-edit ClusterRole which does not properly restrict access to editing Endpoints. This ConstraintTemplate forbids the system:aggregate-to-edit ClusterRole from granting permission to create/patch/update Endpoints.
@@ -16,7 +16,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8sblockendpointeditdefaultrole
   annotations:
-    metadata.gatekeeper.sh/title: "Kubernetes Block Endpoint Edit Default Role"
+    metadata.gatekeeper.sh/title: "Block Endpoint Edit Default Role"
     description: >-
       Many Kubernetes installations by default have a system:aggregate-to-edit
       ClusterRole which does not properly restrict access to editing Endpoints.

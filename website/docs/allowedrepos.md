@@ -1,9 +1,9 @@
 ---
 id: allowedrepos
-title: Kubernetes Allowed Repositories
+title: Allowed Repositories
 ---
 
-# Kubernetes Allowed Repositories
+# Allowed Repositories
 
 ## Description
 Requires container images to begin with a string from the specified list.
@@ -15,7 +15,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8sallowedrepos
   annotations:
-    metadata.gatekeeper.sh/title: "Kubernetes Allowed Repositories"
+    metadata.gatekeeper.sh/title: "Allowed Repositories"
     description: >-
       Requires container images to begin with a string from the specified list.
 spec:

@@ -1,9 +1,9 @@
 ---
 id: requiredlabels
-title: Kubernetes Required Labels
+title: Required Labels
 ---
 
-# Kubernetes Required Labels
+# Required Labels
 
 ## Description
 Requires resources to contain specified labels, with values matching provided regular expressions.
@@ -15,7 +15,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8srequiredlabels
   annotations:
-    metadata.gatekeeper.sh/title: "Kubernetes Required Labels"
+    metadata.gatekeeper.sh/title: "Required Labels"
     description: >-
       Requires resources to contain specified labels, with values matching
       provided regular expressions.

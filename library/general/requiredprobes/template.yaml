@@ -3,7 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8srequiredprobes
   annotations:
-    metadata.gatekeeper.sh/title: "Kubernetes Required Probes"
+    metadata.gatekeeper.sh/title: "Required Probes"
     description: Requires Pods to have readiness and/or liveness probes.
 spec:
   crd:

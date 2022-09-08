@@ -1,9 +1,9 @@
 ---
 id: containerlimits
-title: Kubernetes Container Limits
+title: Container Limits
 ---
 
-# Kubernetes Container Limits
+# Container Limits
 
 ## Description
 Requires containers to have memory and CPU limits set and constrains limits to be within the specified maximum values.
@@ -16,7 +16,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8scontainerlimits
   annotations:
-    metadata.gatekeeper.sh/title: "Kubernetes Container Limits"
+    metadata.gatekeeper.sh/title: "Container Limits"
     description: >-
       Requires containers to have memory and CPU limits set and constrains
       limits to be within the specified maximum values.
