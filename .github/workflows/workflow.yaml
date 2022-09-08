@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Generate templates
+      - name: Generate templates and docs
         run: |
-          make generate
-          git diff --exit-code || (echo "Please run 'make generate' to generate the templates" && exit 1)
+          make generate generate-website-docs
+          git diff --exit-code || (echo "Please run 'make generate generate-website-docs' to generate the templates and docs" && exit 1)
 
   build:
     needs: generate
