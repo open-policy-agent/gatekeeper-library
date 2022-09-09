@@ -16,7 +16,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8sexternalips
   annotations:
-    metadata.gatekeeper.sh/title : "External IPs"
+    metadata.gatekeeper.sh/title: "External IPs"
     description: >-
       Restricts Service externalIPs to an allowed list of IP addresses.
 

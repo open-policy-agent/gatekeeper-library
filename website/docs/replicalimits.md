@@ -1,9 +1,9 @@
 ---
 id: replicalimits
-title: Kubernetes Replica Limits
+title: Replica Limits
 ---
 
-# Kubernetes Replica Limits
+# Replica Limits
 
 ## Description
 Requires that objects with the field `spec.replicas` (Deployments, ReplicaSets, etc.) specify a number of replicas within defined ranges.
@@ -15,7 +15,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8sreplicalimits
   annotations:
-    metadata.gatekeeper.sh/title : "Kubernetes Replica Limits"
+    metadata.gatekeeper.sh/title: "Replica Limits"
     description: >-
       Requires that objects with the field `spec.replicas` (Deployments,
       ReplicaSets, etc.) specify a number of replicas within defined ranges.

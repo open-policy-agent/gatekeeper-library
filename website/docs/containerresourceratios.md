@@ -1,9 +1,9 @@
 ---
 id: containerresourceratios
-title: Kubernetes Container Ratios
+title: Container Ratios
 ---
 
-# Kubernetes Container Ratios
+# Container Ratios
 
 ## Description
 Sets a maximum ratio for container resource limits to requests.
@@ -16,7 +16,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8scontainerratios
   annotations:
-    metadata.gatekeeper.sh/title : "Kubernetes Container Ratios"
+    metadata.gatekeeper.sh/title: "Container Ratios"
     description: >-
       Sets a maximum ratio for container resource limits to requests.
 

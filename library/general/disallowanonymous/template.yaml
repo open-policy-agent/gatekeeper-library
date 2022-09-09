@@ -3,7 +3,7 @@ kind: ConstraintTemplate
 metadata:
   name: k8sdisallowanonymous
   annotations:
-    metadata.gatekeeper.sh/title : "Disallow Anonymous Access"
+    metadata.gatekeeper.sh/title: "Disallow Anonymous Access"
     description: Disallows associating ClusterRole and Role resources to the system:anonymous user and system:unauthenticated group.
 spec:
   crd:
