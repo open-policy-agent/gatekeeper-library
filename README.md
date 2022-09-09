@@ -67,9 +67,7 @@ Each new policy should contain:
 
 * policy code and tests are maintained in `src/<policy-name>/src.rego` and `src/<policy-name>/src_test.rego`
 * `make generate` will generate `library/<policy-name>/template.yaml` from `src/<policy-name>/src.rego` using [gomplate](https://docs.gomplate.ca/).
+* `make generate-website-docs` will generate the markdown files required for the website.
 * run all tests with `./test.sh`
 * run single test with `opa test src/<folder>/src.rego src/<folder>/src_test.rego --verbose`
 * print results with `trace(sprintf("%v", [thing]))`
-
-## Website
-To generate website markdown files run `make generate-website-docs` from root.
