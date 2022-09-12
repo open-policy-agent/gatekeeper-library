@@ -71,6 +71,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredannotations/template.yaml
+```
 ## Examples
 <details>
 <summary>block-endpoint-default-role</summary><blockquote>
@@ -100,6 +104,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredannotations/samples/all-must-have-certain-set-of-annotations/constraint.yaml
+```
+
 </details>
 
 <details>
@@ -123,6 +133,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredannotations/samples/all-must-have-certain-set-of-annotations/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed</summary>
@@ -140,6 +156,12 @@ spec:
   selector:
     app: foo
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredannotations/samples/all-must-have-certain-set-of-annotations/constraint.yaml
 ```
 
 </details>

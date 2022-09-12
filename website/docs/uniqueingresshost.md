@@ -50,6 +50,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/uniqueingresshost/template.yaml
+```
 ## Examples
 <details>
 <summary>block-endpoint-default-role</summary><blockquote>
@@ -68,6 +72,12 @@ spec:
       - apiGroups: ["extensions", "networking.k8s.io"]
         kinds: ["Ingress"]
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/uniqueingresshost/samples/unique-ingress-host/constraint.yaml
 ```
 
 </details>
@@ -106,6 +116,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/uniqueingresshost/samples/unique-ingress-host/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed</summary>
@@ -129,6 +145,12 @@ spec:
             port:
               number: 80
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/uniqueingresshost/samples/unique-ingress-host/constraint.yaml
 ```
 
 </details>
@@ -164,6 +186,12 @@ spec:
             port:
               number: 80
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/uniqueingresshost/samples/unique-ingress-host/constraint.yaml
 ```
 
 </details>

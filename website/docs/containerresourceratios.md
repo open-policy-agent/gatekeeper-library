@@ -326,6 +326,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresourceratios/template.yaml
+```
 ## Examples
 <details>
 <summary>memory-ratio-only</summary><blockquote>
@@ -346,6 +350,12 @@ spec:
   parameters:
     ratio: "2"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresourceratios/samples/container-must-meet-ratio/constraint.yaml
 ```
 
 </details>
@@ -378,6 +388,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresourceratios/samples/container-must-meet-ratio/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed</summary>
@@ -407,6 +423,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresourceratios/samples/container-must-meet-ratio/constraint.yaml
+```
+
 </details>
 
 
@@ -430,6 +452,12 @@ spec:
     ratio: "1"
     cpuRatio: "10"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresourceratios/samples/container-must-meet-memory-and-cpu-ratio/constraint.yaml
 ```
 
 </details>
@@ -462,6 +490,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresourceratios/samples/container-must-meet-memory-and-cpu-ratio/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed</summary>
@@ -489,6 +523,12 @@ spec:
           cpu: "100m"
           memory: "2Gi"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresourceratios/samples/container-must-meet-memory-and-cpu-ratio/constraint.yaml
 ```
 
 </details>

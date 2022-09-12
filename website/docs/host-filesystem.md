@@ -148,6 +148,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-filesystem/template.yaml
+```
 ## Examples
 <details>
 <summary>host-filesystem</summary><blockquote>
@@ -170,6 +174,12 @@ spec:
     - readOnly: true
       pathPrefix: "/foo"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-filesystem/samples/psp-host-filesystem/constraint.yaml
 ```
 
 </details>
@@ -199,6 +209,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-filesystem/samples/psp-host-filesystem/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-allowed</summary>
@@ -225,6 +241,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-filesystem/samples/psp-host-filesystem/constraint.yaml
+```
+
 </details>
 <details>
 <summary>disallowed-ephemeral</summary>
@@ -249,6 +271,12 @@ spec:
     hostPath:
       path: /tmp # directory location on host
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-filesystem/samples/psp-host-filesystem/constraint.yaml
 ```
 
 </details>

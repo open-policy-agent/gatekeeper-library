@@ -61,6 +61,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/allowedrepos/template.yaml
+```
 ## Examples
 <details>
 <summary>allowed-repos</summary><blockquote>
@@ -84,6 +88,12 @@ spec:
     repos:
       - "openpolicyagent/"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/allowedrepos/samples/repo-must-be-openpolicyagent/constraint.yaml
 ```
 
 </details>
@@ -111,6 +121,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/allowedrepos/samples/repo-must-be-openpolicyagent/constraint.yaml
+```
+
 </details>
 <details>
 <summary>container-disallowed</summary>
@@ -129,6 +145,12 @@ spec:
           cpu: "100m"
           memory: "30Mi"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/allowedrepos/samples/repo-must-be-openpolicyagent/constraint.yaml
 ```
 
 </details>
@@ -162,6 +184,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/allowedrepos/samples/repo-must-be-openpolicyagent/constraint.yaml
+```
+
 </details>
 <details>
 <summary>both-disallowed</summary>
@@ -187,6 +215,12 @@ spec:
           cpu: "100m"
           memory: "30Mi"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/allowedrepos/samples/repo-must-be-openpolicyagent/constraint.yaml
 ```
 
 </details>
@@ -221,6 +255,12 @@ spec:
           cpu: "100m"
           memory: "30Mi"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/allowedrepos/samples/repo-must-be-openpolicyagent/constraint.yaml
 ```
 
 </details>

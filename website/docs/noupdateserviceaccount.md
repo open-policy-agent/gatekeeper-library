@@ -116,6 +116,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/noupdateserviceaccount/template.yaml
+```
 ## Examples
 <details>
 <summary>noupdateserviceaccount</summary><blockquote>
@@ -160,6 +164,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/noupdateserviceaccount/samples/noupdateserviceaccount/constraint.yaml
+```
+
 </details>
 
 <details>
@@ -198,6 +208,12 @@ spec:
         - -c
         - sleep 99999
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/noupdateserviceaccount/samples/noupdateserviceaccount/constraint.yaml
 ```
 
 </details>

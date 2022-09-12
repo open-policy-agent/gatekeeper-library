@@ -69,6 +69,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/replicalimits/template.yaml
+```
 ## Examples
 <details>
 <summary>block-endpoint-default-role</summary><blockquote>
@@ -91,6 +95,12 @@ spec:
     - min_replicas: 3
       max_replicas: 50
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/replicalimits/samples/replicalimits/constraint.yaml
 ```
 
 </details>
@@ -121,6 +131,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/replicalimits/samples/replicalimits/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed</summary>
@@ -146,6 +162,12 @@ spec:
         ports:
         - containerPort: 80
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/replicalimits/samples/replicalimits/constraint.yaml
 ```
 
 </details>

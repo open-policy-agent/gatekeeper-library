@@ -115,6 +115,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/template.yaml
+```
 ## Examples
 <details>
 <summary>container-limits-and-requests</summary><blockquote>
@@ -140,6 +144,12 @@ spec:
       - cpu
       - memory
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/samples/container-must-have-limits-and-requests/constraint.yaml
 ```
 
 </details>
@@ -173,6 +183,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/samples/container-must-have-limits-and-requests/constraint.yaml
+```
+
 </details>
 <details>
 <summary>only-requests-defined-disallowed</summary>
@@ -197,6 +213,12 @@ spec:
           cpu: "100m"
           memory: "2Gi"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/samples/container-must-have-limits-and-requests/constraint.yaml
 ```
 
 </details>
@@ -226,6 +248,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/samples/container-must-have-limits-and-requests/constraint.yaml
+```
+
 </details>
 <details>
 <summary>only-memory-limits-defined-disallowed</summary>
@@ -249,6 +277,12 @@ spec:
         limits:
           memory: "2Gi"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/samples/container-must-have-limits-and-requests/constraint.yaml
 ```
 
 </details>
@@ -279,6 +313,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/samples/container-must-have-cpu-requests-memory-limits-and-requests/constraint.yaml
+```
+
 </details>
 
 <details>
@@ -308,6 +348,12 @@ spec:
           memory: "1Gi"
 
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/samples/container-must-have-cpu-requests-memory-limits-and-requests/constraint.yaml
 ```
 
 </details>
@@ -338,6 +384,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/samples/container-must-have-cpu-requests-memory-limits-and-requests/constraint.yaml
+```
+
 </details>
 <details>
 <summary>only-requests-defined-disallowed</summary>
@@ -362,6 +414,12 @@ spec:
           cpu: "100m"
           memory: "2Gi"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/samples/container-must-have-cpu-requests-memory-limits-and-requests/constraint.yaml
 ```
 
 </details>
@@ -389,6 +447,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/samples/container-must-have-cpu-requests-memory-limits-and-requests/constraint.yaml
+```
+
 </details>
 <details>
 <summary>empty-resources-disallowed</summary>
@@ -412,6 +476,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/samples/container-must-have-cpu-requests-memory-limits-and-requests/constraint.yaml
+```
+
 </details>
 
 
@@ -432,6 +502,12 @@ spec:
       - apiGroups: [""]
         kinds: ["Pod"]
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/samples/no-enforcements/constraint.yaml
 ```
 
 </details>
@@ -465,6 +541,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/samples/no-enforcements/constraint.yaml
+```
+
 </details>
 <details>
 <summary>only-requests-defined-allowed</summary>
@@ -489,6 +571,12 @@ spec:
           cpu: "100m"
           memory: "2Gi"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/samples/no-enforcements/constraint.yaml
 ```
 
 </details>
@@ -518,6 +606,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/samples/no-enforcements/constraint.yaml
+```
+
 </details>
 <details>
 <summary>empty-resources-allowed</summary>
@@ -539,6 +633,12 @@ spec:
         - "--addr=localhost:8080"
       resources: {}
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresources/samples/no-enforcements/constraint.yaml
 ```
 
 </details>

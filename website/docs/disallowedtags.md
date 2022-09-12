@@ -103,6 +103,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/disallowedtags/template.yaml
+```
 ## Examples
 <details>
 <summary>block-endpoint-default-role</summary><blockquote>
@@ -128,6 +132,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/disallowedtags/samples/container-image-must-not-have-latest-tag/constraint.yaml
+```
+
 </details>
 
 <details>
@@ -147,6 +157,12 @@ spec:
         - "--server"
         - "--addr=localhost:8080"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/disallowedtags/samples/container-image-must-not-have-latest-tag/constraint.yaml
 ```
 
 </details>
@@ -181,6 +197,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/disallowedtags/samples/container-image-must-not-have-latest-tag/constraint.yaml
+```
+
 </details>
 <details>
 <summary>no-tag</summary>
@@ -201,6 +223,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/disallowedtags/samples/container-image-must-not-have-latest-tag/constraint.yaml
+```
+
 </details>
 <details>
 <summary>single-disallowed-tag</summary>
@@ -219,6 +247,12 @@ spec:
         - "--server"
         - "--addr=localhost:8080"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/disallowedtags/samples/container-image-must-not-have-latest-tag/constraint.yaml
 ```
 
 </details>
@@ -246,6 +280,12 @@ spec:
         - "--server"
         - "--addr=localhost:8080"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/disallowedtags/samples/container-image-must-not-have-latest-tag/constraint.yaml
 ```
 
 </details>
@@ -284,6 +324,12 @@ spec:
         - "--server"
         - "--addr=localhost:8080"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/disallowedtags/samples/container-image-must-not-have-latest-tag/constraint.yaml
 ```
 
 </details>

@@ -62,6 +62,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-endpoint-edit-default-role/template.yaml
+```
 ## Examples
 <details>
 <summary>block-endpoint-default-role</summary><blockquote>
@@ -80,6 +84,12 @@ spec:
       - apiGroups: ["rbac.authorization.k8s.io"]
         kinds: ["ClusterRole"]
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-endpoint-edit-default-role/samples/block-endpoint-edit-default-role/constraint.yaml
 ```
 
 </details>
@@ -229,6 +239,12 @@ rules:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-endpoint-edit-default-role/samples/block-endpoint-edit-default-role/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed</summary>
@@ -314,6 +330,12 @@ rules:
   - patch
   - update
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-endpoint-edit-default-role/samples/block-endpoint-edit-default-role/constraint.yaml
 ```
 
 </details>
