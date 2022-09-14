@@ -9,6 +9,8 @@ slug: /
 
 A community-owned library of policies for the [OPA Gatekeeper project](https://open-policy-agent.github.io/gatekeeper/website/docs/).
 
+If viewing the README, the [website](https://open-policy-agent.github.io/gatekeeper-library/website/) for a more user-friendly browsing experience.
+
 ## Usage
 
 ### kustomize
