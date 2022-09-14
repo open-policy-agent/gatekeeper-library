@@ -65,6 +65,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/forbidden-sysctls/template.yaml
+```
 ## Examples
 <details>
 <summary>forbidden-sysctls</summary><blockquote>
@@ -87,6 +91,12 @@ spec:
     # - "*" # * may be used to forbid all sysctls
     - kernel.*
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/constraint.yaml
 ```
 
 </details>
@@ -114,6 +124,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-allowed</summary>
@@ -134,6 +150,12 @@ spec:
       - name: net.core.somaxconn
         value: "1024"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/constraint.yaml
 ```
 
 </details>

@@ -64,6 +64,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/volumes/template.yaml
+```
 ## Examples
 <details>
 <summary>host-path-disallowed</summary><blockquote>
@@ -93,6 +97,12 @@ spec:
     #- hostPath #required for allowedHostPaths
     - flexVolume #required for allowedFlexVolumes
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/volumes/samples/psp-volume-types/constraint.yaml
 ```
 
 </details>
@@ -128,6 +138,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/volumes/samples/psp-volume-types/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-allowed</summary>
@@ -157,6 +173,12 @@ spec:
   - name: demo-vol
     emptyDir: {}
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/volumes/samples/psp-volume-types/constraint.yaml
 ```
 
 </details>

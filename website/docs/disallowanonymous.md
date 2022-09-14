@@ -60,6 +60,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/disallowanonymous/template.yaml
+```
 ## Examples
 <details>
 <summary>disallow-anonymous</summary><blockquote>
@@ -83,6 +87,12 @@ spec:
     allowedRoles: 
       - cluster-role-1
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/disallowanonymous/samples/no-anonymous-bindings/constraint.yaml
 ```
 
 </details>
@@ -109,6 +119,12 @@ subjects:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/disallowanonymous/samples/no-anonymous-bindings/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed</summary>
@@ -130,6 +146,12 @@ subjects:
   kind: Group
   name: system:unauthenticated
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/disallowanonymous/samples/no-anonymous-bindings/constraint.yaml
 ```
 
 </details>

@@ -277,6 +277,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerrequests/template.yaml
+```
 ## Examples
 <details>
 <summary>container-requests</summary><blockquote>
@@ -298,6 +302,12 @@ spec:
     cpu: "200m"
     memory: "1Gi"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerrequests/samples/container-must-have-requests/constraint.yaml
 ```
 
 </details>
@@ -327,6 +337,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerrequests/samples/container-must-have-requests/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed</summary>
@@ -351,6 +367,12 @@ spec:
           cpu: "100m"
           memory: "2Gi"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerrequests/samples/container-must-have-requests/constraint.yaml
 ```
 
 </details>

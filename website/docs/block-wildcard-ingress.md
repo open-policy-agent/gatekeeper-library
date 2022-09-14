@@ -46,6 +46,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/template.yaml
+```
 ## Examples
 <details>
 <summary>block-wildcard-ingress</summary><blockquote>
@@ -64,6 +68,12 @@ spec:
       - apiGroups: ["extensions", "networking.k8s.io"]
         kinds: ["Ingress"]
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/samples/block-wildcard-ingress/constraint.yaml
 ```
 
 </details>
@@ -91,6 +101,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/samples/block-wildcard-ingress/constraint.yaml
+```
+
 </details>
 <details>
 <summary>blank-host</summary>
@@ -115,6 +131,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/samples/block-wildcard-ingress/constraint.yaml
+```
+
 </details>
 <details>
 <summary>host-omitted</summary>
@@ -137,6 +159,12 @@ spec:
             port:
               number: 80
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/samples/block-wildcard-ingress/constraint.yaml
 ```
 
 </details>
@@ -172,6 +200,12 @@ spec:
             port:
               number: 80
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/samples/block-wildcard-ingress/constraint.yaml
 ```
 
 </details>

@@ -54,6 +54,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-namespaces/template.yaml
+```
 ## Examples
 <details>
 <summary>host-namespace</summary><blockquote>
@@ -72,6 +76,12 @@ spec:
       - apiGroups: [""]
         kinds: ["Pod"]
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-namespaces/samples/psp-host-namespace/constraint.yaml
 ```
 
 </details>
@@ -95,6 +105,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-namespaces/samples/psp-host-namespace/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed</summary>
@@ -113,6 +129,12 @@ spec:
   - name: nginx
     image: nginx
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-namespaces/samples/psp-host-namespace/constraint.yaml
 ```
 
 </details>
