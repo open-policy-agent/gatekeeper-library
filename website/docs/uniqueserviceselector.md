@@ -72,6 +72,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/uniqueserviceselector/template.yaml
+```
 ## Examples
 <details>
 <summary>block-endpoint-default-role</summary><blockquote>
@@ -87,6 +91,12 @@ metadata:
   labels:
     owner: admin.agilebank.demo
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/uniqueserviceselector/samples/unique-service-selector/constraint.yaml
 ```
 
 </details>
@@ -108,6 +118,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/uniqueserviceselector/samples/unique-service-selector/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed</summary>
@@ -124,6 +140,12 @@ spec:
   selector:
     key: value
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/uniqueserviceselector/samples/unique-service-selector/constraint.yaml
 ```
 
 </details>

@@ -294,6 +294,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/users/template.yaml
+```
 ## Examples
 <details>
 <summary>users-and-groups-together</summary><blockquote>
@@ -335,6 +339,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/users/samples/psp-pods-allowed-user-ranges/constraint.yaml
+```
+
 </details>
 
 <details>
@@ -359,6 +369,12 @@ spec:
         runAsUser: 250
         runAsGroup: 250
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/users/samples/psp-pods-allowed-user-ranges/constraint.yaml
 ```
 
 </details>
@@ -386,6 +402,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/users/samples/psp-pods-allowed-user-ranges/constraint.yaml
+```
+
 </details>
 <details>
 <summary>disallowed-ephemeral</summary>
@@ -409,6 +431,12 @@ spec:
         runAsUser: 250
         runAsGroup: 250
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/users/samples/psp-pods-allowed-user-ranges/constraint.yaml
 ```
 
 </details>

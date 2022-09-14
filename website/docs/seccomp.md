@@ -293,6 +293,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/template.yaml
+```
 ## Examples
 <details>
 <summary>default-seccomp-required</summary><blockquote>
@@ -317,6 +321,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/constraint.yaml
+```
+
 </details>
 
 <details>
@@ -336,6 +346,12 @@ spec:
   - name: nginx
     image: nginx
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/constraint.yaml
 ```
 
 </details>
@@ -358,6 +374,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-allowed-container</summary>
@@ -376,6 +398,12 @@ spec:
   - name: nginx
     image: nginx
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/constraint.yaml
 ```
 
 </details>
@@ -398,6 +426,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/constraint.yaml
+```
+
 </details>
 <details>
 <summary>disallowed-ephemeral</summary>
@@ -416,6 +450,12 @@ spec:
   - name: nginx
     image: nginx
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/constraint.yaml
 ```
 
 </details>

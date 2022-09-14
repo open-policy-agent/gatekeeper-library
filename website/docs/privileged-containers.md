@@ -94,6 +94,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/privileged-containers/template.yaml
+```
 ## Examples
 <details>
 <summary>privileged-containers-disallowed</summary><blockquote>
@@ -113,6 +117,12 @@ spec:
         kinds: ["Pod"]
     excludedNamespaces: ["kube-system"]
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/privileged-containers/samples/psp-privileged-container/constraint.yaml
 ```
 
 </details>
@@ -136,6 +146,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/privileged-containers/samples/psp-privileged-container/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-allowed</summary>
@@ -156,6 +172,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/privileged-containers/samples/psp-privileged-container/constraint.yaml
+```
+
 </details>
 <details>
 <summary>disallowed-ephemeral</summary>
@@ -174,6 +196,12 @@ spec:
     securityContext:
       privileged: true
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/privileged-containers/samples/psp-privileged-container/constraint.yaml
 ```
 
 </details>

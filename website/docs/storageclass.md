@@ -125,6 +125,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/storageclass/template.yaml
+```
 ## Examples
 <details>
 <summary>storageclass</summary><blockquote>
@@ -149,6 +153,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/storageclass/samples/storageclass/constraint.yaml
+```
+
 </details>
 
 <details>
@@ -168,6 +178,12 @@ spec:
       storage: 8Gi
   storageClassName: somestorageclass
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/storageclass/samples/storageclass/constraint.yaml
 ```
 
 </details>
@@ -208,6 +224,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/storageclass/samples/storageclass/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed-pvc-badname</summary>
@@ -226,6 +248,12 @@ spec:
       storage: 8Gi
   storageClassName: badstorageclass
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/storageclass/samples/storageclass/constraint.yaml
 ```
 
 </details>
@@ -266,6 +294,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/storageclass/samples/storageclass/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed-pvc-nonamename</summary>
@@ -284,6 +318,12 @@ spec:
     requests:
       storage: 8Gi
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/storageclass/samples/storageclass/constraint.yaml
 ```
 
 </details>
@@ -321,6 +361,12 @@ spec:
         requests:
           storage: 1Gi
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/storageclass/samples/storageclass/constraint.yaml
 ```
 
 </details>

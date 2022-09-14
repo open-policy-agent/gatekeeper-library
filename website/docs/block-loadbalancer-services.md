@@ -39,6 +39,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-loadbalancer-services/template.yaml
+```
 ## Examples
 <details>
 <summary>block-loadbalancer-services</summary><blockquote>
@@ -62,6 +66,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-loadbalancer-services/samples/block-load-balancer/constraint.yaml
+```
+
 </details>
 
 <details>
@@ -80,6 +90,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-loadbalancer-services/samples/block-load-balancer/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed</summary>
@@ -96,6 +112,12 @@ spec:
       targetPort: 80
       nodePort: 30007
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-loadbalancer-services/samples/block-load-balancer/constraint.yaml
 ```
 
 </details>

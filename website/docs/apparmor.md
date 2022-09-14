@@ -111,6 +111,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/apparmor/template.yaml
+```
 ## Examples
 <details>
 <summary>apparmor</summary><blockquote>
@@ -132,6 +136,12 @@ spec:
     allowedProfiles:
     - runtime/default
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/apparmor/samples/psp-apparmor/constraint.yaml
 ```
 
 </details>
@@ -156,6 +166,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/apparmor/samples/psp-apparmor/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed</summary>
@@ -177,6 +193,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/apparmor/samples/psp-apparmor/constraint.yaml
+```
+
 </details>
 <details>
 <summary>disallowed-ephemeral</summary>
@@ -196,6 +218,12 @@ spec:
   - name: nginx
     image: nginx
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/apparmor/samples/psp-apparmor/constraint.yaml
 ```
 
 </details>
