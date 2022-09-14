@@ -1,0 +1,3 @@
+resources:
+  - template.yaml
+  - samples/horizontalpodautoscaler/constraint.yaml
