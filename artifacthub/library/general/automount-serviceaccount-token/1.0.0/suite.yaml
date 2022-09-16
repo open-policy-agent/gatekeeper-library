@@ -1,0 +1,17 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: automount-serviceaccount-token
+tests:
+  - name: automount-serviceaccount-token
+    template: template.yaml
+    constraint: samples/automount-serviceaccount-token/constraint.yaml
+    cases:
+      - name: example-allowed
+        object: samples/automount-serviceaccount-token/example_allowed.yaml
+        assertions:
+          - violations: no
+      - name: example-disallowed
+        object: samples/automount-serviceaccount-token/example_disallowed.yaml
+        assertions:
+          - violations: yes

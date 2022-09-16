@@ -1,0 +1,25 @@
+version: 1.0.0
+name: k8sblockendpointeditdefaultrole
+displayName: Block Endpoint Edit Default Role
+createdAt: "2022-09-26T17:28:27Z"
+description: |-
+    Many Kubernetes installations by default have a system:aggregate-to-edit ClusterRole which does not properly restrict access to editing Endpoints. This ConstraintTemplate forbids the system:aggregate-to-edit ClusterRole from granting permission to create/patch/update Endpoints.
+    ClusterRole/system:aggregate-to-edit should not allow Endpoint edit permissions due to CVE-2021-25740, Endpoint & EndpointSlice permissions allow cross-Namespace forwarding, https://github.com/kubernetes/kubernetes/issues/103675
+digest: 146021d782e773678d7f04bc7228d46c2cbb1d9e02ffde40c2202a70973b1be2
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/block-endpoint-edit-default-role
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Block Endpoint Edit Default Role
+    Many Kubernetes installations by default have a system:aggregate-to-edit ClusterRole which does not properly restrict access to editing Endpoints. This ConstraintTemplate forbids the system:aggregate-to-edit ClusterRole from granting permission to create/patch/update Endpoints.
+    ClusterRole/system:aggregate-to-edit should not allow Endpoint edit permissions due to CVE-2021-25740, Endpoint & EndpointSlice permissions allow cross-Namespace forwarding, https://github.com/kubernetes/kubernetes/issues/103675
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/block-endpoint-edit-default-role/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

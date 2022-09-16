@@ -1,0 +1,22 @@
+version: 1.0.0
+name: k8spspapparmor
+displayName: App Armor
+createdAt: "2022-09-26T17:28:27Z"
+description: Configures an allow-list of AppArmor profiles for use by containers. This corresponds to specific annotations applied to a PodSecurityPolicy. For information on AppArmor, see https://kubernetes.io/docs/tutorials/clusters/apparmor/
+digest: 30b383208012c1e02dc2f7ff00e1d88eb76ce303c969bcee99e1332cd988e256
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/apparmor
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # App Armor
+    Configures an allow-list of AppArmor profiles for use by containers. This corresponds to specific annotations applied to a PodSecurityPolicy. For information on AppArmor, see https://kubernetes.io/docs/tutorials/clusters/apparmor/
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/pod-security-policy/apparmor/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

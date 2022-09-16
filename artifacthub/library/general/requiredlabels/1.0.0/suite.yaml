@@ -1,0 +1,17 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: requiredlabels
+tests:
+- name: block-endpoint-default-role
+  template: template.yaml
+  constraint: samples/all-must-have-owner/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/all-must-have-owner/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/all-must-have-owner/example_disallowed.yaml
+    assertions:
+    - violations: yes

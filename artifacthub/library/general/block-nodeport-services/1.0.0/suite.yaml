@@ -1,0 +1,16 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: block-nodeport-services
+tests:
+- name: block-nodeport-services
+  template: template.yaml
+  constraint: samples/block-node-port/constraint.yaml
+  cases:
+# TODO: Add allowed example.
+#  - name: example-allowed
+#    object: samples/block-node-port/example_allowed.yaml
+  - name: example-disallowed
+    object: samples/block-node-port/example_disallowed.yaml
+    assertions:
+    - violations: yes

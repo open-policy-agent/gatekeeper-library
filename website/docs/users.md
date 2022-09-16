@@ -16,6 +16,7 @@ metadata:
   name: k8spspallowedusers
   annotations:
     metadata.gatekeeper.sh/title: "Allowed Users"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Controls the user and group IDs of the container and some volumes.
       Corresponds to the `runAsUser`, `runAsGroup`, `supplementalGroups`, and

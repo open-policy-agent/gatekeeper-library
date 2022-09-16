@@ -17,6 +17,7 @@ metadata:
   name: k8spoddisruptionbudget
   annotations:
     metadata.gatekeeper.sh/title: "Pod Disruption Budget"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Disallow the following scenarios when deploying PodDisruptionBudgets or resources that implement the replica subresource (e.g. Deployment, ReplicationController, ReplicaSet, StatefulSet):
       1. Deployment of PodDisruptionBudgets with .spec.maxUnavailable == 0

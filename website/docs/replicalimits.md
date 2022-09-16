@@ -16,6 +16,7 @@ metadata:
   name: k8sreplicalimits
   annotations:
     metadata.gatekeeper.sh/title: "Replica Limits"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Requires that objects with the field `spec.replicas` (Deployments,
       ReplicaSets, etc.) specify a number of replicas within defined ranges.

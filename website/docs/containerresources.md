@@ -17,6 +17,7 @@ metadata:
   name: k8srequiredresources
   annotations:
     metadata.gatekeeper.sh/title: "Required Resources"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Requires containers to have defined resources set.
 

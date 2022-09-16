@@ -16,6 +16,7 @@ metadata:
   name: k8srequiredprobes
   annotations:
     metadata.gatekeeper.sh/title: "Required Probes"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: Requires Pods to have readiness and/or liveness probes.
 spec:
   crd:

@@ -17,6 +17,7 @@ metadata:
   name: k8scontainerrequests
   annotations:
     metadata.gatekeeper.sh/title: "Container Requests"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Requires containers to have memory and CPU requests set and constrains
       requests to be within the specified maximum values.

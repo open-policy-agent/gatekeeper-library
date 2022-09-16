@@ -16,6 +16,7 @@ metadata:
   name: k8srequiredannotations
   annotations:
     metadata.gatekeeper.sh/title: "Required Annotations"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Requires resources to contain specified annotations, with values matching
       provided regular expressions.

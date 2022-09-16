@@ -17,6 +17,7 @@ metadata:
   name: k8suniqueingresshost
   annotations:
     metadata.gatekeeper.sh/title: "Unique Ingress Host"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Requires all Ingress rule hosts to be unique.
 

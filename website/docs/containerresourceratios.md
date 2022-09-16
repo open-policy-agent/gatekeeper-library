@@ -17,6 +17,7 @@ metadata:
   name: k8scontainerratios
   annotations:
     metadata.gatekeeper.sh/title: "Container Ratios"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Sets a maximum ratio for container resource limits to requests.
 

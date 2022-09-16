@@ -1,0 +1,25 @@
+version: 1.0.0
+name: k8suniqueingresshost
+displayName: Unique Ingress Host
+createdAt: "2022-09-26T17:28:27Z"
+description: |-
+    Requires all Ingress rule hosts to be unique.
+    Does not handle hostname wildcards: https://kubernetes.io/docs/concepts/services-networking/ingress/
+digest: 8d99a6a21bb9a5521c8979ad1bed01f6ecb1d85f9bf1a6d7113cdd5085a8652f
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/uniqueingresshost
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Unique Ingress Host
+    Requires all Ingress rule hosts to be unique.
+    Does not handle hostname wildcards: https://kubernetes.io/docs/concepts/services-networking/ingress/
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/uniqueingresshost/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library
