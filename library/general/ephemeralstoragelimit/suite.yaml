@@ -1,0 +1,21 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: ephemeral-storage-limit
+tests:
+- name: ephemeral-storage-limit
+  template: template.yaml
+  constraint: samples/container-must-have-ephemeral-storage-limit/constraint.yaml
+  cases:
+  - name: ephemeral-storage-limit-100Mi
+    object: samples/container-must-have-ephemeral-storage-limit/ephemeral-storage-limit-100Mi-allowed.yaml
+    assertions:
+    - violations: no
+  - name: ephemeral-storage-limit-unspecified
+    object: samples/container-must-have-ephemeral-storage-limit/ephemeral-storage-limit-unspecified-disallowed.yaml
+    assertions:
+    - violations: yes
+  - name: ephemeral-storage-limit-1Pi
+    object: samples/container-must-have-ephemeral-storage-limit/ephemeral-storage-limit-1Pi-disallowed.yaml
+    assertions:
+    - violations: yes

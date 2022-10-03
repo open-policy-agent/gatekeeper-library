@@ -1,4 +1,4 @@
-package k8sephemeralstoragelimit
+package k8scontainerephemeralstoragelimit
 
 import data.lib.exempt_container.is_exempt
 

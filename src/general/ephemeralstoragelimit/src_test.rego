@@ -1,4 +1,4 @@
-package k8sephemeralstoragelimit
+package k8scontainerephemeralstoragelimit
 
 test_input_no_violations_int {
     input := {"review": review([ctr("a", 4096)]), "parameters": {"ephemeral-storage": "8192"}}
