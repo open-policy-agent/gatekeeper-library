@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: opa-allowed
+  name: opa-disallowed
   labels:
     owner: me.agilebank.demo
 spec:
@@ -16,4 +16,5 @@ spec:
         limits:
           cpu: "100m"
           memory: "1Gi"
-          ephemeral-storage: "100Mi"
+
+          ephemeral-storage: "1Pi"
