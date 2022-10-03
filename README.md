@@ -27,7 +27,6 @@ You can install everything with `kustomize build . | kubectl apply -f -`.
 
 More information can be found in the [kustomization documentation](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/).
 
-
 ### kubectl
 
 Instead of using kustomize, you can directly apply the `template.yaml` and `constraint.yaml` provided in each directory under `library/`
@@ -46,7 +45,7 @@ kubectl apply -f library/general/httpsonly/sync.yaml # optional: when GK is runn
 The `suite.yaml` files define test cases for each ConstraintTemplate in the library.
 Changes to gatekeeper-library ConstraintTemplates may be tested with the gator CLI:
 
-```
+```bash
 gatekeeper-library$ gator verify ./...
 ```
 
@@ -59,6 +58,7 @@ The gator CLI may be downloaded from the Gatekeeper
 
 If you have a policy you would like to contribute, please submit a pull request.
 Each new policy should contain:
+
 * A constraint template named `src/<policy-name>/constraint.tmpl` with a `description` annotation and the parameter structure, if any, defined in `spec.crd.spec.validation.openAPIV3Schema`. The template is rendered using [gomplate](https://docs.gomplate.ca/).
 * One or more sample constraints, each with an example of an allowed (`example_allowed.yaml`) and disallowed (`example_disallowed.yaml`) resource under `library/<policy-name>/samples/<policy-name>`
 * `kustomization.yaml` and `suite.yaml` under `library/<policy-name>`
