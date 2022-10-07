@@ -1,4 +1,5 @@
 # OPA Gatekeeper Library
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/gatekeeper-policies)](https://artifacthub.io/packages/search?repo=gatekeeper-policies)
 
 A community-owned library of policies for the [OPA Gatekeeper project](https://open-policy-agent.github.io/gatekeeper/website/docs/).
 
