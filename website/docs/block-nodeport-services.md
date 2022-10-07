@@ -17,6 +17,7 @@ metadata:
   name: k8sblocknodeport
   annotations:
     metadata.gatekeeper.sh/title: "Block NodePort"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Disallows all Services with type NodePort.
 

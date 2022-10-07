@@ -17,8 +17,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Generate templates and docs
         run: |
-          make generate generate-website-docs
-          git diff --exit-code || (echo "Please run 'make generate generate-website-docs' to generate the templates and docs" && exit 1)
+          make generate generate-website-docs generate-artifacthub-artifacts
+          git diff --exit-code || (echo "Please run 'make generate generate-website-docs generate-artifacthub-artifacts' to generate the templates and docs" && exit 1)
 
   build:
     needs: generate

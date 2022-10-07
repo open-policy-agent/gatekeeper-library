@@ -1,0 +1,25 @@
+version: 1.0.0
+name: k8scontainerlimits
+displayName: Container Limits
+createdAt: "2022-09-26T17:28:27Z"
+description: |-
+    Requires containers to have memory and CPU limits set and constrains limits to be within the specified maximum values.
+    https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+digest: 491c7efedf4f358fd2bdd3f720c5280708dbc2472fd7d1f334ee0c9569b46e74
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/containerlimits
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Container Limits
+    Requires containers to have memory and CPU limits set and constrains limits to be within the specified maximum values.
+    https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/containerlimits/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

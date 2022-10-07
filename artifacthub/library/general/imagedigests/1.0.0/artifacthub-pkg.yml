@@ -1,0 +1,25 @@
+version: 1.0.0
+name: k8simagedigests
+displayName: Image Digests
+createdAt: "2022-09-26T17:28:27Z"
+description: |-
+    Requires container images to contain a digest.
+    https://kubernetes.io/docs/concepts/containers/images/
+digest: 28630d3b444cc18488fff8400f04c00f550cea36325f1c74a8d035136abac78f
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/imagedigests
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Image Digests
+    Requires container images to contain a digest.
+    https://kubernetes.io/docs/concepts/containers/images/
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/imagedigests/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

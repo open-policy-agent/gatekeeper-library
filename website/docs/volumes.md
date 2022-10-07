@@ -16,6 +16,7 @@ metadata:
   name: k8spspvolumetypes
   annotations:
     metadata.gatekeeper.sh/title: "Volume Types"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Restricts mountable volume types to those specified by the user.
       Corresponds to the `volumes` field in a PodSecurityPolicy. For more

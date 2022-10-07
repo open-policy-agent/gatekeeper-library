@@ -1,0 +1,25 @@
+version: 1.0.0
+name: k8sblockloadbalancer
+displayName: Block Services with type LoadBalancer
+createdAt: "2022-09-26T17:28:27Z"
+description: |-
+    Disallows all Services with type LoadBalancer.
+    https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
+digest: 67bab64d3d842ae1cb4dd3149d206d49d253c51d26ba57447afa281a304168b7
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/block-loadbalancer-services
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Block Services with type LoadBalancer
+    Disallows all Services with type LoadBalancer.
+    https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/block-loadbalancer-services/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

@@ -16,6 +16,7 @@ metadata:
   name: k8spspautomountserviceaccounttokenpod
   annotations:
     metadata.gatekeeper.sh/title: "Automount Service Account Token for Pod"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Controls the ability of any Pod to enable automountServiceAccountToken.
 spec:

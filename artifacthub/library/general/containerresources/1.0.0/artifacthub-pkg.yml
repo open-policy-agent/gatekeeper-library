@@ -1,0 +1,25 @@
+version: 1.0.0
+name: k8srequiredresources
+displayName: Required Resources
+createdAt: "2022-09-26T17:28:27Z"
+description: |-
+    Requires containers to have defined resources set.
+    https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+digest: 4edc5f252b19264a6bdd1463637a2ef48d134eb1230ef4a37a31bb929f17ac0b
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/containerresources
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Required Resources
+    Requires containers to have defined resources set.
+    https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/containerresources/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

@@ -17,6 +17,7 @@ metadata:
   name: k8simagedigests
   annotations:
     metadata.gatekeeper.sh/title: "Image Digests"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Requires container images to contain a digest.
 

@@ -17,6 +17,7 @@ metadata:
   name: k8sblockendpointeditdefaultrole
   annotations:
     metadata.gatekeeper.sh/title: "Block Endpoint Edit Default Role"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Many Kubernetes installations by default have a system:aggregate-to-edit
       ClusterRole which does not properly restrict access to editing Endpoints.

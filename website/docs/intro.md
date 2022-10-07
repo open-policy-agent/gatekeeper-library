@@ -69,12 +69,14 @@ Each new policy should contain:
 * One or more sample constraints, each with an example of an allowed (`example_allowed.yaml`) and disallowed (`example_disallowed.yaml`) resource under `library/<policy-name>/samples/<policy-name>`
 * `kustomization.yaml` and `suite.yaml` under `library/<policy-name>`
 * The rego source, as `src.rego` and unit tests as `src_test.rego` in the corresponding subdirectory under `src/<policy-name>`
+* [Versioning](https://docs.google.com/document/d/1IYiypA-mRcdfSVfmoeyuaeG8XtA1u4GkcqH3kEkv2uw/edit?usp=sharing) has been introduced for Gatekeeper Library policies. Please make sure to add or bump the version of the policy as per the guidelines in the `src/<policy-name>/constraint.tmpl` annotation.
 
 ### Development
 
 * policy code and tests are maintained in `src/<policy-name>/src.rego` and `src/<policy-name>/src_test.rego`
 * `make generate` will generate `library/<policy-name>/template.yaml` from `src/<policy-name>/src.rego` using [gomplate](https://docs.gomplate.ca/).
 * `make generate-website-docs` will generate the markdown files required for the website.
+* `make generate-artifacthub-artifacts` will generate or update the artifact hub packages and associated `artifacthub-pkg.yml` file under `/artifacthub` directory.
 * run all tests with `./test.sh`
 * run single test with `opa test src/<folder>/src.rego src/<folder>/src_test.rego --verbose`
 * print results with `trace(sprintf("%v", [thing]))`

@@ -17,6 +17,7 @@ metadata:
   name: k8sexternalips
   annotations:
     metadata.gatekeeper.sh/title: "External IPs"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Restricts Service externalIPs to an allowed list of IP addresses.
 

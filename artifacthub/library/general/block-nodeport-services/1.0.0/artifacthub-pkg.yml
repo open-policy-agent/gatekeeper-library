@@ -1,0 +1,25 @@
+version: 1.0.0
+name: k8sblocknodeport
+displayName: Block NodePort
+createdAt: "2022-09-26T17:28:27Z"
+description: |-
+    Disallows all Services with type NodePort.
+    https://kubernetes.io/docs/concepts/services-networking/service/#nodeport
+digest: 3edccd9ed2392e0de728f6ab0866770d398b9e0775ad039a0e18e67c60dc6cef
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/block-nodeport-services
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Block NodePort
+    Disallows all Services with type NodePort.
+    https://kubernetes.io/docs/concepts/services-networking/service/#nodeport
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/block-nodeport-services/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

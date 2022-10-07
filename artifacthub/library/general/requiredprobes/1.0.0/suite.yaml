@@ -1,0 +1,21 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: requiredprobes
+tests:
+- name: block-endpoint-default-role
+  template: template.yaml
+  constraint: samples/must-have-probes/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/must-have-probes/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/must-have-probes/example_disallowed.yaml
+    assertions:
+    - violations: yes
+  - name: example-disallowed2
+    object: samples/must-have-probes/example_disallowed2.yaml
+    assertions:
+    - violations: yes

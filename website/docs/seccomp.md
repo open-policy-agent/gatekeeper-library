@@ -16,6 +16,7 @@ metadata:
   name: k8spspseccomp
   annotations:
     metadata.gatekeeper.sh/title: "Seccomp"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Controls the seccomp profile used by containers. Corresponds to the
       `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on

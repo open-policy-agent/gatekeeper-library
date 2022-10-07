@@ -16,6 +16,7 @@ metadata:
   name: k8sstorageclass
   annotations:
     metadata.gatekeeper.sh/title: "Storage Class"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Requires storage classes to be specified when used. Only Gatekeeper 3.9+ is supported.
 spec:

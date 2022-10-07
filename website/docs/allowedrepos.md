@@ -16,6 +16,7 @@ metadata:
   name: k8sallowedrepos
   annotations:
     metadata.gatekeeper.sh/title: "Allowed Repositories"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Requires container images to begin with a string from the specified list.
 spec:
