@@ -46,8 +46,11 @@ spec:
         violation[{"msg": msg}] {
           obj := input.review.object
           pdb := data.inventory.namespace[obj.metadata.namespace]["policy/v1"].PodDisruptionBudget[_]
-          obj.spec.selector.matchLabels == pdb.spec.selector.matchLabels
 
+          matchLabels := { [label, value] | some label; value := pdb.spec.selector.matchLabels[label] }
+          labels := { [label, value] | some label; value := obj.spec.selector.matchLabels[label] }
+          count(matchLabels - labels) == 0
+          
           not valid_pdb_max_unavailable(pdb)
           msg := sprintf(
             "%v <%v> has been selected by PodDisruptionBudget <%v> but has maxUnavailable of 0, only positive integers are allowed for maxUnavailable",
@@ -58,7 +61,10 @@ spec:
         violation[{"msg": msg}] {
           obj := input.review.object
           pdb := data.inventory.namespace[obj.metadata.namespace]["policy/v1"].PodDisruptionBudget[_]
-          obj.spec.selector.matchLabels == pdb.spec.selector.matchLabels
+          
+          matchLabels := { [label, value] | some label; value := pdb.spec.selector.matchLabels[label] }
+          labels := { [label, value] | some label; value := obj.spec.selector.matchLabels[label] }
+          count(matchLabels - labels) == 0
 
           not valid_pdb_min_available(obj, pdb)
           msg := sprintf(
