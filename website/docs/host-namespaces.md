@@ -16,6 +16,7 @@ metadata:
   name: k8spsphostnamespace
   annotations:
     metadata.gatekeeper.sh/title: "Host Namespace"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Disallows sharing of host PID and IPC namespaces by pod containers.
       Corresponds to the `hostPID` and `hostIPC` fields in a PodSecurityPolicy.
@@ -54,6 +55,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-namespaces/template.yaml
+```
 ## Examples
 <details>
 <summary>host-namespace</summary><blockquote>
@@ -72,6 +77,12 @@ spec:
       - apiGroups: [""]
         kinds: ["Pod"]
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-namespaces/samples/psp-host-namespace/constraint.yaml
 ```
 
 </details>
@@ -95,6 +106,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-namespaces/samples/psp-host-namespace/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed</summary>
@@ -113,6 +130,12 @@ spec:
   - name: nginx
     image: nginx
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-namespaces/samples/psp-host-namespace/constraint.yaml
 ```
 
 </details>

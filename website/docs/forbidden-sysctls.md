@@ -16,6 +16,7 @@ metadata:
   name: k8spspforbiddensysctls
   annotations:
     metadata.gatekeeper.sh/title: "Forbidden Sysctls"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Controls the `sysctl` profile used by containers. Corresponds to the
       `forbiddenSysctls` field in a PodSecurityPolicy. For more information,
@@ -65,6 +66,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/forbidden-sysctls/template.yaml
+```
 ## Examples
 <details>
 <summary>forbidden-sysctls</summary><blockquote>
@@ -87,6 +92,12 @@ spec:
     # - "*" # * may be used to forbid all sysctls
     - kernel.*
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/constraint.yaml
 ```
 
 </details>
@@ -114,6 +125,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-allowed</summary>
@@ -134,6 +151,12 @@ spec:
       - name: net.core.somaxconn
         value: "1024"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/constraint.yaml
 ```
 
 </details>

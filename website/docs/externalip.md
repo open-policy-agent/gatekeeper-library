@@ -17,6 +17,7 @@ metadata:
   name: k8sexternalips
   annotations:
     metadata.gatekeeper.sh/title: "External IPs"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Restricts Service externalIPs to an allowed list of IP addresses.
 
@@ -53,6 +54,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/externalip/template.yaml
+```
 ## Examples
 <details>
 <summary>block-endpoint-default-role</summary><blockquote>
@@ -74,6 +79,12 @@ spec:
     allowedIPs:
       - "203.0.113.0"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/externalip/samples/allowed-ip/constraint.yaml
 ```
 
 </details>
@@ -99,6 +110,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/externalip/samples/allowed-ip/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed</summary>
@@ -119,6 +136,12 @@ spec:
   externalIPs:
     - 1.1.1.1
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/externalip/samples/allowed-ip/constraint.yaml
 ```
 
 </details>

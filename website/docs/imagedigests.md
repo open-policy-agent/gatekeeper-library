@@ -17,6 +17,7 @@ metadata:
   name: k8simagedigests
   annotations:
     metadata.gatekeeper.sh/title: "Image Digests"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Requires container images to contain a digest.
 
@@ -98,6 +99,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/imagedigests/template.yaml
+```
 ## Examples
 <details>
 <summary>block-endpoint-default-role</summary><blockquote>
@@ -120,6 +125,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/imagedigests/samples/container-image-must-have-digest/constraint.yaml
+```
+
 </details>
 
 <details>
@@ -139,6 +150,12 @@ spec:
         - "--server"
         - "--addr=localhost:8080"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/imagedigests/samples/container-image-must-have-digest/constraint.yaml
 ```
 
 </details>
@@ -166,6 +183,12 @@ spec:
         - "--server"
         - "--addr=localhost:8080"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/imagedigests/samples/container-image-must-have-digest/constraint.yaml
 ```
 
 </details>
@@ -200,6 +223,12 @@ spec:
         - "--server"
         - "--addr=localhost:8080"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/imagedigests/samples/container-image-must-have-digest/constraint.yaml
 ```
 
 </details>

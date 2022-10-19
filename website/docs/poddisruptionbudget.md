@@ -17,6 +17,7 @@ metadata:
   name: k8spoddisruptionbudget
   annotations:
     metadata.gatekeeper.sh/title: "Pod Disruption Budget"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Disallow the following scenarios when deploying PodDisruptionBudgets or resources that implement the replica subresource (e.g. Deployment, ReplicationController, ReplicaSet, StatefulSet):
       1. Deployment of PodDisruptionBudgets with .spec.maxUnavailable == 0
@@ -87,6 +88,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/template.yaml
+```
 ## Examples
 <details>
 <summary>pod-disruption-budget</summary><blockquote>
@@ -111,6 +116,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/samples/poddisruptionbudget/constraint.yaml
+```
+
 </details>
 
 <details>
@@ -130,6 +141,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/samples/poddisruptionbudget/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed-pdb</summary>
@@ -146,6 +163,12 @@ spec:
     matchLabels:
       foo: bar
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/samples/poddisruptionbudget/constraint.yaml
 ```
 
 </details>
@@ -180,6 +203,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/samples/poddisruptionbudget/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-allowed-max-unavailable</summary>
@@ -212,6 +241,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/samples/poddisruptionbudget/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed-min-available</summary>
@@ -242,6 +277,12 @@ spec:
         ports:
         - containerPort: 80
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/samples/poddisruptionbudget/constraint.yaml
 ```
 
 </details>

@@ -1,0 +1,17 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: forbidden-sysctls
+tests:
+  - name: forbidden-sysctls
+    template: template.yaml
+    constraint: samples/psp-forbidden-sysctls/constraint.yaml
+    cases:
+      - name: example-disallowed
+        object: samples/psp-forbidden-sysctls/example_disallowed.yaml
+        assertions:
+          - violations: yes
+      - name: example-allowed
+        object: samples/psp-forbidden-sysctls/example_allowed.yaml
+        assertions:
+          - violations: no

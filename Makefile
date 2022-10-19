@@ -10,6 +10,7 @@ GOMPLATE_VERSION ?= 3.10.0
 
 REPO_ROOT := $(shell git rev-parse --show-toplevel)
 WEBSITE_SCRIPT_DIR := $(REPO_ROOT)/scripts/website
+ARTIFACTHUB_SCRIPT_DIR := $(REPO_ROOT)/scripts/artifacthub
 
 integration-bootstrap:
 	# Download and install kind
@@ -63,3 +64,7 @@ require-suites:
 .PHONY: generate-website-docs
 generate-website-docs:
 	cd $(WEBSITE_SCRIPT_DIR); go run generate.go
+
+.PHONY: generate-artifacthub-artifacts
+generate-artifacthub-artifacts:
+	cd $(ARTIFACTHUB_SCRIPT_DIR); go run hub.go

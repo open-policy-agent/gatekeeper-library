@@ -1,0 +1,17 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: block-loadbalancer-services
+tests:
+- name: block-loadbalancer-services
+  template: template.yaml
+  constraint: samples/block-load-balancer/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/block-load-balancer/example_allowed.yaml
+    assertions:
+    - violations: no    
+  - name: example-disallowed
+    object: samples/block-load-balancer/example_disallowed.yaml
+    assertions:
+    - violations: yes

@@ -1,0 +1,17 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: block-endpoint-edit-default-role
+tests:
+- name: block-endpoint-default-role
+  template: template.yaml
+  constraint: samples/block-endpoint-edit-default-role/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/block-endpoint-edit-default-role/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/block-endpoint-edit-default-role/example_disallowed.yaml
+    assertions:
+    - violations: yes

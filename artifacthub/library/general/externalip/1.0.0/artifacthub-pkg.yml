@@ -1,0 +1,25 @@
+version: 1.0.0
+name: k8sexternalips
+displayName: External IPs
+createdAt: "2022-09-26T17:28:27Z"
+description: |-
+    Restricts Service externalIPs to an allowed list of IP addresses.
+    https://kubernetes.io/docs/concepts/services-networking/service/#external-ips
+digest: 03fa0677df2ba7a8ddcb94b062f4fb424d7cef3ec9b0f5a4e73a39a8b386b02b
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/externalip
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # External IPs
+    Restricts Service externalIPs to an allowed list of IP addresses.
+    https://kubernetes.io/docs/concepts/services-networking/service/#external-ips
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/externalip/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

@@ -1,0 +1,69 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: containerresources
+tests:
+  - name: container-limits-and-requests
+    template: template.yaml
+    constraint: samples/container-must-have-limits-and-requests/constraint.yaml
+    cases:
+      - name: limits-and-requests-defined-allowed
+        object: samples/container-must-have-limits-and-requests/limits-and-requests-defined-allowed.yaml
+        assertions:
+          - violations: no
+      - name: only-requests-defined-disallowed
+        object: samples/container-must-have-limits-and-requests/only-requests-defined-disallowed.yaml
+        assertions:
+          - violations: yes
+      - name: only-cpu-requests-and-memory-limits-defined-disallowed
+        object: samples/container-must-have-limits-and-requests/only-cpu-requests-and-memory-limits-defined-disallowed.yaml
+        assertions:
+          - violations: yes
+      - name: only-memory-limits-defined-disallowed
+        object: samples/container-must-have-limits-and-requests/only-memory-limits-defined-disallowed.yaml
+        assertions:
+          - violations: yes
+  - name: container-cpu-requests-memory-limits-and-requests
+    template: template.yaml
+    constraint: samples/container-must-have-cpu-requests-memory-limits-and-requests/constraint.yaml
+    cases:
+      - name: limits-and-requests-defined-allowed
+        object: samples/container-must-have-cpu-requests-memory-limits-and-requests/limits-and-requests-defined-allowed.yaml
+        assertions:
+          - violations: no
+      - name: only-cpu-requests-and-memory-limits-and-requests-defined-allowed
+        object: samples/container-must-have-cpu-requests-memory-limits-and-requests/only-cpu-requests-and-memory-limits-and-requests-defined-allowed.yaml
+        assertions:
+          - violations: no
+      - name: only-requests-defined-disallowed
+        object: samples/container-must-have-cpu-requests-memory-limits-and-requests/only-requests-defined-disallowed.yaml
+        assertions:
+          - violations: yes
+      - name: only-memory-limits-defined-disallowed
+        object: samples/container-must-have-cpu-requests-memory-limits-and-requests/only-memory-limits-defined-disallowed.yaml
+        assertions:
+          - violations: yes
+      - name: empty-resources-disallowed
+        object: samples/container-must-have-cpu-requests-memory-limits-and-requests/empty-resources-disallowed.yaml
+        assertions:
+          - violations: yes
+  - name: no-enforcements
+    template: template.yaml
+    constraint: samples/no-enforcements/constraint.yaml
+    cases:
+      - name: limits-and-requests-defined-allowed
+        object: samples/no-enforcements/limits-and-requests-defined-allowed.yaml
+        assertions:
+          - violations: no
+      - name: only-requests-defined-allowed
+        object: samples/no-enforcements/only-requests-defined-allowed.yaml
+        assertions:
+          - violations: no
+      - name: only-cpu-requests-and-memory-limits-defined-allowed
+        object: samples/no-enforcements/only-cpu-requests-and-memory-limits-defined-allowed.yaml
+        assertions:
+          - violations: no
+      - name: empty-resources-allowed
+        object: samples/no-enforcements/empty-resources-allowed.yaml
+        assertions:
+          - violations: no

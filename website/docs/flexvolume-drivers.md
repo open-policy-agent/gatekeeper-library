@@ -16,6 +16,7 @@ metadata:
   name: k8spspflexvolumes
   annotations:
     metadata.gatekeeper.sh/title: "FlexVolumes"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Controls the allowlist of FlexVolume drivers. Corresponds to the
       `allowedFlexVolumes` field in PodSecurityPolicy. For more information,
@@ -72,6 +73,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/flexvolume-drivers/template.yaml
+```
 ## Examples
 <details>
 <summary>flexvolume-drivers</summary><blockquote>
@@ -94,6 +99,12 @@ spec:
     - driver: "example/lvm"
     - driver: "example/cifs"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/flexvolume-drivers/samples/psp-flexvolume-drivers/constraint.yaml
 ```
 
 </details>
@@ -123,6 +134,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/flexvolume-drivers/samples/psp-flexvolume-drivers/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed</summary>
@@ -147,6 +164,12 @@ spec:
     flexVolume:
       driver: "example/testdriver" #"example/lvm"
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/flexvolume-drivers/samples/psp-flexvolume-drivers/constraint.yaml
 ```
 
 </details>

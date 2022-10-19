@@ -16,6 +16,7 @@ metadata:
   name: k8sblockwildcardingress
   annotations:
     metadata.gatekeeper.sh/title: "Block wildcard ingress"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Users should not be able to create Ingresses with a blank or wildcard (*) hostname since that would enable them to intercept traffic for other services in the cluster, even if they don't have access to those services.
 spec:
@@ -46,6 +47,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/template.yaml
+```
 ## Examples
 <details>
 <summary>block-wildcard-ingress</summary><blockquote>
@@ -64,6 +69,12 @@ spec:
       - apiGroups: ["extensions", "networking.k8s.io"]
         kinds: ["Ingress"]
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/samples/block-wildcard-ingress/constraint.yaml
 ```
 
 </details>
@@ -91,6 +102,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/samples/block-wildcard-ingress/constraint.yaml
+```
+
 </details>
 <details>
 <summary>blank-host</summary>
@@ -115,6 +132,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/samples/block-wildcard-ingress/constraint.yaml
+```
+
 </details>
 <details>
 <summary>host-omitted</summary>
@@ -137,6 +160,12 @@ spec:
             port:
               number: 80
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/samples/block-wildcard-ingress/constraint.yaml
 ```
 
 </details>
@@ -172,6 +201,12 @@ spec:
             port:
               number: 80
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/samples/block-wildcard-ingress/constraint.yaml
 ```
 
 </details>

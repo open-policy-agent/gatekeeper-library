@@ -16,6 +16,7 @@ metadata:
   name: k8spspvolumetypes
   annotations:
     metadata.gatekeeper.sh/title: "Volume Types"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Restricts mountable volume types to those specified by the user.
       Corresponds to the `volumes` field in a PodSecurityPolicy. For more
@@ -64,6 +65,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/volumes/template.yaml
+```
 ## Examples
 <details>
 <summary>host-path-disallowed</summary><blockquote>
@@ -93,6 +98,12 @@ spec:
     #- hostPath #required for allowedHostPaths
     - flexVolume #required for allowedFlexVolumes
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/volumes/samples/psp-volume-types/constraint.yaml
 ```
 
 </details>
@@ -128,6 +139,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/volumes/samples/psp-volume-types/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-allowed</summary>
@@ -157,6 +174,12 @@ spec:
   - name: demo-vol
     emptyDir: {}
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/volumes/samples/psp-volume-types/constraint.yaml
 ```
 
 </details>

@@ -17,6 +17,7 @@ metadata:
   name: k8shttpsonly
   annotations:
     metadata.gatekeeper.sh/title: "HTTPS only"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Requires Ingress resources to be HTTPS only.  Ingress resources must
       include the `kubernetes.io/ingress.allow-http` annotation, set to `false`.
@@ -92,6 +93,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/httpsonly/template.yaml
+```
 ## Examples
 <details>
 <summary>tls-required</summary><blockquote>
@@ -110,6 +115,12 @@ spec:
       - apiGroups: ["extensions", "networking.k8s.io"]
         kinds: ["Ingress"]
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/httpsonly/samples/ingress-https-only/constraint.yaml
 ```
 
 </details>
@@ -140,6 +151,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/httpsonly/samples/ingress-https-only/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed</summary>
@@ -164,6 +181,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/httpsonly/samples/ingress-https-only/constraint.yaml
+```
+
 </details>
 
 
@@ -186,6 +209,12 @@ spec:
   parameters:
     tlsOptional: true
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/httpsonly/samples/ingress-https-only-tls-optional/constraint.yaml
 ```
 
 </details>
@@ -215,6 +244,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/httpsonly/samples/ingress-https-only-tls-optional/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed-tls-optional</summary>
@@ -237,6 +272,12 @@ spec:
               port:
                 number: 80
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/httpsonly/samples/ingress-https-only-tls-optional/constraint.yaml
 ```
 
 </details>

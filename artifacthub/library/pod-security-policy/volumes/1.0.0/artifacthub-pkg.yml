@@ -1,0 +1,22 @@
+version: 1.0.0
+name: k8spspvolumetypes
+displayName: Volume Types
+createdAt: "2022-09-26T17:28:27Z"
+description: Restricts mountable volume types to those specified by the user. Corresponds to the `volumes` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
+digest: 78eb0333d3d9b0385907b394920e58e6bc90d1108cce359cc56b1d438dacec51
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/volumes
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Volume Types
+    Restricts mountable volume types to those specified by the user. Corresponds to the `volumes` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/pod-security-policy/volumes/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

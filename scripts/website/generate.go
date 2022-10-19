@@ -9,6 +9,15 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const (
+	// raw github source URL
+	sourceURL = "https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/"
+
+	// directory entry point for parsing
+	entryPoint = "library"
+
+)
+
 // Suite ...
 // ToDo (nilekh): Get this struct from the Gatekeeper repo
 type Suite struct {
@@ -39,7 +48,7 @@ func main() {
 	}
 
 	rootDir := filepath.Join(pwd, "..", "..")
-	libraryPath := filepath.Join(rootDir, "library")
+	libraryPath := filepath.Join(rootDir, entryPoint)
 	dirEntry, err := os.ReadDir(libraryPath)
 	if err != nil {
 		fmt.Println("error while listing directories under library")
@@ -69,6 +78,8 @@ func main() {
 					yaml.Unmarshal(suiteContent, &suite)
 
 					// ConstraintTemplate
+					// Get raw github source URL
+					constraintTemplateRawURL := sourceURL + filepath.Join(entryPoint, entry.Name(), dir.Name(), "template.yaml")
 					constraintTemplateContent, err := os.ReadFile(filepath.Join(basePath, dir.Name(), "template.yaml"))
 					if err != nil {
 						fmt.Println("error while reading template.yaml")
@@ -84,21 +95,23 @@ func main() {
 
 					allExamples := ""
 					for _, test := range suite.Tests {
+						constraintRawURL := sourceURL + filepath.Join(entryPoint, entry.Name(), dir.Name(), test.Constraint)
 						constraintContent, err := os.ReadFile(filepath.Join(basePath, dir.Name(), test.Constraint))
 						if err != nil {
 							fmt.Println("error while reading constraint.yaml")
 							panic(err)
 						}
-						constraintExample := fmt.Sprintf("<details>\n<summary>constraint</summary>\n\n```yaml\n%s\n```\n\n</details>\n", constraintContent)
+						constraintExample := fmt.Sprintf("<details>\n<summary>constraint</summary>\n\n```yaml\n%s\n```\n\nUsage\n\n```shell\nkubectl apply -f %s\n```\n\n</details>\n", constraintContent, constraintRawURL)
 
 						examples := ""
 						for _, testCase := range test.Cases {
+							exampleRawURL := sourceURL + filepath.Join(entryPoint, entry.Name(), dir.Name(), test.Constraint)
 							exampleContent, err := os.ReadFile(filepath.Join(basePath, dir.Name(), testCase.Object))
 							if err != nil {
 								fmt.Println("error while reading ", testCase.Object)
 								panic(err)
 							}
-							examples += fmt.Sprintf("<details>\n<summary>%s</summary>\n\n```yaml\n%s\n```\n\n</details>\n", testCase.Name, exampleContent)
+							examples += fmt.Sprintf("<details>\n<summary>%s</summary>\n\n```yaml\n%s\n```\n\nUsage\n\n```shell\nkubectl apply -f %s\n```\n\n</details>\n", testCase.Name, exampleContent, exampleRawURL)
 						}
 
 						allExamples += fmt.Sprintf("<details>\n<summary>%s</summary><blockquote>\n\n%s\n%s\n\n</blockquote></details>", test.Name, constraintExample, examples)
@@ -112,6 +125,7 @@ func main() {
 
 					replacer := strings.NewReplacer(
 						"%TEMPLATE%", string(constraintTemplateContent),
+						"%RAWURL%", constraintTemplateRawURL,
 						"%EXAMPLES%", allExamples,
 						"%TITLE%", fmt.Sprintf("%s", constraintTemplate["metadata"].(map[string]interface{})["annotations"].(map[string]interface{})["metadata.gatekeeper.sh/title"]),
 						"%DESCRIPTION%", fmt.Sprintf("%s", constraintTemplate["metadata"].(map[string]interface{})["annotations"].(map[string]interface{})["description"]),

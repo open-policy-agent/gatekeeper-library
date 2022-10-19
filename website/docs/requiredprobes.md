@@ -16,6 +16,7 @@ metadata:
   name: k8srequiredprobes
   annotations:
     metadata.gatekeeper.sh/title: "Required Probes"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: Requires Pods to have readiness and/or liveness probes.
 spec:
   crd:
@@ -72,6 +73,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredprobes/template.yaml
+```
 ## Examples
 <details>
 <summary>block-endpoint-default-role</summary><blockquote>
@@ -93,6 +98,12 @@ spec:
     probes: ["readinessProbe", "livenessProbe"]
     probeTypes: ["tcpSocket", "httpGet", "exec"]
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredprobes/samples/must-have-probes/constraint.yaml
 ```
 
 </details>
@@ -125,6 +136,12 @@ spec:
   - name: cache-volume
     emptyDir: {}
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredprobes/samples/must-have-probes/constraint.yaml
 ```
 
 </details>
@@ -163,6 +180,12 @@ spec:
   - name: cache-volume
     emptyDir: {}
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredprobes/samples/must-have-probes/constraint.yaml
 ```
 
 </details>
@@ -212,6 +235,12 @@ spec:
   - name: cache-volume
     emptyDir: {}
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredprobes/samples/must-have-probes/constraint.yaml
 ```
 
 </details>

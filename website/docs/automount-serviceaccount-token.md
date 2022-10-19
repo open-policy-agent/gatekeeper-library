@@ -16,6 +16,7 @@ metadata:
   name: k8spspautomountserviceaccounttokenpod
   annotations:
     metadata.gatekeeper.sh/title: "Automount Service Account Token for Pod"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Controls the ability of any Pod to enable automountServiceAccountToken.
 spec:
@@ -66,6 +67,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/automount-serviceaccount-token/template.yaml
+```
 ## Examples
 <details>
 <summary>automount-serviceaccount-token</summary><blockquote>
@@ -85,6 +90,12 @@ spec:
         kinds: ["Pod"]
     excludedNamespaces: ["kube-system"]
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/automount-serviceaccount-token/samples/automount-serviceaccount-token/constraint.yaml
 ```
 
 </details>
@@ -107,6 +118,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/automount-serviceaccount-token/samples/automount-serviceaccount-token/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-disallowed</summary>
@@ -124,6 +141,12 @@ spec:
   - name: nginx
     image: nginx
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/automount-serviceaccount-token/samples/automount-serviceaccount-token/constraint.yaml
 ```
 
 </details>

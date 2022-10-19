@@ -1,0 +1,31 @@
+# Note: The gator tests currently require exactly one object per example file.
+# Since this is an update-triggered policy, at least two objects are technically
+# required to demonstrate it. Due to the gator requirement, we only have one
+# object below. The policy should allow changing everything but the
+# serviceAccountName field.
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: policy-test
+  namespace: kube-system
+  labels:
+    app: policy-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: policy-test-deploy
+  template:
+    metadata:
+      labels:
+        app: policy-test-deploy
+    spec:
+      # Changing anything except this field should be allowed by the policy.
+      serviceAccountName: policy-test-sa-1
+      containers:
+      - name: policy-test
+        image: ubuntu
+        command:
+        - /bin/bash
+        - -c
+        - sleep 99999

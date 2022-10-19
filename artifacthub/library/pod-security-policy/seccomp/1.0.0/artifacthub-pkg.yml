@@ -1,0 +1,22 @@
+version: 1.0.0
+name: k8spspseccomp
+displayName: Seccomp
+createdAt: "2022-09-26T17:28:27Z"
+description: Controls the seccomp profile used by containers. Corresponds to the `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccomp
+digest: 84dc712cca546cecd23e269d76e53dbd946e440ff61bbdd82f7a5decd14c7521
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/seccomp
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Seccomp
+    Controls the seccomp profile used by containers. Corresponds to the `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccomp
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/pod-security-policy/seccomp/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

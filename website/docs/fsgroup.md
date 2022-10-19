@@ -16,6 +16,7 @@ metadata:
   name: k8spspfsgroup
   annotations:
     metadata.gatekeeper.sh/title: "FS Group"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Controls allocating an FSGroup that owns the Pod's volumes. Corresponds
       to the `fsGroup` field in a PodSecurityPolicy. For more information, see
@@ -105,6 +106,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/fsgroup/template.yaml
+```
 ## Examples
 <details>
 <summary>fsgroup</summary><blockquote>
@@ -128,6 +133,12 @@ spec:
     - min: 1
       max: 1000
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/fsgroup/samples/psp-fsgroup/constraint.yaml
 ```
 
 </details>
@@ -156,6 +167,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/fsgroup/samples/psp-fsgroup/constraint.yaml
+```
+
 </details>
 <details>
 <summary>example-allowed</summary>
@@ -179,6 +196,12 @@ spec:
         - name: fsgroup-demo-vol
           mountPath: /data/demo
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/fsgroup/samples/psp-fsgroup/constraint.yaml
 ```
 
 </details>

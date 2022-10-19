@@ -17,6 +17,7 @@ metadata:
   name: k8sblocknodeport
   annotations:
     metadata.gatekeeper.sh/title: "Block NodePort"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Disallows all Services with type NodePort.
 
@@ -39,6 +40,10 @@ spec:
 
 ```
 
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-nodeport-services/template.yaml
+```
 ## Examples
 <details>
 <summary>block-nodeport-services</summary><blockquote>
@@ -59,6 +64,12 @@ spec:
 
 ```
 
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-nodeport-services/samples/block-node-port/constraint.yaml
+```
+
 </details>
 
 <details>
@@ -76,6 +87,12 @@ spec:
       targetPort: 80
       nodePort: 30007
 
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-nodeport-services/samples/block-node-port/constraint.yaml
 ```
 
 </details>

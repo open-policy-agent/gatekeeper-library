@@ -50,6 +50,11 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      algolia: {
+        appId: '50R2XL9XTU',
+        apiKey: 'c6cf0797aa351ac2c8640899d40c8821',
+        indexName: 'gatekeeper-library-web',
+      },
       colorMode: {
         defaultMode: 'light',
         disableSwitch: false,
