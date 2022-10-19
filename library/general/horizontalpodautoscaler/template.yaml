@@ -4,6 +4,7 @@ metadata:
   name: k8shorizontalpodautoscaler
   annotations:
     metadata.gatekeeper.sh/title: "Horizontal Pod Autoscaler"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Disallow the following scenarios when deploying `HorizontalPodAutoscalers`
       1. Deployment of HorizontalPodAutoscalers with `.spec.minReplicas` or `.spec.maxReplicas` outside the ranges defined in the constraint
@@ -56,6 +57,7 @@ spec:
           hpa := input.review.object
 
           not input_replica_spread(hpa)
+          
           msg := sprintf("The %v <%v> is configured with minReplicas %v and maxReplicas %v which is a spread of %v replica(s). The spread must be at least %v replica(s)", [hpa.kind, hpa.metadata.name, hpa.spec.minReplicas, hpa.spec.maxReplicas, hpa.spec.maxReplicas - hpa.spec.minReplicas, input.parameters.minimumReplicaSpread])
         }
 
