@@ -17,6 +17,16 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "Storage Class"
     metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/requiresSyncData: |
+      "[
+        [
+          {
+            "groups":["storage.k8s.io"],
+            "versions": ["v1"],
+            "kinds": ["StorageClass"]
+          }
+        ]
+      ]"
     description: >-
       Requires storage classes to be specified when used. Only Gatekeeper 3.9+ is supported.
 spec:
