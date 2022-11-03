@@ -6,7 +6,7 @@ title: Forbidden Sysctls
 # Forbidden Sysctls
 
 ## Description
-Controls the `sysctl` profile used by containers. Corresponds to the `forbiddenSysctls` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
+Controls the `sysctl` profile used by containers. Corresponds to the `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy. Any sysctl not in the `allowedSysctls` parameter is considered to be forbidden. The `forbiddenSysctls` parameter takes precedence over the `allowedSysctls` parameter. For more information, see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
 
 ## Template
 ```yaml
@@ -19,8 +19,10 @@ metadata:
     metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Controls the `sysctl` profile used by containers. Corresponds to the
-      `forbiddenSysctls` field in a PodSecurityPolicy. For more information,
-      see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
+      `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy.
+      Any sysctl not in the `allowedSysctls` parameter is considered to be forbidden.
+      The `forbiddenSysctls` parameter takes precedence over the `allowedSysctls` parameter.
+      For more information, see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
 spec:
   crd:
     spec:
@@ -32,9 +34,16 @@ spec:
           type: object
           description: >-
             Controls the `sysctl` profile used by containers. Corresponds to the
-            `forbiddenSysctls` field in a PodSecurityPolicy. For more information,
-            see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
+            `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy.
+            Any sysctl not in the `allowedSysctls` parameter is considered to be forbidden.
+            The `forbiddenSysctls` parameter takes precedence over the `allowedSysctls` parameter.
+            For more information, see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
           properties:
+            allowedSysctls:
+              type: array
+              description: "An allow-list of sysctls. `*` allows all sysctls not listed in the `forbiddenSysctls` parameter."
+              items:
+                type: string
             forbiddenSysctls:
               type: array
               description: "A disallow-list of sysctls. `*` forbids all sysctls."
@@ -45,10 +54,18 @@ spec:
       rego: |
         package k8spspforbiddensysctls
 
+        # Block if forbidden
         violation[{"msg": msg, "details": {}}] {
             sysctl := input.review.object.spec.securityContext.sysctls[_].name
             forbidden_sysctl(sysctl)
             msg := sprintf("The sysctl %v is not allowed, pod: %v. Forbidden sysctls: %v", [sysctl, input.review.object.metadata.name, input.parameters.forbiddenSysctls])
+        }
+
+        # Block if not explicitly allowed
+        violation[{"msg": msg, "details": {}}] {
+            sysctl := input.review.object.spec.securityContext.sysctls[_].name
+            not allowed_sysctl(sysctl)
+            msg := sprintf("The sysctl %v is not explictly allowed, pod: %v. Allowed sysctls: %v", [sysctl, input.review.object.metadata.name, input.parameters.allowedSysctls])
         }
 
         # * may be used to forbid all sysctls
@@ -62,6 +79,19 @@ spec:
 
         forbidden_sysctl(sysctl) {
             startswith(sysctl, trim(input.parameters.forbiddenSysctls[_], "*"))
+        }
+
+        # * may be used to allow all sysctls
+        allowed_sysctl(sysctl) {
+            input.parameters.allowedSysctls[_] == "*"
+        }
+
+        allowed_sysctl(sysctl) {
+            input.parameters.allowedSysctls[_] == sysctl
+        }
+
+        allowed_sysctl(sysctl) {
+            startswith(sysctl, trim(input.parameters.allowedSysctls[_], "*"))
         }
 
 ```
@@ -91,6 +121,8 @@ spec:
     forbiddenSysctls:
     # - "*" # * may be used to forbid all sysctls
     - kernel.*
+    allowedSysctls:
+    - * # allows all sysctls. allowedSysctls is optional.
 
 ```
 

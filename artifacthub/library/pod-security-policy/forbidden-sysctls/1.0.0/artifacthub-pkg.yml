@@ -3,7 +3,7 @@ name: k8spspforbiddensysctls
 displayName: Forbidden Sysctls
 createdAt: "2022-09-26T17:28:27Z"
 description: Controls the `sysctl` profile used by containers. Corresponds to the `forbiddenSysctls` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
-digest: 9b9dd72e566453d8e1b5961848c5f354b19581c3f5264077885fdc08248cb632
+digest: 16d9f9f709b72c7e047477f5a4bda2e10bbcf70a8ed91eb4c4b73e2c72449eee
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/forbidden-sysctls
 keywords:
