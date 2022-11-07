@@ -214,7 +214,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/noupdateserviceaccount/samples/noupdateserviceaccount/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/noupdateserviceaccount/samples/noupdateserviceaccount/example_allowed.yaml
 ```
 
 </details>

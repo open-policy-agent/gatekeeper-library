@@ -154,7 +154,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/httpsonly/samples/ingress-https-only/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/httpsonly/samples/ingress-https-only/example_allowed.yaml
 ```
 
 </details>
@@ -184,7 +184,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/httpsonly/samples/ingress-https-only/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/httpsonly/samples/ingress-https-only/example_disallowed.yaml
 ```
 
 </details>
@@ -247,7 +247,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/httpsonly/samples/ingress-https-only-tls-optional/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/httpsonly/samples/ingress-https-only-tls-optional/example_allowed.yaml
 ```
 
 </details>
@@ -277,7 +277,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/httpsonly/samples/ingress-https-only-tls-optional/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/httpsonly/samples/ingress-https-only-tls-optional/example_disallowed.yaml
 ```
 
 </details>

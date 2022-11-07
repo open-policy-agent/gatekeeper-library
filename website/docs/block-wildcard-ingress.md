@@ -105,7 +105,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/samples/block-wildcard-ingress/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/samples/block-wildcard-ingress/example_allowed.yaml
 ```
 
 </details>
@@ -135,7 +135,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/samples/block-wildcard-ingress/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/samples/block-wildcard-ingress/disallowed/blank_host.yaml
 ```
 
 </details>
@@ -165,7 +165,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/samples/block-wildcard-ingress/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/samples/block-wildcard-ingress/disallowed/host_omitted.yaml
 ```
 
 </details>
@@ -206,7 +206,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/samples/block-wildcard-ingress/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/samples/block-wildcard-ingress/disallowed/wildcard_host.yaml
 ```
 
 </details>

@@ -144,7 +144,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/samples/poddisruptionbudget/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/samples/poddisruptionbudget/example_allowed_pdb.yaml
 ```
 
 </details>
@@ -168,7 +168,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/samples/poddisruptionbudget/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/samples/poddisruptionbudget/example_disallowed_pdb.yaml
 ```
 
 </details>
@@ -206,7 +206,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/samples/poddisruptionbudget/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/samples/poddisruptionbudget/example_allowed_deployment1.yaml
 ```
 
 </details>
@@ -244,7 +244,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/samples/poddisruptionbudget/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/samples/poddisruptionbudget/example_allowed_deployment2.yaml
 ```
 
 </details>
@@ -282,7 +282,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/samples/poddisruptionbudget/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/samples/poddisruptionbudget/example_disallowed_deployment.yaml
 ```
 
 </details>
