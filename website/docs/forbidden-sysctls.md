@@ -6,7 +6,7 @@ title: Forbidden Sysctls
 # Forbidden Sysctls
 
 ## Description
-Controls the `sysctl` profile used by containers. Corresponds to the `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy. Any sysctl not in the `allowedSysctls` parameter is considered to be forbidden. The `forbiddenSysctls` parameter takes precedence over the `allowedSysctls` parameter. For more information, see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
+Controls the `sysctl` profile used by containers. Corresponds to the `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy. When specified, any sysctl not in the `allowedSysctls` parameter is considered to be forbidden. The `forbiddenSysctls` parameter takes precedence over the `allowedSysctls` parameter. For more information, see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
 
 ## Template
 ```yaml
@@ -16,11 +16,11 @@ metadata:
   name: k8spspforbiddensysctls
   annotations:
     metadata.gatekeeper.sh/title: "Forbidden Sysctls"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Controls the `sysctl` profile used by containers. Corresponds to the
       `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy.
-      Any sysctl not in the `allowedSysctls` parameter is considered to be forbidden.
+      When specified, any sysctl not in the `allowedSysctls` parameter is considered to be forbidden.
       The `forbiddenSysctls` parameter takes precedence over the `allowedSysctls` parameter.
       For more information, see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
 spec:
@@ -35,7 +35,7 @@ spec:
           description: >-
             Controls the `sysctl` profile used by containers. Corresponds to the
             `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy.
-            Any sysctl not in the `allowedSysctls` parameter is considered to be forbidden.
+            When specified, any sysctl not in the `allowedSysctls` parameter is considered to be forbidden.
             The `forbiddenSysctls` parameter takes precedence over the `allowedSysctls` parameter.
             For more information, see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
           properties:
@@ -78,7 +78,9 @@ spec:
         }
 
         forbidden_sysctl(sysctl) {
-            startswith(sysctl, trim(input.parameters.forbiddenSysctls[_], "*"))
+            forbidden := input.parameters.forbiddenSysctls[_]
+            endswith(forbidden, "*")
+            startswith(sysctl, trim_suffix(forbidden, "*"))
         }
 
         # * may be used to allow all sysctls
@@ -91,7 +93,9 @@ spec:
         }
 
         allowed_sysctl(sysctl) {
-            startswith(sysctl, trim(input.parameters.allowedSysctls[_], "*"))
+            allowed := input.parameters.allowedSysctls[_]
+            endswith(allowed, "*")
+            startswith(sysctl, trim_suffix(allowed, "*"))
         }
 
 ```
@@ -122,7 +126,7 @@ spec:
     # - "*" # * may be used to forbid all sysctls
     - kernel.*
     allowedSysctls:
-    - * # allows all sysctls. allowedSysctls is optional.
+    - "*" # allows all sysctls. allowedSysctls is optional.
 
 ```
 
