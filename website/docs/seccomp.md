@@ -352,7 +352,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/example_disallowed2.yaml
 ```
 
 </details>
@@ -378,7 +378,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/example_disallowed.yaml
 ```
 
 </details>
@@ -404,7 +404,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/example_allowed.yaml
 ```
 
 </details>
@@ -430,7 +430,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/example_allowed2.yaml
 ```
 
 </details>
@@ -456,7 +456,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/disallowed_ephemeral.yaml
 ```
 
 </details>

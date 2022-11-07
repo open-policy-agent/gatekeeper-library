@@ -141,7 +141,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredprobes/samples/must-have-probes/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredprobes/samples/must-have-probes/example_allowed.yaml
 ```
 
 </details>
@@ -185,7 +185,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredprobes/samples/must-have-probes/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredprobes/samples/must-have-probes/example_disallowed.yaml
 ```
 
 </details>
@@ -240,7 +240,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredprobes/samples/must-have-probes/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredprobes/samples/must-have-probes/example_disallowed2.yaml
 ```
 
 </details>

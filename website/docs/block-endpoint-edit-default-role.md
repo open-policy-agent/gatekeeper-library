@@ -243,7 +243,7 @@ rules:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-endpoint-edit-default-role/samples/block-endpoint-edit-default-role/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-endpoint-edit-default-role/samples/block-endpoint-edit-default-role/example_allowed.yaml
 ```
 
 </details>
@@ -336,7 +336,7 @@ rules:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-endpoint-edit-default-role/samples/block-endpoint-edit-default-role/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-endpoint-edit-default-role/samples/block-endpoint-edit-default-role/example_disallowed.yaml
 ```
 
 </details>
