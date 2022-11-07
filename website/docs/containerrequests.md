@@ -341,7 +341,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerrequests/samples/container-must-have-requests/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerrequests/samples/container-must-have-requests/example_allowed.yaml
 ```
 
 </details>
@@ -373,7 +373,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerrequests/samples/container-must-have-requests/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerrequests/samples/container-must-have-requests/example_disallowed.yaml
 ```
 
 </details>

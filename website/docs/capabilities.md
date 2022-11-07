@@ -228,7 +228,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/capabilities-demo/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/capabilities-demo/example_disallowed.yaml
 ```
 
 </details>
@@ -264,7 +264,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/capabilities-demo/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/capabilities-demo/example_allowed.yaml
 ```
 
 </details>
@@ -299,7 +299,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/capabilities-demo/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/capabilities-demo/disallowed_ephemeral.yaml
 ```
 
 </details>

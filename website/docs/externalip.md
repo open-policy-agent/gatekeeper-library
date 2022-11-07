@@ -113,7 +113,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/externalip/samples/allowed-ip/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/externalip/samples/allowed-ip/example_allowed.yaml
 ```
 
 </details>
@@ -141,7 +141,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/externalip/samples/allowed-ip/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/externalip/samples/allowed-ip/example_disallowed.yaml
 ```
 
 </details>

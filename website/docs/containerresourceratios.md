@@ -392,7 +392,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresourceratios/samples/container-must-meet-ratio/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresourceratios/samples/container-must-meet-ratio/example_allowed.yaml
 ```
 
 </details>
@@ -427,7 +427,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresourceratios/samples/container-must-meet-ratio/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresourceratios/samples/container-must-meet-ratio/example_disallowed.yaml
 ```
 
 </details>
@@ -494,7 +494,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresourceratios/samples/container-must-meet-memory-and-cpu-ratio/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresourceratios/samples/container-must-meet-memory-and-cpu-ratio/example_allowed.yaml
 ```
 
 </details>
@@ -529,7 +529,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresourceratios/samples/container-must-meet-memory-and-cpu-ratio/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerresourceratios/samples/container-must-meet-memory-and-cpu-ratio/example_disallowed.yaml
 ```
 
 </details>
