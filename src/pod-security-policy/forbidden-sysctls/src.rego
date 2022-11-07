@@ -24,7 +24,9 @@ forbidden_sysctl(sysctl) {
 }
 
 forbidden_sysctl(sysctl) {
-    startswith(sysctl, trim(input.parameters.forbiddenSysctls[_], "*"))
+    forbidden := input.parameters.forbiddenSysctls[_]
+    endswith(forbidden, "*")
+    startswith(sysctl, trim_suffix(forbidden, "*"))
 }
 
 # * may be used to allow all sysctls
@@ -37,5 +39,7 @@ allowed_sysctl(sysctl) {
 }
 
 allowed_sysctl(sysctl) {
-    startswith(sysctl, trim(input.parameters.allowedSysctls[_], "*"))
+    allowed := input.parameters.allowedSysctls[_]
+    endswith(allowed, "*")
+    startswith(sysctl, trim_suffix(allowed, "*"))
 }
