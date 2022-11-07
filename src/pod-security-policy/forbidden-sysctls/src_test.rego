@@ -48,32 +48,38 @@ test_input_sysctls_empty_forbidden {
     count(results) == 0
 }
 
-test_input_no_sysctls_wildcard {
-    input := { "review": input_review_empty, "parameters": input_parameters_wildcard}
+test_input_seccontext_empty_wildcard {
+    input := { "review": input_review_seccontext_empty, "parameters": input_parameters_wildcard}
     results := violation with input as input
     count(results) == 0
 }
 
-test_input_empty_sysctls_wildcard {
+test_input_sysctls_empty_wildcard {
     input := { "review": input_review_sysctls_empty, "parameters": input_parameters_wildcard}
     results := violation with input as input
     count(results) == 0
 }
 
-test_input_empty_wildcard {
-    input := { "review": input_review_empty_seccontext, "parameters": input_parameters_wildcard}
+test_input_seccontext_null_wildcard {
+    input := { "review": input_review_seccontext_null, "parameters": input_parameters_wildcard}
     results := violation with input as input
     count(results) == 0
 }
 
-test_input_no_sysctls_empty_forbidden {
-    input := { "review": input_review_empty, "parameters": input_parameters_empty}
+test_input_seccontext_empty_empty_forbidden {
+    input := { "review": input_review_seccontext_empty, "parameters": input_parameters_empty}
     results := violation with input as input
     count(results) == 0
 }
 
-test_input_empty_empty_forbidden {
-    input := { "review": input_review_empty_seccontext, "parameters": input_parameters_empty}
+test_input_sysctls_empty_empty_forbidden {
+    input := { "review": input_review_sysctls_empty, "parameters": input_parameters_empty}
+    results := violation with input as input
+    count(results) == 0
+}
+
+test_input_seccontext_null_empty_forbidden {
+    input := { "review": input_review_seccontext_null, "parameters": input_parameters_empty}
     results := violation with input as input
     count(results) == 0
 }
@@ -179,7 +185,7 @@ input_init_review = {
             "name": "nginx"
         },
         "spec": {
-            "containers": {
+            "initContainers": {
                 "name": "nginx",
                 "image": "nginx"
             },
@@ -199,7 +205,7 @@ input_init_review = {
     }
 }
 
-input_review_empty = {
+input_review_seccontext_empty = {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -232,7 +238,7 @@ input_review_sysctls_empty = {
     }
 }
 
-input_review_empty_seccontext = {
+input_review_seccontext_null = {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -300,43 +306,6 @@ input_parameters_sysctls_allowed_all = {
 
 input_parameters_sysctls_allowed_empty = {
     "allowedSysctls": []
-}
-
-input_parameters_sysctls_allowed_wildcards = {
-    "allowedSysctls": [
-        "kernel.*",
-        "net.*"
-    ]
-}
-
-input_parameters_sysctls_allowed_exact = {
-    "allowedSysctls": [
-        "kernel.shm_rmid_forced",
-        "net.core.somaxconn"
-    ]
-}
-
-input_parameters_sysctls_some_allowed_exact = {
-    "allowedSysctls": [
-        "net.core.somaxconn"
-    ]
-}
-
-input_parameters_sysctls_some_allowed_wildcards = {
-    "allowedSysctls": [
-        "net.*"
-    ]
-}
-
-input_parameters_sysctls_allowed_and_forbidden = {
-    "allowedSysctls": [
-        "kernel.shm_rmid_forced",
-        "net.core.somaxconn"
-    ],
-    "forbiddenSysctls": [
-        "kernel.shm_rmid_forced",
-        "net.core.somaxconn"
-    ]
 }
 
 input_parameters_sysctls_allowed_wildcards = {
