@@ -64,7 +64,7 @@ require-suites:
 
 .PHONY: require-sync
 require-sync:
-	cd $(REQUIRE_SYNC_SCRIPT_DIR); go run main.go --path="$(REPO_ROOT)/library" --sync_file=true
+	cd $(REQUIRE_SYNC_SCRIPT_DIR); go run main.go --path="$(REPO_ROOT)/library" --sync-file=true
 
 .PHONY: generate-website-docs
 generate-website-docs:

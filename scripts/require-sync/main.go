@@ -26,7 +26,7 @@ const syncAnnotation string = "metadata.gatekeeper.sh/requiresSyncData"
 
 var (
 	pathFlag = flag.String("path", "", "Path to verify referential templates include sync data.")
-	fileFlag = flag.Bool("sync_file", false, "When `true`, require a `sync.yaml` file for each referential template.")
+	fileFlag = flag.Bool("sync-file", false, "When `true`, require a `sync.yaml` file for each referential template.")
 )
 
 var scheme *runtime.Scheme
