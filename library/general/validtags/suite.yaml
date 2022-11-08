@@ -1,0 +1,21 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: valid-tags
+tests:
+- name: valid-tags
+  template: template.yaml
+  constraint: samples/constraint.yaml
+  cases:
+  - name: disallowed
+    object: samples/disallow_all.yaml
+    assertions:
+    - violations: yes
+  - name: allowed
+    object: samples/allow_all.yaml
+    assertions:
+    - violations: no
+  - name: allow-disallow
+    object: samples/allow_disallow.yaml
+    assertions:
+    - violations: yes
