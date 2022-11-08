@@ -17,7 +17,7 @@ metadata:
   name: k8suniqueingresshost
   annotations:
     metadata.gatekeeper.sh/title: "Unique Ingress Host"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     metadata.gatekeeper.sh/requiresSyncData: |
       "[
         [

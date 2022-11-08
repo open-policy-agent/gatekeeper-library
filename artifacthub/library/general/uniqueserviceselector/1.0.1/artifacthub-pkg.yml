@@ -1,0 +1,25 @@
+version: 1.0.1
+name: k8suniqueserviceselector
+displayName: Unique Service Selector
+createdAt: "2022-11-08T23:45:23Z"
+description: |-
+    Requires Services to have unique selectors within a namespace. Selectors are considered the same if they have identical keys and values. Selectors may share a key/value pair so long as there is at least one distinct key/value pair between them.
+    https://kubernetes.io/docs/concepts/services-networking/service/#defining-a-service
+digest: 5fdf21c0eb998edd9eb8f590f21122f59906eb8a6b261d5322b31f9e2c305790
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/uniqueserviceselector
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Unique Service Selector
+    Requires Services to have unique selectors within a namespace. Selectors are considered the same if they have identical keys and values. Selectors may share a key/value pair so long as there is at least one distinct key/value pair between them.
+    https://kubernetes.io/docs/concepts/services-networking/service/#defining-a-service
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/uniqueserviceselector/1.0.1/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

@@ -16,7 +16,7 @@ metadata:
   name: k8sstorageclass
   annotations:
     metadata.gatekeeper.sh/title: "Storage Class"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     metadata.gatekeeper.sh/requiresSyncData: |
       "[
         [

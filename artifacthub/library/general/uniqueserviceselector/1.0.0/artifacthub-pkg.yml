@@ -5,7 +5,7 @@ createdAt: "2022-09-16T16:22:28Z"
 description: |-
     Requires Services to have unique selectors within a namespace. Selectors are considered the same if they have identical keys and values. Selectors may share a key/value pair so long as there is at least one distinct key/value pair between them.
     https://kubernetes.io/docs/concepts/services-networking/service/#defining-a-service
-digest: bf0478ac1e082fd4b8c0383f21ab8eb0a4636edacabf4718f65645cc55cc4a74
+digest: 619dceb345b6050715f8c7526c61cbca56b0f5b2fb5113365f29dfc42e626073
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/uniqueserviceselector
 keywords:
