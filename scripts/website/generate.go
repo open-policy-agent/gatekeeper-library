@@ -105,7 +105,8 @@ func main() {
 
 						examples := ""
 						for _, testCase := range test.Cases {
-							exampleRawURL := sourceURL + filepath.Join(entryPoint, entry.Name(), dir.Name(), test.Constraint)
+							exampleRawURL := sourceURL + filepath.Join(entryPoint, entry.Name(), dir.Name(), testCase.Object)
+
 							exampleContent, err := os.ReadFile(filepath.Join(basePath, dir.Name(), testCase.Object))
 							if err != nil {
 								fmt.Println("error while reading ", testCase.Object)

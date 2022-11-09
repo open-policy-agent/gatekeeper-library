@@ -121,7 +121,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/automount-serviceaccount-token/samples/automount-serviceaccount-token/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/automount-serviceaccount-token/samples/automount-serviceaccount-token/example_allowed.yaml
 ```
 
 </details>
@@ -146,7 +146,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/automount-serviceaccount-token/samples/automount-serviceaccount-token/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/automount-serviceaccount-token/samples/automount-serviceaccount-token/example_disallowed.yaml
 ```
 
 </details>

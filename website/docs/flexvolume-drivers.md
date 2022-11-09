@@ -137,7 +137,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/flexvolume-drivers/samples/psp-flexvolume-drivers/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/flexvolume-drivers/samples/psp-flexvolume-drivers/example_allowed.yaml
 ```
 
 </details>
@@ -169,7 +169,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/flexvolume-drivers/samples/psp-flexvolume-drivers/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/flexvolume-drivers/samples/psp-flexvolume-drivers/example_disallowed.yaml
 ```
 
 </details>
