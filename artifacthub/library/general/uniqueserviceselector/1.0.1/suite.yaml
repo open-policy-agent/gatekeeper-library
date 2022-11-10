@@ -1,0 +1,19 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: uniqueserviceselector
+tests:
+- name: block-endpoint-default-role
+  template: template.yaml
+  constraint: samples/unique-service-selector/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/unique-service-selector/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/unique-service-selector/example_disallowed.yaml
+    inventory:
+    - samples/unique-service-selector/example_inventory_disallowed.yaml
+    assertions:
+    - violations: yes

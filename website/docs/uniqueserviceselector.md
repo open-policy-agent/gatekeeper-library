@@ -17,7 +17,17 @@ metadata:
   name: k8suniqueserviceselector
   annotations:
     metadata.gatekeeper.sh/title: "Unique Service Selector"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/requiresSyncData: |
+      "[
+        [
+          {
+            "groups":[""],
+            "versions": ["v1"],
+            "kinds": ["Service"]
+          }
+        ]
+      ]"
     description: >-
       Requires Services to have unique selectors within a namespace.
       Selectors are considered the same if they have identical keys and values.

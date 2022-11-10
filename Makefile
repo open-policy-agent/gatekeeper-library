@@ -11,6 +11,7 @@ GOMPLATE_VERSION ?= 3.10.0
 REPO_ROOT := $(shell git rev-parse --show-toplevel)
 WEBSITE_SCRIPT_DIR := $(REPO_ROOT)/scripts/website
 ARTIFACTHUB_SCRIPT_DIR := $(REPO_ROOT)/scripts/artifacthub
+REQUIRE_SYNC_SCRIPT_DIR := $(REPO_ROOT)/scripts/require-sync
 
 integration-bootstrap:
 	# Download and install kind
@@ -60,6 +61,10 @@ __build-gomplate:
 .PHONY: require-suites
 require-suites:
 	./scripts/require-suites.sh
+
+.PHONY: require-sync
+require-sync:
+	cd $(REQUIRE_SYNC_SCRIPT_DIR); go run main.go --path="$(REPO_ROOT)/library" --sync-file=true
 
 .PHONY: generate-website-docs
 generate-website-docs:

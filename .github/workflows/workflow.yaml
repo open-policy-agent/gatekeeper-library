@@ -78,6 +78,14 @@ jobs:
       - name: Run script
         run: |
           make require-suites
+  require_sync:
+    runs-on: ubuntu-latest
+    name: "Require a sync.yaml file and metadata.gatekeeper.sh/requiresSyncData annotation for every template.yaml using data.inventory"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run script
+        run: |
+          make require-sync
   gator-verify:
     runs-on: ubuntu-latest
     name: "Verify assertions in suite.yaml files"
