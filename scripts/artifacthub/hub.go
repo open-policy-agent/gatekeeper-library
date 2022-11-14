@@ -138,33 +138,34 @@ func createVersionDirectory(rootDir, basePath string, constraintTemplate map[str
 	version := fmt.Sprintf("%s", constraintTemplate["metadata"].(map[string]interface{})["annotations"].(map[string]interface{})["metadata.gatekeeper.sh/version"])
 
 	// create directory if not exists
-	if _, err := os.Stat(filepath.Join(rootDir, ahEntryPoint, basePath, version)); os.IsNotExist(err) {
-		err = os.MkdirAll(filepath.Join(rootDir, ahEntryPoint, basePath, version), 0755)
+	destination := filepath.Join(rootDir, ahEntryPoint, basePath, version)
+	if _, err := os.Stat(destination); os.IsNotExist(err) {
+		err = os.MkdirAll(destination, 0o755)
 		if err != nil {
 			fmt.Println("error while creating version directory")
 			panic(err)
 		}
 	}
 
-	// copy content
 	source := filepath.Join(rootDir, basePath)
-	destination := filepath.Join(rootDir, ahEntryPoint, basePath, version)
 	ahBasePath := filepath.Join(ahEntryPoint, basePath, version)
 
-	// copy directory
+	// create artifacthub-pkg.yml file first then copy rest of the files. This will avoid unnecessary diff if there is any error while generating or updating artifacthub-pkg.yml
+	// add artifact hub metadata
+	addArtifactHubMetadata(filepath.Base(source), destination, ahBasePath, constraintTemplate)
+
+	// copy directory content
 	err := copyDirectory(source, destination)
 	if err != nil {
 		fmt.Println("error while copying directories")
 		panic(err)
 	}
-
-	// add artifact hub metadata
-	addArtifactHubMetadata(filepath.Base(source), destination, ahBasePath, constraintTemplate)
 }
 
 func addArtifactHubMetadata(sourceDirectory, destinationPath, ahBasePath string, constraintTemplate map[string]interface{}) {
 	metadataFilePath := filepath.Join(destinationPath, "artifacthub-pkg.yml")
 
+	constraintTemplateHash := getConstraintTemplateHash(constraintTemplate)
 	artifactHubMetadata := getMetadataIfExist(metadataFilePath)
 	if artifactHubMetadata == nil {
 		format := "2006-01-02 15:04:05Z"
@@ -196,10 +197,16 @@ func addArtifactHubMetadata(sourceDirectory, destinationPath, ahBasePath string,
 			Readme: fmt.Sprintf(`# %s
 %s`, constraintTemplate["metadata"].(map[string]interface{})["annotations"].(map[string]interface{})["metadata.gatekeeper.sh/title"], constraintTemplate["metadata"].(map[string]interface{})["annotations"].(map[string]interface{})["description"]),
 		}
+	} else {
+		// when metadata file already exists, check version to make sure it's updated if constraint template is changed
+		err := checkVersion(artifactHubMetadata, constraintTemplate, constraintTemplateHash)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	// updating digest triggers artifact hub to update the package
-	artifactHubMetadata.Digest = getConstraintTemplateHash(constraintTemplate)
+	artifactHubMetadata.Digest = constraintTemplateHash
 
 	artifactHubMetadataBytes, err := yaml.Marshal(artifactHubMetadata)
 	if err != nil {
@@ -212,6 +219,19 @@ func addArtifactHubMetadata(sourceDirectory, destinationPath, ahBasePath string,
 		fmt.Println("error while writing artifact hub metadata")
 		panic(err)
 	}
+}
+
+func checkVersion(artifactHubMetadata *ArtifactHubMetadata, constraintTemplate map[string]interface{}, newConstraintTemplateHash string) error {
+	// compare hash
+	if artifactHubMetadata.Digest != newConstraintTemplateHash {
+		// compare version
+		if artifactHubMetadata.Version == constraintTemplate["metadata"].(map[string]interface{})["annotations"].(map[string]interface{})["metadata.gatekeeper.sh/version"].(string) {
+			// panic if version is same but hash is different
+			return fmt.Errorf("looks like template.yaml is updated but the version is not. Please update the 'metadata.gatekeeper.sh/version' annotation in the template.yaml source")
+		}
+	}
+
+	return nil
 }
 
 func getConstraintTemplateHash(constraintTemplate map[string]interface{}) string {
