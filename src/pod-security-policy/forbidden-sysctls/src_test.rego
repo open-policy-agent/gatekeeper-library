@@ -102,6 +102,26 @@ test_input_init_sysctls_forbidden_not_in_list {
     count(results) == 0
 }
 
+test_input_sysctls_exempt_in_list {
+    input := { "review": input_review, "parameters": input_parameters_one_in_list_exempt}
+    results := violation with input as input
+    count(results) == 0
+}
+
+test_input_sysctls_non_exempt_in_list {
+    input := { "review": input_review, "parameters": input_parameters_one_in_list_not_exempt}
+    results := violation with input as input
+    print(results)
+    count(results) == 1
+}
+
+test_input_sysctls_mixed_exempt_in_list {
+    input := { "review": input_review, "parameters": input_parameters_two_in_list_mixed_exempt}
+    results := violation with input as input
+    print(results)
+    count(results) == 1
+}
+
 input_review = {
     "object": {
         "metadata": {
@@ -247,4 +267,32 @@ input_parameters_not_in_list_wildcard = {
 
 input_parameters_empty = {
     "forbiddenSysctls": []
+}
+
+input_parameters_one_in_list_exempt = {
+    "forbiddenSysctls": [
+        "kernel.shm_rmid_forced"
+    ],
+    "exemptSysctls": [
+        "kernel.shm_rmid_forced"
+    ]
+}
+
+input_parameters_one_in_list_not_exempt = {
+    "forbiddenSysctls": [
+        "kernel.shm_rmid_forced"
+    ],
+    "exemptSysctls": [
+        "net.core.somaxconn"
+    ]
+}
+
+input_parameters_two_in_list_mixed_exempt = {
+    "forbiddenSysctls": [
+        "kernel.shm_rmid_forced",
+        "net.core.somaxconn"
+    ],
+    "exemptSysctls": [
+        "kernel.shm_rmid_forced"
+    ]
 }

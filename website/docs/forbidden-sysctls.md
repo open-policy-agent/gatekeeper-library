@@ -16,7 +16,7 @@ metadata:
   name: k8spspforbiddensysctls
   annotations:
     metadata.gatekeeper.sh/title: "Forbidden Sysctls"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Controls the `sysctl` profile used by containers. Corresponds to the
       `forbiddenSysctls` field in a PodSecurityPolicy. For more information,
@@ -40,6 +40,11 @@ spec:
               description: "A disallow-list of sysctls. `*` forbids all sysctls."
               items:
                 type: string
+            exemptSysctls:
+              type: array
+              description: "A list of specific Sysctls exempt from forbiddenSysctls."
+              items:
+                type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
@@ -47,6 +52,7 @@ spec:
 
         violation[{"msg": msg, "details": {}}] {
             sysctl := input.review.object.spec.securityContext.sysctls[_].name
+            not exempt_sysctl(sysctl)
             forbidden_sysctl(sysctl)
             msg := sprintf("The sysctl %v is not allowed, pod: %v. Forbidden sysctls: %v", [sysctl, input.review.object.metadata.name, input.parameters.forbiddenSysctls])
         }
@@ -62,6 +68,10 @@ spec:
 
         forbidden_sysctl(sysctl) {
             startswith(sysctl, trim(input.parameters.forbiddenSysctls[_], "*"))
+        }
+
+        exempt_sysctl(sysctl) {
+          object.get(input.parameters, "exemptSysctls", [])[_] == sysctl
         }
 
 ```
@@ -91,6 +101,8 @@ spec:
     forbiddenSysctls:
     # - "*" # * may be used to forbid all sysctls
     - kernel.*
+    exemptSysctls:
+    - kernel.shm_rmid_forced
 
 ```
 
@@ -157,6 +169,34 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>example-exempt</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-exempt-sysctls
+  labels:
+    app: nginx-exempt-sysctls
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+  securityContext:
+    sysctls:
+      - name: kernel.shm_rmid_forced
+        value: "1"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/example_exempt.yaml
 ```
 
 </details>
