@@ -17,7 +17,22 @@ metadata:
   name: k8suniqueingresshost
   annotations:
     metadata.gatekeeper.sh/title: "Unique Ingress Host"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/requiresSyncData: |
+      "[
+        [
+          {
+            "groups":["extensions"],
+            "versions": ["v1beta1"],
+            "kinds": ["Ingress"]
+          },
+          {
+            "group": ["networking.k8s.io"],
+            "version": ["v1beta1", "v1"],
+            "kind": ["Ingress"]
+          }
+        ]
+      ]"
     description: >-
       Requires all Ingress rule hosts to be unique.
 
@@ -120,7 +135,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/uniqueingresshost/samples/unique-ingress-host/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/uniqueingresshost/samples/unique-ingress-host/example_allowed.yaml
 ```
 
 </details>
@@ -151,7 +166,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/uniqueingresshost/samples/unique-ingress-host/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/uniqueingresshost/samples/unique-ingress-host/example_disallowed.yaml
 ```
 
 </details>
@@ -192,7 +207,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/uniqueingresshost/samples/unique-ingress-host/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/uniqueingresshost/samples/unique-ingress-host/example_disallowed2.yaml
 ```
 
 </details>

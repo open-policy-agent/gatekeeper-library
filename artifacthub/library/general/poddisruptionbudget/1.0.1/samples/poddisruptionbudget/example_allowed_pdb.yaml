@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: nginx-pdb-allowed
+  namespace: default
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      foo: bar
