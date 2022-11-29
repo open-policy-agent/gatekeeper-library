@@ -4,11 +4,13 @@ metadata:
   name: k8spspforbiddensysctls
   annotations:
     metadata.gatekeeper.sh/title: "Forbidden Sysctls"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Controls the `sysctl` profile used by containers. Corresponds to the
-      `forbiddenSysctls` field in a PodSecurityPolicy. For more information,
-      see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
+      `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy.
+      When specified, any sysctl not in the `allowedSysctls` parameter is considered to be forbidden.
+      The `forbiddenSysctls` parameter takes precedence over the `allowedSysctls` parameter.
+      For more information, see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
 spec:
   crd:
     spec:
@@ -20,9 +22,16 @@ spec:
           type: object
           description: >-
             Controls the `sysctl` profile used by containers. Corresponds to the
-            `forbiddenSysctls` field in a PodSecurityPolicy. For more information,
-            see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
+            `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy.
+            When specified, any sysctl not in the `allowedSysctls` parameter is considered to be forbidden.
+            The `forbiddenSysctls` parameter takes precedence over the `allowedSysctls` parameter.
+            For more information, see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
           properties:
+            allowedSysctls:
+              type: array
+              description: "An allow-list of sysctls. `*` allows all sysctls not listed in the `forbiddenSysctls` parameter."
+              items:
+                type: string
             forbiddenSysctls:
               type: array
               description: "A disallow-list of sysctls. `*` forbids all sysctls."
