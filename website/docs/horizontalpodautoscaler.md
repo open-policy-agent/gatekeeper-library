@@ -17,6 +17,21 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "Horizontal Pod Autoscaler"
     metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/requiresSyncData: |
+      "[
+        [
+          {
+            "groups":["apps"],
+            "versions": ["v1"],
+            "kinds": ["Deployment"]
+          },
+          {
+            "groups":["apps"],
+            "versions": ["v1"],
+            "kinds": ["StatefulSet"]
+          }
+        ]
+      ]"
     description: >-
       Disallow the following scenarios when deploying `HorizontalPodAutoscalers`
       1. Deployment of HorizontalPodAutoscalers with `.spec.minReplicas` or `.spec.maxReplicas` outside the ranges defined in the constraint
@@ -168,7 +183,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/horizontalpodautoscaler/samples/horizontalpodautoscaler/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/horizontalpodautoscaler/samples/horizontalpodautoscaler/example_allowed_hpa.yaml
 ```
 
 </details>
@@ -201,7 +216,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/horizontalpodautoscaler/samples/horizontalpodautoscaler/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/horizontalpodautoscaler/samples/horizontalpodautoscaler/example_disallowed_hpa_replicas.yaml
 ```
 
 </details>
@@ -234,7 +249,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/horizontalpodautoscaler/samples/horizontalpodautoscaler/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/horizontalpodautoscaler/samples/horizontalpodautoscaler/example_disallowed_hpa_replicaspread.yaml
 ```
 
 </details>
@@ -267,7 +282,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/horizontalpodautoscaler/samples/horizontalpodautoscaler/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/horizontalpodautoscaler/samples/horizontalpodautoscaler/example_disallowed_hpa_scaletarget.yaml
 ```
 
 </details>

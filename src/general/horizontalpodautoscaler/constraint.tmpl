@@ -5,6 +5,21 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "Horizontal Pod Autoscaler"
     metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/requiresSyncData: |
+      "[
+        [
+          {
+            "groups":["apps"],
+            "versions": ["v1"],
+            "kinds": ["Deployment"]
+          },
+          {
+            "groups":["apps"],
+            "versions": ["v1"],
+            "kinds": ["StatefulSet"]
+          }
+        ]
+      ]"
     description: >-
       Disallow the following scenarios when deploying `HorizontalPodAutoscalers`
       1. Deployment of HorizontalPodAutoscalers with `.spec.minReplicas` or `.spec.maxReplicas` outside the ranges defined in the constraint
