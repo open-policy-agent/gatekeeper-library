@@ -6,7 +6,9 @@ title: Pod Disruption Budget
 # Pod Disruption Budget
 
 ## Description
-Disallow the following scenarios when deploying PodDisruptionBudgets or resources that implement the replica subresource (e.g. Deployment, ReplicationController, ReplicaSet, StatefulSet): 1. Deployment of PodDisruptionBudgets with .spec.maxUnavailable == 0 2. Deployment of PodDisruptionBudgets with .spec.minAvailable == .spec.replicas of the resource with replica subresource This will prevent PodDisruptionBudgets from blocking voluntary disruptions such as node draining.
+Disallow the following scenarios when deploying PodDisruptionBudgets or resources that implement the replica subresource (e.g. Deployment, ReplicationController, ReplicaSet, StatefulSet):
+1. Deployment of PodDisruptionBudgets with .spec.maxUnavailable == 0
+2. Deployment of PodDisruptionBudgets with .spec.minAvailable == .spec.replicas of the resource with replica subresource. This will prevent PodDisruptionBudgets from blocking voluntary disruptions such as node draining.
 https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
 
 ## Template
