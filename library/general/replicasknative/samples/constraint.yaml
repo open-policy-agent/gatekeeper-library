@@ -1,0 +1,11 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sKnativeReplica
+metadata:
+  name: k8sknativereplica
+spec:
+  match:
+    kinds:
+      - apiGroups: ["serving.knative.dev"]
+        kinds: ["Service"]
+  parameters:
+    replicas: 10
