@@ -1,0 +1,21 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: replicalimits
+tests:
+- name: block-endpoint-default-role
+  template: template.yaml
+  constraint: samples/replicasknative/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/replicasknative/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/replicasknative/example_disallowed.yaml
+    assertions:
+    - violations: yes
+  - name: example-empty-annotations
+    object: samples/replicasknative/example_empty_annotations.yaml
+    assertions:
+    - violations: yes    
