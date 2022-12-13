@@ -6,7 +6,7 @@ metadata:
     metadata.gatekeeper.sh/title: "Knative Replica Limits"
     metadata.gatekeeper.sh/version: 1.0.0
     description: >-
-      Requires that knative service objects with the field `annotations.xxxScale` specify a number of replicas within defined ranges.
+      Requires that knative service objects with the field `annotations.{max,min,initial}Scale` specify a number of replicas within defined max values.
 spec:
   crd:
     spec:
@@ -19,7 +19,7 @@ spec:
           properties:
             replicas:
               type: integer
-              description: Allowed value for max numbers of replicas. 
+              description: Allowed max value for number of replicas. 
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
