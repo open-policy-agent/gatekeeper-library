@@ -35,13 +35,17 @@ const config = {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl:
-          'https://github.com/open-policy-agent/gatekeeper-library/edit/master/website',
+            'https://github.com/open-policy-agent/gatekeeper-library/edit/master/website',
           routeBasePath: '/',
           sidebarCollapsed: true
         },
         blog: false,
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
+        },
+        gtag: {
+          trackingID: 'G-RX9N8G7RS5',
+          anonymizeIP: true,
         },
       }),
     ],

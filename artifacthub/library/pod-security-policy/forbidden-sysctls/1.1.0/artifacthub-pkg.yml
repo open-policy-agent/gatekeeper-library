@@ -1,0 +1,22 @@
+version: 1.1.0
+name: k8spspforbiddensysctls
+displayName: Forbidden Sysctls
+createdAt: "2022-11-07T01:02:51Z"
+description: Controls the `sysctl` profile used by containers. Corresponds to the `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy. Any sysctl not in the `allowedSysctls` parameter is considered to be forbidden. The `forbiddenSysctls` parameter takes precedence over the `allowedSysctls` parameter. For more information, see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
+digest: f99cb53952fc80678b5ceca001fb9683bb2047337cb907585f4127978b104437
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/forbidden-sysctls
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Forbidden Sysctls
+    Controls the `sysctl` profile used by containers. Corresponds to the `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy. Any sysctl not in the `allowedSysctls` parameter is considered to be forbidden. The `forbiddenSysctls` parameter takes precedence over the `allowedSysctls` parameter. For more information, see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/pod-security-policy/forbidden-sysctls/1.1.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

@@ -72,4 +72,4 @@ generate-website-docs:
 
 .PHONY: generate-artifacthub-artifacts
 generate-artifacthub-artifacts:
-	cd $(ARTIFACTHUB_SCRIPT_DIR); go run hub.go
+	cd $(ARTIFACTHUB_SCRIPT_DIR); go test -v && go run hub.go
