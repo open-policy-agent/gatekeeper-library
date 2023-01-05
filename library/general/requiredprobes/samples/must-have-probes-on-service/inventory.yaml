@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-service
+  namespace: default
+spec:
+  selector:
+    app.kubernetes.io/name: tomcat
+  ports:
+  - name: name-of-service-port
+    protocol: TCP
+    port: 80
+    targetPort: tomcat-http

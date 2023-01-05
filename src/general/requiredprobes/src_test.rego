@@ -335,6 +335,60 @@ test_two_ctrs_empty_liveness_in_ctr_two_both_empty_probes_in_ctr_one {
     count(results) == 3
 }
 
+test_one_ctr_readiness_violation_with_svc_port_name {
+    kind := kinds[_]
+    input := {"review": review([{"name": "my-container1","image": "my-image:latest", "ports": [{ "name": "http", "containerPort": "8080"}], "livenessProbe": {"tcpSocket": {"port":80}}}]),
+              "parameters": parameters_only_svc}
+    inv := inv_svc({"app.kubernetes.io/name": "test"}, [{ "name": "name-of-service-port", "port": "80", "targetPort": "http"}])
+    results := violation with input as input with data.inventory as inv
+    count(results) == 1
+}
+
+test_one_ctr_readiness_violation_with_svc_port_num {
+    kind := kinds[_]
+    input := {"review": review([{"name": "my-container1","image": "my-image:latest", "ports": [{ "name": "http", "containerPort": "8080"}], "livenessProbe": {"tcpSocket": {"port":8080}}}]),
+              "parameters": parameters_only_svc}
+    inv := inv_svc({"app.kubernetes.io/name": "test"}, [{ "name": "name-of-service-port", "port": "80", "targetPort": "8080"}])
+    results := violation with input as input with data.inventory as inv
+    count(results) == 1
+}
+
+test_one_ctr_readiness_violation_with_svc_multiple_port_num {
+    kind := kinds[_]
+    input := {"review": review([{"name": "my-container1","image": "my-image:latest", "ports": [{ "name": "http", "containerPort": "8080"}, { "name": "https", "containerPort": "8443"}], "livenessProbe": {"tcpSocket": {"port":8080}}}]),
+              "parameters": parameters_only_svc}
+    inv := inv_svc({"app.kubernetes.io/name": "test"}, [{ "name": "name-of-service-port", "port": "80", "targetPort": "8080"}, { "name": "name-of-service-port", "port": "443", "targetPort": "8443"}])
+    results := violation with input as input with data.inventory as inv
+    count(results) == 1
+}
+
+test_one_ctr_no_violation_with_svc_port_name {
+    kind := kinds[_]
+    input := {"review": review([{"name": "my-container1","image": "my-image:latest", "ports": [{ "name": "http", "containerPort": "8080"}], "readinessProbe": {"tcpSocket": {"port":8080}}, "livenessProbe": {"tcpSocket": {"port":8080}}}]),
+              "parameters": parameters_only_svc}
+    inv := inv_svc({"app.kubernetes.io/name": "test"}, [{ "name": "name-of-service-port", "port": "80", "targetPort": "http"}])
+    results := violation with input as input with data.inventory as inv
+    count(results) == 0
+}
+
+test_one_ctr_no_violation_with_svc_port_num {
+    kind := kinds[_]
+    input := {"review": review([{"name": "my-container1","image": "my-image:latest", "ports": [{ "name": "http", "containerPort": "8080"}], "readinessProbe": {"tcpSocket": {"port":8080}}, "livenessProbe": {"tcpSocket": {"port":8080}}}]),
+              "parameters": parameters_only_svc}
+    inv := inv_svc({"app.kubernetes.io/name": "test"}, [{ "name": "name-of-service-port", "port": "80", "targetPort": "8080"}])
+    results := violation with input as input with data.inventory as inv
+    count(results) == 0
+}
+
+test_one_ctr_missing_both_no_violation_without_svc_port_num {
+    kind := kinds[_]
+    input := {"review": review([{"name": "my-container1","image": "my-image:latest", "ports": [{ "name": "http", "containerPort": "8080"}]}]),
+              "parameters": parameters_only_svc}
+    inv := inv_svc({"app.kubernetes.io/name": "non-matching-pod-selector"}, [{ "name": "name-of-service-port", "port": "80", "targetPort": "8080"}])
+    results := violation with input as input with data.inventory as inv
+    count(results) == 0
+}
+
 review(containers) = obj {
     obj = {
             "kind": {
@@ -342,14 +396,44 @@ review(containers) = obj {
             },
             "object": {
                 "metadata": {
-                    "name": "some-name"
+                    "name": "some-name",
+                    "namespace": namespace,
+                    "labels": {
+                        "app.kubernetes.io/name": "test"
+                    }
                 },
                 "spec": {
-                    "containers":containers
+                    "containers": containers
                 }
             }
         }
 }
 
+svc_out(selector, ports) = output {
+  output := {
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": {
+      "name": "example-service",
+      "namespace": namespace,
+    },
+    "spec": {
+      "selector": selector,
+      "ports": ports,
+    },
+  }
+}
+
+inventory(obj) = output {
+  output := {"namespace": {namespace: {obj.apiVersion: {obj.kind: [obj]}}}}
+}
+
+inv_svc(selector, ports) = output {
+  svc = svc_out(selector, ports)
+  output := inventory(svc)
+}
+
+namespace := "default"
 parameters = {"probes": ["readinessProbe", "livenessProbe"], "probeTypes": ["tcpSocket", "httpGet", "exec"]}
+parameters_only_svc = {"onlyServices": true, "probes": ["readinessProbe", "livenessProbe"], "probeTypes": ["tcpSocket", "httpGet", "exec"]}
 kinds = ["Pod"]
