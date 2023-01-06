@@ -16,6 +16,7 @@ require (
 	github.com/open-policy-agent/frameworks/constraint v0.0.0-20221021181852-5942e3928c9d
 	github.com/open-policy-agent/gatekeeper v0.0.0-20221104171333-ce34b7e4d040
 	k8s.io/apimachinery v0.24.7
+	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9
 )
 
 require (
@@ -117,7 +118,6 @@ require (
 	k8s.io/component-base v0.24.6 // indirect
 	k8s.io/klog/v2 v2.70.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20220413171646-5e7f5fdc6da6 // indirect
-	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.0.30 // indirect
 	sigs.k8s.io/controller-runtime v0.12.3 // indirect
 	sigs.k8s.io/json v0.0.0-20220525155127-227cbc7cc124 // indirect
