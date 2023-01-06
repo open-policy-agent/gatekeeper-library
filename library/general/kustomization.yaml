@@ -13,6 +13,7 @@ resources:
 - disallowanonymous
 - disallowedtags
 - externalip
+- horizontalpodautoscaler
 - httpsonly
 - imagedigests
 - noupdateserviceaccount
