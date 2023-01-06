@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/fs"
@@ -16,6 +17,7 @@ import (
 	"github.com/open-policy-agent/frameworks/constraint/pkg/client/drivers/local"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/core/templates"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/utils/strings/slices"
 
 	gkapis "github.com/open-policy-agent/gatekeeper/apis"
 	"github.com/open-policy-agent/gatekeeper/pkg/gator"
@@ -96,8 +98,14 @@ func checkTemplates(libraryPath string) error {
 		log.Printf("Referential template: %s\n", absolutePath)
 
 		// verify our annotation is present
-		if _, ok := tmpl.GetAnnotations()[syncAnnotation]; !ok {
+		content, ok := tmpl.GetAnnotations()[syncAnnotation]
+		if !ok {
 			return fmt.Errorf("template at path '%s' is missing annotation with key '%s'", absolutePath, syncAnnotation)
+		}
+
+		// verify the annotation content
+		if ok, err := validateRequiresSyncDataContent(strings.TrimSpace(content)); !ok {
+			return fmt.Errorf("template at path '%s' annotation with key '%s': %w", absolutePath, syncAnnotation, err)
 		}
 
 		// verify that the sync object is present in the same directory as the template
@@ -190,4 +198,35 @@ func opaClient(referential bool) (*opa.Client, error) {
 	}
 
 	return client, nil
+}
+
+func validateRequiresSyncDataContent(annotation string) (bool, error) {
+	allowedKeys := []string{"kinds", "groups", "versions"}
+
+	// Remove outer quotes
+	annotation = annotation[1 : len(annotation)-1]
+
+	// Validate JSON
+	if ok := json.Valid([]byte(annotation)); !ok {
+		return false, fmt.Errorf("Error validating JSON format")
+	}
+
+	// Unmarshal JSON
+	var contents []interface{}
+	if err := json.Unmarshal([]byte(annotation), &contents); err != nil {
+		return false, fmt.Errorf("Error validating JSON content")
+	}
+
+	// Validate keys
+	for _, requirement := range contents {
+		for _, equivalents := range requirement.([]interface{}) {
+			for key := range equivalents.(map[string]interface{}) {
+				if !slices.Contains(allowedKeys, key) {
+					return false, fmt.Errorf("Unexpected key '%s'", key)
+				}
+			}
+		}
+	}
+
+  return true, nil
 }
