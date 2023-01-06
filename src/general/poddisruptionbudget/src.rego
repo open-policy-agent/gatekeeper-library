@@ -14,7 +14,10 @@ violation[{"msg": msg}] {
 violation[{"msg": msg}] {
   obj := input.review.object
   pdb := data.inventory.namespace[obj.metadata.namespace]["policy/v1"].PodDisruptionBudget[_]
-  obj.spec.selector.matchLabels == pdb.spec.selector.matchLabels
+
+  matchLabels := { [label, value] | some label; value := pdb.spec.selector.matchLabels[label] }
+  labels := { [label, value] | some label; value := obj.spec.selector.matchLabels[label] }
+  count(matchLabels - labels) == 0
 
   not valid_pdb_max_unavailable(pdb)
   msg := sprintf(
@@ -26,12 +29,15 @@ violation[{"msg": msg}] {
 violation[{"msg": msg}] {
   obj := input.review.object
   pdb := data.inventory.namespace[obj.metadata.namespace]["policy/v1"].PodDisruptionBudget[_]
-  obj.spec.selector.matchLabels == pdb.spec.selector.matchLabels
+  
+  matchLabels := { [label, value] | some label; value := pdb.spec.selector.matchLabels[label] }
+  labels := { [label, value] | some label; value := obj.spec.selector.matchLabels[label] }
+  count(matchLabels - labels) == 0
 
   not valid_pdb_min_available(obj, pdb)
   msg := sprintf(
     "%v <%v> has %v replica(s) but PodDisruptionBudget <%v> has minAvailable of %v, PodDisruptionBudget count should always be lower than replica(s), and not used when replica(s) is set to 1",
-    [obj.kind, obj.metadata.name, obj.spec.replicas, pdb.metadata.name, pdb.spec.minAvailable, obj.spec.replicas],
+    [obj.kind, obj.metadata.name, obj.spec.replicas, pdb.metadata.name, pdb.spec.minAvailable],
   )
 }
 
