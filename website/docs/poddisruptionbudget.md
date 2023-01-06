@@ -17,7 +17,7 @@ metadata:
   name: k8spoddisruptionbudget
   annotations:
     metadata.gatekeeper.sh/title: "Pod Disruption Budget"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.0.2
     metadata.gatekeeper.sh/requiresSyncData: |
       "[
         [
@@ -261,6 +261,82 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/samples/poddisruptionbudget/example_allowed_deployment2.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-subset-selector</summary>
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment-allowed-3
+  namespace: default
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+      example: allowed-deployment-3
+  template:
+    metadata:
+      labels:
+        app: nginx
+        example: allowed-deployment-3
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/samples/poddisruptionbudget/example_allowed_deployment3.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-nomatch-selector</summary>
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment-allowed-4
+  namespace: default
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+      example: allowed-deployment-4
+  template:
+    metadata:
+      labels:
+        app: nginx
+        example: allowed-deployment-4
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/poddisruptionbudget/samples/poddisruptionbudget/example_allowed_deployment4.yaml
 ```
 
 </details>
