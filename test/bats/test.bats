@@ -127,8 +127,8 @@ setup() {
             kubectl delete --ignore-not-found -f "$disallowed"
           fi
         done
-        # delete constraint
-        kubectl delete -f "$sample"/constraint.yaml
+        # delete remaining resources
+        kubectl delete  --ignore-not-found -f "$sample"/
       done
       # delete template
       kubectl delete -k "$policy"
