@@ -14,7 +14,7 @@ A community-owned library of policies for the [OPA Gatekeeper project](https://o
 
 ### kustomize
 
-You can use [kustomize](https://kubectl.docs.kubernetes.io/installation/kustomize/) to install some or all of the templates alongside your own contraints.
+You can use [kustomize](https://kubectl.docs.kubernetes.io/installation/kustomize/) to install some or all of the templates alongside your own constraints.
 
 First, create a `kustomization.yaml` file:
 
