@@ -124,7 +124,7 @@ setup() {
             assert_match_either 'denied the request' 'no matches for kind' "${output}"
             assert_failure
             # delete resource
-            kubectl delete --ignore-not-found -f "$disallowed"
+            run kubectl delete --ignore-not-found -f "$disallowed"
           fi
         done
 
