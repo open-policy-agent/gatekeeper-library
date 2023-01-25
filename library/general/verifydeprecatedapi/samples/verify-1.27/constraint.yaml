@@ -1,0 +1,15 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: VerifyDeprecatedAPI
+metadata:
+  name: verify-1.27
+spec:
+  match:
+    kinds:
+      - apiGroups: ["storage.k8s.io"]
+        kinds: ["CSIStorageCapacity"]
+  parameters:
+    kvs: 
+      - deprecatedAPI: "storage.k8s.io/v1beta1"
+        kinds: ["CSIStorageCapacity"]
+        targetAPI: "storage.k8s.io/v1"
+    k8sVersion: 1.27

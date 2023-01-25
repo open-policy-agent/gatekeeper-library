@@ -1,0 +1,22 @@
+version: 1.0.0
+name: verifydeprecatedapi
+displayName: Verify deprecated APIs
+createdAt: "2023-01-24T20:57:39Z"
+description: Verifies deprecated Kubernetes APIs to ensure all the API versions are up to date.
+digest: bd571aabd03b5cb91fcafeb4b2aecbfe8cfe44189cc32cdee448f8b330b178a8
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/verifydeprecatedapi
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Verify deprecated APIs
+    Verifies deprecated Kubernetes APIs to ensure all the API versions are up to date.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/verifydeprecatedapi/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

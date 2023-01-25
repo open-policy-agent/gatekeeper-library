@@ -1,0 +1,41 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: VerifyDeprecatedAPI
+metadata:
+  name: verify-1.25
+spec:
+  match:
+    kinds:
+      - apiGroups: ["batch"]
+        kinds: ["CronJob"]
+      - apiGroups: ["discovery.k8s.io"]
+        kinds: ["EndpointSlice"]
+      - apiGroups: ["events.k8s.io"]
+        kinds: ["Event"]
+      - apiGroups: ["autoscaling"]
+        kinds: ["HorizontalPodAutoscaler"]
+      - apiGroups: ["policy"]
+        kinds: ["PodDisruptionBudget", "PodSecurityPolicy"]
+  parameters:
+    kvs: 
+      - deprecatedAPI: "batch/v1beta1"
+        kinds: ["CronJob"]
+        targetAPI: "batch/v1"
+      - deprecatedAPI: "discovery.k8s.io/v1beta1"
+        kinds: ["EndpointSlice"]
+        targetAPI: "discovery.k8s.io/v1"
+      - deprecatedAPI: "events.k8s.io/v1beta1"
+        kinds: ["Event"]
+        targetAPI: "events.k8s.io/v1"
+      - deprecatedAPI: "autoscaling/v2beta1"
+        kinds: ["HorizontalPodAutoscaler"]
+        targetAPI: "autoscaling/v2"
+      - deprecatedAPI: "policy/v1beta1"
+        kinds: ["PodDisruptionBudget"]
+        targetAPI: "policy/v1"
+      - deprecatedAPI: "policy/v1beta1"
+        kinds: ["PodSecurityPolicy"]
+        targetAPI: "None"
+      - deprecatedAPI: "node.k8s.io/v1beta1"
+        kinds: ["RuntimeClass"]
+        targetAPI: "node.k8s.io/v1"
+    k8sVersion: 1.25
