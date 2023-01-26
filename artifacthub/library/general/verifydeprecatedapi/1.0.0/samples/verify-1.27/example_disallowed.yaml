@@ -1,0 +1,6 @@
+apiVersion: storage.k8s.io/v1beta1
+kind: CSIStorageCapacity
+metadata:
+  name: allowed-csistoragecapacity
+  namespace: default
+storageClassName: standard

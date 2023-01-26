@@ -121,14 +121,23 @@ setup() {
           if [[ -e "$disallowed" ]]; then
             # apply resource
             run kubectl apply -f "$disallowed"
-            assert_match 'denied the request' "${output}"
+            assert_match_either 'denied the request' 'no matches for kind' "${output}"
             assert_failure
             # delete resource
-            kubectl delete --ignore-not-found -f "$disallowed"
+            run kubectl delete --ignore-not-found -f "$disallowed"
           fi
         done
-        # delete remaining resources
-        kubectl delete  --ignore-not-found -f "$sample"/
+
+        # delete inventory resources
+        for inventory in "$sample"/example_inventory*.yaml; do
+          if [[ -e "$inventory" ]]; then
+            kubectl delete --ignore-not-found -f "$inventory"
+          fi
+        done
+
+        # delete constraint
+        wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl delete -f ${sample}/constraint.yaml"
+
       done
       # delete template
       kubectl delete -k "$policy"
