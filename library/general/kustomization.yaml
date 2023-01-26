@@ -23,5 +23,6 @@ resources:
 - requiredprobes
 - uniqueingresshost
 - uniqueserviceselector
+- verifydeprecatedapi
 - containerresources
 - storageclass

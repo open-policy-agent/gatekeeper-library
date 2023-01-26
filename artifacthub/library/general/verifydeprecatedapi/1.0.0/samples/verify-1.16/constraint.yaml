@@ -1,0 +1,29 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: VerifyDeprecatedAPI
+metadata:
+  name: verify-1.16
+spec:
+  match:
+    kinds:
+      - apiGroups: ["apps"]
+        kinds: ["Deployment", "ReplicaSet", "StatefulSet", "DaemonSet"]
+      - apiGroups: ["extensions"]
+        kinds: ["PodSecurityPolicy", "ReplicaSet", "Deployment", "DaemonSet", "NetworkPolicy"]
+  parameters:
+    kvs: 
+      - deprecatedAPI: "apps/v1beta1"
+        kinds: ["Deployment", "ReplicaSet", "StatefulSet"]
+        targetAPI: "apps/v1"
+      - deprecatedAPI: "extensions/v1beta1"
+        kinds: ["ReplicaSet", "Deployment", "DaemonSet"]
+        targetAPI: "apps/v1"
+      - deprecatedAPI: "extensions/v1beta1"
+        kinds: ["PodSecurityPolicy"]
+        targetAPI: "policy/v1beta1"
+      - deprecatedAPI: "apps/v1beta2"
+        kinds: ["ReplicaSet", "StatefulSet", "Deployment", "DaemonSet"]
+        targetAPI: "apps/v1"
+      - deprecatedAPI: "extensions/v1beta1"
+        kinds: ["NetworkPolicy"]
+        targetAPI: "networking.k8s.io/v1"
+    k8sVersion: 1.16
