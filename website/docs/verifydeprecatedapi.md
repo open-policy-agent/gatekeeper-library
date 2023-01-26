@@ -6,7 +6,7 @@ title: Verify deprecated APIs
 # Verify deprecated APIs
 
 ## Description
-Verifies deprecated Kubernetes APIs to ensure all the API versions are up to date.
+Verifies deprecated Kubernetes APIs to ensure all the API versions are up to date. This template does not apply to audit as audit looks at the resources which are already present in the cluster with non-deprecated API versions.
 
 ## Template
 ```yaml
@@ -18,7 +18,7 @@ metadata:
     metadata.gatekeeper.sh/title: "Verify deprecated APIs"
     metadata.gatekeeper.sh/version: 1.0.0
     description: >-
-      Verifies deprecated Kubernetes APIs to ensure all the API versions are up to date.
+      Verifies deprecated Kubernetes APIs to ensure all the API versions are up to date. This template does not apply to audit as audit looks at the resources which are already present in the cluster with non-deprecated API versions.
 spec:
   crd:
     spec:
@@ -37,14 +37,17 @@ spec:
                   deprecatedAPI:
                     type: string
                     description: deprecated api
+                    example: flowcontrol.apiserver.k8s.io/v1beta2
                   kinds: 
                     type: array
                     items:
                       type: string
                     description: impacted list of kinds
+                    example: '["FlowSchema", "PriorityLevelConfiguration"]'
                   targetAPI:
                     type: string
                     description: target api
+                    example: flowcontrol.apiserver.k8s.io/v1beta3
             k8sVersion:
               type: number
               description: kubernetes version
@@ -74,6 +77,7 @@ spec:
         match(api) {
           api == "None"
         }
+
 ```
 
 ### Usage
@@ -117,6 +121,7 @@ spec:
         kinds: ["NetworkPolicy"]
         targetAPI: "networking.k8s.io/v1"
     k8sVersion: 1.16
+
 ```
 
 Usage
@@ -152,6 +157,7 @@ spec:
         image: nginx:1.14.2
         ports:
         - containerPort: 80
+
 ```
 
 Usage
@@ -186,6 +192,7 @@ spec:
         image: nginx:1.14.2
         ports:
         - containerPort: 80
+
 ```
 
 Usage
@@ -274,6 +281,7 @@ spec:
         kinds: ["CSIDriver", "CSINode", "StorageClass", "VolumeAttachment"]
         targetAPI: "storage.k8s.io/v1"
     k8sVersion: 1.22
+
 ```
 
 Usage
@@ -306,6 +314,7 @@ spec:
             name: test
             port:
               number: 80
+
 ```
 
 Usage
@@ -337,6 +346,7 @@ spec:
             name: test
             port:
               number: 80
+
 ```
 
 Usage
@@ -396,6 +406,7 @@ spec:
         kinds: ["RuntimeClass"]
         targetAPI: "node.k8s.io/v1"
     k8sVersion: 1.25
+
 ```
 
 Usage
@@ -430,6 +441,7 @@ spec:
             - -c
             - date; echo Hello from the Kubernetes cluster
           restartPolicy: OnFailure
+
 ```
 
 Usage
@@ -463,6 +475,7 @@ spec:
             - -c
             - date; echo Hello from the Kubernetes cluster
           restartPolicy: OnFailure
+
 ```
 
 Usage
@@ -501,6 +514,7 @@ spec:
         kinds: ["HorizontalPodAutoscaler"]
         targetAPI: "autoscaling/v2"
     k8sVersion: 1.26
+
 ```
 
 Usage
@@ -536,6 +550,7 @@ spec:
         - kind: Group
           group:
             name: "system:unauthenticated"
+
 ```
 
 Usage
@@ -570,6 +585,7 @@ spec:
         - kind: Group
           group:
             name: "system:unauthenticated"
+
 ```
 
 Usage
@@ -603,6 +619,7 @@ spec:
         kinds: ["CSIStorageCapacity"]
         targetAPI: "storage.k8s.io/v1"
     k8sVersion: 1.27
+
 ```
 
 Usage
@@ -676,6 +693,7 @@ spec:
         kinds: ["FlowSchema", "PriorityLevelConfiguration"]
         targetAPI: "flowcontrol.apiserver.k8s.io/v1beta3"
     k8sVersion: 1.29
+
 ```
 
 Usage
@@ -711,6 +729,7 @@ spec:
         - kind: Group
           group:
             name: "system:unauthenticated"
+
 ```
 
 Usage
@@ -745,6 +764,7 @@ spec:
         - kind: Group
           group:
             name: "system:unauthenticated"
+
 ```
 
 Usage

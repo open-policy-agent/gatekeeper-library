@@ -6,7 +6,7 @@ metadata:
     metadata.gatekeeper.sh/title: "Verify deprecated APIs"
     metadata.gatekeeper.sh/version: 1.0.0
     description: >-
-      Verifies deprecated Kubernetes APIs to ensure all the API versions are up to date.
+      Verifies deprecated Kubernetes APIs to ensure all the API versions are up to date. This template does not apply to audit as audit looks at the resources which are already present in the cluster with non-deprecated API versions.
 spec:
   crd:
     spec:
@@ -25,14 +25,17 @@ spec:
                   deprecatedAPI:
                     type: string
                     description: deprecated api
+                    example: flowcontrol.apiserver.k8s.io/v1beta2
                   kinds: 
                     type: array
                     items:
                       type: string
                     description: impacted list of kinds
+                    example: '["FlowSchema", "PriorityLevelConfiguration"]'
                   targetAPI:
                     type: string
                     description: target api
+                    example: flowcontrol.apiserver.k8s.io/v1beta3
             k8sVersion:
               type: number
               description: kubernetes version
