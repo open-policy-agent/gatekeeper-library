@@ -3,7 +3,7 @@ apiVersion: test.gatekeeper.sh/v1alpha1
 metadata:
   name: disallowedtags
 tests:
-- name: block-endpoint-default-role
+- name: disallowed-tags
   template: template.yaml
   constraint: samples/container-image-must-not-have-latest-tag/constraint.yaml
   cases:
