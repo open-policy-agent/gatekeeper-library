@@ -58,7 +58,7 @@ spec:
             service := input.review.object
             min_scale := service.spec.template.metadata.annotations["autoscaling.knative.dev/minScale"]
             to_number(replicas) < to_number(min_scale)
-            msg := sprintf("minScale value %v cannot be greater than %v replicas", [min_scale, replicas])
+            msg := sprintf("replicas value %v cannot be smaller than minScale value %v ", [replicas, min_scale])
         }
 
         violation[{"msg": msg}] {
