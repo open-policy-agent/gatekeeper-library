@@ -3,7 +3,7 @@ apiVersion: test.gatekeeper.sh/v1alpha1
 metadata:
   name: replicalimits
 tests:
-- name: block-endpoint-default-role
+- name: knative-service-replica-limit
   template: template.yaml
   constraint: samples/replicasknative/constraint.yaml
   cases:
