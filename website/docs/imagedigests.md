@@ -105,7 +105,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>block-endpoint-default-role</summary><blockquote>
+<summary>container-image-must-have-digest</summary><blockquote>
 
 <details>
 <summary>constraint</summary>

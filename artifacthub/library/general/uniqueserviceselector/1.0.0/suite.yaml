@@ -3,7 +3,7 @@ apiVersion: test.gatekeeper.sh/v1alpha1
 metadata:
   name: uniqueserviceselector
 tests:
-- name: block-endpoint-default-role
+- name: unique-service-selector
   template: template.yaml
   constraint: samples/unique-service-selector/constraint.yaml
   cases:

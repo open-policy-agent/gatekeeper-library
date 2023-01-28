@@ -3,7 +3,7 @@ apiVersion: test.gatekeeper.sh/v1alpha1
 metadata:
   name: requiredprobes
 tests:
-- name: block-endpoint-default-role
+- name: required-probes
   template: template.yaml
   constraint: samples/must-have-probes/constraint.yaml
   cases:
