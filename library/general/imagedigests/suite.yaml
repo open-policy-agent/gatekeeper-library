@@ -3,7 +3,7 @@ apiVersion: test.gatekeeper.sh/v1alpha1
 metadata:
   name: imagedigests
 tests:
-- name: block-endpoint-default-role
+- name: container-image-must-have-digest
   template: template.yaml
   constraint: samples/container-image-must-have-digest/constraint.yaml
   cases:

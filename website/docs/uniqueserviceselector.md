@@ -89,7 +89,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>block-endpoint-default-role</summary><blockquote>
+<summary>unique-service-selector</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
