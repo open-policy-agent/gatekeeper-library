@@ -1,7 +1,7 @@
 kind: Suite
 apiVersion: test.gatekeeper.sh/v1alpha1
 metadata:
-  name: containerprobes
+  name: requiredprobes
 tests:
 - name: required-probes
   template: template.yaml
@@ -19,7 +19,7 @@ tests:
     object: samples/must-have-probes/example_disallowed2.yaml
     assertions:
     - violations: yes
-- name: container-probes-only-services
+- name: required-probes-only-services
   template: template.yaml
   constraint: samples/must-have-probes-on-service/constraint.yaml
   cases:
