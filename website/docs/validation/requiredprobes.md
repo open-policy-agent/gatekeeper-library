@@ -289,7 +289,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 
 
 </blockquote></details><details>
-<summary>container-probes-only-services</summary><blockquote>
+<summary>required-probes-only-services</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
@@ -327,7 +327,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 apiVersion: v1
 kind: Pod
 metadata:
-  name: test-pod1
+  name: allowed-pod-without-service
   namespace: default
   labels:
     app.kubernetes.io/name: tomcat-no-svc
@@ -358,7 +358,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 apiVersion: v1
 kind: Pod
 metadata:
-  name: test-pod1
+  name: allowed-pod-with-service
   namespace: default
   labels:
     app.kubernetes.io/name: tomcat
@@ -399,7 +399,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 apiVersion: v1
 kind: Pod
 metadata:
-  name: test-pod1
+  name: disallowed-pod-with-service
   namespace: default
   labels:
     app.kubernetes.io/name: tomcat

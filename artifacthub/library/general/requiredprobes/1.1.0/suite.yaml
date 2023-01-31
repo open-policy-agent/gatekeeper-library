@@ -1,7 +1,7 @@
 kind: Suite
 apiVersion: test.gatekeeper.sh/v1alpha1
 metadata:
-  name: containerprobes
+  name: requiredprobes
 tests:
 - name: required-probes
   template: template.yaml
@@ -19,25 +19,25 @@ tests:
     object: samples/must-have-probes/example_disallowed2.yaml
     assertions:
     - violations: yes
-- name: container-probes-only-services
+- name: required-probes-only-services
   template: template.yaml
   constraint: samples/must-have-probes-on-service/constraint.yaml
   cases:
   - name: example-allowed-without-service
     object: samples/must-have-probes-on-service/example_allowed_without_service.yaml
     inventory:
-    - samples/must-have-probes-on-service/inventory.yaml
+    - samples/must-have-probes-on-service/example_inventory.yaml
     assertions:
     - violations: no
   - name: example-allowed-with-service
     object: samples/must-have-probes-on-service/example_allowed_with_service.yaml
     inventory:
-    - samples/must-have-probes-on-service/inventory.yaml
+    - samples/must-have-probes-on-service/example_inventory.yaml
     assertions:
     - violations: no
   - name: example-disallowed-with-service
     object: samples/must-have-probes-on-service/example_disallowed_with_service.yaml
     inventory:
-    - samples/must-have-probes-on-service/inventory.yaml
+    - samples/must-have-probes-on-service/example_inventory.yaml
     assertions:
     - violations: yes

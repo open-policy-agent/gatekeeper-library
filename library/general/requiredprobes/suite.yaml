@@ -26,18 +26,18 @@ tests:
   - name: example-allowed-without-service
     object: samples/must-have-probes-on-service/example_allowed_without_service.yaml
     inventory:
-    - samples/must-have-probes-on-service/inventory.yaml
+    - samples/must-have-probes-on-service/example_inventory.yaml
     assertions:
     - violations: no
   - name: example-allowed-with-service
     object: samples/must-have-probes-on-service/example_allowed_with_service.yaml
     inventory:
-    - samples/must-have-probes-on-service/inventory.yaml
+    - samples/must-have-probes-on-service/example_inventory.yaml
     assertions:
     - violations: no
   - name: example-disallowed-with-service
     object: samples/must-have-probes-on-service/example_disallowed_with_service.yaml
     inventory:
-    - samples/must-have-probes-on-service/inventory.yaml
+    - samples/must-have-probes-on-service/example_inventory.yaml
     assertions:
     - violations: yes
