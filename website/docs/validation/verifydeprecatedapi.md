@@ -222,7 +222,7 @@ spec:
         kinds: ["MutatingWebhookConfiguration", "ValidatingWebhookConfiguration"]
       - apiGroups: ["apiextensions.k8s.io"]
         kinds: ["CustomResourceDefinition"]
-      - apiGroups: [apiregistration.k8s.io"]
+      - apiGroups: ["apiregistration.k8s.io"]
         kinds: ["APIService"]
       - apiGroups: ["authentication.k8s.io"]
         kinds: ["TokenReview"]
@@ -243,7 +243,7 @@ spec:
       - apiGroups: ["storage.k8s.io/v1beta1"]
         kinds: ["CSIDriver", "CSINode", "StorageClass", "VolumeAttachment"]
   parameters:
-    kvs: 
+    kvs:
       - deprecatedAPI: "admissionregistration.k8s.io/v1beta1"
         kinds: ["MutatingWebhookConfiguration", "ValidatingWebhookConfiguration"]
         targetAPI: "admissionregistration.k8s.io/v1"
