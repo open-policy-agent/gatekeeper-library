@@ -38,7 +38,7 @@ spec:
                     type: string
                     description: deprecated api
                     example: flowcontrol.apiserver.k8s.io/v1beta2
-                  kinds: 
+                  kinds:
                     type: array
                     items:
                       type: string
