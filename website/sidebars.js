@@ -42,6 +42,7 @@ module.exports = {
             'validation/storageclass',
             'validation/uniqueingresshost',
             'validation/uniqueserviceselector',
+            'validation/verifydeprecatedapi',
           ],
         },
         {
