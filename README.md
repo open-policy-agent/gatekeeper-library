@@ -3,11 +3,16 @@
 
 A community-owned library of policies for the [OPA Gatekeeper project](https://open-policy-agent.github.io/gatekeeper/website/docs/).
 
+## Validation and Mutation
+The library consists of two main components: `Validation` and `Mutation`.
+- Validation: Gatekeeper can validate resources in the cluster against Gatekeeper validation policies, such as these defined in the library. The policies are defined as `ConstraintTemplates` and `Constraints`. `ConstraintTemplates` can be applied directly to a cluster and then `Constraints` can be applied to customize policy to fit your specific needs.
+- Mutation: Gatekeeper can mutate resources in the cluster against the Gatekeeper mutation policies, such as these defined in the library. Mutation policies are only examples, they should be customized to meet your needs before being applied.
+
 ## Usage
 
 ### kustomize
 
-You can use [kustomize](https://kubectl.docs.kubernetes.io/installation/kustomize/) to install some or all of the templates alongside your own contraints.
+You can use [kustomize](https://kubectl.docs.kubernetes.io/installation/kustomize/) to install some or all of the templates alongside your own constraints.
 
 First, create a `kustomization.yaml` file:
 

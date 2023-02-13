@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        gatekeeper: [ "release-3.8", "release-3.9" ]
+        gatekeeper: [ "release-3.10", "release-3.11" ]
     name: "Integration test on Gatekeeper ${{ matrix.gatekeeper }}"
     steps:
       - name: Check out code into the Go module directory

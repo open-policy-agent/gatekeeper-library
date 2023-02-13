@@ -1,0 +1,77 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: verifydeprecatedapi
+tests:
+- name: verifydeprecatedapi-1.16
+  template: template.yaml
+  constraint: samples/verify-1.16/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/verify-1.16/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/verify-1.16/example_disallowed.yaml
+    assertions:
+    - violations: yes
+- name: verifydeprecatedapi-1.22
+  template: template.yaml
+  constraint: samples/verify-1.22/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/verify-1.22/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/verify-1.22/example_disallowed.yaml
+    assertions:
+    - violations: yes
+- name: verifydeprecatedapi-1.25
+  template: template.yaml
+  constraint: samples/verify-1.25/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/verify-1.25/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/verify-1.25/example_disallowed.yaml
+    assertions:
+    - violations: yes
+- name: verifydeprecatedapi-1.26
+  template: template.yaml
+  constraint: samples/verify-1.26/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/verify-1.26/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/verify-1.26/example_disallowed.yaml
+    assertions:
+    - violations: yes
+- name: verifydeprecatedapi-1.27
+  template: template.yaml
+  constraint: samples/verify-1.27/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/verify-1.27/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/verify-1.27/example_disallowed.yaml
+    assertions:
+    - violations: yes
+- name: verifydeprecatedapi-1.29
+  template: template.yaml
+  constraint: samples/verify-1.29/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/verify-1.29/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/verify-1.29/example_disallowed.yaml
+    assertions:
+    - violations: yes

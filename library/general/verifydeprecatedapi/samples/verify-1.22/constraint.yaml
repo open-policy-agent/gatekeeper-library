@@ -1,0 +1,70 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: VerifyDeprecatedAPI
+metadata:
+  name: verify-1.22
+spec:
+  match:
+    kinds:
+      - apiGroups: ["admissionregistration.k8s.io"]
+        kinds: ["MutatingWebhookConfiguration", "ValidatingWebhookConfiguration"]
+      - apiGroups: ["apiextensions.k8s.io"]
+        kinds: ["CustomResourceDefinition"]
+      - apiGroups: ["apiregistration.k8s.io"]
+        kinds: ["APIService"]
+      - apiGroups: ["authentication.k8s.io"]
+        kinds: ["TokenReview"]
+      - apiGroups: ["authorization.k8s.io"]
+        kinds: ["SubjectAccessReview"]
+      - apiGroups: ["certificates.k8s.io"]
+        kinds: ["CertificateSigningRequest"]
+      - apiGroups: ["coordination.k8s.io"]
+        kinds: ["Lease"]
+      - apiGroups: ["extensions", "networking.k8s.io"]
+        kinds: ["Ingress"]
+      - apiGroups: ["networking.k8s.io"]
+        kinds: ["IngressClass"]
+      - apiGroups: ["rbac.authorization.k8s.io"]
+        kinds: ["ClusterRole", "ClusterRoleBinding", "Role", "RoleBinding"]
+      - apiGroups: ["scheduling.k8s.io/v1beta1"]
+        kinds: ["PriorityClass"]
+      - apiGroups: ["storage.k8s.io/v1beta1"]
+        kinds: ["CSIDriver", "CSINode", "StorageClass", "VolumeAttachment"]
+  parameters:
+    kvs:
+      - deprecatedAPI: "admissionregistration.k8s.io/v1beta1"
+        kinds: ["MutatingWebhookConfiguration", "ValidatingWebhookConfiguration"]
+        targetAPI: "admissionregistration.k8s.io/v1"
+      - deprecatedAPI: "apiextensions.k8s.io/v1beta1"
+        kinds: ["CustomResourceDefinition"]
+        targetAPI: "apiextensions.k8s.io/v1"
+      - deprecatedAPI: "apiregistration.k8s.io/v1beta1"
+        kinds: ["APIService"]
+        targetAPI: "apiregistration.k8s.io/v1"
+      - deprecatedAPI: "authentication.k8s.io/v1beta1"
+        kinds: ["TokenReview"]
+        targetAPI: "authentication.k8s.io/v1"
+      - deprecatedAPI: "authorization.k8s.io/v1beta1"
+        kinds: ["SubjectAccessReview"]
+        targetAPI: "authorization.k8s.io/v1"
+      - deprecatedAPI: "certificates.k8s.io/v1beta1"
+        kinds: ["CertificateSigningRequest"]
+        targetAPI: "certificates.k8s.io/v1"
+      - deprecatedAPI: "coordination.k8s.io/v1beta1"
+        kinds: ["Lease"]
+        targetAPI: "coordination.k8s.io/v1"
+      - deprecatedAPI: "extensions/v1beta1"
+        kinds: ["Ingress"]
+        targetAPI: "networking.k8s.io/v1"
+      - deprecatedAPI: "networking.k8s.io/v1beta1"
+        kinds: ["Ingress", "IngressClass"]
+        targetAPI: "networking.k8s.io/v1"
+      - deprecatedAPI: "rbac.authorization.k8s.io/v1beta1"
+        kinds: ["ClusterRole", "ClusterRoleBinding", "Role", "RoleBinding"]
+        targetAPI: "rbac.authorization.k8s.io/v1"
+      - deprecatedAPI: "scheduling.k8s.io/v1beta1"
+        kinds: ["PriorityClass"]
+        targetAPI: "scheduling.k8s.io/v1"
+      - deprecatedAPI: "storage.k8s.io/v1beta1"
+        kinds: ["CSIDriver", "CSINode", "StorageClass", "VolumeAttachment"]
+        targetAPI: "storage.k8s.io/v1"
+    k8sVersion: 1.22

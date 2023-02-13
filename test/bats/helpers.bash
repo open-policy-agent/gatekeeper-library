@@ -42,6 +42,14 @@ assert_match() {
   fi
 }
 
+assert_match_either() {
+  if [[ ! ("$3" =~ $1 || "$3" =~ $2 ) ]]; then
+    echo "expected: $1 or $2"
+    echo "actual: $3"
+    return 1
+  fi
+}
+
 assert_not_match() {
   if [[ "$2" =~ $1 ]]; then
     echo "expected: $1"

@@ -3,7 +3,7 @@ apiVersion: test.gatekeeper.sh/v1alpha1
 metadata:
   name: externalip
 tests:
-- name: block-endpoint-default-role
+- name: allowed-ip
   template: template.yaml
   constraint: samples/allowed-ip/constraint.yaml
   cases:

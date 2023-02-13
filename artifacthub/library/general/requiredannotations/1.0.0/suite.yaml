@@ -3,7 +3,7 @@ apiVersion: test.gatekeeper.sh/v1alpha1
 metadata:
   name: requiredannotations
 tests:
-- name: block-endpoint-default-role
+- name: must-have-set-of-annotations
   template: template.yaml
   constraint: samples/all-must-have-certain-set-of-annotations/constraint.yaml
   cases:

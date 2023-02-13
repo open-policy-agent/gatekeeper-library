@@ -3,7 +3,7 @@ apiVersion: test.gatekeeper.sh/v1alpha1
 metadata:
   name: uniqueingresshost
 tests:
-- name: block-endpoint-default-role
+- name: unique-ingress-host
   template: template.yaml
   constraint: samples/unique-ingress-host/constraint.yaml
   cases:
