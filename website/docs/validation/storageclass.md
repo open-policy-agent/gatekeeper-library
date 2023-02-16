@@ -219,7 +219,7 @@ spec:
     spec:
       containers:
       - name: main
-        image: k8s.gcr.io/nginx-slim:0.8
+        image: registry.k8s.io/nginx-slim:0.8
         volumeMounts:
         - name: data
           mountPath: /usr/share/nginx/html
@@ -289,7 +289,7 @@ spec:
     spec:
       containers:
       - name: main
-        image: k8s.gcr.io/nginx-slim:0.8
+        image: registry.k8s.io/nginx-slim:0.8
         volumeMounts:
         - name: data
           mountPath: /usr/share/nginx/html
@@ -359,7 +359,7 @@ spec:
     spec:
       containers:
       - name: main
-        image: k8s.gcr.io/nginx-slim:0.8
+        image: registry.k8s.io/nginx-slim:0.8
         volumeMounts:
         - name: data
           mountPath: /usr/share/nginx/html
