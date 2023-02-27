@@ -15,6 +15,17 @@ spec:
         openAPIV3Schema:
           type: object
           properties:
+            exemptContainers:
+              description: >-
+                Any container with a name that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-container-name-*`.
+              type: array
+              items:
+                type: string
+            ignoreInitContainers:
+              description: >-
+                Ignore any containers that are init containers.
+              type: bool
             probes:
               description: "A list of probes that are required (ex: `readinessProbe`)"
               type: array
@@ -30,12 +41,15 @@ spec:
       rego: |
         package k8srequiredprobes
 
+        import data.lib.exempt_container.is_exempt
+
         probe_type_set = probe_types {
             probe_types := {type | type := input.parameters.probeTypes[_]}
         }
 
         violation[{"msg": msg}] {
             container := input.review.object.spec.containers[_]
+            not is_exempt(container)
             probe := input.parameters.probes[_]
             probe_is_missing(container, probe)
             msg := get_violation_message(container, input.review, probe)
@@ -58,3 +72,26 @@ spec:
         get_violation_message(container, review, probe) = msg {
             msg := sprintf("Container <%v> in your <%v> <%v> has no <%v>", [container.name, review.kind.kind, review.object.metadata.name, probe])
         }
+
+      libs:
+        - |
+          package lib.exempt_container
+
+          is_exempt(container) {
+              exempt_containers := object.get(object.get(input, "parameters", {}), "exemptContainers", [])
+              msg := sprintf("Exempting container <%v> from probe requirement", [container.name])
+              cont := container.name
+              exemption := exempt_containers[_]
+              _matches_exemption(cont, exemption)
+          }
+
+          _matches_exemption(cont, exemption) {
+              not endswith(exemption, "*")
+              exemption == cont
+          }
+
+          _matches_exemption(cont, exemption) {
+              endswith(exemption, "*")
+              prefix := trim_suffix(exemption, "*")
+              startswith(cont, prefix)
+          }
