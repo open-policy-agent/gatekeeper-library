@@ -1,0 +1,22 @@
+version: 1.0.1
+name: k8sblockwildcardingress
+displayName: Block Wildcard Ingress
+createdAt: "2023-03-01T18:38:35Z"
+description: Users should not be able to create Ingresses with a blank or wildcard (*) hostname since that would enable them to intercept traffic for other services in the cluster, even if they don't have access to those services.
+digest: d45ef771937159ae05aec274ec4b75479626089461cc5495328a46f4f3acc1bc
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/block-wildcard-ingress
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Block Wildcard Ingress
+    Users should not be able to create Ingresses with a blank or wildcard (*) hostname since that would enable them to intercept traffic for other services in the cluster, even if they don't have access to those services.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/block-wildcard-ingress/1.0.1/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

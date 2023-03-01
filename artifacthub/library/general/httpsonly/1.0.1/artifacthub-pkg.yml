@@ -1,0 +1,25 @@
+version: 1.0.1
+name: k8shttpsonly
+displayName: HTTPS Only
+createdAt: "2023-03-01T18:38:35Z"
+description: |-
+    Requires Ingress resources to be HTTPS only.  Ingress resources must include the `kubernetes.io/ingress.allow-http` annotation, set to `false`. By default a valid TLS {} configuration is required, this can be made optional by setting the `tlsOptional` parameter to `true`.
+    https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
+digest: a984590ce76c2590ae11062be433b7e7f89548a94ad7a997f6166fd5c38df469
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/httpsonly
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # HTTPS Only
+    Requires Ingress resources to be HTTPS only.  Ingress resources must include the `kubernetes.io/ingress.allow-http` annotation, set to `false`. By default a valid TLS {} configuration is required, this can be made optional by setting the `tlsOptional` parameter to `true`.
+    https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/httpsonly/1.0.1/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library
