@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kustomize-allowed
+spec:
+  containers:
+    - name: kustomize
+      image: registry.k8s.io/kustomize/kustomize:v3.8.9
