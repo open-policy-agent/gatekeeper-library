@@ -1,7 +1,7 @@
 version: 1.0.1
 name: k8sstorageclass
 displayName: Storage Class
-createdAt: "2022-11-08T23:45:23Z"
+createdAt: "2023-03-04T00:36:00Z"
 description: Requires storage classes to be specified when used. Only Gatekeeper 3.9+ is supported.
 digest: 60bc85a9f37888ca1025e0f74d7453fca2296d83a1a71c0752d25afc3b2b1aae
 license: Apache-2.0
