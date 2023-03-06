@@ -1,9 +1,9 @@
 ---
 id: block-wildcard-ingress
-title: Block wildcard ingress
+title: Block Wildcard Ingress
 ---
 
-# Block wildcard ingress
+# Block Wildcard Ingress
 
 ## Description
 Users should not be able to create Ingresses with a blank or wildcard (*) hostname since that would enable them to intercept traffic for other services in the cluster, even if they don't have access to those services.
@@ -15,8 +15,8 @@ kind: ConstraintTemplate
 metadata:
   name: k8sblockwildcardingress
   annotations:
-    metadata.gatekeeper.sh/title: "Block wildcard ingress"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/title: "Block Wildcard Ingress"
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Users should not be able to create Ingresses with a blank or wildcard (*) hostname since that would enable them to intercept traffic for other services in the cluster, even if they don't have access to those services.
 spec:
