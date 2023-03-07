@@ -12,10 +12,10 @@ tests:
     assertions:
     - violations: no
   - name: ephemeral-storage-limit-unspecified
-    object: samples/container-must-have-ephemeral-storage-limit/example_disallowed_ephemeral_storage_limit_1Pi.yaml
+    object: samples/container-must-have-ephemeral-storage-limit/example_disallowed_ephemeral_storage_limit_unspecified.yaml
     assertions:
     - violations: yes
   - name: ephemeral-storage-limit-1Pi
-    object: samples/container-must-have-ephemeral-storage-limit/example_disallowed_ephemeral_storage_limit_unspecified.yaml
+    object: samples/container-must-have-ephemeral-storage-limit/example_disallowed_ephemeral_storage_limit_1Pi.yaml
     assertions:
     - violations: yes
