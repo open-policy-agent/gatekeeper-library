@@ -28,6 +28,7 @@ module.exports = {
             'validation/containerrequests',
             'validation/containerresourceratios',
             'validation/containerresources',
+            'validation/disallowedrepos',
             'validation/disallowanonymous',
             'validation/disallowedtags',
             'validation/externalip',

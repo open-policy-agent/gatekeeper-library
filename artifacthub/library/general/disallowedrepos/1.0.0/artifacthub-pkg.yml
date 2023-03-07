@@ -1,0 +1,22 @@
+version: 1.0.0
+name: k8sdisallowedrepos
+displayName: Disallowed Repositories
+createdAt: "2023-03-03T23:46:21Z"
+description: Disallowed container repositories that begin with a string from the specified list.
+digest: 9478274fc650184ad53d3073d25a522ca96cbe61ca5b3283b0b3c3097d0ce94e
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/disallowedrepos
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Disallowed Repositories
+    Disallowed container repositories that begin with a string from the specified list.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/disallowedrepos/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library
