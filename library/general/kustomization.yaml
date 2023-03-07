@@ -10,6 +10,7 @@ resources:
 - containerlimits
 - containerrequests
 - containerresourceratios
+- disallowedrepos
 - disallowanonymous
 - disallowedtags
 - externalip
