@@ -68,7 +68,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>allowed-repos</summary><blockquote>
+<summary>repo-must-not-be-k8s-gcr-io</summary><blockquote>
 
 <details>
 <summary>constraint</summary>
