@@ -97,6 +97,7 @@ spec:
   parameters:
     probes: ["readinessProbe", "livenessProbe"]
     probeTypes: ["tcpSocket", "httpGet", "exec"]
+    exemptContainers: ["allowed-container"]
 
 ```
 
@@ -132,6 +133,10 @@ spec:
         port: 8080
       initialDelaySeconds: 5
       periodSeconds: 10
+  - name: allowed-container
+    image: tomcat
+    ports:
+    - containerPort: 8080
   volumes:
   - name: cache-volume
     emptyDir: {}

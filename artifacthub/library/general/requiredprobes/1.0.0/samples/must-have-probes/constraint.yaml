@@ -10,3 +10,4 @@ spec:
   parameters:
     probes: ["readinessProbe", "livenessProbe"]
     probeTypes: ["tcpSocket", "httpGet", "exec"]
+    exemptContainers: ["allowed-container"]
