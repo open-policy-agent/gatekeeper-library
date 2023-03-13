@@ -1,0 +1,49 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdisallowedrepos
+  annotations:
+    metadata.gatekeeper.sh/title: "Disallowed Repositories"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      Disallowed container repositories that begin with a string from the specified list.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDisallowedRepos
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          properties:
+            repos:
+              description: The list of prefixes a container image is not allowed to have.
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sdisallowedrepos
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.containers[_]
+          image := container.image
+          startswith(image, input.parameters.repos[_])
+          msg := sprintf("container <%v> has an invalid image repo <%v>, disallowed repos are %v", [container.name, container.image, input.parameters.repos])
+        }
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.initContainers[_]
+          image := container.image
+          startswith(image, input.parameters.repos[_])
+          msg := sprintf("initContainer <%v> has an invalid image repo <%v>, disallowed repos are %v", [container.name, container.image, input.parameters.repos])
+        }
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.ephemeralContainers[_]
+          image := container.image
+          startswith(image, input.parameters.repos[_])
+          msg := sprintf("ephemeralContainer <%v> has an invalid image repo <%v>, disallowed repos are %v", [container.name, container.image, input.parameters.repos])
+        }

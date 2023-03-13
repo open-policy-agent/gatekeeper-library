@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kustomize-disallowed
+spec:
+  initContainers:
+  - name: kustomizeinit
+    image: k8s.gcr.io/kustomize/kustomize:v3.8.9
+  containers:
+    - name: kustomize
+      image: k8s.gcr.io/kustomize/kustomize:v3.8.9
