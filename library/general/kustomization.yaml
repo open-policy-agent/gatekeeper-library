@@ -27,3 +27,4 @@ resources:
 - verifydeprecatedapi
 - containerresources
 - storageclass
+- ephemeralstoragelimit

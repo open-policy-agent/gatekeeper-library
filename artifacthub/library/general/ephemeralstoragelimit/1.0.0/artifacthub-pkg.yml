@@ -1,0 +1,25 @@
+version: 1.0.0
+name: k8scontainerephemeralstoragelimit
+displayName: Container ephemeral storage limit
+createdAt: "2022-11-23T07:58:17Z"
+description: |-
+    Requires containers to have an ephemeral storage limit set and constrains the limit to be within the specified maximum values.
+    https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+digest: 9e8a77a3c304bbf7c66ad48ec01cd569bd3696d54a3ccabd75b80c5d0dc588a5
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/ephemeralstoragelimit
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Container ephemeral storage limit
+    Requires containers to have an ephemeral storage limit set and constrains the limit to be within the specified maximum values.
+    https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/ephemeralstoragelimit/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library
