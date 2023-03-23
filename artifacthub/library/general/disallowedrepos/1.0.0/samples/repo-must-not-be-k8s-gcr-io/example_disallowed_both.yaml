@@ -5,7 +5,7 @@ metadata:
 spec:
   initContainers:
   - name: kustomizeinit
-    image: k8s.gcr.io/kustomize/kustomize:v3.8.9
+    image: registry.k8s.io/kustomize/kustomize:v3.8.9
   containers:
     - name: kustomize
-      image: k8s.gcr.io/kustomize/kustomize:v3.8.9
+      image: registry.k8s.io/kustomize/kustomize:v3.8.9

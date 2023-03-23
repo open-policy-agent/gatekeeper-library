@@ -85,7 +85,7 @@ spec:
         kinds: ["Pod"]
   parameters:
     repos:
-      - "k8s.gcr.io/"
+      - "registry.k8s.io/"
 
 ```
 
@@ -130,7 +130,7 @@ metadata:
 spec:
   containers:
     - name: kustomize
-      image: k8s.gcr.io/kustomize/kustomize:v3.8.9
+      image: registry.k8s.io/kustomize/kustomize:v3.8.9
 
 
 ```
@@ -153,7 +153,7 @@ metadata:
 spec:
   initContainers:
   - name: kustomizeinit
-    image: k8s.gcr.io/kustomize/kustomize:v3.8.9
+    image: registry.k8s.io/kustomize/kustomize:v3.8.9
   containers:
     - name: kustomize
       image: registry.k8s.io/kustomize/kustomize:v3.8.9
@@ -178,10 +178,10 @@ metadata:
 spec:
   initContainers:
   - name: kustomizeinit
-    image: k8s.gcr.io/kustomize/kustomize:v3.8.9
+    image: registry.k8s.io/kustomize/kustomize:v3.8.9
   containers:
     - name: kustomize
-      image: k8s.gcr.io/kustomize/kustomize:v3.8.9
+      image: registry.k8s.io/kustomize/kustomize:v3.8.9
 
 ```
 
@@ -203,13 +203,13 @@ metadata:
 spec:
   initContainers:
   - name: kustomize
-    image:  k8s.gcr.io/kustomize/kustomize:v3.8.9
+    image:  registry.k8s.io/kustomize/kustomize:v3.8.9
   containers:
     - name: kustomize
-      image: k8s.gcr.io/kustomize/kustomize:v3.8.9
+      image: registry.k8s.io/kustomize/kustomize:v3.8.9
   ephemeralContainers:
     - name: kustomize
-      image: k8s.gcr.io/kustomize/kustomize:v3.8.9
+      image: registry.k8s.io/kustomize/kustomize:v3.8.9
 
 ```
 
