@@ -3,7 +3,7 @@ apiVersion: test.gatekeeper.sh/v1alpha1
 metadata:
   name: disallowedrepos
 tests:
-- name: allowed-repos
+- name: repo-must-not-be-k8s-gcr-io
   template: template.yaml
   constraint: samples/repo-must-not-be-k8s-gcr-io/constraint.yaml
   cases:
