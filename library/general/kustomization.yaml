@@ -17,6 +17,7 @@ resources:
 - disallowinteractive
 - ephemeralstoragelimit
 - externalip
+- horizontalpodautoscaler
 - httpsonly
 - imagedigests
 - noupdateserviceaccount
