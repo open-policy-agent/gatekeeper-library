@@ -52,6 +52,11 @@ empty = {
 
 review(replicas) = output {
   output = {
+    "kind": {
+      "kind": "Deployment",
+      "version": "v1",
+      "group": "apps",
+    },
     "object": {
     "metadata": {
         "name": "nginx"
@@ -61,7 +66,7 @@ review(replicas) = output {
       },
     }
   }
-} 
+}
 
 input_parameters_valid_range = {
     "ranges": [
