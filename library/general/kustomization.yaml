@@ -10,6 +10,7 @@ resources:
 - containerlimits
 - containerrequests
 - containerresourceratios
+- disallowedrepos
 - disallowanonymous
 - disallowedtags
 - externalip
@@ -27,3 +28,4 @@ resources:
 - verifydeprecatedapi
 - containerresources
 - storageclass
+- ephemeralstoragelimit

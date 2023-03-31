@@ -52,7 +52,10 @@ __build-gator:
 
 .PHONY: generate
 generate: __build-gomplate
-	$(docker) run -v $(shell pwd):/gatekeeper-library gomplate-container ./scripts/generate.sh
+	$(docker) run \
+		-u $(shell id -u):$(shell id -g) \
+		-v $(shell pwd):/gatekeeper-library \
+		gomplate-container ./scripts/generate.sh
 
 .PHONY: __build-gomplate
 __build-gomplate:
@@ -73,3 +76,6 @@ generate-website-docs:
 .PHONY: generate-artifacthub-artifacts
 generate-artifacthub-artifacts:
 	cd $(ARTIFACTHUB_SCRIPT_DIR); go test -v && go run hub.go
+
+.PHONY: generate-all
+generate-all: generate generate-website-docs generate-artifacthub-artifacts

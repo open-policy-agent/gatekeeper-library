@@ -10,6 +10,11 @@ slug: /
 
 A community-owned library of policies for the [OPA Gatekeeper project](https://open-policy-agent.github.io/gatekeeper/website/docs/).
 
+## Validation and Mutation
+The library consists of two main components: `Validation` and `Mutation`.
+- Validation: Gatekeeper can validate resources in the cluster against Gatekeeper validation policies, such as these defined in the library. The policies are defined as `ConstraintTemplates` and `Constraints`. `ConstraintTemplates` can be applied directly to a cluster and then `Constraints` can be applied to customize policy to fit your specific needs.
+- Mutation: Gatekeeper can mutate resources in the cluster against the Gatekeeper mutation policies, such as these defined in the library. Mutation policies are only examples, they should be customized to meet your needs before being applied.
+
 ## Usage
 
 ### kustomize
@@ -34,7 +39,6 @@ You can install everything with `kustomize build . | kubectl apply -f -`.
 
 More information can be found in the [kustomization documentation](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/).
 
-
 ### kubectl
 
 Instead of using kustomize, you can directly apply the `template.yaml` and `constraint.yaml` provided in each directory under `library/`
@@ -53,7 +57,7 @@ kubectl apply -f library/general/httpsonly/sync.yaml # optional: when GK is runn
 The `suite.yaml` files define test cases for each ConstraintTemplate in the library.
 Changes to gatekeeper-library ConstraintTemplates may be tested with the gator CLI:
 
-```
+```bash
 gatekeeper-library$ gator verify ./...
 ```
 
@@ -66,6 +70,7 @@ The gator CLI may be downloaded from the Gatekeeper
 
 If you have a policy you would like to contribute, please submit a pull request.
 Each new policy should contain:
+
 * A constraint template named `src/<policy-name>/constraint.tmpl` with a `description` annotation and the parameter structure, if any, defined in `spec.crd.spec.validation.openAPIV3Schema`. The template is rendered using [gomplate](https://docs.gomplate.ca/).
 * One or more sample constraints, each with an example of an allowed (`example_allowed.yaml`) and disallowed (`example_disallowed.yaml`) resource under `library/<policy-name>/samples/<policy-name>`
 * `kustomization.yaml` and `suite.yaml` under `library/<policy-name>`
@@ -81,6 +86,7 @@ Each new policy should contain:
 * `make generate` will generate `library/<policy-name>/template.yaml` from `src/<policy-name>/src.rego` using [gomplate](https://docs.gomplate.ca/).
 * `make generate-website-docs` will generate the markdown files required for the website.
 * `make generate-artifacthub-artifacts` will generate or update the artifact hub packages and associated `artifacthub-pkg.yml` file under `/artifacthub` directory.
+* `make generate-all` will generate all artifacts above.
 * run all tests with `./test.sh`
 * run single test with `opa test src/<folder>/src.rego src/<folder>/src_test.rego --verbose`
 * print results with `trace(sprintf("%v", [thing]))`

@@ -1,0 +1,28 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdisallowedrepos
+  annotations:
+    metadata.gatekeeper.sh/title: "Disallowed Repositories"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      Disallowed container repositories that begin with a string from the specified list.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDisallowedRepos
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          properties:
+            repos:
+              description: The list of prefixes a container image is not allowed to have.
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ file.Read "src/general/disallowedrepos/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}

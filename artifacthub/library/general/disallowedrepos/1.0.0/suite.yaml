@@ -1,0 +1,43 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: disallowedrepos
+tests:
+- name: repo-must-not-be-k8s-gcr-io
+  template: template.yaml
+  constraint: samples/repo-must-not-be-k8s-gcr-io/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/repo-must-not-be-k8s-gcr-io/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: container-disallowed
+    object: samples/repo-must-not-be-k8s-gcr-io/example_disallowed_container.yaml
+    assertions:
+    - violations: yes
+      message: container
+  - name: initcontainer-disallowed
+    object: samples/repo-must-not-be-k8s-gcr-io/example_disallowed_initcontainer.yaml
+    assertions:
+    - violations: 1
+      message: initContainer
+    - violations: 0
+      message: container
+  - name: both-disallowed
+    object: samples/repo-must-not-be-k8s-gcr-io/example_disallowed_both.yaml
+    assertions:
+    - violations: 2
+    - message: initContainer
+      violations: 1
+    - message: container
+      violations: 1
+  - name: all-disallowed
+    object: samples/repo-must-not-be-k8s-gcr-io/disallowed_all.yaml
+    assertions:
+    - violations: 3
+    - message: initContainer
+      violations: 1
+    - message: container
+      violations: 1
+    - message: ephemeralContainer
+      violations: 1

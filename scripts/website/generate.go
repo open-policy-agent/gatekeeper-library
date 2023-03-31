@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -14,8 +16,8 @@ const (
 	sourceURL = "https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/"
 
 	// directory entry point for parsing
-	entryPoint = "library"
-
+	entryPoint         = "library"
+	mutationEntryPoint = "mutation"
 )
 
 // Suite ...
@@ -55,9 +57,18 @@ func main() {
 		panic(err)
 	}
 
+	// create website validation directory if not exists
+	if _, err := os.Stat(filepath.Join(rootDir, "website/docs/validation")); os.IsNotExist(err) {
+		os.Mkdir(filepath.Join(rootDir, "website/docs/validation"), 0755)
+	}
+
 	for _, entry := range dirEntry {
 		if entry.Type().IsDir() {
-			basePath, _ := filepath.Abs(filepath.Join(libraryPath, entry.Name()))
+			basePath, err := filepath.Abs(filepath.Join(libraryPath, entry.Name()))
+			if err != nil {
+				fmt.Println("error while getting absolute path for ", entry.Name())
+				panic(err)
+			}
 			directories, err := os.ReadDir(basePath)
 			if err != nil {
 				fmt.Println("error while listing directories under ", entry.Name())
@@ -75,7 +86,11 @@ func main() {
 					}
 
 					suite := Suite{}
-					yaml.Unmarshal(suiteContent, &suite)
+					err = yaml.Unmarshal(suiteContent, &suite)
+					if err != nil {
+						fmt.Println("error while unmarshaling suite.yaml")
+						panic(err)
+					}
 
 					// ConstraintTemplate
 					// Get raw github source URL
@@ -133,11 +148,90 @@ func main() {
 						"%FILENAME%", dir.Name(),
 					)
 
-					os.WriteFile(
-						filepath.Join(rootDir, "website/docs", fmt.Sprintf("%s.md", dir.Name())),
+					err = os.WriteFile(
+						filepath.Join(rootDir, "website/docs/validation", fmt.Sprintf("%s.md", dir.Name())),
 						[]byte(replacer.Replace(string(templateContent))),
 						0644,
 					)
+					if err != nil {
+						fmt.Println("error while writing file")
+						panic(err)
+					}
+				}
+			}
+		}
+	}
+
+	// mutation
+	mutationPath := filepath.Join(rootDir, mutationEntryPoint)
+	mutationDirEntry, err := os.ReadDir(mutationPath)
+	if err != nil {
+		fmt.Println("error while listing directories under mutation")
+		panic(err)
+	}
+
+	// create website mutation directory if not exists
+	if _, err := os.Stat(filepath.Join(rootDir, "website/docs/mutation-examples")); os.IsNotExist(err) {
+		os.Mkdir(filepath.Join(rootDir, "website/docs/mutation-examples"), 0755)
+	}
+
+	for _, entry := range mutationDirEntry {
+		if entry.Type().IsDir() {
+			basePath, err := filepath.Abs(filepath.Join(mutationPath, entry.Name()))
+			if err != nil {
+				fmt.Println("error while getting absolute path for ", entry.Name())
+				panic(err)
+			}
+			directories, err := os.ReadDir(basePath)
+			if err != nil {
+				fmt.Println("error while listing directories under ", entry.Name())
+				panic(err)
+			}
+
+			for _, dir := range directories {
+				if dir.Type().IsDir() {
+					fmt.Println("Generating markdown for ", filepath.Join(basePath, dir.Name()))
+				}
+
+				// get all files with name starting with "mutation"
+				files, err := os.ReadDir(filepath.Join(basePath, dir.Name(), "samples"))
+				if err != nil {
+					panic(err)
+				}
+
+				mutationTemplateContent, err := os.ReadFile(filepath.Join(pwd, "mutation-template.md"))
+				if err != nil {
+					fmt.Println("error while reading mutation-template.md")
+					panic(err)
+				}
+
+				for _, file := range files {
+					var fileContentBytes []byte
+					if strings.HasPrefix(file.Name(), "mutation") {
+						// read mutation.yaml
+						fileContentBytes, err = os.ReadFile(filepath.Join(basePath, dir.Name(), "samples", file.Name()))
+						if err != nil {
+							fmt.Println("error while reading ", file.Name())
+							panic(err)
+						}
+
+						replacer := strings.NewReplacer(
+							"%RAWURL%", sourceURL+filepath.Join(mutationEntryPoint, entry.Name(), dir.Name(), "samples", file.Name()),
+							"%EXAMPLES%", fmt.Sprintf("%s", fileContentBytes),
+							"%TITLE%", dir.Name(),
+							"%FILENAME%", dir.Name(),
+						)
+
+						err := os.WriteFile(
+							filepath.Join(rootDir, "website/docs/mutation-examples", fmt.Sprintf("%s.md", dir.Name())),
+							[]byte(replacer.Replace(string(mutationTemplateContent))),
+							0644,
+						)
+						if err != nil {
+							fmt.Println("error while writing ", file.Name())
+							panic(err)
+						}
+					}
 				}
 			}
 		}
@@ -179,6 +273,19 @@ func main() {
 	if err != nil {
 		fmt.Println("error while reading psp README.md")
 		panic(err)
+	}
+
+	// find all directory path correct them to point inside validation directory
+	regex := regexp.MustCompile(`\[([^\[\]]+)\]\(([^(]+)\)`)
+	matches := regex.FindAllStringSubmatch(string(pspReadmeContent), -1)
+
+	// iterate over matches and replace content within ()
+	for _, match := range matches {
+		// check if match does not start with http
+		if !strings.HasPrefix(match[2], "http") {
+			// replace content within ()
+			pspReadmeContent = bytes.ReplaceAll(pspReadmeContent, []byte(fmt.Sprintf("(%s)", match[2])), []byte(fmt.Sprintf("(validation/%s)", match[2])))
+		}
 	}
 
 	err = os.WriteFile(
