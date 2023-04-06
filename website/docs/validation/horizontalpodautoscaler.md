@@ -1,3 +1,15 @@
+---
+id: horizontalpodautoscaler
+title: Horizontal Pod Autoscaler
+---
+
+# Horizontal Pod Autoscaler
+
+## Description
+Disallow the following scenarios when deploying `HorizontalPodAutoscalers` 1. Deployment of HorizontalPodAutoscalers with `.spec.minReplicas` or `.spec.maxReplicas` outside the ranges defined in the constraint 2. Deployment of HorizontalPodAutoscalers where the difference between `.spec.minReplicas` and `.spec.maxReplicas` is less than the configured `minimumReplicaSpread` 3. Deployment of HorizontalPodAutoscalers that do not reference a valid `scaleTargetRef` (e.g. Deployment, ReplicationController, ReplicaSet, StatefulSet).
+
+## Template
+```yaml
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
@@ -100,3 +112,180 @@ spec:
             input.parameters.minimumReplicaSpread
             (hpa.spec.maxReplicas - hpa.spec.minReplicas) >= input.parameters.minimumReplicaSpread
         }
+
+```
+
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/horizontalpodautoscaler/template.yaml
+```
+## Examples
+<details>
+<summary>horizontal-pod-autoscaler</summary><blockquote>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sHorizontalPodAutoscaler
+metadata:
+  name: horizontal-pod-autoscaler
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups: ["autoscaling"]
+        kinds: ["HorizontalPodAutoscaler"]
+  parameters:
+    minimumReplicaSpread: 1
+    enforceScaleTargetRef: true
+    ranges:
+    - min_replicas: 3
+      max_replicas: 6
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/horizontalpodautoscaler/samples/horizontalpodautoscaler/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-allowed-hpa</summary>
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx-hpa-allowed
+  namespace: default
+spec:
+  minReplicas: 3
+  maxReplicas: 6
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 900
+        type: Utilization
+    type: Resource
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx-deployment
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/horizontalpodautoscaler/samples/horizontalpodautoscaler/example_allowed_hpa.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-hpa-replicas</summary>
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx-hpa-disallowed-replicas
+  namespace: default
+spec:
+  minReplicas: 2
+  maxReplicas: 7
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 900
+        type: Utilization
+    type: Resource
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx-deployment
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/horizontalpodautoscaler/samples/horizontalpodautoscaler/example_disallowed_hpa_replicas.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-hpa-replicaspread</summary>
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx-hpa-disallowed-replicaspread
+  namespace: default
+spec:
+  minReplicas: 4
+  maxReplicas: 4
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 900
+        type: Utilization
+    type: Resource
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx-deployment
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/horizontalpodautoscaler/samples/horizontalpodautoscaler/example_disallowed_hpa_replicaspread.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-scaletarget</summary>
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: nginx-hpa-disallowed-scaletarget
+  namespace: default
+spec:
+  minReplicas: 3
+  maxReplicas: 6
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 900
+        type: Utilization
+    type: Resource
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx-deployment-missing
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/horizontalpodautoscaler/samples/horizontalpodautoscaler/example_disallowed_hpa_scaletarget.yaml
+```
+
+</details>
+
+
+</blockquote></details>
