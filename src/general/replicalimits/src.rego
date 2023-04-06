@@ -1,11 +1,12 @@
 package k8sreplicalimits
 
-deployment_name = input.review.object.metadata.name
+object_name = input.review.object.metadata.name
+object_kind = input.review.kind.kind
 
 violation[{"msg": msg}] {
     spec := input.review.object.spec
     not input_replica_limit(spec)
-    msg := sprintf("The provided number of replicas is not allowed for deployment: %v. Allowed ranges: %v", [deployment_name, input.parameters])
+    msg := sprintf("The provided number of replicas is not allowed for %v: %v. Allowed ranges: %v", [object_kind, object_name, input.parameters])
 }
 
 input_replica_limit(spec) {
