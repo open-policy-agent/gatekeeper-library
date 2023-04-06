@@ -31,6 +31,26 @@ test_input_denied_pvc_storageclassname_missing {
     results := violation with input as input with data.inventory as inv
     count(results) == 1
 }
+test_input_allowed_pvc_sc {
+    input := { "review": input_review_pvc_name("slow"), "parameters": { "includeStorageClassesInMessage": true, "allowedStorageClasses": ["slow"] } }
+    results := violation with input as input with data.inventory as inv
+    count(results) == 0
+}
+test_input_denied_pvc_sc {
+    input := { "review": input_review_pvc_name("slow"), "parameters": { "includeStorageClassesInMessage": true, "allowedStorageClasses": ["fast"] } }
+    results := violation with input as input with data.inventory as inv
+    count(results) == 1
+}
+test_input_allowed_pvc_mixed_sc {
+    input := { "review": input_review_pvc_name("slow"), "parameters": { "includeStorageClassesInMessage": true, "allowedStorageClasses": ["fast", "slow"] } }
+    results := violation with input as input with data.inventory as inv
+    count(results) == 0
+}
+test_input_denied_pvc_multiple_sc {
+    input := { "review": input_review_pvc_name("slow"), "parameters": { "includeStorageClassesInMessage": true, "allowedStorageClasses": ["other", "fast"] } }
+    results := violation with input as input with data.inventory as inv
+    count(results) == 1
+}
 test_input_allowed_statefulset_fast {
     input := { "review": input_review_statefulset_name("fast"), "parameters": { "includeStorageClassesInMessage": true } }
     results := violation with input as input with data.inventory as inv
@@ -48,6 +68,26 @@ test_input_denied_statefulset_bad_storageclassname {
 }
 test_input_denied_statefulset_storageclassname_missing {
     input := { "review": input_review_statefulset_storageclassname_missing, "parameters": { "includeStorageClassesInMessage": true } }
+    results := violation with input as input with data.inventory as inv
+    count(results) == 1
+}
+test_input_allowed_statefulset_sc {
+    input := { "review": input_review_statefulset_name("slow"), "parameters": { "includeStorageClassesInMessage": true, "allowedStorageClasses": ["slow"] } }
+    results := violation with input as input with data.inventory as inv
+    count(results) == 0
+}
+test_input_denied_statefulset_sc {
+    input := { "review": input_review_statefulset_name("slow"), "parameters": { "includeStorageClassesInMessage": true, "allowedStorageClasses": ["fast"] } }
+    results := violation with input as input with data.inventory as inv
+    count(results) == 1
+}
+test_input_allowed_statefulset_mixed_sc {
+    input := { "review": input_review_statefulset_name("slow"), "parameters": { "includeStorageClassesInMessage": true, "allowedStorageClasses": ["fast", "slow"] } }
+    results := violation with input as input with data.inventory as inv
+    count(results) == 0
+}
+test_input_denied_statefulset_multiple_sc {
+    input := { "review": input_review_statefulset_name("slow"), "parameters": { "includeStorageClassesInMessage": true, "allowedStorageClasses": ["other","fast"] } }
     results := violation with input as input with data.inventory as inv
     count(results) == 1
 }
