@@ -1,3 +1,15 @@
+---
+id: disallowinteractive
+title: Disallow Interactive TTY Containers
+---
+
+# Disallow Interactive TTY Containers
+
+## Description
+Requires that objects have the fields `spec.tty` and `spec.stdin` set to false or unset.
+
+## Template
+```yaml
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
@@ -65,3 +77,93 @@ spec:
         has_field(object, field) = true {
             object[field]
         }
+
+```
+
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/disallowinteractive/template.yaml
+```
+## Examples
+<details>
+<summary>disallow-interactive</summary><blockquote>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sDisallowInteractiveTTY
+metadata:
+  name: no-interactive-tty-containers
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/disallowinteractive/samples/no-interactive-containers/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-interactive-tty-allowed
+  labels:
+    app: nginx-interactive-tty
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    stdin: false
+    tty: false
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/disallowinteractive/samples/no-interactive-containers/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-privilege-escalation-disallowed
+  labels:
+    app: nginx-privilege-escalation
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    stdin: true
+    tty: true
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/disallowinteractive/samples/no-interactive-containers/example_disallowed.yaml
+```
+
+</details>
+
+
+</blockquote></details>

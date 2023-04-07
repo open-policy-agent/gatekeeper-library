@@ -1,0 +1,22 @@
+version: 1.0.0
+name: k8sdisallowinteractivetty
+displayName: Disallow Interactive TTY Containers
+createdAt: "2023-04-07T02:14:48Z"
+description: Requires that objects have the fields `spec.tty` and `spec.stdin` set to false or unset.
+digest: 485078cadf4c4a849eb3a89071ee058c9d4bf7aec9cf5e6e448bd356eda80c92
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/disallowinteractive
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Disallow Interactive TTY Containers
+    Requires that objects have the fields `spec.tty` and `spec.stdin` set to false or unset.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/disallowinteractive/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library
