@@ -16,7 +16,7 @@ metadata:
   name: k8spspprocmount
   annotations:
     metadata.gatekeeper.sh/title: "Proc Mount"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Controls the allowed `procMount` types for the container. Corresponds to
       the `allowedProcMountTypes` field in a PodSecurityPolicy. For more
@@ -102,10 +102,12 @@ spec:
             out = "default"
         }
         get_allowed_proc_mount(arg) = out {
+            arg.parameters.procMount
             not valid_proc_mount(arg.parameters.procMount)
             out = "default"
         }
         get_allowed_proc_mount(arg) = out {
+            valid_proc_mount(arg.parameters.procMount)
             out = lower(arg.parameters.procMount)
         }
 
