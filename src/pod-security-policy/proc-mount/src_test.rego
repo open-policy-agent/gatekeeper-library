@@ -45,6 +45,11 @@ test_input_container_proc_mount_case_insensitive {
     results := violation with input as input
     count(results) == 0
 }
+test_input_container_proc_mount_case_invalid_procMount {
+    input := { "review": input_review, "parameters": input_parameters_invalid_procMount}
+    results := violation with input as input
+    count(results) == 0
+}
 test_input_container_not_proc_mount_unmasked {
     input := { "review": input_review, "parameters": input_parameters_unmasked}
     results := violation with input as input
@@ -188,4 +193,8 @@ input_parameters_unmasked = {
 input_parameters_exempt = {
      "exemptImages": ["nginx"],
      "procMount": "Default"
+}
+
+input_parameters_invalid_procMount = {
+     "procMount": "invalid"
 }
