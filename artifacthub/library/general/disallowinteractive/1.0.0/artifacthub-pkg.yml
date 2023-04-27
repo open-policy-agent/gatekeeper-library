@@ -1,9 +1,9 @@
 version: 1.0.0
 name: k8sdisallowinteractivetty
 displayName: Disallow Interactive TTY Containers
-createdAt: "2023-04-07T02:14:48Z"
+createdAt: "2023-04-27T21:41:24Z"
 description: Requires that objects have the fields `spec.tty` and `spec.stdin` set to false or unset.
-digest: 485078cadf4c4a849eb3a89071ee058c9d4bf7aec9cf5e6e448bd356eda80c92
+digest: c462c392ee271922f97e53d084646857dbbc97f496382e9b5c117532ccf3b5bc
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/disallowinteractive
 keywords:
