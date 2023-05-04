@@ -114,7 +114,9 @@ func TestCopyDirectory(t *testing.T) {
 
 	// create a file in the src directory
 	srcFilePath := srcDirPath + "/test.txt"
-	os.WriteFile(srcFilePath, []byte("test"), 0o644)
+	if os.WriteFile(srcFilePath, []byte("test"), 0o644) != nil {
+		t.Errorf("error writing file")
+	}
 
 	testCases := []struct {
 		name          string

@@ -67,7 +67,10 @@ func main() {
 
 	// create website validation directory if not exists
 	if _, err := os.Stat(filepath.Join(rootDir, "website/docs/validation")); os.IsNotExist(err) {
-		os.Mkdir(filepath.Join(rootDir, "website/docs/validation"), 0755)
+		if os.Mkdir(filepath.Join(rootDir, "website/docs/validation"), 0755) != nil {
+			fmt.Println("error while creating directory")
+			panic(err)
+		}
 	}
 
 	validationSidebarItems := make(map[string][]string)
@@ -183,7 +186,10 @@ func main() {
 
 	// create website mutation directory if not exists
 	if _, err := os.Stat(filepath.Join(rootDir, "website/docs/mutation-examples")); os.IsNotExist(err) {
-		os.Mkdir(filepath.Join(rootDir, "website/docs/mutation-examples"), 0755)
+		if os.Mkdir(filepath.Join(rootDir, "website/docs/mutation-examples"), 0755) != nil {
+			fmt.Println("error while creating directory")
+			panic(err)
+		}
 	}
 
 	for _, entry := range mutationDirEntry {
@@ -229,7 +235,7 @@ func main() {
 
 						replacer := strings.NewReplacer(
 							"%RAWURL%", sourceURL+filepath.Join(mutationEntryPoint, entry.Name(), dir.Name(), "samples", file.Name()),
-							"%EXAMPLES%", fmt.Sprintf("%s", fileContentBytes),
+							"%EXAMPLES%", string(fileContentBytes),
 							"%TITLE%", dir.Name(),
 							"%FILENAME%", dir.Name(),
 						)
@@ -388,7 +394,7 @@ func getRegexReplacedString(content string, pattern string, replacement []string
 			item,
 		)
 	}
-	
+
 	updatedContent := fmt.Sprintf("%s%s%s",
 		matches[1],
 		matches[2],
