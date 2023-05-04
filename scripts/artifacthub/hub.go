@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
@@ -72,6 +73,19 @@ type ArtifactHubMetadata struct {
 	} `yaml:"annotations,omitempty"`
 }
 
+// HTTPClient is an interface that matches the methods needed from http.Client.
+type HTTPClient interface {
+	Get(url string) (*http.Response, error)
+}
+
+// DefaultClient is a default implementation of the HTTPClient interface.
+type DefaultClient struct{}
+
+// Get is a method of DefaultClient that makes the actual HTTP GET request.
+func (c DefaultClient) Get(url string) (*http.Response, error) {
+	return http.Get(url)
+}
+
 const (
 	// entryPoint is the directory entry point for artifact hub
 	ahEntryPoint = "artifacthub"
@@ -123,9 +137,11 @@ func main() {
 						panic(err)
 					}
 
+					githubSourceRelativePath := filepath.Join(entryPoint, entry.Name(), dir.Name(), "template.yaml")
 					createVersionDirectory(
 						rootDir,
 						filepath.Join(entryPoint, entry.Name(), dir.Name()),
+						githubSourceRelativePath,
 						constraintTemplate,
 					)
 				}
@@ -134,7 +150,7 @@ func main() {
 	}
 }
 
-func createVersionDirectory(rootDir, basePath string, constraintTemplate map[string]interface{}) {
+func createVersionDirectory(rootDir, basePath, githubSourceRelativePath string, constraintTemplate map[string]interface{}) {
 	version := fmt.Sprintf("%s", constraintTemplate["metadata"].(map[string]interface{})["annotations"].(map[string]interface{})["metadata.gatekeeper.sh/version"])
 
 	// create directory if not exists
@@ -152,7 +168,7 @@ func createVersionDirectory(rootDir, basePath string, constraintTemplate map[str
 
 	// create artifacthub-pkg.yml file first then copy rest of the files. This will avoid unnecessary diff if there is any error while generating or updating artifacthub-pkg.yml
 	// add artifact hub metadata
-	addArtifactHubMetadata(filepath.Base(source), destination, ahBasePath, constraintTemplate)
+	addArtifactHubMetadata(filepath.Base(source), destination, ahBasePath, githubSourceRelativePath, constraintTemplate)
 
 	// copy directory content
 	err := copyDirectory(source, destination)
@@ -162,7 +178,7 @@ func createVersionDirectory(rootDir, basePath string, constraintTemplate map[str
 	}
 }
 
-func addArtifactHubMetadata(sourceDirectory, destinationPath, ahBasePath string, constraintTemplate map[string]interface{}) {
+func addArtifactHubMetadata(sourceDirectory, destinationPath, ahBasePath, githubSourceRelativePath string, constraintTemplate map[string]interface{}) {
 	metadataFilePath := filepath.Join(destinationPath, "artifacthub-pkg.yml")
 
 	constraintTemplateHash := getConstraintTemplateHash(constraintTemplate)
@@ -199,7 +215,7 @@ func addArtifactHubMetadata(sourceDirectory, destinationPath, ahBasePath string,
 		}
 	} else {
 		// when metadata file already exists, check version to make sure it's updated if constraint template is changed
-		err := checkVersion(artifactHubMetadata, constraintTemplate, constraintTemplateHash)
+		err := checkVersion(&DefaultClient{}, artifactHubMetadata, githubSourceRelativePath)
 		if err != nil {
 			panic(err)
 		}
@@ -221,11 +237,35 @@ func addArtifactHubMetadata(sourceDirectory, destinationPath, ahBasePath string,
 	}
 }
 
-func checkVersion(artifactHubMetadata *ArtifactHubMetadata, constraintTemplate map[string]interface{}, newConstraintTemplateHash string) error {
-	// compare hash
-	if artifactHubMetadata.Digest != newConstraintTemplateHash {
+func checkVersion(httpClient HTTPClient, artifactHubMetadata *ArtifactHubMetadata, githubSourceRelativePath string) error {
+	// compare hash with template.yaml in github
+	githubTemplateURL := sourceURL + githubSourceRelativePath
+	resp, err := httpClient.Get(githubTemplateURL)
+	if err != nil {
+		return fmt.Errorf("error while getting constraint template from github: %v", err)
+	}
+	if resp.StatusCode == http.StatusNotFound {
+		fmt.Printf("constraint template %s not found in github. It is likely that constraint template is being updated locally and not merged to github yet.\n", githubSourceRelativePath)
+
+		return nil
+	}
+	defer resp.Body.Close()
+
+	githubConstraintTemplateBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("error while reading constraint template from github")
+	}
+
+	githubConstraintTemplate := make(map[string]interface{})
+	err = yaml.Unmarshal(githubConstraintTemplateBytes, &githubConstraintTemplate)
+	if err != nil {
+		return fmt.Errorf("error while unmarshaling constraint template from github")
+	}
+
+	githubConstraintTemplateHash := getConstraintTemplateHash(githubConstraintTemplate)
+	if artifactHubMetadata.Digest != githubConstraintTemplateHash {
 		// compare version
-		if artifactHubMetadata.Version == constraintTemplate["metadata"].(map[string]interface{})["annotations"].(map[string]interface{})["metadata.gatekeeper.sh/version"].(string) {
+		if artifactHubMetadata.Version == githubConstraintTemplate["metadata"].(map[string]interface{})["annotations"].(map[string]interface{})["metadata.gatekeeper.sh/version"].(string) {
 			// panic if version is same but hash is different
 			return fmt.Errorf("looks like template.yaml is updated but the version is not. Please update the 'metadata.gatekeeper.sh/version' annotation in the template.yaml source")
 		}
