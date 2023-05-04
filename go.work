@@ -2,6 +2,7 @@ go 1.19
 
 use (
 	./scripts/artifacthub
-	./scripts/website
 	./scripts/require-sync
+	./scripts/validate
+	./scripts/website
 )

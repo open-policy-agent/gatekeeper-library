@@ -87,6 +87,8 @@ Each new policy should contain:
 * `make generate-website-docs` will generate the markdown files required for the website.
 * `make generate-artifacthub-artifacts` will generate or update the artifact hub packages and associated `artifacthub-pkg.yml` file under `/artifacthub` directory.
 * `make generate-all` will generate all artifacts above.
+* `make validate` will run validation checks on the library repo. Currently it validates directory structure of `website/docs` directory.
+* `make unit-test` will run all unit tests in the scripts directory.
 * run all tests with `./test.sh`
 * run single test with `opa test src/<folder>/src.rego src/<folder>/src_test.rego --verbose`
 * print results with `trace(sprintf("%v", [thing]))`
