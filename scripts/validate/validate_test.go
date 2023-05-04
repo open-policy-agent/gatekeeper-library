@@ -50,14 +50,14 @@ func TestValidateDocsDirStructure(t *testing.T) {
 
 			// Create the directory structure
 			docsDirPath := filepath.Join(tmpDir, docsDirEntry)
-			err = os.MkdirAll(docsDirPath, 0755)
+			err = os.MkdirAll(docsDirPath, 0o755)
 			if err != nil {
 				t.Fatalf("Error creating docs dir: %v", err)
 			}
 			for _, item := range tc.dirStructure {
 				path := filepath.Join(docsDirPath, item)
 				if filepath.Ext(path) == "" {
-					if os.Mkdir(path, 0755) != nil {
+					if os.Mkdir(path, 0o755) != nil {
 						t.Fatalf("Error creating directory: %v", path)
 					}
 				} else {

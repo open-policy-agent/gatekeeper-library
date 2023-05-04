@@ -214,7 +214,7 @@ func addArtifactHubMetadata(sourceDirectory, destinationPath, ahBasePath string,
 		panic(err)
 	}
 
-	err = os.WriteFile(filepath.Join(destinationPath, "artifacthub-pkg.yml"), artifactHubMetadataBytes, 0644)
+	err = os.WriteFile(filepath.Join(destinationPath, "artifacthub-pkg.yml"), artifactHubMetadataBytes, 0o644)
 	if err != nil {
 		fmt.Println("error while writing artifact hub metadata")
 		panic(err)

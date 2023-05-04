@@ -228,5 +228,5 @@ func validateRequiresSyncDataContent(annotation string) (bool, error) {
 		}
 	}
 
-  return true, nil
+	return true, nil
 }

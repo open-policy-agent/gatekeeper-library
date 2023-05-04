@@ -75,7 +75,6 @@ func TestGetConstraintTemplateHash(t *testing.T) {
 }
 
 func TestGetMetadataIfExist(t *testing.T) {
-
 	testCases := []struct {
 		name             string
 		metadataFilePath string

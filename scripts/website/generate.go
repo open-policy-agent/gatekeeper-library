@@ -67,7 +67,7 @@ func main() {
 
 	// create website validation directory if not exists
 	if _, err := os.Stat(filepath.Join(rootDir, "website/docs/validation")); os.IsNotExist(err) {
-		if os.Mkdir(filepath.Join(rootDir, "website/docs/validation"), 0755) != nil {
+		if os.Mkdir(filepath.Join(rootDir, "website/docs/validation"), 0o755) != nil {
 			fmt.Println("error while creating directory")
 			panic(err)
 		}
@@ -164,7 +164,7 @@ func main() {
 					err = os.WriteFile(
 						filepath.Join(rootDir, "website/docs/validation", fmt.Sprintf("%s.md", dir.Name())),
 						[]byte(replacer.Replace(string(templateContent))),
-						0644,
+						0o644,
 					)
 					if err != nil {
 						fmt.Println("error while writing file")
@@ -186,7 +186,7 @@ func main() {
 
 	// create website mutation directory if not exists
 	if _, err := os.Stat(filepath.Join(rootDir, "website/docs/mutation-examples")); os.IsNotExist(err) {
-		if os.Mkdir(filepath.Join(rootDir, "website/docs/mutation-examples"), 0755) != nil {
+		if os.Mkdir(filepath.Join(rootDir, "website/docs/mutation-examples"), 0o755) != nil {
 			fmt.Println("error while creating directory")
 			panic(err)
 		}
@@ -243,7 +243,7 @@ func main() {
 						err := os.WriteFile(
 							filepath.Join(rootDir, "website/docs/mutation-examples", fmt.Sprintf("%s.md", dir.Name())),
 							[]byte(replacer.Replace(string(mutationTemplateContent))),
-							0644,
+							0o644,
 						)
 						if err != nil {
 							fmt.Println("error while writing ", file.Name())
@@ -255,7 +255,7 @@ func main() {
 		}
 	}
 
-	//update README.md
+	// update README.md
 	fmt.Println("Updating README.md")
 	readmeTemplateContent, err := os.ReadFile(filepath.Join(rootDir, "scripts/website", "readme-template.md"))
 	if err != nil {
@@ -272,14 +272,14 @@ func main() {
 	err = os.WriteFile(
 		filepath.Join(rootDir, "website/docs/intro.md"),
 		[]byte(strings.Replace(string(readmeTemplateContent), "%CONTENT%", string(readmeContent), 1)),
-		0644,
+		0o644,
 	)
 	if err != nil {
 		fmt.Println("error while updating README.md")
 		panic(err)
 	}
 
-	//update PSP README.md
+	// update PSP README.md
 	fmt.Println("Updating PSP README.md")
 	pspReadmeTemplateContent, err := os.ReadFile(filepath.Join(rootDir, "scripts/website", "pspreadme-template.md"))
 	if err != nil {
@@ -309,7 +309,7 @@ func main() {
 	err = os.WriteFile(
 		filepath.Join(rootDir, "website/docs/pspintro.md"),
 		[]byte(strings.Replace(string(pspReadmeTemplateContent), "%CONTENT%", string(pspReadmeContent), 1)),
-		0644,
+		0o644,
 	)
 	if err != nil {
 		fmt.Println("error while updating psp README.md")
@@ -373,7 +373,7 @@ func main() {
 	)
 
 	// write the updated content to the file
-	err = os.WriteFile(filepath.Join(rootDir, sidebarPath), []byte(updatedSidebar), 0644)
+	err = os.WriteFile(filepath.Join(rootDir, sidebarPath), []byte(updatedSidebar), 0o644)
 	if err != nil {
 		log.Fatal(err)
 	}
