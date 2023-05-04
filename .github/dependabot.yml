@@ -1,0 +1,55 @@
+version: 2
+updates:
+  - package-ecosystem: docker
+    directory: /build/gator
+    schedule:
+      interval: daily
+    commit-message:
+      prefix: "chore"
+      
+  - package-ecosystem: docker
+    directory: /build/gomplate
+    schedule:
+      interval: daily
+    commit-message:
+      prefix: "chore"
+      
+  - package-ecosystem: gomod
+    directory: /scripts/artifacthub
+    schedule:
+      interval: daily
+    commit-message:
+      prefix: "chore"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+        - "version-update:semver-major"
+
+  - package-ecosystem: gomod
+    directory: /scripts/require-sync
+    schedule:
+      interval: daily
+    commit-message:
+      prefix: "chore"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+        - "version-update:semver-major"
+
+  - package-ecosystem: gomod
+    directory: /scripts/website
+    schedule:
+      interval: daily
+    commit-message:
+      prefix: "chore"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+        - "version-update:semver-major"
+
+  - package-ecosystem: npm
+    directory: /website
+    schedule:
+      interval: daily
+    commit-message:
+      prefix: "chore"
