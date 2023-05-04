@@ -425,7 +425,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sStorageClass
 metadata:
-  name: storageclass
+  name: allowed-storageclass
 spec:
   match:
     kinds:
