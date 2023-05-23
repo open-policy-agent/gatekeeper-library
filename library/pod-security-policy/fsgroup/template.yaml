@@ -46,13 +46,13 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package k8spspfsgroup
-
+        
         violation[{"msg": msg, "details": {}}] {
             spec := input.review.object.spec
             not input_fsGroup_allowed(spec)
             msg := sprintf("The provided pod spec fsGroup is not allowed, pod: %v. Allowed fsGroup: %v", [input.review.object.metadata.name, input.parameters])
         }
-
+        
         input_fsGroup_allowed(spec) {
             # RunAsAny - No range is required. Allows any fsGroup ID to be specified.
             input.parameters.rule == "RunAsAny"
@@ -90,4 +90,4 @@ spec:
         # has_field returns whether an object has a field
         has_field(object, field) = true {
             object[field]
-        }
+        }

@@ -61,9 +61,9 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package k8spspprocmount
-
+        
         import data.lib.exempt_container.is_exempt
-
+        
         violation[{"msg": msg, "details": {}}] {
             c := input_containers[_]
             not is_exempt(c)
@@ -71,7 +71,7 @@ spec:
             not input_proc_mount_type_allowed(allowedProcMount, c)
             msg := sprintf("ProcMount type is not allowed, container: %v. Allowed procMount types: %v", [c.name, allowedProcMount])
         }
-
+        
         input_proc_mount_type_allowed(allowedProcMount, c) {
             allowedProcMount == "default"
             lower(c.securityContext.procMount) == "default"
@@ -79,7 +79,7 @@ spec:
         input_proc_mount_type_allowed(allowedProcMount, c) {
             allowedProcMount == "unmasked"
         }
-
+        
         input_containers[c] {
             c := input.review.object.spec.containers[_]
             c.securityContext.procMount
@@ -92,7 +92,7 @@ spec:
             c := input.review.object.spec.ephemeralContainers[_]
             c.securityContext.procMount
         }
-
+        
         get_allowed_proc_mount(arg) = out {
             not arg.parameters
             out = "default"
@@ -110,34 +110,34 @@ spec:
             valid_proc_mount(arg.parameters.procMount)
             out = lower(arg.parameters.procMount)
         }
-
+        
         valid_proc_mount(str) {
             lower(str) == "default"
         }
         valid_proc_mount(str) {
             lower(str) == "unmasked"
-        }
+        }
       libs:
         - |
           package lib.exempt_container
-
+          
           is_exempt(container) {
               exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
               img := container.image
               exemption := exempt_images[_]
               _matches_exemption(img, exemption)
           }
-
+          
           _matches_exemption(img, exemption) {
               not endswith(exemption, "*")
               exemption == img
           }
-
+          
           _matches_exemption(img, exemption) {
               endswith(exemption, "*")
               prefix := trim_suffix(exemption, "*")
               startswith(img, prefix)
-          }
+          }
 
 ```
 

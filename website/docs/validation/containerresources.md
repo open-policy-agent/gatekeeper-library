@@ -62,17 +62,17 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package k8srequiredresources
-
+        
         import data.lib.exempt_container.is_exempt
-
+        
         violation[{"msg": msg}] {
           general_violation[{"msg": msg, "field": "containers"}]
         }
-
+        
         violation[{"msg": msg}] {
           general_violation[{"msg": msg, "field": "initContainers"}]
         }
-
+        
         general_violation[{"msg": msg, "field": field}] {
           container := input.review.object.spec[field][_]
           not is_exempt(container)
@@ -82,7 +82,7 @@ spec:
           count(missing) > 0
           msg := sprintf("container <%v> does not have <%v> limits defined", [container.name, missing])
         }
-
+        
         general_violation[{"msg": msg, "field": field}] {
           container := input.review.object.spec[field][_]
           not is_exempt(container)
@@ -91,28 +91,28 @@ spec:
           missing := required - provided
           count(missing) > 0
           msg := sprintf("container <%v> does not have <%v> requests defined", [container.name, missing])
-        }
+        }
       libs:
         - |
           package lib.exempt_container
-
+          
           is_exempt(container) {
               exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
               img := container.image
               exemption := exempt_images[_]
               _matches_exemption(img, exemption)
           }
-
+          
           _matches_exemption(img, exemption) {
               not endswith(exemption, "*")
               exemption == img
           }
-
+          
           _matches_exemption(img, exemption) {
               endswith(exemption, "*")
               prefix := trim_suffix(exemption, "*")
               startswith(img, prefix)
-          }
+          }
 
 ```
 
