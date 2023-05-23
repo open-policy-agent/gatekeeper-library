@@ -1,6 +1,11 @@
 package k8spspfsgroup
 
+import data.lib.exclude_update_patch.is_update_or_patch
+
 violation[{"msg": msg, "details": {}}] {
+    # spec.securityContext.fsGroup field is immutable.
+    not is_update_or_patch(input.review)
+
     spec := input.review.object.spec
     not input_fsGroup_allowed(spec)
     msg := sprintf("The provided pod spec fsGroup is not allowed, pod: %v. Allowed fsGroup: %v", [input.review.object.metadata.name, input.parameters])

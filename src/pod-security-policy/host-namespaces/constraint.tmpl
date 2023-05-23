@@ -4,7 +4,7 @@ metadata:
   name: k8spsphostnamespace
   annotations:
     metadata.gatekeeper.sh/title: "Host Namespace"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Disallows sharing of host PID and IPC namespaces by pod containers.
       Corresponds to the `hostPID` and `hostIPC` fields in a PodSecurityPolicy.
@@ -28,3 +28,6 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
 {{ file.Read "src/pod-security-policy/host-namespaces/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
+      libs:
+        - |
+{{ file.Read "src/pod-security-policy/host-namespaces/lib_exclude_update_patch.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}

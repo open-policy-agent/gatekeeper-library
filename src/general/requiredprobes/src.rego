@@ -1,10 +1,15 @@
 package k8srequiredprobes
 
+import data.lib.exclude_update_patch.is_update_or_patch
+
 probe_type_set = probe_types {
     probe_types := {type | type := input.parameters.probeTypes[_]}
 }
 
 violation[{"msg": msg}] {
+    # Probe fields are immutable.
+    not is_update_or_patch(input.review)
+
     container := input.review.object.spec.containers[_]
     probe := input.parameters.probes[_]
     probe_is_missing(container, probe)

@@ -1,6 +1,11 @@
 package k8spsphostfilesystem
 
+import data.lib.exclude_update_patch.is_update_or_patch
+
 violation[{"msg": msg, "details": {}}] {
+    # spec.volumes field is immutable.
+    not is_update_or_patch(input.review)
+
     volume := input_hostpath_volumes[_]
     allowedPaths := get_allowed_paths(input)
     input_hostpath_violation(allowedPaths, volume)

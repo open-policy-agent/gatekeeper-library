@@ -1,8 +1,12 @@
 package capabilities
 
+import data.lib.exclude_update_patch.is_update_or_patch
 import data.lib.exempt_container.is_exempt
 
 violation[{"msg": msg}] {
+  # spec.containers.securityContext.capabilities field is immutable.
+  not is_update_or_patch(input.review)
+
   container := input.review.object.spec.containers[_]
   not is_exempt(container)
   has_disallowed_capabilities(container)
@@ -10,6 +14,7 @@ violation[{"msg": msg}] {
 }
 
 violation[{"msg": msg}] {
+  not is_update_or_patch(input.review)
   container := input.review.object.spec.containers[_]
   not is_exempt(container)
   missing_drop_capabilities(container)
@@ -19,6 +24,7 @@ violation[{"msg": msg}] {
 
 
 violation[{"msg": msg}] {
+  not is_update_or_patch(input.review)
   container := input.review.object.spec.initContainers[_]
   not is_exempt(container)
   has_disallowed_capabilities(container)
@@ -26,6 +32,7 @@ violation[{"msg": msg}] {
 }
 
 violation[{"msg": msg}] {
+  not is_update_or_patch(input.review)
   container := input.review.object.spec.initContainers[_]
   not is_exempt(container)
   missing_drop_capabilities(container)
@@ -35,6 +42,7 @@ violation[{"msg": msg}] {
 
 
 violation[{"msg": msg}] {
+  not is_update_or_patch(input.review)
   container := input.review.object.spec.ephemeralContainers[_]
   not is_exempt(container)
   has_disallowed_capabilities(container)
@@ -42,6 +50,7 @@ violation[{"msg": msg}] {
 }
 
 violation[{"msg": msg}] {
+  not is_update_or_patch(input.review)
   container := input.review.object.spec.ephemeralContainers[_]
   not is_exempt(container)
   missing_drop_capabilities(container)

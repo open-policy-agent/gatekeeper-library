@@ -1,8 +1,12 @@
 package k8spspreadonlyrootfilesystem
 
+import data.lib.exclude_update_patch.is_update_or_patch
 import data.lib.exempt_container.is_exempt
 
 violation[{"msg": msg, "details": {}}] {
+    # spec.containers.readOnlyRootFilesystem field is immutable.
+    not is_update_or_patch(input.review)
+
     c := input_containers[_]
     not is_exempt(c)
     input_read_only_root_fs(c)

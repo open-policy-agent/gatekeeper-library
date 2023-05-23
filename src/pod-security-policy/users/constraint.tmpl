@@ -4,7 +4,7 @@ metadata:
   name: k8spspallowedusers
   annotations:
     metadata.gatekeeper.sh/title: "Allowed Users"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Controls the user and group IDs of the container and some volumes.
       Corresponds to the `runAsUser`, `runAsGroup`, `supplementalGroups`, and
@@ -135,5 +135,7 @@ spec:
       rego: |
 {{ file.Read "src/pod-security-policy/users/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
       libs:
+        - |
+{{ file.Read "src/pod-security-policy/users/lib_exclude_update_patch.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}
         - |
 {{ file.Read "src/pod-security-policy/users/lib_exempt_container.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}

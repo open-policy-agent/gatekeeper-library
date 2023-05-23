@@ -4,7 +4,7 @@ metadata:
   name: k8spspfsgroup
   annotations:
     metadata.gatekeeper.sh/title: "FS Group"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Controls allocating an FSGroup that owns the Pod's volumes. Corresponds
       to the `fsGroup` field in a PodSecurityPolicy. For more information, see
@@ -46,3 +46,6 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
 {{ file.Read "src/pod-security-policy/fsgroup/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
+      libs:
+        - |
+{{ file.Read "src/pod-security-policy/fsgroup/lib_exclude_update_patch.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}
