@@ -52,16 +52,16 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package k8srequiredlabels
-        
+
         get_message(parameters, _default) = msg {
           not parameters.message
           msg := _default
         }
-        
+
         get_message(parameters, _default) = msg {
           msg := parameters.message
         }
-        
+
         violation[{"msg": msg, "details": {"missing_labels": missing}}] {
           provided := {label | input.review.object.metadata.labels[label]}
           required := {label | label := input.parameters.labels[_].key}
@@ -70,7 +70,7 @@ spec:
           def_msg := sprintf("you must provide labels: %v", [missing])
           msg := get_message(input.parameters, def_msg)
         }
-        
+
         violation[{"msg": msg}] {
           value := input.review.object.metadata.labels[key]
           expected := input.parameters.labels[_]
@@ -80,7 +80,7 @@ spec:
           not re_match(expected.allowedRegex, value)
           def_msg := sprintf("Label <%v: %v> does not satisfy allowed regex: %v", [key, value, expected.allowedRegex])
           msg := get_message(input.parameters, def_msg)
-        }
+        }
 
 ```
 

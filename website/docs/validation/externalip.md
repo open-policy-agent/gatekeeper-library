@@ -41,7 +41,7 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package k8sexternalips
-        
+
         violation[{"msg": msg}] {
           input.review.kind.kind == "Service"
           input.review.kind.group == ""
@@ -50,7 +50,7 @@ spec:
           forbiddenIPs := externalIPs - allowedIPs
           count(forbiddenIPs) > 0
           msg := sprintf("service has forbidden external IPs: %v", [forbiddenIPs])
-        }
+        }
 
 ```
 

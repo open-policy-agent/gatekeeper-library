@@ -41,7 +41,7 @@ spec:
   - target: admission.k8s.gatekeeper.sh
     rego: |
       package noupdateserviceaccount
-      
+
       privileged(userInfo, allowedUsers, allowedGroups) {
         # Allow if the user is in allowedUsers.
         # Use object.get so omitted parameters can't cause policy bypass by
@@ -58,7 +58,7 @@ spec:
         intersection := groups & allowed
         count(intersection) > 0
       }
-      
+
       get_service_account(obj) = spec {
         obj.kind == "Pod"
         spec := obj.spec.serviceAccountName
@@ -84,21 +84,21 @@ spec:
         obj.kind == "CronJob"
         spec := obj.spec.jobTemplate.spec.template.spec.serviceAccountName
       }
-      
+
       violation[{"msg": msg}] {
         # This policy only applies to updates of existing resources.
         input.review.operation == "UPDATE"
-      
+
         # Use object.get so omitted parameters can't cause policy bypass by
         # evaluating to undefined.
         params := object.get(input, "parameters", {})
         allowedUsers := object.get(params, "allowedUsers", [])
         allowedGroups := object.get(params, "allowedGroups", [])
-      
+
         # Extract the service account.
         oldKSA := get_service_account(input.review.oldObject)
         newKSA := get_service_account(input.review.object)
-      
+
         # Deny unprivileged users and groups from changing serviceAccountName.
         not privileged(input.review.userInfo, allowedUsers, allowedGroups)
         oldKSA != newKSA
@@ -113,7 +113,7 @@ spec:
         input.review.operation == "UPDATE"
         not get_service_account(input.review.oldObject)
         msg := "missing serviceAccountName field in oldObject under review"
-      }
+      }
 
 ```
 

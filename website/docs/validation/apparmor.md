@@ -56,9 +56,9 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package k8spspapparmor
-        
+
         import data.lib.exempt_container.is_exempt
-        
+
         violation[{"msg": msg, "details": {}}] {
             metadata := input.review.object.metadata
             container := input_containers[_]
@@ -66,11 +66,11 @@ spec:
             not input_apparmor_allowed(container, metadata)
             msg := sprintf("AppArmor profile is not allowed, pod: %v, container: %v. Allowed profiles: %v", [input.review.object.metadata.name, container.name, input.parameters.allowedProfiles])
         }
-        
+
         input_apparmor_allowed(container, metadata) {
             get_annotation_for(container, metadata) == input.parameters.allowedProfiles[_]
         }
-        
+
         input_containers[c] {
             c := input.review.object.spec.containers[_]
         }
@@ -80,35 +80,35 @@ spec:
         input_containers[c] {
             c := input.review.object.spec.ephemeralContainers[_]
         }
-        
+
         get_annotation_for(container, metadata) = out {
             out = metadata.annotations[sprintf("container.apparmor.security.beta.kubernetes.io/%v", [container.name])]
         }
         get_annotation_for(container, metadata) = out {
             not metadata.annotations[sprintf("container.apparmor.security.beta.kubernetes.io/%v", [container.name])]
             out = "runtime/default"
-        }
+        }
       libs:
         - |
           package lib.exempt_container
-          
+
           is_exempt(container) {
               exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
               img := container.image
               exemption := exempt_images[_]
               _matches_exemption(img, exemption)
           }
-          
+
           _matches_exemption(img, exemption) {
               not endswith(exemption, "*")
               exemption == img
           }
-          
+
           _matches_exemption(img, exemption) {
               endswith(exemption, "*")
               prefix := trim_suffix(exemption, "*")
               startswith(img, prefix)
-          }
+          }
 
 ```
 

@@ -44,31 +44,31 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
         package k8suniqueserviceselector
-        
+
         make_apiversion(kind) = apiVersion {
           g := kind.group
           v := kind.version
           g != ""
           apiVersion = sprintf("%v/%v", [g, v])
         }
-        
+
         make_apiversion(kind) = apiVersion {
           kind.group == ""
           apiVersion = kind.version
         }
-        
+
         identical(obj, review) {
           obj.metadata.namespace == review.namespace
           obj.metadata.name == review.name
           obj.kind == review.kind.kind
           obj.apiVersion == make_apiversion(review.kind)
         }
-        
+
         flatten_selector(obj) = flattened {
           selectors := [s | s = concat(":", [key, val]); val = obj.spec.selector[key]]
           flattened := concat(",", sort(selectors))
         }
-        
+
         violation[{"msg": msg}] {
           input.review.kind.kind == "Service"
           input.review.kind.version == "v1"
@@ -79,7 +79,7 @@ spec:
           other_selector := flatten_selector(other)
           input_selector == other_selector
           msg := sprintf("same selector as service <%v> in namespace <%v>", [name, namespace])
-        }
+        }
 
 ```
 

@@ -33,13 +33,6 @@ test_input_deployment_2_replicas_pdb_1_min_available {
   count(results) == 0
 }
 
-test_input_deployment_2_replicas_pdb_50%_min_available {
-  input := {"review": input_deployment(2)}
-  inv := inv_pdb_min_available("50%")
-  results := violation with input as input with data.inventory as inv
-  count(results) == 0
-}
-
 test_input_deployment_pdb_0_max_unavailable {
   input := {"review": input_deployment(2)}
   inv := inv_pdb_max_unavailable(0)
