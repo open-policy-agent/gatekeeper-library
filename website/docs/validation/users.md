@@ -16,7 +16,7 @@ metadata:
   name: k8spspallowedusers
   annotations:
     metadata.gatekeeper.sh/title: "Allowed Users"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Controls the user and group IDs of the container and some volumes.
       Corresponds to the `runAsUser`, `runAsGroup`, `supplementalGroups`, and
@@ -147,9 +147,13 @@ spec:
       rego: |
         package k8spspallowedusers
 
+        import data.lib.exclude_update_patch.is_update_or_patch
         import data.lib.exempt_container.is_exempt
 
         violation[{"msg": msg}] {
+          # runAsUser, runAsGroup, supplementalGroups, fsGroup fields are immutable.
+          not is_update_or_patch(input.review)
+
           fields := ["runAsUser", "runAsGroup", "supplementalGroups", "fsGroup"]
           field := fields[_]
           container := input_containers[_]
@@ -272,6 +276,14 @@ spec:
             c := input.review.object.spec.ephemeralContainers[_]
         }
       libs:
+        - |
+          package lib.exclude_update_patch
+
+          import future.keywords.in
+
+          is_update_or_patch(review) {
+              review.operation in ["UPDATE", "PATCH"]
+          }
         - |
           package lib.exempt_container
 

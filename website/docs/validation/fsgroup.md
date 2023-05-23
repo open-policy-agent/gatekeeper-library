@@ -16,7 +16,7 @@ metadata:
   name: k8spspfsgroup
   annotations:
     metadata.gatekeeper.sh/title: "FS Group"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Controls allocating an FSGroup that owns the Pod's volumes. Corresponds
       to the `fsGroup` field in a PodSecurityPolicy. For more information, see
@@ -59,7 +59,12 @@ spec:
       rego: |
         package k8spspfsgroup
 
+        import data.lib.exclude_update_patch.is_update_or_patch
+
         violation[{"msg": msg, "details": {}}] {
+            # spec.securityContext.fsGroup field is immutable.
+            not is_update_or_patch(input.review)
+
             spec := input.review.object.spec
             not input_fsGroup_allowed(spec)
             msg := sprintf("The provided pod spec fsGroup is not allowed, pod: %v. Allowed fsGroup: %v", [input.review.object.metadata.name, input.parameters])
@@ -103,6 +108,15 @@ spec:
         has_field(object, field) = true {
             object[field]
         }
+      libs:
+        - |
+          package lib.exclude_update_patch
+
+          import future.keywords.in
+
+          is_update_or_patch(review) {
+              review.operation in ["UPDATE", "PATCH"]
+          }
 
 ```
 

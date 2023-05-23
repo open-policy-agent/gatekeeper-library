@@ -16,7 +16,7 @@ metadata:
   name: k8spspselinuxv2
   annotations:
     metadata.gatekeeper.sh/title: "SELinux V2"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Defines an allow-list of seLinuxOptions configurations for pod
       containers. Corresponds to a PodSecurityPolicy requiring SELinux configs.
@@ -71,16 +71,23 @@ spec:
       rego: |
         package k8spspselinux
 
+        import data.lib.exclude_update_patch.is_update_or_patch
         import data.lib.exempt_container.is_exempt
 
         # Disallow top level custom SELinux options
         violation[{"msg": msg, "details": {}}] {
+            # spec.securityContext.seLinuxOptions field is immutable.
+            not is_update_or_patch(input.review)
+
             has_field(input.review.object.spec.securityContext, "seLinuxOptions")
             not input_seLinuxOptions_allowed(input.review.object.spec.securityContext.seLinuxOptions)
             msg := sprintf("SELinux options is not allowed, pod: %v. Allowed options: %v", [input.review.object.metadata.name, input.parameters.allowedSELinuxOptions])
         }
         # Disallow container level custom SELinux options
         violation[{"msg": msg, "details": {}}] {
+            # spec.containers.securityContext.seLinuxOptions field is immutable.
+            not is_update_or_patch(input.review)
+
             c := input_security_context[_]
             not is_exempt(c)
             has_field(c.securityContext, "seLinuxOptions")
@@ -121,6 +128,14 @@ spec:
             object[field]
         }
       libs:
+        - |
+          package lib.exclude_update_patch
+
+          import future.keywords.in
+
+          is_update_or_patch(review) {
+              review.operation in ["UPDATE", "PATCH"]
+          }
         - |
           package lib.exempt_container
 

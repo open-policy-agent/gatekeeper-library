@@ -1,0 +1,17 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: flexvolume-drivers
+tests:
+  - name: flexvolume-drivers
+    template: template.yaml
+    constraint: samples/psp-flexvolume-drivers/constraint.yaml
+    cases:
+      - name: example-allowed
+        object: samples/psp-flexvolume-drivers/example_allowed.yaml
+        assertions:
+          - violations: no
+      - name: example-disallowed
+        object: samples/psp-flexvolume-drivers/example_disallowed.yaml
+        assertions:
+          - violations: yes

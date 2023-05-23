@@ -16,7 +16,7 @@ metadata:
   name: k8spspflexvolumes
   annotations:
     metadata.gatekeeper.sh/title: "FlexVolumes"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Controls the allowlist of FlexVolume drivers. Corresponds to the
       `allowedFlexVolumes` field in PodSecurityPolicy. For more information,
@@ -51,7 +51,12 @@ spec:
       rego: |
         package k8spspflexvolumes
 
+        import data.lib.exclude_update_patch.is_update_or_patch
+
         violation[{"msg": msg, "details": {}}] {
+            # spec.volumes field is immutable.
+            not is_update_or_patch(input.review)
+
             volume := input_flexvolumes[_]
             not input_flexvolumes_allowed(volume)
             msg := sprintf("FlexVolume %v is not allowed, pod: %v. Allowed drivers: %v", [volume, input.review.object.metadata.name, input.parameters.allowedFlexVolumes])
@@ -70,6 +75,15 @@ spec:
         has_field(object, field) = true {
             object[field]
         }
+      libs:
+        - |
+          package lib.exclude_update_patch
+
+          import future.keywords.in
+
+          is_update_or_patch(review) {
+              review.operation in ["UPDATE", "PATCH"]
+          }
 
 ```
 

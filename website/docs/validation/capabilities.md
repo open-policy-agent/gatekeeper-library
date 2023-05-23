@@ -16,7 +16,7 @@ metadata:
   name: k8spspcapabilities
   annotations:
     metadata.gatekeeper.sh/title: "Capabilities"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Controls Linux capabilities on containers. Corresponds to the
       `allowedCapabilities` and `requiredDropCapabilities` fields in a
@@ -62,9 +62,13 @@ spec:
       rego: |
         package capabilities
 
+        import data.lib.exclude_update_patch.is_update_or_patch
         import data.lib.exempt_container.is_exempt
 
         violation[{"msg": msg}] {
+          # spec.containers.securityContext.capabilities field is immutable.
+          not is_update_or_patch(input.review)
+
           container := input.review.object.spec.containers[_]
           not is_exempt(container)
           has_disallowed_capabilities(container)
@@ -72,6 +76,7 @@ spec:
         }
 
         violation[{"msg": msg}] {
+          not is_update_or_patch(input.review)
           container := input.review.object.spec.containers[_]
           not is_exempt(container)
           missing_drop_capabilities(container)
@@ -81,6 +86,7 @@ spec:
 
 
         violation[{"msg": msg}] {
+          not is_update_or_patch(input.review)
           container := input.review.object.spec.initContainers[_]
           not is_exempt(container)
           has_disallowed_capabilities(container)
@@ -88,6 +94,7 @@ spec:
         }
 
         violation[{"msg": msg}] {
+          not is_update_or_patch(input.review)
           container := input.review.object.spec.initContainers[_]
           not is_exempt(container)
           missing_drop_capabilities(container)
@@ -97,6 +104,7 @@ spec:
 
 
         violation[{"msg": msg}] {
+          not is_update_or_patch(input.review)
           container := input.review.object.spec.ephemeralContainers[_]
           not is_exempt(container)
           has_disallowed_capabilities(container)
@@ -104,6 +112,7 @@ spec:
         }
 
         violation[{"msg": msg}] {
+          not is_update_or_patch(input.review)
           container := input.review.object.spec.ephemeralContainers[_]
           not is_exempt(container)
           missing_drop_capabilities(container)
@@ -138,6 +147,14 @@ spec:
           out = _default
         }
       libs:
+        - |
+          package lib.exclude_update_patch
+
+          import future.keywords.in
+
+          is_update_or_patch(review) {
+              review.operation in ["UPDATE", "PATCH"]
+          }
         - |
           package lib.exempt_container
 

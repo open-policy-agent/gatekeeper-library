@@ -16,7 +16,7 @@ metadata:
   name: k8spsphostfilesystem
   annotations:
     metadata.gatekeeper.sh/title: "Host Filesystem"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Controls usage of the host filesystem. Corresponds to the
       `allowedHostPaths` field in a PodSecurityPolicy. For more information,
@@ -54,7 +54,12 @@ spec:
       rego: |
         package k8spsphostfilesystem
 
+        import data.lib.exclude_update_patch.is_update_or_patch
+
         violation[{"msg": msg, "details": {}}] {
+            # spec.volumes field is immutable.
+            not is_update_or_patch(input.review)
+
             volume := input_hostpath_volumes[_]
             allowedPaths := get_allowed_paths(input)
             input_hostpath_violation(allowedPaths, volume)
@@ -146,6 +151,15 @@ spec:
         input_containers[c] {
             c := input.review.object.spec.ephemeralContainers[_]
         }
+      libs:
+        - |
+          package lib.exclude_update_patch
+
+          import future.keywords.in
+
+          is_update_or_patch(review) {
+              review.operation in ["UPDATE", "PATCH"]
+          }
 
 ```
 
