@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: inventory-nginx-pdb-allowed-5
+  namespace: default
+spec:
+  minAvailable: 50%
+  selector:
+    matchLabels:
+      app: nginx
