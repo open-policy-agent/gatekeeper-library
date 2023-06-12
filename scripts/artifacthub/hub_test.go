@@ -119,7 +119,7 @@ func TestCopyDirectory(t *testing.T) {
 
 	// create a file in the src directory
 	srcFilePath := srcDirPath + "/test.txt"
-	if os.WriteFile(srcFilePath, []byte("test"), 0o644) != nil {
+	if os.WriteFile(srcFilePath, []byte("test"), 0o600) != nil {
 		t.Errorf("error writing file")
 	}
 
@@ -173,7 +173,7 @@ type MockClient struct {
 }
 
 // Get is a method of MockClient that returns the pre-configured response and error.
-func (c MockClient) Get(url string) (*http.Response, error) {
+func (c MockClient) Get(_ string) (*http.Response, error) {
 	return c.Resp, c.Err
 }
 
@@ -245,7 +245,7 @@ func TestCheckVersion(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			githubConstraintTemplateBytes, err := yaml.Marshal(tc.githubConstraintTemplate)
+			githubConstraintTemplateBytes, _ := yaml.Marshal(tc.githubConstraintTemplate)
 
 			// Create a mock client with a pre-configured response and error.
 			mockResp := &http.Response{
@@ -257,7 +257,7 @@ func TestCheckVersion(t *testing.T) {
 				Err:  tc.httpError,
 			}
 
-			err = checkVersion(mockClient, tc.artifactHubMetadata, "path/to/constraint/template.yaml")
+			err := checkVersion(mockClient, tc.artifactHubMetadata, "path/to/constraint/template.yaml")
 
 			if tc.expectedErrorMessage != "" {
 				if err == nil {

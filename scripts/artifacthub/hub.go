@@ -83,17 +83,17 @@ type DefaultClient struct{}
 
 // Get is a method of DefaultClient that makes the actual HTTP GET request.
 func (c DefaultClient) Get(url string) (*http.Response, error) {
-	return http.Get(url)
+	return http.Get(url) //nolint
 }
 
 const (
-	// entryPoint is the directory entry point for artifact hub
+	// entryPoint is the directory entry point for artifact hub.
 	ahEntryPoint = "artifacthub"
 
-	// directory entry point for library
+	// directory entry point for library.
 	entryPoint = "library"
 
-	// raw github source URL
+	// raw github source URL.
 	sourceURL = "https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/"
 )
 
@@ -151,7 +151,7 @@ func main() {
 }
 
 func createVersionDirectory(rootDir, basePath, githubSourceRelativePath string, constraintTemplate map[string]interface{}) {
-	version := fmt.Sprintf("%s", constraintTemplate["metadata"].(map[string]interface{})["annotations"].(map[string]interface{})["metadata.gatekeeper.sh/version"])
+	version := getConstraintTemplateVersion(constraintTemplate)
 
 	// create directory if not exists
 	destination := filepath.Join(rootDir, ahEntryPoint, basePath, version)
@@ -192,11 +192,11 @@ func addArtifactHubMetadata(sourceDirectory, destinationPath, ahBasePath, github
 		}
 
 		artifactHubMetadata = &ArtifactHubMetadata{
-			Version:     fmt.Sprintf("%s", constraintTemplate["metadata"].(map[string]interface{})["annotations"].(map[string]interface{})["metadata.gatekeeper.sh/version"]),
-			Name:        fmt.Sprintf("%s", constraintTemplate["metadata"].(map[string]interface{})["name"]),
-			DisplayName: fmt.Sprintf("%s", constraintTemplate["metadata"].(map[string]interface{})["annotations"].(map[string]interface{})["metadata.gatekeeper.sh/title"]),
+			Version:     getConstraintTemplateVersion(constraintTemplate),
+			Name:        getConstraintTemplateName(constraintTemplate),
+			DisplayName: getConstraintTemplateTitle(constraintTemplate),
 			CreatedAt:   currentDateTime.Format(time.RFC3339),
-			Description: fmt.Sprintf("%s", constraintTemplate["metadata"].(map[string]interface{})["annotations"].(map[string]interface{})["description"]),
+			Description: getConstraintTemplateDescription(constraintTemplate),
 			License:     "Apache-2.0",
 			HomeURL:     "https://open-policy-agent.github.io/gatekeeper-library/website/" + sourceDirectory,
 			Keywords: []string{
@@ -211,7 +211,7 @@ func addArtifactHubMetadata(sourceDirectory, destinationPath, ahBasePath, github
 			},
 			Install: fmt.Sprintf("### Usage\n```shell\nkubectl apply -f %s\n```", sourceURL+filepath.Join(ahBasePath, "template.yaml")),
 			Readme: fmt.Sprintf(`# %s
-%s`, constraintTemplate["metadata"].(map[string]interface{})["annotations"].(map[string]interface{})["metadata.gatekeeper.sh/title"], constraintTemplate["metadata"].(map[string]interface{})["annotations"].(map[string]interface{})["description"]),
+%s`, getConstraintTemplateTitle(constraintTemplate), getConstraintTemplateDescription(constraintTemplate)),
 		}
 	} else {
 		// when metadata file already exists, check version to make sure it's updated if constraint template is changed
@@ -230,7 +230,7 @@ func addArtifactHubMetadata(sourceDirectory, destinationPath, ahBasePath, github
 		panic(err)
 	}
 
-	err = os.WriteFile(filepath.Join(destinationPath, "artifacthub-pkg.yml"), artifactHubMetadataBytes, 0o644)
+	err = os.WriteFile(filepath.Join(destinationPath, "artifacthub-pkg.yml"), artifactHubMetadataBytes, 0o600)
 	if err != nil {
 		fmt.Println("error while writing artifact hub metadata")
 		panic(err)
@@ -242,7 +242,7 @@ func checkVersion(httpClient HTTPClient, artifactHubMetadata *ArtifactHubMetadat
 	githubTemplateURL := sourceURL + githubSourceRelativePath
 	resp, err := httpClient.Get(githubTemplateURL)
 	if err != nil {
-		return fmt.Errorf("error while getting constraint template from github: %v", err)
+		return fmt.Errorf("error while getting constraint template from github: %w", err)
 	}
 	if resp.StatusCode == http.StatusNotFound {
 		fmt.Printf("constraint template %s not found in github. It is likely that constraint template is being updated locally and not merged to github yet.\n", githubSourceRelativePath)
@@ -265,7 +265,7 @@ func checkVersion(httpClient HTTPClient, artifactHubMetadata *ArtifactHubMetadat
 	githubConstraintTemplateHash := getConstraintTemplateHash(githubConstraintTemplate)
 	if artifactHubMetadata.Digest != githubConstraintTemplateHash {
 		// compare version
-		if artifactHubMetadata.Version == githubConstraintTemplate["metadata"].(map[string]interface{})["annotations"].(map[string]interface{})["metadata.gatekeeper.sh/version"].(string) {
+		if artifactHubMetadata.Version == getConstraintTemplateVersion(githubConstraintTemplate) {
 			// panic if version is same but hash is different
 			return fmt.Errorf("looks like template.yaml is updated but the version is not. Please update the 'metadata.gatekeeper.sh/version' annotation in the template.yaml source")
 		}
@@ -308,7 +308,7 @@ func getMetadataIfExist(metadataFilePath string) *ArtifactHubMetadata {
 	return nil
 }
 
-// copyDirectory copies a whole directory recursively
+// copyDirectory copies a whole directory recursively.
 func copyDirectory(src string, dst string) error {
 	var err error
 	var directoryFileInfo []fs.DirEntry
@@ -345,7 +345,7 @@ func copyDirectory(src string, dst string) error {
 	return nil
 }
 
-// copyFile copies a single file from src to dst
+// copyFile copies a single file from src to dst.
 func copyFile(src, dst string) error {
 	var err error
 	var sourceFile *os.File
@@ -370,4 +370,47 @@ func copyFile(src, dst string) error {
 		return err
 	}
 	return os.Chmod(dst, sourceFileInfo.Mode())
+}
+
+func getConstraintTemplateMetadata(constraintTemplate map[string]interface{}) map[string]interface{} {
+	metadata, ok := constraintTemplate["metadata"].(map[string]interface{})
+	if !ok {
+		panic("error while retrieving constraintTemplate metadata")
+	}
+	return metadata
+}
+
+func getConstraintTemplateAnnotations(constraintTemplate map[string]interface{}) map[string]interface{} {
+	metadata := getConstraintTemplateMetadata(constraintTemplate)
+
+	annotations, ok := metadata["annotations"].(map[string]interface{})
+	if !ok {
+		panic("error while retrieving constraintTemplate annotations")
+	}
+
+	return annotations
+}
+
+func getConstraintTemplateName(constraintTemplate map[string]interface{}) string {
+	metadata := getConstraintTemplateMetadata(constraintTemplate)
+
+	return fmt.Sprintf("%s", metadata["name"])
+}
+
+func getConstraintTemplateVersion(constraintTemplate map[string]interface{}) string {
+	annotations := getConstraintTemplateAnnotations(constraintTemplate)
+
+	return fmt.Sprintf("%s", annotations["metadata.gatekeeper.sh/version"])
+}
+
+func getConstraintTemplateTitle(constraintTemplate map[string]interface{}) string {
+	annotations := getConstraintTemplateAnnotations(constraintTemplate)
+
+	return fmt.Sprintf("%s", annotations["metadata.gatekeeper.sh/title"])
+}
+
+func getConstraintTemplateDescription(constraintTemplate map[string]interface{}) string {
+	annotations := getConstraintTemplateAnnotations(constraintTemplate)
+
+	return fmt.Sprintf("%s", annotations["description"])
 }
