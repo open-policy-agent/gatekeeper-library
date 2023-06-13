@@ -1,7 +1,5 @@
 run:
   timeout: 5m
-  skip-files:
-    - pkg/target/matchcrd_constant.go
 
 linters-settings:
   gocritic:
