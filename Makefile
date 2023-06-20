@@ -10,6 +10,7 @@ GOMPLATE_VERSION ?= 3.10.0
 
 REPO_ROOT := $(shell git rev-parse --show-toplevel)
 WEBSITE_SCRIPT_DIR := $(REPO_ROOT)/scripts/website
+VALIDATE_SCRIPT_DIR := $(REPO_ROOT)/scripts/validate
 ARTIFACTHUB_SCRIPT_DIR := $(REPO_ROOT)/scripts/artifacthub
 REQUIRE_SYNC_SCRIPT_DIR := $(REPO_ROOT)/scripts/require-sync
 
@@ -73,9 +74,18 @@ require-sync:
 generate-website-docs:
 	cd $(WEBSITE_SCRIPT_DIR); go run generate.go
 
+.PHONY: unit-test
+unit-test:
+	cd $(ARTIFACTHUB_SCRIPT_DIR); go test -v
+	cd $(VALIDATE_SCRIPT_DIR); go test -v
+
 .PHONY: generate-artifacthub-artifacts
 generate-artifacthub-artifacts:
-	cd $(ARTIFACTHUB_SCRIPT_DIR); go test -v && go run hub.go
+	cd $(ARTIFACTHUB_SCRIPT_DIR); go run hub.go
+
+.PHONY: validate
+validate:
+	cd $(VALIDATE_SCRIPT_DIR); go run validate.go
 
 .PHONY: generate-all
 generate-all: generate generate-website-docs generate-artifacthub-artifacts

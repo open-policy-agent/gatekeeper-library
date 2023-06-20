@@ -1,8 +1,14 @@
 package main
 
 import (
+	"errors"
+	"io"
+	"net/http"
 	"os"
+	"strings"
 	"testing"
+
+	"gopkg.in/yaml.v3"
 )
 
 const (
@@ -159,13 +165,25 @@ func TestCopyDirectory(t *testing.T) {
 	}
 }
 
+// MockClient is a mock implementation of the HTTPClient interface for testing.
+type MockClient struct {
+	Resp *http.Response
+	Err  error
+}
+
+// Get is a method of MockClient that returns the pre-configured response and error.
+func (c MockClient) Get(url string) (*http.Response, error) {
+	return c.Resp, c.Err
+}
+
 func TestCheckVersion(t *testing.T) {
 	testCases := []struct {
-		name                      string
-		artifactHubMetadata       *ArtifactHubMetadata
-		constraintTemplate        map[string]interface{}
-		newConstraintTemplateHash string
-		expectedError             bool
+		name                     string
+		artifactHubMetadata      *ArtifactHubMetadata
+		httpStatus               int
+		httpError                error
+		githubConstraintTemplate map[string]interface{}
+		expectedErrorMessage     string
 	}{
 		{
 			name: "invalid version",
@@ -173,47 +191,83 @@ func TestCheckVersion(t *testing.T) {
 				Digest:  "invalid-digest",
 				Version: "v1.0.0",
 			},
-			newConstraintTemplateHash: "some-random-hash",
-			constraintTemplate: map[string]interface{}{
+			httpStatus: http.StatusOK,
+			githubConstraintTemplate: map[string]interface{}{
 				"metadata": map[string]interface{}{
 					"annotations": map[string]interface{}{
 						"metadata.gatekeeper.sh/version": "v1.0.0",
 					},
 				},
 			},
-			expectedError: true,
+			expectedErrorMessage: "looks like template.yaml is updated but the version is not. Please update the 'metadata.gatekeeper.sh/version' annotation in the template.yaml source",
 		},
 		{
 			name: "valid version with same digest",
 			artifactHubMetadata: &ArtifactHubMetadata{
-				Digest: "same-digest",
+				Digest: "600ca4d7048b1b64a5d80aaabf015eceef5d613c2f5a0a3d31e5360535d3c6e8",
 			},
-			newConstraintTemplateHash: "same-digest",
-			expectedError:             false,
-		},
-		{
-			name: "valid version with different digest",
-			artifactHubMetadata: &ArtifactHubMetadata{
-				Digest:  "digest",
-				Version: "v1.0.0",
-			},
-			newConstraintTemplateHash: "different-digest",
-			constraintTemplate: map[string]interface{}{
+			httpStatus: http.StatusOK,
+			githubConstraintTemplate: map[string]interface{}{
 				"metadata": map[string]interface{}{
 					"annotations": map[string]interface{}{
-						"metadata.gatekeeper.sh/version": "v1.0.1",
+						"metadata.gatekeeper.sh/version": "v1.0.0",
 					},
 				},
 			},
-			expectedError: false,
+		},
+		{
+			name: "valid version bump with different digest",
+			artifactHubMetadata: &ArtifactHubMetadata{
+				Digest:  "digest",
+				Version: "v1.0.1",
+			},
+			httpStatus: http.StatusOK,
+			githubConstraintTemplate: map[string]interface{}{
+				"metadata": map[string]interface{}{
+					"annotations": map[string]interface{}{
+						"metadata.gatekeeper.sh/version": "v1.0.0",
+					},
+				},
+			},
+		},
+		{
+			name:       "template not found",
+			httpStatus: http.StatusNotFound,
+		},
+		{
+			name:                 "get template error",
+			httpStatus:           http.StatusOK,
+			httpError:            errors.New("fake error"),
+			expectedErrorMessage: "error while getting constraint template from github: fake error",
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			err := checkVersion(tc.artifactHubMetadata, tc.constraintTemplate, tc.newConstraintTemplateHash)
-			if err != nil && !tc.expectedError {
-				t.Errorf("expected error to be nil")
+			githubConstraintTemplateBytes, err := yaml.Marshal(tc.githubConstraintTemplate)
+
+			// Create a mock client with a pre-configured response and error.
+			mockResp := &http.Response{
+				StatusCode: tc.httpStatus,
+				Body:       io.NopCloser(strings.NewReader(string(githubConstraintTemplateBytes))),
+			}
+			mockClient := MockClient{
+				Resp: mockResp,
+				Err:  tc.httpError,
+			}
+
+			err = checkVersion(mockClient, tc.artifactHubMetadata, "path/to/constraint/template.yaml")
+
+			if tc.expectedErrorMessage != "" {
+				if err == nil {
+					t.Errorf("Expected error '%s', but got no error", tc.expectedErrorMessage)
+				} else if err.Error() != tc.expectedErrorMessage {
+					t.Errorf("Expected error '%s', but got '%s'", tc.expectedErrorMessage, err.Error())
+				}
+			} else {
+				if err != nil {
+					t.Errorf("Expected no error, but got '%s'", err.Error())
+				}
 			}
 		})
 	}

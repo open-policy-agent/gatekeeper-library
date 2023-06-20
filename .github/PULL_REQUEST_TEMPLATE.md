@@ -6,6 +6,9 @@ Fixes #
 <!--
 **Are you making changes to Gatekeeper Library policies?**
 Please refer to [How to contribute to the library](https://open-policy-agent.github.io/gatekeeper-library/website/#how-to-contribute-to-the-library) to add new policies or update existing policies.
+
+**Are you updating an existing policy?**
+Please run `make generate generate-website-docs generate-artifacthub-artifacts` to generate the templates and docs.
 -->
 
 **Special notes for your reviewer**:

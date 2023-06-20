@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -18,6 +19,13 @@ const (
 	// directory entry point for parsing
 	entryPoint         = "library"
 	mutationEntryPoint = "mutation"
+	sidebarPath        = "website/sidebars.js"
+
+	// regex patterns
+	pspReadmeLinkPattern = `\[([^\[\]]+)\]\(([^(]+)\)`
+	generalPattern       = `(\s*)(type:\s+'category',\s+label:\s+'General',\s+collapsed:\s+true,\s+items:\s*\[\s)(\s*)([^\]]*,)`
+	pspPattern           = `(\s*)(type:\s+'category',\s+label:\s+'Pod Security Policy',\s+collapsed:\s+true,\s+items:\s*\[\s)(\s*)([^\]]*,)`
+	mutationPattern      = `(\s*)(type:\s+'category',\s+label:\s+'Mutation',\s+collapsed:\s+true,\s+items:\s*\[\s)(\s*)([^\]]*,)`
 )
 
 // Suite ...
@@ -62,6 +70,7 @@ func main() {
 		os.Mkdir(filepath.Join(rootDir, "website/docs/validation"), 0755)
 	}
 
+	validationSidebarItems := make(map[string][]string)
 	for _, entry := range dirEntry {
 		if entry.Type().IsDir() {
 			basePath, err := filepath.Abs(filepath.Join(libraryPath, entry.Name()))
@@ -77,6 +86,7 @@ func main() {
 
 			for _, dir := range directories {
 				if dir.Type().IsDir() {
+					validationSidebarItems[entry.Name()] = append(validationSidebarItems[entry.Name()], dir.Name())
 					fmt.Println("Generating markdown for ", filepath.Join(basePath, dir.Name()))
 
 					suiteContent, err := os.ReadFile(filepath.Join(basePath, dir.Name(), "suite.yaml"))
@@ -163,6 +173,7 @@ func main() {
 	}
 
 	// mutation
+	mutationSidebarItems := make(map[string][]string)
 	mutationPath := filepath.Join(rootDir, mutationEntryPoint)
 	mutationDirEntry, err := os.ReadDir(mutationPath)
 	if err != nil {
@@ -192,6 +203,7 @@ func main() {
 				if dir.Type().IsDir() {
 					fmt.Println("Generating markdown for ", filepath.Join(basePath, dir.Name()))
 				}
+				mutationSidebarItems[entry.Name()] = append(mutationSidebarItems[entry.Name()], dir.Name())
 
 				// get all files with name starting with "mutation"
 				files, err := os.ReadDir(filepath.Join(basePath, dir.Name(), "samples"))
@@ -276,7 +288,7 @@ func main() {
 	}
 
 	// find all directory path correct them to point inside validation directory
-	regex := regexp.MustCompile(`\[([^\[\]]+)\]\(([^(]+)\)`)
+	regex := regexp.MustCompile(pspReadmeLinkPattern)
 	matches := regex.FindAllStringSubmatch(string(pspReadmeContent), -1)
 
 	// iterate over matches and replace content within ()
@@ -297,4 +309,91 @@ func main() {
 		fmt.Println("error while updating psp README.md")
 		panic(err)
 	}
+
+	// update sidebar
+	fmt.Println("Updating sidebar")
+	var generalItems []string
+	for _, item := range validationSidebarItems["general"] {
+		generalItems = append(
+			generalItems,
+			fmt.Sprintf(
+				"'validation/%s',",
+				item,
+			),
+		)
+	}
+
+	var podSecurityPolicyItems []string
+	podSecurityPolicyItems = append(podSecurityPolicyItems, "'pspintro',")
+	for _, item := range validationSidebarItems["pod-security-policy"] {
+		podSecurityPolicyItems = append(
+			podSecurityPolicyItems,
+			fmt.Sprintf(
+				"'validation/%s',",
+				item,
+			),
+		)
+	}
+
+	var mutationItems []string
+	for _, item := range mutationSidebarItems["pod-security-policy"] {
+		mutationItems = append(
+			mutationItems,
+			fmt.Sprintf(
+				"'mutation-examples/%s',",
+				item,
+			),
+		)
+	}
+
+	data, err := os.ReadFile(filepath.Join(rootDir, sidebarPath))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// find and replace the matching content
+	updatedSidebar := getRegexReplacedString(
+		getRegexReplacedString(
+			getRegexReplacedString(
+				string(data),
+				generalPattern,
+				generalItems,
+			),
+			pspPattern,
+			podSecurityPolicyItems,
+		),
+		mutationPattern,
+		mutationItems,
+	)
+
+	// write the updated content to the file
+	err = os.WriteFile(filepath.Join(rootDir, sidebarPath), []byte(updatedSidebar), 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func getRegexReplacedString(content string, pattern string, replacement []string) string {
+	re := regexp.MustCompile(pattern)
+	matches := re.FindStringSubmatch(content)
+	if len(matches) < 5 {
+		panic("Error: could not find match in file content")
+	}
+
+	// add indentation to each item
+	for i, item := range replacement {
+		replacement[i] = fmt.Sprintf(
+			"%s%s",
+			matches[3],
+			item,
+		)
+	}
+	
+	updatedContent := fmt.Sprintf("%s%s%s",
+		matches[1],
+		matches[2],
+		strings.Join(replacement, "\n"),
+	)
+
+	return re.ReplaceAllString(content, updatedContent)
 }
