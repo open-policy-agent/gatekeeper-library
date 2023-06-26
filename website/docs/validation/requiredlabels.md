@@ -16,7 +16,7 @@ metadata:
   name: k8srequiredlabels
   annotations:
     metadata.gatekeeper.sh/title: "Required Labels"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Requires resources to contain specified labels, with values matching
       provided regular expressions.
@@ -29,6 +29,16 @@ spec:
         openAPIV3Schema:
           type: object
           properties:
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
+              type: array
+              items:
+                type: string
             message:
               type: string
             labels:
@@ -53,6 +63,8 @@ spec:
       rego: |
         package k8srequiredlabels
 
+        import data.lib.exempt_container.is_exempt
+
         get_message(parameters, _default) = msg {
           not parameters.message
           msg := _default
@@ -63,6 +75,7 @@ spec:
         }
 
         violation[{"msg": msg, "details": {"missing_labels": missing}}] {
+          input.review.kind.kind != "Pod"
           provided := {label | input.review.object.metadata.labels[label]}
           required := {label | label := input.parameters.labels[_].key}
           missing := required - provided
@@ -72,6 +85,7 @@ spec:
         }
 
         violation[{"msg": msg}] {
+          input.review.kind.kind != "Pod"
           value := input.review.object.metadata.labels[key]
           expected := input.parameters.labels[_]
           expected.key == key
@@ -81,6 +95,53 @@ spec:
           def_msg := sprintf("Label <%v: %v> does not satisfy allowed regex: %v", [key, value, expected.allowedRegex])
           msg := get_message(input.parameters, def_msg)
         }
+
+        violation[{"msg": msg, "details": {"missing_labels": missing}}] {
+          input.review.kind.kind == "Pod"
+          container := input.review.object.spec[field][_]
+          not is_exempt(container)
+          provided := {label | input.review.object.metadata.labels[label]}
+          required := {label | label := input.parameters.labels[_].key}
+          missing := required - provided
+          count(missing) > 0
+          def_msg := sprintf("you must provide labels: %v", [missing])
+          msg := get_message(input.parameters, def_msg)
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Pod"
+          container := input.review.object.spec[field][_]
+          not is_exempt(container)
+          value := input.review.object.metadata.labels[key]
+          expected := input.parameters.labels[_]
+          expected.key == key
+          # do not match if allowedRegex is not defined, or is an empty string
+          expected.allowedRegex != ""
+          not re_match(expected.allowedRegex, value)
+          def_msg := sprintf("Label <%v: %v> does not satisfy allowed regex: %v", [key, value, expected.allowedRegex])
+          msg := get_message(input.parameters, def_msg)
+        }
+      libs:
+        - |
+          package lib.exempt_container
+
+          is_exempt(container) {
+              exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+              img := container.image
+              exemption := exempt_images[_]
+              _matches_exemption(img, exemption)
+          }
+
+          _matches_exemption(img, exemption) {
+              not endswith(exemption, "*")
+              exemption == img
+          }
+
+          _matches_exemption(img, exemption) {
+              endswith(exemption, "*")
+              prefix := trim_suffix(exemption, "*")
+              startswith(img, prefix)
+          }
 
 ```
 

@@ -65,11 +65,22 @@ test_input_message {
     results := violation with input as input
     results[_].msg == "WRONG_VALUE"
 }
+test_input_missing_label_with_exemption {
+    input := { "review": review_pod({"some_other": "label"}), "parameters": {"labels": [lbl("some", "label")], "exemptImages": ["nginx"]}}
+    results := violation with input as input
+    count(results) == 0
+}
+test_input_missing_label_without_exemption {
+    input := { "review": review_pod({"some_other": "label"}), "parameters": {"labels": [lbl("some", "label")]}}
+    results := violation with input as input
+    count(results) == 1
+}
 
 empty = {
+  "kind": {"kind": "Service"},
   "object": {
     "metadata": {
-      "name": "nginx"
+      "name": "service"
     },
   }
 
@@ -77,10 +88,31 @@ empty = {
 
 review(labels) = output {
   output = {
+    "kind": {"kind": "Service"},
+    "object": {
+      "metadata": {
+        "name": "service",
+        "labels": labels,
+      },
+    }
+  }
+}
+
+review_pod(labels) = output {
+  output = {
+    "kind": {"kind": "Pod"},
     "object": {
       "metadata": {
         "name": "nginx",
         "labels": labels,
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "nginx",
+            "image": "nginx",
+          }
+        ]
       },
     }
   }

@@ -60,9 +60,19 @@ test_input_two_allowed {
     results := violation with input as input
     count(results) == 0
 }
-
+test_input_missing_annotation_with_exemption {
+    input := { "review": review_pod({"some_other": "annotation"}), "parameters": {"annotations": [lbl("some", "annotation")], "exemptImages": ["nginx"]}}
+    results := violation with input as input
+    count(results) == 0
+}
+test_input_missing_annotation_without_exemption {
+    input := { "review": review_pod({"some_other": "annotation"}), "parameters": {"annotations": [lbl("some", "annotation")]}}
+    results := violation with input as input
+    count(results) == 1
+}
 
 empty = {
+  "kind": {"kind": "Service"},
   "object": {
     "metadata": {
       "name": "service"
@@ -73,10 +83,31 @@ empty = {
 
 review(annotations) = output {
   output = {
+    "kind": {"kind": "Service"},
     "object": {
       "metadata": {
         "name": "service",
         "annotations": annotations,
+      },
+    }
+  }
+}
+
+review_pod(annotations) = output {
+  output = {
+    "kind": {"kind": "Pod"},
+    "object": {
+      "metadata": {
+        "name": "nginx",
+        "annotations": annotations,
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "nginx",
+            "image": "nginx",
+          }
+        ]
       },
     }
   }
