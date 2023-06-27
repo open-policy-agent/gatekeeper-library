@@ -61,9 +61,6 @@ spec:
     kinds:
       - apiGroups: [""]
         kinds: ["Service"]
-    excludedNamespaces:
-      - "ingress-nginx-private"
-      - "ingress-nginx-public"
 
 ```
 
