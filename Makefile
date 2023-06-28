@@ -78,6 +78,7 @@ generate-website-docs:
 unit-test:
 	cd $(ARTIFACTHUB_SCRIPT_DIR); go test -v
 	cd $(VALIDATE_SCRIPT_DIR); go test -v
+	cd $(REQUIRE_SYNC_SCRIPT_DIR); go test -v
 
 .PHONY: generate-artifacthub-artifacts
 generate-artifacthub-artifacts:

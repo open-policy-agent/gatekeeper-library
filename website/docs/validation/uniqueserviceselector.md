@@ -17,8 +17,8 @@ metadata:
   name: k8suniqueserviceselector
   annotations:
     metadata.gatekeeper.sh/title: "Unique Service Selector"
-    metadata.gatekeeper.sh/version: 1.0.1
-    metadata.gatekeeper.sh/requiresSyncData: |
+    metadata.gatekeeper.sh/version: 1.0.2
+    metadata.gatekeeper.sh/requires-sync-data: |
       "[
         [
           {
