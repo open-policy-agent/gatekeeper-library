@@ -23,7 +23,7 @@ import (
 	"k8s.io/utils/strings/slices"
 )
 
-const syncAnnotation string = "metadata.gatekeeper.sh/requiresSyncData"
+const syncAnnotation string = "metadata.gatekeeper.sh/requires-sync-data"
 
 var (
 	pathFlag = flag.String("path", "", "Path to verify referential templates include sync data.")

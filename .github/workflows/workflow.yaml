@@ -114,7 +114,7 @@ jobs:
           make require-suites
   require_sync:
     runs-on: ubuntu-latest
-    name: "Require a sync.yaml file and metadata.gatekeeper.sh/requiresSyncData annotation for every template.yaml using data.inventory"
+    name: "Require a sync.yaml file and metadata.gatekeeper.sh/requires-sync-data annotation for every template.yaml using data.inventory"
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@128a63446a954579617e875aaab7d2978154e969 # v2.4.0

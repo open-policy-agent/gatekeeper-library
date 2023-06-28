@@ -16,8 +16,8 @@ metadata:
   name: k8shorizontalpodautoscaler
   annotations:
     metadata.gatekeeper.sh/title: "Horizontal Pod Autoscaler"
-    metadata.gatekeeper.sh/version: 1.0.0
-    metadata.gatekeeper.sh/requiresSyncData: |
+    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/requires-sync-data: |
       "[
         [
           {
