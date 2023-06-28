@@ -17,8 +17,8 @@ metadata:
   name: k8spoddisruptionbudget
   annotations:
     metadata.gatekeeper.sh/title: "Pod Disruption Budget"
-    metadata.gatekeeper.sh/version: 1.0.2
-    metadata.gatekeeper.sh/requiresSyncData: |
+    metadata.gatekeeper.sh/version: 1.0.3
+    metadata.gatekeeper.sh/requires-sync-data: |
       "[
         [
           {
