@@ -17,7 +17,7 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "Required Probes"
     metadata.gatekeeper.sh/version: 1.1.0
-    metadata.gatekeeper.sh/requiresSyncData: |
+    metadata.gatekeeper.sh/requires-sync-data: |
       "[
         [
           {
