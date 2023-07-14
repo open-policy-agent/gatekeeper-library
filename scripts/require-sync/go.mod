@@ -15,7 +15,7 @@ replace (
 require (
 	github.com/open-policy-agent/frameworks/constraint v0.0.0-20221214024800-b745745c4118
 	github.com/open-policy-agent/gatekeeper v0.0.0-20230426022931-1f6f701644ba
-	k8s.io/apimachinery v0.24.14
+	k8s.io/apimachinery v0.24.15
 	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9
 )
 
