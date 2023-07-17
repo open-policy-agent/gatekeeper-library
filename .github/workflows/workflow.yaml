@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     name: "Test scripts"
     steps:
-      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
       - name: Unit test
         run: |
           make unit-test
@@ -30,7 +30,7 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
       - name: Generate templates and docs
         run: |
           make generate generate-website-docs generate-artifacthub-artifacts
@@ -53,7 +53,7 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
       - run: |
           binary=$([[ "$OSTYPE" == "darwin"* ]] && echo "opa_darwin_amd64" || echo "opa_linux_amd64")
           sudo curl -L -o /usr/local/bin/opa https://github.com/open-policy-agent/opa/releases/download/${{ matrix.opa }}/$binary
@@ -74,7 +74,7 @@ jobs:
           egress-policy: audit
 
       - name: Check out code into the Go module directory
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
 
       - name: Bootstrap integration test
         run: |
@@ -108,7 +108,7 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
       - name: Run script
         run: |
           make require-suites
@@ -121,7 +121,7 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
       - name: Run script
         run: |
           make require-sync
@@ -134,6 +134,6 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
       - run: |
           make verify-gator-dockerized
