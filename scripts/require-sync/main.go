@@ -13,18 +13,17 @@ import (
 	"path/filepath"
 	"strings"
 
-	opa "github.com/open-policy-agent/frameworks/constraint/pkg/client"
+	constraintclient "github.com/open-policy-agent/frameworks/constraint/pkg/client"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/client/drivers/local"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/core/templates"
+	gkapis "github.com/open-policy-agent/gatekeeper/apis"
+	"github.com/open-policy-agent/gatekeeper/pkg/gator/reader"
+	"github.com/open-policy-agent/gatekeeper/pkg/target"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/utils/strings/slices"
-
-	gkapis "github.com/open-policy-agent/gatekeeper/apis"
-	"github.com/open-policy-agent/gatekeeper/pkg/gator"
-	"github.com/open-policy-agent/gatekeeper/pkg/target"
 )
 
-const syncAnnotation string = "metadata.gatekeeper.sh/requiresSyncData"
+const syncAnnotation string = "metadata.gatekeeper.sh/requires-sync-data"
 
 var (
 	pathFlag = flag.String("path", "", "Path to verify referential templates include sync data.")
@@ -79,7 +78,7 @@ func checkTemplates(libraryPath string) error {
 		absolutePath := filepath.Join(libraryPath, path)
 
 		// read template
-		tmpl, err := gator.ReadTemplate(scheme, system, path)
+		tmpl, err := reader.ReadTemplate(scheme, system, path)
 		if err != nil {
 			return fmt.Errorf("reading template: %w", err)
 		}
@@ -131,8 +130,8 @@ func checkTemplates(libraryPath string) error {
 }
 
 type referentialChecker struct {
-	refClient    *opa.Client
-	nonRefClient *opa.Client
+	refClient    *constraintclient.Client
+	nonRefClient *constraintclient.Client
 }
 
 func newRefChecker() (*referentialChecker, error) {
@@ -181,7 +180,7 @@ func errTextIsReferential(err error) bool {
 	return strings.Contains(err.Error(), "check refs failed on module")
 }
 
-func opaClient(referential bool) (*opa.Client, error) {
+func opaClient(referential bool) (*constraintclient.Client, error) {
 	externs := local.Externs()
 	if referential {
 		externs = local.Externs("inventory")
@@ -192,7 +191,7 @@ func opaClient(referential bool) (*opa.Client, error) {
 		return nil, fmt.Errorf("creating driver: %w", err)
 	}
 
-	client, err := opa.NewClient(opa.Targets(&target.K8sValidationTarget{}), opa.Driver(driver))
+	client, err := constraintclient.NewClient(constraintclient.Targets(&target.K8sValidationTarget{}), constraintclient.Driver(driver))
 	if err != nil {
 		return nil, fmt.Errorf("creating client: %w", err)
 	}
@@ -219,8 +218,16 @@ func validateRequiresSyncDataContent(annotation string) (bool, error) {
 
 	// Validate keys
 	for _, requirement := range contents {
-		for _, equivalents := range requirement.([]interface{}) {
-			for key := range equivalents.(map[string]interface{}) {
+		requirement, ok := requirement.([]interface{})
+		if !ok {
+			return false, fmt.Errorf("Error validating requirement content")
+		}
+		for _, equivalents := range requirement {
+			equivalents, ok := equivalents.(map[string]interface{})
+			if !ok {
+				return false, fmt.Errorf("Error validating equivalents content")
+			}
+			for key := range equivalents {
 				if !slices.Contains(allowedKeys, key) {
 					return false, fmt.Errorf("Unexpected key '%s'", key)
 				}
@@ -228,5 +235,5 @@ func validateRequiresSyncDataContent(annotation string) (bool, error) {
 		}
 	}
 
-  return true, nil
+	return true, nil
 }
