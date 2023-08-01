@@ -20,6 +20,11 @@ test_input_hostnamespace_both_not_allowed {
     results := violation with input as input
     count(results) > 0
 }
+test_update {
+    input := { "review": object.union(input_review_hostPID, {"operation": "UPDATE"})}
+    results := violation with input as input
+    count(results) == 0
+}
 
 input_review = {
     "object": {

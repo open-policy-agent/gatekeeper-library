@@ -65,6 +65,11 @@ test_input_container_many_mixed_proc_mount_allowed_two {
     results := violation with input as input
     count(results) == 0
 }
+test_update {
+    input := { "review": object.union(input_review_unmasked, {"operation": "UPDATE"}), "parameters": input_parameters_default}
+    results := violation with input as input
+    count(results) == 0
+}
 
 input_review = {
     "object": {

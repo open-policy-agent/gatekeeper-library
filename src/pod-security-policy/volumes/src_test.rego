@@ -67,6 +67,12 @@ test_input_volume_type_allowed_in_list_many_volumes_mixed {
     count(results) == 1
 }
 
+test_input_volume_type_update {
+    input := { "review": object.union(input_review, {"operation": "UPDATE"}), "parameters": input_parameters_empty}
+    results := violation with input as input
+    count(results) == 0
+}
+
 input_review = {
     "object": {
         "metadata": {

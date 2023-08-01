@@ -41,6 +41,11 @@ test_input_with_hostnetwork_container_ports_not_allowed_but_exempt {
     trace(sprintf("%v", [results]))
     count(results) == 0
 }
+test_update {
+    input := { "review": object.union(input_review_no_hostnetwork_container_ports_outofrange, {"operation": "UPDATE"}), "parameters": input_parameters_ports}
+    results := violation with input as input
+    count(results) == 0
+}
 
 input_review = {
     "object": {

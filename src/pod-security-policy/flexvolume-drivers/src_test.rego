@@ -54,6 +54,12 @@ test_input_flexvolume_many_mixed_allowed {
     count(results) == 1
 }
 
+test_update {
+    input := { "review": object.union(input_review, {"operation": "UPDATE"}), "parameters": input_parameters_empty}
+    results := violation with input as input
+    count(results) == 0
+}
+
 input_review = {
     "object": {
         "metadata": {
