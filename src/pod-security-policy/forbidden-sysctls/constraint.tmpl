@@ -43,4 +43,4 @@ spec:
 {{ file.Read "src/pod-security-policy/forbidden-sysctls/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
       libs:
         - |
-{{ file.Read "src/pod-security-policy/forbidden-sysctls/lib_exclude_update_patch.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+{{ file.Read "src/pod-security-policy/forbidden-sysctls/lib_exclude_update.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}

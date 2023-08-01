@@ -1,11 +1,11 @@
 package k8spspallowedusers
 
-import data.lib.exclude_update_patch.is_update_or_patch
+import data.lib.exclude_update.is_update
 import data.lib.exempt_container.is_exempt
 
 violation[{"msg": msg}] {
   # runAsUser, runAsGroup, supplementalGroups, fsGroup fields are immutable.
-  not is_update_or_patch(input.review)
+  not is_update(input.review)
 
   fields := ["runAsUser", "runAsGroup", "supplementalGroups", "fsGroup"]
   field := fields[_]

@@ -1,10 +1,10 @@
 package k8sautomountserviceaccounttoken
 
-import data.lib.exclude_update_patch.is_update_or_patch
+import data.lib.exclude_update.is_update
 
 violation[{"msg": msg}] {
     # spec.automountServiceAccountToken and spec.containers.volumeMounts fields are immutable.
-    not is_update_or_patch(input.review)
+    not is_update(input.review)
 
     obj := input.review.object
     mountServiceAccountToken(obj.spec)

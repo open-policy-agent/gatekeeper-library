@@ -1,10 +1,10 @@
 package k8spspfsgroup
 
-import data.lib.exclude_update_patch.is_update_or_patch
+import data.lib.exclude_update.is_update
 
 violation[{"msg": msg, "details": {}}] {
     # spec.securityContext.fsGroup field is immutable.
-    not is_update_or_patch(input.review)
+    not is_update(input.review)
 
     spec := input.review.object.spec
     not input_fsGroup_allowed(spec)
