@@ -3,7 +3,7 @@ name: k8spspreadonlyrootfilesystem
 displayName: Read Only Root Filesystem
 createdAt: "2023-05-23T09:47:31Z"
 description: Requires the use of a read-only root file system by pod containers. Corresponds to the `readOnlyRootFilesystem` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
-digest: c5191ecc692cff6ebe63895c42278e84be63e6f2e247d1ef68351ff54ec4383b
+digest: d0639793ce5c44a84c39b94e61196a2c0436f4360b965f502d11287167e56bb6
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/read-only-root-filesystem
 keywords:

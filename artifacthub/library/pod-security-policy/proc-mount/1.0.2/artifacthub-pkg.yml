@@ -3,7 +3,7 @@ name: k8spspprocmount
 displayName: Proc Mount
 createdAt: "2023-05-23T09:47:31Z"
 description: Controls the allowed `procMount` types for the container. Corresponds to the `allowedProcMountTypes` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#allowedprocmounttypes
-digest: 4b54aedfc0a708de76efdd810bd7d63e92625fd79358d196977b7ea51359e46c
+digest: 381e044afad0fa50bce39483149badf7bb50650d6df6856c02c2f38dac74dd14
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/proc-mount
 keywords:

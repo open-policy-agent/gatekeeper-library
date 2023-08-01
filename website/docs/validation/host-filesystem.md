@@ -54,11 +54,11 @@ spec:
       rego: |
         package k8spsphostfilesystem
 
-        import data.lib.exclude_update_patch.is_update_or_patch
+        import data.lib.exclude_update.is_update
 
         violation[{"msg": msg, "details": {}}] {
             # spec.volumes field is immutable.
-            not is_update_or_patch(input.review)
+            not is_update(input.review)
 
             volume := input_hostpath_volumes[_]
             allowedPaths := get_allowed_paths(input)
@@ -153,12 +153,12 @@ spec:
         }
       libs:
         - |
-          package lib.exclude_update_patch
+          package lib.exclude_update
 
           import future.keywords.in
 
-          is_update_or_patch(review) {
-              review.operation in ["UPDATE", "PATCH"]
+          is_update(review) {
+              review.operation == "UPDATE"
           }
 
 ```

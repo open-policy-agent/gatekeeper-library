@@ -3,7 +3,7 @@ name: k8spsphostfilesystem
 displayName: Host Filesystem
 createdAt: "2023-05-23T09:47:31Z"
 description: Controls usage of the host filesystem. Corresponds to the `allowedHostPaths` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
-digest: 4be50b48cb82f049e9045c4c847baf8764c64f8b9d121e2b4d9036e7cab1fcfb
+digest: de1a34191f8482e7326878d0c8f7b653f1d5a2805674cdd4393ee917349ac0a9
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/host-filesystem
 keywords:

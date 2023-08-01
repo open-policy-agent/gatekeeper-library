@@ -47,11 +47,11 @@ spec:
       rego: |
         package k8spspvolumetypes
 
-        import data.lib.exclude_update_patch.is_update_or_patch
+        import data.lib.exclude_update.is_update
 
         violation[{"msg": msg, "details": {}}] {
             # spec.volumes field is immutable.
-            not is_update_or_patch(input.review)
+            not is_update(input.review)
 
             volume_fields := {x | input.review.object.spec.volumes[_][x]; x != "name"}
             field := volume_fields[_]
@@ -69,12 +69,12 @@ spec:
         }
       libs:
         - |
-          package lib.exclude_update_patch
+          package lib.exclude_update
 
           import future.keywords.in
 
-          is_update_or_patch(review) {
-              review.operation in ["UPDATE", "PATCH"]
+          is_update(review) {
+              review.operation == "UPDATE"
           }
 
 ```

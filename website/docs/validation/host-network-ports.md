@@ -61,12 +61,12 @@ spec:
       rego: |
         package k8spsphostnetworkingports
 
-        import data.lib.exclude_update_patch.is_update_or_patch
+        import data.lib.exclude_update.is_update
         import data.lib.exempt_container.is_exempt
 
         violation[{"msg": msg, "details": {}}] {
             # spec.hostNetwork field is immutable.
-            not is_update_or_patch(input.review)
+            not is_update(input.review)
 
             input_share_hostnetwork(input.review.object)
             msg := sprintf("The specified hostNetwork and hostPort are not allowed, pod: %v. Allowed values: %v", [input.review.object.metadata.name, input.parameters])
@@ -103,12 +103,12 @@ spec:
         }
       libs:
         - |
-          package lib.exclude_update_patch
+          package lib.exclude_update
 
           import future.keywords.in
 
-          is_update_or_patch(review) {
-              review.operation in ["UPDATE", "PATCH"]
+          is_update(review) {
+              review.operation == "UPDATE"
           }
         - |
           package lib.exempt_container

@@ -42,7 +42,7 @@ spec:
       rego: |
         package k8srequiredprobes
 
-        import data.lib.exclude_update_patch.is_update_or_patch
+        import data.lib.exclude_update.is_update
 
         probe_type_set = probe_types {
             probe_types := {type | type := input.parameters.probeTypes[_]}
@@ -50,7 +50,7 @@ spec:
 
         violation[{"msg": msg}] {
             # Probe fields are immutable.
-            not is_update_or_patch(input.review)
+            not is_update(input.review)
 
             container := input.review.object.spec.containers[_]
             probe := input.parameters.probes[_]
@@ -77,12 +77,12 @@ spec:
         }
       libs:
         - |
-          package lib.exclude_update_patch
+          package lib.exclude_update
 
           import future.keywords.in
 
-          is_update_or_patch(review) {
-              review.operation in ["UPDATE", "PATCH"]
+          is_update(review) {
+              review.operation == "UPDATE"
           }
 
 ```

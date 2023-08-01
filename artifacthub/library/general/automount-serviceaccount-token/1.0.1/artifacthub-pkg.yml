@@ -3,7 +3,7 @@ name: k8spspautomountserviceaccounttokenpod
 displayName: Automount Service Account Token for Pod
 createdAt: "2023-05-23T09:47:24Z"
 description: Controls the ability of any Pod to enable automountServiceAccountToken.
-digest: 703ebbf0f93e4ccc2dd0a5a28f8f944285fe3581848d34f40573e9129ade5f50
+digest: 1e55c4d9801d57049bfef336f7f76070c860e7e3fd5a824f971559e205cb7036
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/automount-serviceaccount-token
 keywords:

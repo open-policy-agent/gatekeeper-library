@@ -5,7 +5,7 @@ createdAt: "2023-05-23T09:47:27Z"
 description: |-
     Requires containers to have an ephemeral storage limit set and constrains the limit to be within the specified maximum values.
     https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
-digest: 3831d46393ad418fa151a3c5996c89145f65adf270f324da59c6fb8e72ab7724
+digest: bf3a7954950e519148677ae4505ba8997e8cf94214e3fb38878e6ef6324a3f9d
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/ephemeralstoragelimit
 keywords:
