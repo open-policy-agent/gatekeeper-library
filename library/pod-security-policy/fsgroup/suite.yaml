@@ -15,3 +15,7 @@ tests:
         object: samples/psp-fsgroup/example_allowed.yaml
         assertions:
           - violations: no
+      - name: update
+        object: samples/psp-fsgroup/update.yaml
+        assertions:
+          - violations: no

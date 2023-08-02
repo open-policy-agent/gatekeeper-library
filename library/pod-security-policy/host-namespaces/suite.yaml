@@ -15,3 +15,7 @@ tests:
         object: samples/psp-host-namespace/example_disallowed.yaml
         assertions:
           - violations: yes
+      - name: update
+        object: samples/psp-host-namespace/update.yaml
+        assertions:
+          - violations: no

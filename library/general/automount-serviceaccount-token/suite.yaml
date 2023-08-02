@@ -15,3 +15,7 @@ tests:
         object: samples/automount-serviceaccount-token/example_disallowed.yaml
         assertions:
           - violations: yes
+      - name: update
+        object: samples/automount-serviceaccount-token/update.yaml
+        assertions:
+          - violations: no

@@ -15,3 +15,7 @@ tests:
     object: samples/psp-volume-types/example_allowed.yaml
     assertions:
     - violations: no
+  - name: update
+    object: samples/psp-volume-types/update.yaml
+    assertions:
+    - violations: no

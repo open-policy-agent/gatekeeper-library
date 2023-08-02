@@ -19,3 +19,7 @@ tests:
     object: samples/psp-privileged-container/disallowed_ephemeral.yaml
     assertions:
     - violations: yes
+  - name: update
+    object: samples/psp-privileged-container/update.yaml
+    assertions:
+    - violations: no

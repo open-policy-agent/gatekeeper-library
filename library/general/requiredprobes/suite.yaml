@@ -19,3 +19,7 @@ tests:
     object: samples/must-have-probes/example_disallowed2.yaml
     assertions:
     - violations: yes
+  - name: update
+    object: samples/must-have-probes/update.yaml
+    assertions:
+    - violations: no

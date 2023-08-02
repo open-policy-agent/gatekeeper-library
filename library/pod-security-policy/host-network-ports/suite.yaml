@@ -19,3 +19,7 @@ tests:
     object: samples/psp-host-network-ports/disallowed_ephemeral.yaml
     assertions:
     - violations: yes
+  - name: update
+    object: samples/psp-host-network-ports/update.yaml
+    assertions:
+    - violations: no

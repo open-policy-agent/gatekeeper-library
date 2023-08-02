@@ -19,3 +19,7 @@ tests:
     object: samples/psp-selinux-v2/disallowed_ephemeral.yaml
     assertions:
     - violations: yes
+  - name: update
+    object: samples/psp-selinux-v2/update.yaml
+    assertions:
+    - violations: no
