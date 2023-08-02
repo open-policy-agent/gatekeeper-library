@@ -320,6 +320,46 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 
 </details>
+<details>
+<summary>update</summary>
+
+```yaml
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: opa-disallowed
+      labels:
+        owner: me.agilebank.demo
+    spec:
+      containers:
+        - name: opa
+          image: openpolicyagent/opa:0.9.2
+          args:
+            - "run"
+            - "--server"
+            - "--addr=localhost:8080"
+          securityContext:
+            capabilities:
+              add: ["disallowedcapability"]
+          resources:
+            limits:
+              cpu: "100m"
+              memory: "30Mi"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/capabilities-demo/update.yaml
+```
+
+</details>
 
 
 </blockquote></details>

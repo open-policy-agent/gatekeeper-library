@@ -474,6 +474,44 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 
 </details>
+<details>
+<summary>ephemeral-storage-limit-update</summary>
+
+```yaml
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: opa-allowed
+      labels:
+        owner: me.agilebank.demo
+    spec:
+      containers:
+        - name: opa
+          image: openpolicyagent/opa:0.9.2
+          args:
+            - "run"
+            - "--server"
+            - "--addr=localhost:8080"
+          resources:
+            limits:
+              cpu: "100m"
+              memory: "1Gi"
+              ephemeral-storage: "1Pi"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/ephemeralstoragelimit/samples/container-must-have-ephemeral-storage-limit/update.yaml
+```
+
+</details>
 
 
 </blockquote></details>

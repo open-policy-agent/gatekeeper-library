@@ -295,6 +295,43 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 
 </details>
+<details>
+<summary>update</summary>
+
+```yaml
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx-host-filesystem
+      labels:
+        app: nginx-host-filesystem-disallowed
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        volumeMounts:
+        - mountPath: /cache
+          name: cache-volume
+          readOnly: true
+      volumes:
+      - name: cache-volume
+        hostPath:
+          path: /tmp # directory location on host
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-filesystem/samples/psp-host-filesystem/update.yaml
+```
+
+</details>
 
 
 </blockquote></details>

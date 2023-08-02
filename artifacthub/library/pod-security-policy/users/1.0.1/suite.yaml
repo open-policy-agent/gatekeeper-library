@@ -19,3 +19,7 @@ tests:
     object: samples/psp-pods-allowed-user-ranges/disallowed_ephemeral.yaml
     assertions:
     - violations: yes
+  - name: update
+    object: samples/psp-pods-allowed-user-ranges/update.yaml
+    assertions:
+    - violations: no

@@ -453,6 +453,42 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 
 </details>
+<details>
+<summary>update</summary>
+
+```yaml
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx-users-disallowed
+      labels:
+        app: nginx-users
+    spec:
+      securityContext:
+        supplementalGroups:
+          - 250
+        fsGroup: 250
+      containers:
+        - name: nginx
+          image: nginx
+          securityContext:
+            runAsUser: 250
+            runAsGroup: 250
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/users/samples/psp-pods-allowed-user-ranges/update.yaml
+```
+
+</details>
 
 
 </blockquote></details>

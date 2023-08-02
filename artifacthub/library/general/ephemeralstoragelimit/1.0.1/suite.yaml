@@ -27,3 +27,7 @@ tests:
     object: samples/container-must-have-ephemeral-storage-limit/example_disallowed_ephemeral_storage_limit_1Pi-initContainer.yaml
     assertions:
     - violations: yes
+  - name: ephemeral-storage-limit-update
+    object: samples/container-must-have-ephemeral-storage-limit/update.yaml
+    assertions:
+    - violations: no

@@ -258,6 +258,55 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 
 </details>
+<details>
+<summary>update</summary>
+
+```yaml
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: test-pod1
+    spec:
+      containers:
+      - name: nginx-1
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          # tcpSocket:
+          #   port: 80
+          # initialDelaySeconds: 5
+          # periodSeconds: 10
+        volumeMounts:
+        - mountPath: /tmp/cache
+          name: cache-volume
+      - name: tomcat
+        image: tomcat
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+      volumes:
+      - name: cache-volume
+        emptyDir: {}
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredprobes/samples/must-have-probes/update.yaml
+```
+
+</details>
 
 
 </blockquote></details>

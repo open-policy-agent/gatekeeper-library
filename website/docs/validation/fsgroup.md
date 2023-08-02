@@ -219,6 +219,42 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 
 </details>
+<details>
+<summary>update</summary>
+
+```yaml
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: fsgroup-disallowed
+    spec:
+      securityContext:
+        fsGroup: 2000 # directory will have group ID 2000
+      volumes:
+      - name: fsgroup-demo-vol
+        emptyDir: {}
+      containers:
+      - name: fsgroup-demo
+        image: busybox
+        command: [ "sh", "-c", "sleep 1h" ]
+        volumeMounts:
+        - name: fsgroup-demo-vol
+          mountPath: /data/demo
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/fsgroup/samples/psp-fsgroup/update.yaml
+```
+
+</details>
 
 
 </blockquote></details>

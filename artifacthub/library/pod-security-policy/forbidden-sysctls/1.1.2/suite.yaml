@@ -15,3 +15,7 @@ tests:
         object: samples/psp-forbidden-sysctls/example_allowed.yaml
         assertions:
           - violations: no
+      - name: update
+        object: samples/psp-forbidden-sysctls/update.yaml
+        assertions:
+          - violations: no

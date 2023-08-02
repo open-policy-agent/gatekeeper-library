@@ -15,3 +15,7 @@ tests:
         object: samples/psp-flexvolume-drivers/example_disallowed.yaml
         assertions:
           - violations: yes
+      - name: update
+        object: samples/psp-flexvolume-drivers/update.yaml
+        assertions:
+          - violations: no

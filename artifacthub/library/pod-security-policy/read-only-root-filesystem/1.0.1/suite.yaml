@@ -19,3 +19,7 @@ tests:
     object: samples/psp-readonlyrootfilesystem/disallowed_ephemeral.yaml
     assertions:
     - violations: yes
+  - name: update
+    object: samples/psp-readonlyrootfilesystem/update.yaml
+    assertions:
+    - violations: no
