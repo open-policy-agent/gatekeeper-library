@@ -80,3 +80,7 @@ updates:
       interval: weekly
     commit-message:
       prefix: "chore"
+    groups:
+      all:
+        patterns:
+        - "*"
