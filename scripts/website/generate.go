@@ -13,15 +13,15 @@ import (
 )
 
 const (
-	// raw github source URL
+	// raw github source URL.
 	sourceURL = "https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/"
 
-	// directory entry point for parsing
+	// directory entry point for parsing.
 	entryPoint         = "library"
 	mutationEntryPoint = "mutation"
 	sidebarPath        = "website/sidebars.js"
 
-	// regex patterns
+	// regex patterns.
 	pspReadmeLinkPattern = `\[([^\[\]]+)\]\(([^(]+)\)`
 	generalPattern       = `(\s*)(type:\s+'category',\s+label:\s+'General',\s+collapsed:\s+true,\s+items:\s*\[\s)(\s*)([^\]]*,)`
 	pspPattern           = `(\s*)(type:\s+'category',\s+label:\s+'Pod Security Policy',\s+collapsed:\s+true,\s+items:\s*\[\s)(\s*)([^\]]*,)`
@@ -29,7 +29,7 @@ const (
 )
 
 // Suite ...
-// ToDo (nilekh): Get this struct from the Gatekeeper repo
+// ToDo (nilekh): Get this struct from the Gatekeeper repo.
 type Suite struct {
 	Kind       string `yaml:"kind"`
 	APIVersion string `yaml:"apiVersion"`
@@ -67,7 +67,10 @@ func main() {
 
 	// create website validation directory if not exists
 	if _, err := os.Stat(filepath.Join(rootDir, "website/docs/validation")); os.IsNotExist(err) {
-		os.Mkdir(filepath.Join(rootDir, "website/docs/validation"), 0755)
+		if os.Mkdir(filepath.Join(rootDir, "website/docs/validation"), 0o755) != nil {
+			fmt.Println("error while creating directory")
+			panic(err)
+		}
 	}
 
 	validationSidebarItems := make(map[string][]string)
@@ -153,15 +156,15 @@ func main() {
 						"%TEMPLATE%", string(constraintTemplateContent),
 						"%RAWURL%", constraintTemplateRawURL,
 						"%EXAMPLES%", allExamples,
-						"%TITLE%", fmt.Sprintf("%s", constraintTemplate["metadata"].(map[string]interface{})["annotations"].(map[string]interface{})["metadata.gatekeeper.sh/title"]),
-						"%DESCRIPTION%", fmt.Sprintf("%s", constraintTemplate["metadata"].(map[string]interface{})["annotations"].(map[string]interface{})["description"]),
+						"%TITLE%", getConstraintTemplateTitle(constraintTemplate),
+						"%DESCRIPTION%", getConstraintTemplateDescription(constraintTemplate),
 						"%FILENAME%", dir.Name(),
 					)
 
 					err = os.WriteFile(
 						filepath.Join(rootDir, "website/docs/validation", fmt.Sprintf("%s.md", dir.Name())),
 						[]byte(replacer.Replace(string(templateContent))),
-						0644,
+						0o600,
 					)
 					if err != nil {
 						fmt.Println("error while writing file")
@@ -183,7 +186,10 @@ func main() {
 
 	// create website mutation directory if not exists
 	if _, err := os.Stat(filepath.Join(rootDir, "website/docs/mutation-examples")); os.IsNotExist(err) {
-		os.Mkdir(filepath.Join(rootDir, "website/docs/mutation-examples"), 0755)
+		if os.Mkdir(filepath.Join(rootDir, "website/docs/mutation-examples"), 0o755) != nil {
+			fmt.Println("error while creating directory")
+			panic(err)
+		}
 	}
 
 	for _, entry := range mutationDirEntry {
@@ -229,7 +235,7 @@ func main() {
 
 						replacer := strings.NewReplacer(
 							"%RAWURL%", sourceURL+filepath.Join(mutationEntryPoint, entry.Name(), dir.Name(), "samples", file.Name()),
-							"%EXAMPLES%", fmt.Sprintf("%s", fileContentBytes),
+							"%EXAMPLES%", string(fileContentBytes),
 							"%TITLE%", dir.Name(),
 							"%FILENAME%", dir.Name(),
 						)
@@ -237,7 +243,7 @@ func main() {
 						err := os.WriteFile(
 							filepath.Join(rootDir, "website/docs/mutation-examples", fmt.Sprintf("%s.md", dir.Name())),
 							[]byte(replacer.Replace(string(mutationTemplateContent))),
-							0644,
+							0o600,
 						)
 						if err != nil {
 							fmt.Println("error while writing ", file.Name())
@@ -249,7 +255,7 @@ func main() {
 		}
 	}
 
-	//update README.md
+	// update README.md
 	fmt.Println("Updating README.md")
 	readmeTemplateContent, err := os.ReadFile(filepath.Join(rootDir, "scripts/website", "readme-template.md"))
 	if err != nil {
@@ -266,14 +272,14 @@ func main() {
 	err = os.WriteFile(
 		filepath.Join(rootDir, "website/docs/intro.md"),
 		[]byte(strings.Replace(string(readmeTemplateContent), "%CONTENT%", string(readmeContent), 1)),
-		0644,
+		0o600,
 	)
 	if err != nil {
 		fmt.Println("error while updating README.md")
 		panic(err)
 	}
 
-	//update PSP README.md
+	// update PSP README.md
 	fmt.Println("Updating PSP README.md")
 	pspReadmeTemplateContent, err := os.ReadFile(filepath.Join(rootDir, "scripts/website", "pspreadme-template.md"))
 	if err != nil {
@@ -303,7 +309,7 @@ func main() {
 	err = os.WriteFile(
 		filepath.Join(rootDir, "website/docs/pspintro.md"),
 		[]byte(strings.Replace(string(pspReadmeTemplateContent), "%CONTENT%", string(pspReadmeContent), 1)),
-		0644,
+		0o600,
 	)
 	if err != nil {
 		fmt.Println("error while updating psp README.md")
@@ -367,7 +373,7 @@ func main() {
 	)
 
 	// write the updated content to the file
-	err = os.WriteFile(filepath.Join(rootDir, sidebarPath), []byte(updatedSidebar), 0644)
+	err = os.WriteFile(filepath.Join(rootDir, sidebarPath), []byte(updatedSidebar), 0o600)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -388,7 +394,7 @@ func getRegexReplacedString(content string, pattern string, replacement []string
 			item,
 		)
 	}
-	
+
 	updatedContent := fmt.Sprintf("%s%s%s",
 		matches[1],
 		matches[2],
@@ -396,4 +402,36 @@ func getRegexReplacedString(content string, pattern string, replacement []string
 	)
 
 	return re.ReplaceAllString(content, updatedContent)
+}
+
+// TODO: Use shared pkg.
+func getConstraintTemplateMetadata(constraintTemplate map[string]interface{}) map[string]interface{} {
+	metadata, ok := constraintTemplate["metadata"].(map[string]interface{})
+	if !ok {
+		panic("error while retrieving constraintTemplate metadata")
+	}
+	return metadata
+}
+
+func getConstraintTemplateAnnotations(constraintTemplate map[string]interface{}) map[string]interface{} {
+	metadata := getConstraintTemplateMetadata(constraintTemplate)
+
+	annotations, ok := metadata["annotations"].(map[string]interface{})
+	if !ok {
+		panic("error while retrieving constraintTemplate annotations")
+	}
+
+	return annotations
+}
+
+func getConstraintTemplateTitle(constraintTemplate map[string]interface{}) string {
+	annotations := getConstraintTemplateAnnotations(constraintTemplate)
+
+	return fmt.Sprintf("%s", annotations["metadata.gatekeeper.sh/title"])
+}
+
+func getConstraintTemplateDescription(constraintTemplate map[string]interface{}) string {
+	annotations := getConstraintTemplateAnnotations(constraintTemplate)
+
+	return fmt.Sprintf("%s", annotations["description"])
 }
