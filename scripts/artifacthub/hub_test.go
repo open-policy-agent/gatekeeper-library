@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	expectedHash = "dc888d5c05f7e0421a47adfe2d4e59b5264d6e56ec0b3392fe9b3d224bd61a3e"
+	expectedHash = "dc888d5c05f7e0421a47adfe2d4e59b5264d6e56ec0b3392fe9b3d224bd61a3e" //nolint
 )
 
 func TestGetConstraintTemplateHash(t *testing.T) {
