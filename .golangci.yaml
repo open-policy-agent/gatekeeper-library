@@ -1,0 +1,50 @@
+run:
+  timeout: 5m
+
+linters-settings:
+  gocritic:
+    enabled-tags:
+    - performance
+  gosec:
+    excludes:
+    - G108
+  importas:
+    no-unaliased: true
+    alias:
+      - pkg: "github.com/open-policy-agent/frameworks/constraint/pkg/client"
+        alias: constraintclient
+  lll:
+    line-length: 200
+
+  misspell:
+    locale: US
+  staticcheck:
+    # Select the Go version to target. The default is '1.13'.
+    go: "1.20"
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck
+    - errorlint
+    - exportloopref
+    - forcetypeassert
+    - gci
+    - gocritic
+    - goconst
+    - godot
+    - gofmt
+    - gofumpt
+    - goimports
+    - gosec
+    - gosimple
+    - govet
+    - importas
+    - ineffassign
+    - misspell
+    - revive # replacement for golint
+    - staticcheck
+    - typecheck
+    - unconvert
+    - unused
+    - whitespace
