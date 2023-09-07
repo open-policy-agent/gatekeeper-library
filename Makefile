@@ -6,7 +6,7 @@ KUSTOMIZE_VERSION ?= 4.5.5
 GATEKEEPER_VERSION ?= release-3.11
 BATS_VERSION ?= 1.8.2
 GATOR_VERSION ?= 3.11.0
-GOMPLATE_VERSION ?= 3.10.0
+GOMPLATE_VERSION ?= 3.11.5
 
 REPO_ROOT := $(shell git rev-parse --show-toplevel)
 WEBSITE_SCRIPT_DIR := $(REPO_ROOT)/scripts/website
@@ -78,6 +78,7 @@ generate-website-docs:
 unit-test:
 	cd $(ARTIFACTHUB_SCRIPT_DIR); go test -v
 	cd $(VALIDATE_SCRIPT_DIR); go test -v
+	cd $(REQUIRE_SYNC_SCRIPT_DIR); go test -v
 
 .PHONY: generate-artifacthub-artifacts
 generate-artifacthub-artifacts:

@@ -1,0 +1,25 @@
+{{- if .Values.validation.pspSELinuxV2.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPSELinuxV2
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: psp-selinux-v2
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    {{- if .Values.validation.pspSELinuxV2.allowedSELinuxOptions }}
+    allowedSELinuxOptions:
+      {{ .Values.validation.pspSELinuxV2.allowedSELinuxOptions | nindent 6 }}
+    {{- end }}
+{{- end }}

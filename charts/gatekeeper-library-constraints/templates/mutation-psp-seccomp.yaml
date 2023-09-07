@@ -1,0 +1,25 @@
+{{- if .Values.mutation.pspSeccomp.enabled }}
+apiVersion: mutations.gatekeeper.sh/v1alpha1
+kind: AssignMetadata
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: k8spspseccomp
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    scope: Namespaced
+    kinds:
+    - apiGroups: [""]
+      kinds: ["Pod"]
+  location: metadata.annotations."seccomp.security.alpha.kubernetes.io/pod"
+  parameters:
+    assign:
+      value: {{ .Values.mutation.pspSeccomp.value }}
+{{- end }}

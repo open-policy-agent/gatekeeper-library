@@ -1,0 +1,20 @@
+{{- if .Values.validation.blockLoadBalancer.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sBlockLoadBalancer
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: block-load-balancer
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Service"]
+{{- end }}

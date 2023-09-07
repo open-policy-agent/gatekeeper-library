@@ -1,0 +1,40 @@
+# https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-loadbalancer-services/template.yaml
+{{- if .Values.validation.blockLoadBalancer.enabled }}
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sblockloadbalancer
+  annotations:
+    metadata.gatekeeper.sh/title: "Block Services with type LoadBalancer"
+    metadata.gatekeeper.sh/version: 1.0.0
+    meta.helm.sh/release-name: {{ .Release.Name }}
+    meta.helm.sh/release-namespace: {{ .Release.Namespace }}
+    description: >-
+      Disallows all Services with type LoadBalancer.
+
+      https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
+{{- if .Values.annotations }}
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    app.kubernetes.io/managed-by: "Helm"
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sBlockLoadBalancer
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sblockloadbalancer
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Service"
+          input.review.object.spec.type == "LoadBalancer"
+          msg := "User is not allowed to create service of type LoadBalancer"
+        }
+{{- end }}

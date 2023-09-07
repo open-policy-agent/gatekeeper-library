@@ -1,0 +1,49 @@
+{{- if .Values.mutation.pspRunAsNonRoot.enabled }}
+{{- if .Values.mutation.pspRunAsNonRoot.containerEnabled }}
+apiVersion: mutations.gatekeeper.sh/v1alpha1
+kind: Assign
+metadata:
+  name: k8spsprunasnonroot
+  namespace: {{ .Values.namespace }}
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  location: "spec.containers[name:*].securityContext.runAsNonRoot"
+  parameters:
+    pathTests:
+      - subPath: "spec.containers[name:*].securityContext.runAsNonRoot"
+        condition: MustNotExist
+    assign:
+      value: true
+{{- end }}
+{{- if .Values.mutation.pspRunAsNonRoot.initContainerEnabled }}
+---
+apiVersion: mutations.gatekeeper.sh/v1alpha1
+kind: Assign
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: k8spsprunasnonroot-init
+  namespace: {{ .Release.Namespace }}
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  location: "spec.initContainers[name:*].securityContext.runAsNonRoot"
+  parameters:
+    pathTests:
+      - subPath: "spec.initContainers[name:*].securityContext.runAsNonRoot"
+        condition: MustNotExist
+    assign:
+      value: true
+{{- end }}
+{{- end }}

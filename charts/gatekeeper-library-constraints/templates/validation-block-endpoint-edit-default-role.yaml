@@ -1,0 +1,20 @@
+{{- if .Values.validation.blockEndpointEditDefaultRole.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sBlockEndpointEditDefaultRole
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: block-endpoint-edit-default-role
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: ["rbac.authorization.k8s.io"]
+        kinds: ["ClusterRole"]
+{{- end }}

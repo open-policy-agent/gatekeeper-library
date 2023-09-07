@@ -1,0 +1,29 @@
+{{- if .Values.validation.disallowAnonymous.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sDisallowAnonymous
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: no-anonymous
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: ["rbac.authorization.k8s.io"]
+        kinds: ["ClusterRoleBinding"]
+      - apiGroups: ["rbac.authorization.k8s.io"]
+        kinds: ["RoleBinding"]
+  {{- if .Values.validation.disallowAnonymous.allowedRoles }}
+  parameters:
+    allowedRoles: 
+    {{- range $index, $role := .Values.validation.disallowAnonymous.allowedRoles }}
+      - {{ $role | quote }}
+    {{- end }}
+  {{- end }}
+{{- end }}

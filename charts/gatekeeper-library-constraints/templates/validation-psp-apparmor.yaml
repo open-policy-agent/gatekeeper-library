@@ -1,0 +1,25 @@
+{{- if .Values.validation.pspAppArmor.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAppArmor
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: psp-apparmor
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    allowedProfiles:
+    {{- range $index, $profile := .Values.validation.pspAppArmor.allowedProfiles }}
+      - {{ $profile | quote }}
+    {{- end }}
+{{- end }}

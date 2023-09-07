@@ -1,0 +1,37 @@
+{{- if .Values.validation.disallowedTags.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sDisallowedTags
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: container-image-must-not-have-latest-tag
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    {{- if .Values.validation.disallowedTags.namespaces }}
+    namespaces:
+    {{- range $index, $ns := .Values.validation.disallowedTags.namespaces }}
+      - {{ $ns | quote }}
+    {{- end }}
+    {{- end }}
+  parameters:
+    tags:
+    {{- range $index, $tag := .Values.validation.disallowedTags.tags }}
+      - {{ $tag | quote }}
+    {{- end }}
+    {{- if .Values.validation.disallowedTags.exemptImages }}
+    exemptImages:
+    {{- range $index, $image := .Values.validation.disallowedTags.exemptImages }}
+      - {{ $image | quote }}
+    {{- end }}
+    {{- end }}
+{{- end }}

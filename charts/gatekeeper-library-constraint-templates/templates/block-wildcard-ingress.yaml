@@ -1,0 +1,48 @@
+# https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-wildcard-ingress/template.yaml
+{{- if .Values.validation.blockWildcardIngress.enabled }}
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sblockwildcardingress
+  annotations:
+    metadata.gatekeeper.sh/title: "Block Wildcard Ingress"
+    metadata.gatekeeper.sh/version: 1.0.1
+    meta.helm.sh/release-name: {{ .Release.Name }}
+    meta.helm.sh/release-namespace: {{ .Release.Namespace }}
+    description: >-
+      Users should not be able to create Ingresses with a blank or wildcard (*) hostname since that would enable them to intercept traffic for other services in the cluster, even if they don't have access to those services.
+{{- if .Values.annotations }}
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    app.kubernetes.io/managed-by: "Helm"
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sBlockWildcardIngress
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package K8sBlockWildcardIngress
+
+        contains_wildcard(hostname) = true {
+          hostname == ""
+        }
+
+        contains_wildcard(hostname) = true {
+          contains(hostname, "*")
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Ingress"
+          # object.get is required to detect omitted host fields
+          hostname := object.get(input.review.object.spec.rules[_], "host", "")
+          contains_wildcard(hostname)
+          msg := sprintf("Hostname '%v' is not allowed since it counts as a wildcard, which can be used to intercept traffic from other applications.", [hostname])
+        }
+{{- end }}

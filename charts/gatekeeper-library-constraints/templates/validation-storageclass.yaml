@@ -1,0 +1,30 @@
+{{- if .Values.validation.storageClass.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sStorageClass
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: allowed-storageclass
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["PersistentVolumeClaim"]
+      - apiGroups: ["apps"]
+        kinds: ["StatefulSet"]
+  parameters:
+    includeStorageClassesInMessage: {{ .Values.validation.storageClass.includeStorageClassesInMessage }}
+    {{- if .Values.validation.storageClass.allowedStorageClasses }}
+    allowedStorageClasses:
+    {{- range $index, $sc := .Values.validation.storageClass.allowedStorageClasses }}
+      - {{ $sc | quote }}
+    {{- end }}
+    {{- end }}
+{{- end }}

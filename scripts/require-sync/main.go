@@ -4,7 +4,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io/fs"
@@ -14,16 +13,16 @@ import (
 	"strings"
 
 	constraintclient "github.com/open-policy-agent/frameworks/constraint/pkg/client"
-	"github.com/open-policy-agent/frameworks/constraint/pkg/client/drivers/local"
+	"github.com/open-policy-agent/frameworks/constraint/pkg/client/drivers/rego"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/core/templates"
-	gkapis "github.com/open-policy-agent/gatekeeper/apis"
-	"github.com/open-policy-agent/gatekeeper/pkg/gator/reader"
-	"github.com/open-policy-agent/gatekeeper/pkg/target"
+	gkapis "github.com/open-policy-agent/gatekeeper/v3/apis"
+	"github.com/open-policy-agent/gatekeeper/v3/pkg/gator/reader"
+	"github.com/open-policy-agent/gatekeeper/v3/pkg/syncutil/parser"
+	"github.com/open-policy-agent/gatekeeper/v3/pkg/target"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/utils/strings/slices"
 )
 
-const syncAnnotation string = "metadata.gatekeeper.sh/requiresSyncData"
+const syncAnnotation string = "metadata.gatekeeper.sh/requires-sync-data"
 
 var (
 	pathFlag = flag.String("path", "", "Path to verify referential templates include sync data.")
@@ -96,15 +95,10 @@ func checkTemplates(libraryPath string) error {
 
 		log.Printf("Referential template: %s\n", absolutePath)
 
-		// verify our annotation is present
-		content, ok := tmpl.GetAnnotations()[syncAnnotation]
-		if !ok {
-			return fmt.Errorf("template at path '%s' is missing annotation with key '%s'", absolutePath, syncAnnotation)
-		}
-
-		// verify the annotation content
-		if ok, err := validateRequiresSyncDataContent(strings.TrimSpace(content)); !ok {
-			return fmt.Errorf("template at path '%s' annotation with key '%s': %w", absolutePath, syncAnnotation, err)
+		// verify sync annotation is present and parsable by gatekeeper
+		_, err = parser.ReadSyncRequirements(tmpl)
+		if err != nil {
+			return fmt.Errorf("template at path %q is missing valid %s annotation: %w", absolutePath, syncAnnotation, err)
 		}
 
 		// verify that the sync object is present in the same directory as the template
@@ -181,12 +175,12 @@ func errTextIsReferential(err error) bool {
 }
 
 func opaClient(referential bool) (*constraintclient.Client, error) {
-	externs := local.Externs()
+	externs := rego.Externs()
 	if referential {
-		externs = local.Externs("inventory")
+		externs = rego.Externs("inventory")
 	}
 
-	driver, err := local.New(local.Tracing(false), externs)
+	driver, err := rego.New(rego.Tracing(false), externs)
 	if err != nil {
 		return nil, fmt.Errorf("creating driver: %w", err)
 	}
@@ -197,43 +191,4 @@ func opaClient(referential bool) (*constraintclient.Client, error) {
 	}
 
 	return client, nil
-}
-
-func validateRequiresSyncDataContent(annotation string) (bool, error) {
-	allowedKeys := []string{"kinds", "groups", "versions"}
-
-	// Remove outer quotes
-	annotation = annotation[1 : len(annotation)-1]
-
-	// Validate JSON
-	if ok := json.Valid([]byte(annotation)); !ok {
-		return false, fmt.Errorf("Error validating JSON format")
-	}
-
-	// Unmarshal JSON
-	var contents []interface{}
-	if err := json.Unmarshal([]byte(annotation), &contents); err != nil {
-		return false, fmt.Errorf("Error validating JSON content")
-	}
-
-	// Validate keys
-	for _, requirement := range contents {
-		requirement, ok := requirement.([]interface{})
-		if !ok {
-			return false, fmt.Errorf("Error validating requirement content")
-		}
-		for _, equivalents := range requirement {
-			equivalents, ok := equivalents.(map[string]interface{})
-			if !ok {
-				return false, fmt.Errorf("Error validating equivalents content")
-			}
-			for key := range equivalents {
-				if !slices.Contains(allowedKeys, key) {
-					return false, fmt.Errorf("Unexpected key '%s'", key)
-				}
-			}
-		}
-	}
-
-	return true, nil
 }

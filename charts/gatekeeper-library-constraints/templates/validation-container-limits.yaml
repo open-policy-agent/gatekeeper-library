@@ -1,0 +1,23 @@
+{{- if .Values.validation.containerLimits.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sContainerLimits
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: container-must-have-limits
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    cpu: {{ .Values.validation.containerLimits.cpu }}
+    memory: {{ .Values.validation.containerLimits.memory }}
+{{- end }}

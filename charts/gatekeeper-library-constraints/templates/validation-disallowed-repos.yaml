@@ -1,0 +1,27 @@
+{{- if .Values.validation.disallowedRepos.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sDisallowedRepos
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: disallowed-repos
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  {{- if .Values.validation.disallowAnonymous.allowedRoles }}
+  parameters:
+    repos: 
+    {{- range $index, $repo := .Values.validation.disallowedRepos.repos }}
+      - {{ $repo | quote }}
+    {{- end }}
+  {{- end }}
+{{- end }}

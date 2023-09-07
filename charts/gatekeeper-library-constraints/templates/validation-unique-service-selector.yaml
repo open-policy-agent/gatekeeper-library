@@ -1,0 +1,15 @@
+{{- if .Values.validation.uniqueServiceSelector.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sUniqueServiceSelector
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: unique-service-selector
+  namespace: {{ .Release.Namespace }}
+{{- end }}

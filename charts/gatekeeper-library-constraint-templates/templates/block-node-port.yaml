@@ -1,0 +1,40 @@
+# https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/block-nodeport-services/template.yaml
+{{- if .Values.validation.blockNodePort.enabled }}
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sblocknodeport
+  annotations:
+    metadata.gatekeeper.sh/title: "Block NodePort"
+    metadata.gatekeeper.sh/version: 1.0.0
+    meta.helm.sh/release-name: {{ .Release.Name }}
+    meta.helm.sh/release-namespace: {{ .Release.Namespace }}
+    description: >-
+      Disallows all Services with type NodePort.
+
+      https://kubernetes.io/docs/concepts/services-networking/service/#nodeport
+{{- if .Values.annotations }}
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    app.kubernetes.io/managed-by: "Helm"
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sBlockNodePort
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sblocknodeport
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Service"
+          input.review.object.spec.type == "NodePort"
+          msg := "User is not allowed to create service of type NodePort"
+        }
+{{- end }}

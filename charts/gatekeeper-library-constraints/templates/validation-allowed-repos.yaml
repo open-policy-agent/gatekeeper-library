@@ -1,0 +1,31 @@
+{{- if .Values.validation.allowedRepos.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sAllowedRepos
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: allowed-repos
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    {{- if .Values.validation.allowedRepos.namespaces}}
+    namespaces:
+    {{- range $index, $ns := .Values.validation.allowedRepos.namespaces }}
+      - {{ $ns | quote }}
+    {{- end }}
+    {{- end }}
+  parameters:
+    repos:
+    {{- range $index, $repo := .Values.validation.allowedRepos.repos }}
+      - {{ $repo | quote }}
+    {{- end }}
+{{- end }}

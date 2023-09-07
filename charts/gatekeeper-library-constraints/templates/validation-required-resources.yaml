@@ -1,0 +1,29 @@
+{{- if .Values.validation.requiredResources.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredResources
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: container-must-have-limits-and-requests
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    limits:
+    {{- range $index, $limit := .Values.validation.requiredResources.limits }}
+      - {{ $limit | quote }}
+    {{- end }}
+    requests:
+    {{- range $index, $request := .Values.validation.requiredResources.requests }}
+      - {{ $request | quote }}
+    {{- end }}
+{{- end }}

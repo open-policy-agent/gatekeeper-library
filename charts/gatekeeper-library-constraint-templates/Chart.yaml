@@ -1,0 +1,11 @@
+apiVersion: v1
+description: A Helm chart for Gatekeeper Library Constraint Templates
+name: gatekeeper-library-constraint-templates
+icon: https://open-policy-agent.github.io/gatekeeper/website/img/logo.svg
+keywords:
+  - open policy agent
+version: 1.0.0
+home: https://open-policy-agent.github.io/gatekeeper-library
+sources:
+  - https://github.com/open-policy-agent/gatekeeper-library.git
+appVersion: v1.0.0

@@ -1,0 +1,20 @@
+{{- if .Values.validation.blockWildcardIngress.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sBlockWildcardIngress
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: block-wildcard-ingress
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: ["extensions", "networking.k8s.io"]
+        kinds: ["Ingress"]
+{{- end }}

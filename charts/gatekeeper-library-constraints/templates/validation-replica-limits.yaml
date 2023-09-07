@@ -1,0 +1,26 @@
+{{- if .Values.validation.replicaLimits.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sReplicaLimits
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: replica-limits
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: ["apps"]
+        kinds: ["Deployment"]
+  parameters:
+    ranges:
+    - min_replicas: {{ .Values.validation.replicaLimits.minReplicas }}
+      {{- if .Values.validation.replicaLimits.maxReplicas }}
+      max_replicas: {{ .Values.validation.replicaLimits.maxReplicas }}
+      {{- end }}
+{{- end }}

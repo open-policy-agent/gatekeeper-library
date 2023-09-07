@@ -1,0 +1,26 @@
+{{- if .Values.validation.pspPrivilegedContainer.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPPrivilegedContainer
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: psp-privileged-container
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    {{- if .Values.validation.pspPrivilegedContainer.excludedNamespaces }}
+    excludedNamespaces:
+    {{- range $index, $ns := .Values.validation.pspPrivilegedContainer.excludedNamespaces }}
+      - {{ $ns | quote }}
+    {{- end }}
+    {{- end }}
+{{- end }}

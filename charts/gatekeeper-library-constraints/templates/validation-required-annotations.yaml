@@ -1,0 +1,24 @@
+{{- if .Values.validation.requiredAnnotations.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredAnnotations
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: reqired-annotations
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: {{ .Values.validation.requiredAnnotations.kinds }}
+  parameters:
+    message: {{ .Values.validation.requiredAnnotations.message }}
+    annotations:
+      {{ .Values.validation.requiredAnnotations.annotations | nindent 6 }}
+{{- end }}

@@ -1,0 +1,27 @@
+{{- if .Values.validation.pspSeccomp.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPSeccomp
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: psp-seccomp
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    {{- if .Values.validation.pspSeccomp.allowedProfiles }}
+    allowedProfiles:
+    {{- range $index, $profile := .Values.validation.pspSeccomp.allowedProfiles }}
+      - {{ $profile | quote }}
+    {{- end }}
+    {{- end }}
+{{- end }}

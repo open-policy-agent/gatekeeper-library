@@ -1,0 +1,23 @@
+{{- if .Values.validation.verifyDeprecatedAPI.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: VerifyDeprecatedAPI
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: verify
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      {{ .Values.validation.verifyDeprecatedAPI.kinds | nindent 6 }}
+  parameters:
+    kvs: 
+      {{ .Values.validation.verifyDeprecatedAPI.kvs | nindent 6 }}
+    k8sVersion: {{ .Values.validation.verifyDeprecatedAPI.k8sVersion }}
+{{- end }}

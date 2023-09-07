@@ -1,0 +1,31 @@
+{{- if .Values.validation.horizontalPodAutoscaler.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sHorizontalPodAutoscaler
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: horizontal-pod-autoscaler
+  namespace: {{ .Release.Namespace }}
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups: ["autoscaling"]
+        kinds: ["HorizontalPodAutoscaler"]
+  parameters:
+    {{- if .Values.validation.horizontalPodAutoscaler.minimumReplicaSpread }}
+    minimumReplicaSpread: {{ .Values.validation.horizontalPodAutoscaler.minimumReplicaSpread }}
+    {{- end }}
+    enforceScaleTargetRef: {{ .Values.validation.horizontalPodAutoscaler.enforceScaleTargetRef }}
+    ranges:
+    - min_replicas: {{ .Values.validation.horizontalPodAutoscaler.minReplicas }}
+      {{- if .Values.validation.horizontalPodAutoscaler.maxReplicas  }}
+      max_replicas: {{ .Values.validation.horizontalPodAutoscaler.maxReplicas }}
+      {{- end }}
+{{- end }}

@@ -1,0 +1,22 @@
+{{- if .Values.validation.containerEphemeralStorageLimit.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sContainerEphemeralStorageLimit
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: container-ephemeral-storage-limit
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    ephemeral-storage: {{ .Values.validation.containerEphemeralStorageLimit.limit }}
+{{- end }}

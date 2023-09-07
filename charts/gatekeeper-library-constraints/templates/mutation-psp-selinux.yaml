@@ -1,0 +1,31 @@
+{{- if .Values.mutation.pspSELinux.enabled }}
+apiVersion: mutations.gatekeeper.sh/v1alpha1
+kind: Assign
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: k8spspselinux
+  namespace: {{ .Release.Namespace }}
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  location: spec.containers[name:*].securityContext.seLinuxOptions
+  parameters:
+    pathTests:
+    - subPath: spec.containers[name:*].securityContext.seLinuxOptions
+      condition: MustNotExist
+    assign:
+      value:
+        level: {{ .Values.mutation.pspSELinux.level }}
+        user: {{ .Values.mutation.pspSELinux.user }}
+        role: {{ .Values.mutation.pspSELinux.role }}
+        type: {{ .Values.mutation.pspSELinux.type }}
+{{- end }}

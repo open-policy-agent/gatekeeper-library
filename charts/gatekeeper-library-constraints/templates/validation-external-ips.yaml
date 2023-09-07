@@ -1,0 +1,25 @@
+{{- if .Values.validation.externalIPs.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sExternalIPs
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: external-ips
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Service"]
+  parameters:
+    allowedIPs:
+    {{- range $index, $ip := .Values.validation.externalIPs.allowedIPs }}
+      - {{ $ip | quote }}
+    {{- end }}
+{{- end }}

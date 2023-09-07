@@ -1,0 +1,24 @@
+{{- if .Values.validation.podDisruptionBudget.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPodDisruptionBudget
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: pod-distruption-budget
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: ["apps"]
+        kinds: ["Deployment", "ReplicaSet", "StatefulSet"]
+      - apiGroups: ["policy"]
+        kinds: ["PodDisruptionBudget"]
+      - apiGroups: [""]
+        kinds: ["ReplicationController"]
+{{- end }}

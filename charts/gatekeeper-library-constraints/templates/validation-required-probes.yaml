@@ -1,0 +1,29 @@
+{{- if .Values.validation.requiredProbes.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredProbes
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: must-have-probes
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    probes:
+    {{- range $index, $probe := .Values.validation.requiredProbes.probes }}
+      - {{ $probe | quote }}
+    {{- end }}
+    probeTypes:
+    {{- range $index, $type := .Values.validation.requiredProbes.probeTypes }}
+      - {{ $type | quote }}
+    {{- end }}
+{{- end }}

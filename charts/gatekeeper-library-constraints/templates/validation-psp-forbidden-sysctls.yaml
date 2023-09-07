@@ -1,0 +1,33 @@
+{{- if .Values.validation.pspForbiddenSysctls.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPForbiddenSysctls
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: psp-forbidden-sysctls
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    {{- if .Values.validation.pspForbiddenSysctls.forbiddenSysctls }}
+    forbiddenSysctls:
+    {{- range $index, $sysctl := .Values.validation.pspForbiddenSysctls.forbiddenSysctls }}
+      - {{ $sysctl | quote }}
+    {{- end }}
+    {{- end }}
+    {{- if .Values.validation.pspForbiddenSysctls.allowedSysctls }}
+    allowedSysctls:
+    {{- range $index, $sysctl := .Values.validation.pspForbiddenSysctls.allowedSysctls }}
+      - {{ $sysctl | quote }}
+    {{- end }}
+    {{- end }}
+{{- end }}

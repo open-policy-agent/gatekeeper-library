@@ -1,0 +1,23 @@
+{{- if .Values.validation.containerRequests.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sContainerRequests
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: container-must-have-requests
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    cpu: {{ .Values.validation.containerRequests.cpu }}
+    memory: {{ .Values.validation.containerRequests.memory }}
+{{- end }}

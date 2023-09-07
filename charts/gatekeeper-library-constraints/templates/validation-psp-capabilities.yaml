@@ -1,0 +1,35 @@
+{{- if .Values.validation.pspCapabilities.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPCapabilities
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: capabilities-demo
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - "default"
+  parameters:
+    {{- if .Values.validation.pspCapabilities.allowedCapabilities }}
+    allowedCapabilities:
+    {{- range $index, $capability := .Values.validation.pspCapabilities.allowedCapabilities }}
+      - {{ $capability | quote }}
+    {{- end }}
+    {{- end }}
+    {{- if .Values.validation.pspCapabilities.requiredDropCapabilities }}
+    requiredDropCapabilities:
+    {{- range $index, $capability := .Values.validation.pspCapabilities.requiredDropCapabilities }}
+      - {{ $capability | quote }}
+    {{- end }}
+    {{- end }}
+{{- end }}

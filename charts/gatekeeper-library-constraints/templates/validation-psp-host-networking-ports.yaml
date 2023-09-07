@@ -1,0 +1,24 @@
+{{- if .Values.validation.pspHostNetworkingPorts.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostNetworkingPorts
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: psp-host-network-ports
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    hostNetwork: {{ .Values.validation.pspHostNetworkingPorts.hostNetwork }}
+    min: {{ .Values.validation.pspHostNetworkingPorts.min }}
+    max: {{ .Values.validation.pspHostNetworkingPorts.max }}
+{{- end }}

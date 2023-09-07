@@ -1,0 +1,24 @@
+{{- if .Values.validation.imageDigests.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sImageDigests
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: container-image-must-have-digest
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+    {{- range $index, $ns := .Values.validation.imageDigests.namespaces }}
+      - {{ $ns | quote }}
+    {{- end }}
+{{- end }}

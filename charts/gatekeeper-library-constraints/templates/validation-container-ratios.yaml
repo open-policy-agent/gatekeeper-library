@@ -1,0 +1,27 @@
+{{- if .Values.validation.containerRatios.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sContainerRatios
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: container-must-meet-memory-and-cpu-ratio
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    {{- if .Values.validation.containerRatios.memoryRatio }}
+    ratio: {{ .Values.validation.containerRatios.memoryRatio }}
+    {{- end }}
+    {{- if .Values.validation.containerRatios.cpuRatio }}
+    cpuRatio: {{ .Values.validation.containerRatios.cpuRatio }}
+    {{- end }}
+{{- end }}

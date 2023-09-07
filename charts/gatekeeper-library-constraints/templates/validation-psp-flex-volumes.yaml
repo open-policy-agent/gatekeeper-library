@@ -1,0 +1,27 @@
+{{- if .Values.validation.pspFlexVolumes.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPFlexVolumes
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: psp-flexvolume-drivers
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    {{- if .Values.validation.pspFlexVolumes.allowedFlexVolumes }}
+    allowedFlexVolumes:
+    {{- range $index, $volume := .Values.validation.pspFlexVolumes.allowedFlexVolumes }}
+      - driver: {{ $volume | quote }}
+    {{- end }}
+    {{- end }}
+{{- end }}

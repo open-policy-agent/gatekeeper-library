@@ -1,0 +1,27 @@
+{{- if .Values.mutation.pspReadOnlyRootFS.enabled }}
+apiVersion: mutations.gatekeeper.sh/v1alpha1
+kind: Assign
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: k8spspreadonlyrootfs
+  namespace: {{ .Release.Namespace }}
+spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  location: "spec.containers[name:*].securityContext.readOnlyRootFilesystem"
+  parameters:
+    pathTests:
+    - subPath: "spec.containers[name:*].securityContext.readOnlyRootFilesystem"
+      condition: MustNotExist
+    assign:
+      value: true
+{{- end }}

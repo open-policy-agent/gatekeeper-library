@@ -1,0 +1,334 @@
+annotations:
+labels:
+
+mutation:
+  # https://open-policy-agent.github.io/gatekeeper-library/website/mutation-examples/allow-privilege-escalation
+  pspAllowPrivilegeEscalation:
+    containerEnabled: false
+    enabled: false
+    ephemeralContainerEnabled: false
+    initContainerEnabled: false
+  
+  # https://open-policy-agent.github.io/gatekeeper-library/website/mutation-examples/capabilities
+  pspCapabilities:
+    enabled: false
+  
+  # https://open-policy-agent.github.io/gatekeeper-library/website/mutation-examples/read-only-root-filesystem
+  pspReadOnlyRootFS:
+    capabilities:
+    enabled: false
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/mutation-examples/seccomp
+  pspRunAsNonRoot:
+    containerEnabled: false
+    enabled: false
+    initContainerEnabled: false
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/mutation-examples/seccomp
+  pspSeccomp:
+    enabled: false
+    value:
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/mutation-examples/selinux
+  pspSELinux:
+    enabled: false
+    level:
+    role:
+    type:
+    user:
+
+validation:
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/allowedrepos
+  allowedRepos:
+    enabled: false
+    namespaces: # defaults to *
+    repos:
+      - "openpolicyagent/"
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/block-endpoint-edit-default-role
+  blockEndpointEditDefaultRole:
+    enabled: false
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/block-loadbalancer-services
+  blockLoadBalancer:
+    enabled: false
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/block-nodeport-services
+  blockNodePort:
+    enabled: false
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/block-wildcard-ingress
+  blockWildcardIngress:
+    enabled: false
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/ephemeralstoragelimit
+  containerEphemeralStorageLimit:
+    enabled: false
+    limit: "500mi"
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/containerlimits
+  containerLimits:
+    enabled: false
+    cpu: "200m"
+    memory: "1Gi"
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/containerresourceratios
+  containerRatios:
+    enabled: false
+    cpuRatio: ""
+    memoryRatio: ""
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/containerrequests
+  containerRequests:
+    enabled: false
+    cpu: "200m"
+    memory: "1Gi"
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/disallowanonymous
+  disallowAnonymous:
+    enabled: false
+    roles:
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/disallowedrepos
+  disallowedRepos:
+    enabled: false
+    repos:
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/disallowedtags
+  disallowedTags:
+    enabled: false
+    exemptImages:
+    namespaces: # defaults to *
+    tags:
+      - "latest"
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/externalip
+  externalIPs:
+    allowedIPs:
+      - "0.0.0.0"
+    enabled: false
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/horizontalpodautoscaler
+  horizontalPodAutoscaler:
+    enforceScaleTargetRef: false
+    enabled: false
+    maxReplicas:
+    minReplicas: 1
+    minimumReplicaSpread:
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/httpsonly
+  httpsOnly:
+    enabled: false
+    tlsOptional: true
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/imagedigests
+  imageDigests:
+    enabled: false
+    namespaces: # defaults to *
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/noupdateserviceaccount
+  noUpdateServiceAccount:
+    allowedGroups:
+    allowedUsers:
+    enabled: false
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/poddisruptionbudget
+  podDisruptionBudget:
+    enabled: false
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/allow-privilege-escalation
+  pspAllowPrivilegeEscalationContainer:
+    enabled: false
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/users
+  pspAllowedUsers:
+    enabled: false
+    fsGroup:
+      # rule: MustRunAs RunAsAny 
+      # ranges:
+      #   - min: 100
+      #     max: 200
+    runAsGroup:
+      # rule: MustRunAs RunAsAny 
+      # ranges:
+      #   - min: 100
+      #     max: 200
+    runAsUser:
+      # rule: MustRunAs MustRunAsNonRoot RunAsAny 
+      # ranges:
+      #   - min: 100
+      #     max: 200
+    supplementalGroups:
+      # rule: MustRunAs RunAsAny 
+      # ranges:
+      #   - min: 100
+      #     max: 200
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/apparmor
+  pspAppArmor:
+    allowedProfiles:
+      - runtime/default
+    enabled: false
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/automount-serviceaccount-token  
+  pspAutomountServiceAccountTokenPod:
+    enabled: false
+    excludedNamespaces: # defaults to none
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/capabilities
+  pspCapabilities:
+    allowedCapabilities:
+    enabled: false
+    requiredDropCapabilities:
+    namespaces: # defaults to *
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/flexvolume-drivers
+  pspFlexVolumes:
+    allowedFlexVolumes:
+    enabled: false
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/forbidden-sysctls
+  pspForbiddenSysctls:
+    allowedSysctls:
+    enabled: false
+    forbiddenSysctls:
+      - kernel.*
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/fsgroup
+  pspFsgroup:
+    enabled: false
+    rule: "MayRunAs" #"MustRunAs" #"MayRunAs", "RunAsAny"
+    ranges:
+    - min: 1
+      max: 1000
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/host-filesystem
+  pspHostFilesystem:
+    allowedHostPaths:
+        # - readOnly: true
+        #   pathPrefix: "/foo"
+    enabled: false
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/host-namespaces
+  pspHostNamespace:
+    enabled: false
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/host-network-ports
+  pspHostNetworkingPorts:
+    enabled: false
+    hostNetwork: true
+    max: 9000
+    min: 80
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/privileged-containers
+  pspPrivilegedContainer:
+    enabled: false
+    excludedNamespaces: # defaults to none
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/proc-mount
+  pspProcMount:
+    enabled: false
+    procMount: "Default"
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/read-only-root-filesystem
+  pspReadOnlyRootFilesystem:
+    enabled: false
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/seccomp
+  pspSeccomp:
+    allowedProfiles:
+    enabled: false
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/selinux
+  pspSELinuxV2:
+    allowedSELinuxOptions:
+      # - level: s0:c123,c456
+      #   role: object_r
+      #   type: svirt_sandbox_file_t
+      #   user: system_u
+    enabled: false
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/volumes
+  pspVolumeTypes:
+    enabled: false
+    volumes:
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/replicalimits
+  replicaLimits:
+    enabled: false
+    maxReplicas:
+    minReplicas: 1
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/requiredannotations
+  requiredAnnotations:
+    annotations:
+      - key: a8r.io/owner
+        # Matches email address or github user
+        allowedRegex: ^([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}|[a-z]{1,39})$
+      - key: a8r.io/runbook
+        # Matches urls including or not http/https
+        allowedRegex: ^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$
+    enabled: false
+    kinds: ["Service"]
+    message: "All services must have a `a8r.io/owner` and `a8r.io/runbook` annotations."
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/requiredlabels
+  requiredLabels:
+    enabled: false
+    kinds: ["Namespace"]
+    labels:
+      - key: owner
+        allowedRegex: "^[a-zA-Z]+.agilebank.demo$"
+    message: "All namespaces must have an `owner` label that points to your company username"
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/requiredprobes
+  requiredProbes:
+    enabled: false
+    probes:
+     - "readinessProbe"
+     - "livenessProbe"
+    probeTypes: 
+      - "tcpSocket"
+      - "httpGet"
+      - "exec"
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/containerresources
+  requiredResources:
+    enabled: false
+    limits:
+      - cpu
+      - memory
+    requests:
+      - cpu
+      - memory
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/storageclass
+  storageClass:
+    allowedStorageClasses:
+    enabled: false
+    includeStorageClassesInMessage: true
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/uniqueingresshost
+  uniqueIngressHost:
+    enabled: false
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/uniqueserviceselector 
+  uniqueServiceSelector:
+    enabled: false
+
+  # https://open-policy-agent.github.io/gatekeeper-library/website/validation/verifydeprecatedapi
+  verifyDeprecatedAPI:
+    enabled: false
+    k8sVersion: 1.26
+    kinds:
+      - apiGroups: ["flowcontrol.apiserver.k8s.io"]
+        kinds: ["FlowSchema", "PriorityLevelConfiguration"]
+      - apiGroups: ["autoscaling"]
+        kinds: ["HorizontalPodAutoscaler"]
+    kvs: 
+      - deprecatedAPI: "flowcontrol.apiserver.k8s.io/v1beta1"
+        kinds: ["FlowSchema", "PriorityLevelConfiguration"]
+        targetAPI: "flowcontrol.apiserver.k8s.io/v1beta3"
+      - deprecatedAPI: "autoscaling/v2beta2"
+        kinds: ["HorizontalPodAutoscaler"]
+        targetAPI: "autoscaling/v2"

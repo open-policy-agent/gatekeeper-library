@@ -1,0 +1,37 @@
+{{- if .Values.validation.pspAllowedUsers.enabled }}
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPAllowedUsers
+metadata:
+{{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | nindent 4 }}
+{{- end }}
+{{- if .Values.labels }}
+  labels:
+    {{ toYaml .Values.labels | nindent 4 }}
+{{- end }}
+  name: psp-pods-allowed-user-ranges
+  namespace: {{ .Release.Namespace }}
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    {{- if .Values.validation.pspAllowedUsers.runAsUser }}
+    runAsUser:
+      {{ .Values.validation.pspAllowedUsers.runAsUser | nindent 6 }}
+    {{- end }}
+    {{- if .Values.validation.pspAllowedUsers.runAsGroup }}
+    runAsGroup:
+      {{ .Values.validation.pspAllowedUsers.runAsGroup | nindent 6 }}
+    {{- end }}
+    {{- if .Values.validation.pspAllowedUsers.supplementalGroups }}
+    supplementalGroups:
+      {{ .Values.validation.pspAllowedUsers.supplementalGroups | nindent 6 }}
+    {{- end }}
+    {{- if .Values.validation.pspAllowedUsers.fsGroup }}
+    fsGroup:
+      {{ .Values.validation.pspAllowedUsers.fsGroup | nindent 6 }}
+    {{- end }}
+{{- end }}
