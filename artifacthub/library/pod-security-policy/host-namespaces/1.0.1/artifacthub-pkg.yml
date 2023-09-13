@@ -3,7 +3,7 @@ name: k8spsphostnamespace
 displayName: Host Namespace
 createdAt: "2023-05-23T09:47:31Z"
 description: Disallows sharing of host PID and IPC namespaces by pod containers. Corresponds to the `hostPID` and `hostIPC` fields in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
-digest: af63ee9b0b61519aa6e3a63f36e41ee56706805e0f04c92e6b21dc98fb08cfc8
+digest: a0e3fc6ed087233e70ae10bdc2a3ee550226207bf2bf7fb4567833710d39bed0
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/host-namespaces
 keywords:

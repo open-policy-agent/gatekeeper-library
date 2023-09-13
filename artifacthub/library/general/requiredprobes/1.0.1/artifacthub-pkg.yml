@@ -3,7 +3,7 @@ name: k8srequiredprobes
 displayName: Required Probes
 createdAt: "2023-05-23T09:47:30Z"
 description: Requires Pods to have readiness and/or liveness probes.
-digest: 55e7fd2c471e761e3530d0e7d2a4a7c0cbe63b957aa219a538c3e05dda6ae377
+digest: 217bec367754aadcce3929828825aca968030e4219045d659553a9cc0173d18d
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/requiredprobes
 keywords:

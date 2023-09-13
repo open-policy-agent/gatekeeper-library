@@ -3,7 +3,7 @@ name: k8spsphostnetworkingports
 displayName: Host Networking Ports
 createdAt: "2023-05-23T09:47:31Z"
 description: Controls usage of host network namespace by pod containers. Specific ports must be specified. Corresponds to the `hostNetwork` and `hostPorts` fields in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
-digest: 0032aa648e76385fb05fbd44d525ea97e78ceae87b5b615ec527ba3e9af0c5a2
+digest: 00d1eec4552138ea7eb40a5f24cd8d5ec3b3da5bc7121928d1f66dc899064d86
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/host-network-ports
 keywords:
