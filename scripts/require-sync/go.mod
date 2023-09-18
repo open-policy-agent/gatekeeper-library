@@ -3,8 +3,8 @@ module require-sync
 go 1.20
 
 require (
-	github.com/open-policy-agent/frameworks/constraint v0.0.0-20230712214810-96753a21c26f
-	github.com/open-policy-agent/gatekeeper/v3 v3.13.0
+	github.com/open-policy-agent/frameworks/constraint v0.0.0-20230812003220-e24af74adbae
+	github.com/open-policy-agent/gatekeeper/v3 v3.14.0-beta.0.0.20230831155303-366ba791d009
 	k8s.io/apimachinery v0.27.6
 )
 
@@ -107,11 +107,11 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/api v0.27.2 // indirect
-	k8s.io/apiextensions-apiserver v0.27.2 // indirect
-	k8s.io/apiserver v0.27.2 // indirect
-	k8s.io/client-go v0.27.2 // indirect
-	k8s.io/component-base v0.27.2 // indirect
+	k8s.io/api v0.27.4 // indirect
+	k8s.io/apiextensions-apiserver v0.27.4 // indirect
+	k8s.io/apiserver v0.27.4 // indirect
+	k8s.io/client-go v0.27.4 // indirect
+	k8s.io/component-base v0.27.4 // indirect
 	k8s.io/klog/v2 v2.90.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20230501164219-8b0f38b5fd1f // indirect
 	k8s.io/utils v0.0.0-20230209194617-a36077c30491 // indirect
