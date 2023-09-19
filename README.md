@@ -69,9 +69,10 @@ Each new policy should contain:
 * `kustomization.yaml` and `suite.yaml` under `library/<policy-name>`
 * The rego source, as `src.rego` and unit tests as `src_test.rego` in the corresponding subdirectory under `src/<policy-name>`
 * [Versioning](https://docs.google.com/document/d/1IYiypA-mRcdfSVfmoeyuaeG8XtA1u4GkcqH3kEkv2uw/edit) has been introduced for Gatekeeper Library policies. Please make sure to add or bump the version of the policy as per the guidelines in the `src/<policy-name>/constraint.tmpl` annotation.
-  * Major version bump required: Whenever there is a breaking change in the policy e.g.  updating template Kind, parameter schema, or any other breaking changes
+  * Major version bump required: Whenever there is a breaking change in the policy e.g.  updating template Kind, updating existing parameter schema, adding the `requires-sync-data` annotation to sync new data, or any other breaking changes
   * Minor version bump required: Whenever there is a backward compatible change in the policy e.g. adding a parameter, updating Rego logic
   * Patch version bump required: Whenever there is a simple backward compatible change in the policy, e.g. Simple Rego fix, updating policy metadata
+  * Note: Sample constraints, mutations, and expansion templates are provided as examples, and severable changes do not require a version bump.
 
 ### Development
 
