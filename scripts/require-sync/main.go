@@ -16,8 +16,8 @@ import (
 	"github.com/open-policy-agent/frameworks/constraint/pkg/client/drivers/rego"
 	"github.com/open-policy-agent/frameworks/constraint/pkg/core/templates"
 	gkapis "github.com/open-policy-agent/gatekeeper/v3/apis"
+	"github.com/open-policy-agent/gatekeeper/v3/pkg/cachemanager/parser"
 	"github.com/open-policy-agent/gatekeeper/v3/pkg/gator/reader"
-	"github.com/open-policy-agent/gatekeeper/v3/pkg/syncutil/parser"
 	"github.com/open-policy-agent/gatekeeper/v3/pkg/target"
 	"k8s.io/apimachinery/pkg/runtime"
 )
