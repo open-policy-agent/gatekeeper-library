@@ -105,6 +105,11 @@ test_input_hostpath_allowed_mixed_writable_mixed_parameters {
     results := violation with input as input
     count(results) == 0
 }
+test_update {
+    input := { "review": object.union(input_review, {"operation": "UPDATE"}), "parameters": input_parameters_empty}
+    results := violation with input as input
+    count(results) == 0
+}
 
 
 # Init Containers

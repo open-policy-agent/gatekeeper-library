@@ -16,7 +16,7 @@ metadata:
   name: k8spspforbiddensysctls
   annotations:
     metadata.gatekeeper.sh/title: "Forbidden Sysctls"
-    metadata.gatekeeper.sh/version: 1.1.1
+    metadata.gatekeeper.sh/version: 1.1.2
     description: >-
       Controls the `sysctl` profile used by containers. Corresponds to the
       `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy.
@@ -54,8 +54,13 @@ spec:
       rego: |
         package k8spspforbiddensysctls
 
+        import data.lib.exclude_update.is_update
+
         # Block if forbidden
         violation[{"msg": msg, "details": {}}] {
+            # spec.securityContext.sysctls field is immutable.
+            not is_update(input.review)
+
             sysctl := input.review.object.spec.securityContext.sysctls[_].name
             forbidden_sysctl(sysctl)
             msg := sprintf("The sysctl %v is not allowed, pod: %v. Forbidden sysctls: %v", [sysctl, input.review.object.metadata.name, input.parameters.forbiddenSysctls])
@@ -63,6 +68,7 @@ spec:
 
         # Block if not explicitly allowed
         violation[{"msg": msg, "details": {}}] {
+            not is_update(input.review)
             sysctl := input.review.object.spec.securityContext.sysctls[_].name
             not allowed_sysctl(sysctl)
             msg := sprintf("The sysctl %v is not explicitly allowed, pod: %v. Allowed sysctls: %v", [sysctl, input.review.object.metadata.name, input.parameters.allowedSysctls])
@@ -97,6 +103,13 @@ spec:
             endswith(allowed, "*")
             startswith(sysctl, trim_suffix(allowed, "*"))
         }
+      libs:
+        - |
+          package lib.exclude_update
+
+          is_update(review) {
+              review.operation == "UPDATE"
+          }
 
 ```
 
@@ -193,6 +206,41 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>update</summary>
+
+```yaml
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx-forbidden-sysctls-disallowed
+      labels:
+        app: nginx-forbidden-sysctls
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+      securityContext:
+        sysctls:
+          - name: kernel.msgmax
+            value: "65536"
+          - name: net.core.somaxconn
+            value: "1024"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/update.yaml
 ```
 
 </details>

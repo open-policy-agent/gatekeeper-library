@@ -16,7 +16,7 @@ metadata:
   name: k8spsphostnamespace
   annotations:
     metadata.gatekeeper.sh/title: "Host Namespace"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Disallows sharing of host PID and IPC namespaces by pod containers.
       Corresponds to the `hostPID` and `hostIPC` fields in a PodSecurityPolicy.
@@ -41,7 +41,12 @@ spec:
       rego: |
         package k8spsphostnamespace
 
+        import data.lib.exclude_update.is_update
+
         violation[{"msg": msg, "details": {}}] {
+            # spec.hostPID and spec.hostIPC fields are immutable.
+            not is_update(input.review)
+
             input_share_hostnamespace(input.review.object)
             msg := sprintf("Sharing the host namespace is not allowed: %v", [input.review.object.metadata.name])
         }
@@ -52,6 +57,13 @@ spec:
         input_share_hostnamespace(o) {
             o.spec.hostIPC
         }
+      libs:
+        - |
+          package lib.exclude_update
+
+          is_update(review) {
+              review.operation == "UPDATE"
+          }
 
 ```
 
@@ -136,6 +148,37 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-namespaces/samples/psp-host-namespace/example_disallowed.yaml
+```
+
+</details>
+<details>
+<summary>update</summary>
+
+```yaml
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx-host-namespace-disallowed
+      labels:
+        app: nginx-host-namespace
+    spec:
+      hostPID: true
+      hostIPC: true
+      containers:
+      - name: nginx
+        image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-namespaces/samples/psp-host-namespace/update.yaml
 ```
 
 </details>

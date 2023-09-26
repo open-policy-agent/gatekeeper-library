@@ -1,0 +1,22 @@
+version: 1.0.1
+name: k8srequiredprobes
+displayName: Required Probes
+createdAt: "2023-05-23T09:47:30Z"
+description: Requires Pods to have readiness and/or liveness probes.
+digest: 217bec367754aadcce3929828825aca968030e4219045d659553a9cc0173d18d
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/requiredprobes
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Required Probes
+    Requires Pods to have readiness and/or liveness probes.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/requiredprobes/1.0.1/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

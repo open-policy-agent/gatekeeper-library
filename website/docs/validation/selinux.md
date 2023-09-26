@@ -16,7 +16,7 @@ metadata:
   name: k8spspselinuxv2
   annotations:
     metadata.gatekeeper.sh/title: "SELinux V2"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Defines an allow-list of seLinuxOptions configurations for pod
       containers. Corresponds to a PodSecurityPolicy requiring SELinux configs.
@@ -71,16 +71,23 @@ spec:
       rego: |
         package k8spspselinux
 
+        import data.lib.exclude_update.is_update
         import data.lib.exempt_container.is_exempt
 
         # Disallow top level custom SELinux options
         violation[{"msg": msg, "details": {}}] {
+            # spec.securityContext.seLinuxOptions field is immutable.
+            not is_update(input.review)
+
             has_field(input.review.object.spec.securityContext, "seLinuxOptions")
             not input_seLinuxOptions_allowed(input.review.object.spec.securityContext.seLinuxOptions)
             msg := sprintf("SELinux options is not allowed, pod: %v. Allowed options: %v", [input.review.object.metadata.name, input.parameters.allowedSELinuxOptions])
         }
         # Disallow container level custom SELinux options
         violation[{"msg": msg, "details": {}}] {
+            # spec.containers.securityContext.seLinuxOptions field is immutable.
+            not is_update(input.review)
+
             c := input_security_context[_]
             not is_exempt(c)
             has_field(c.securityContext, "seLinuxOptions")
@@ -121,6 +128,12 @@ spec:
             object[field]
         }
       libs:
+        - |
+          package lib.exclude_update
+
+          is_update(review) {
+              review.operation == "UPDATE"
+          }
         - |
           package lib.exempt_container
 
@@ -269,6 +282,41 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/selinux/samples/psp-selinux-v2/disallowed_ephemeral.yaml
+```
+
+</details>
+<details>
+<summary>update</summary>
+
+```yaml
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+        name: nginx-selinux-disallowed
+        labels:
+            app: nginx-selinux
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        securityContext:
+          seLinuxOptions:
+            level: s1:c234,c567
+            user: sysadm_u
+            role: sysadm_r
+            type: svirt_lxc_net_t
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/selinux/samples/psp-selinux-v2/update.yaml
 ```
 
 </details>

@@ -1,15 +1,22 @@
 package k8spspselinux
 
+import data.lib.exclude_update.is_update
 import data.lib.exempt_container.is_exempt
 
 # Disallow top level custom SELinux options
 violation[{"msg": msg, "details": {}}] {
+    # spec.securityContext.seLinuxOptions field is immutable.
+    not is_update(input.review)
+
     has_field(input.review.object.spec.securityContext, "seLinuxOptions")
     not input_seLinuxOptions_allowed(input.review.object.spec.securityContext.seLinuxOptions)
     msg := sprintf("SELinux options is not allowed, pod: %v. Allowed options: %v", [input.review.object.metadata.name, input.parameters.allowedSELinuxOptions])
 }
 # Disallow container level custom SELinux options
 violation[{"msg": msg, "details": {}}] {
+    # spec.containers.securityContext.seLinuxOptions field is immutable.
+    not is_update(input.review)
+
     c := input_security_context[_]
     not is_exempt(c)
     has_field(c.securityContext, "seLinuxOptions")

@@ -153,6 +153,12 @@ test_input_sysctls_allowed_and_forbidden {
     count(results) == 2
 }
 
+test_update {
+    input := { "review": object.union(input_review, {"operation": "UPDATE"}), "parameters": input_parameters_wildcard}
+    results := violation with input as input
+    count(results) == 0
+}
+
 input_review = {
     "object": {
         "metadata": {

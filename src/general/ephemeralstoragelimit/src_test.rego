@@ -147,6 +147,11 @@ test_input_violations_eph_Ei_with_exemption {
     results := violation with input as input
     count(results) == 0
 }
+test_update {
+    input := {"review": object.union(review([ctr("a", 4096)]), {"operation": "UPDATE"}), "parameters": {"ephemeral-storage": "2048"}}
+    results := violation with input as input
+    count(results) == 0
+}
 
 review(containers) = output {
   output = {

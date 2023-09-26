@@ -1,0 +1,22 @@
+version: 1.0.1
+name: k8spspfsgroup
+displayName: FS Group
+createdAt: "2023-05-23T09:47:31Z"
+description: Controls allocating an FSGroup that owns the Pod's volumes. Corresponds to the `fsGroup` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
+digest: 18d489cff65194e1ee7963197d4384cbd6b3141e3babfa66aff59b5062e32d35
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/fsgroup
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # FS Group
+    Controls allocating an FSGroup that owns the Pod's volumes. Corresponds to the `fsGroup` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/pod-security-policy/fsgroup/1.0.1/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

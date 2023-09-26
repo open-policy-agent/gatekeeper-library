@@ -17,7 +17,7 @@ metadata:
   name: k8scontainerephemeralstoragelimit
   annotations:
     metadata.gatekeeper.sh/title: "Container ephemeral storage limit"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Requires containers to have an ephemeral storage limit set and constrains
       the limit to be within the specified maximum values.
@@ -51,6 +51,7 @@ spec:
       rego: |
         package k8scontainerephemeralstoragelimit
 
+        import data.lib.exclude_update.is_update
         import data.lib.exempt_container.is_exempt
 
         missing(obj, field) = true {
@@ -163,10 +164,14 @@ spec:
         }
 
         violation[{"msg": msg}] {
+          # spec.containers.resources.limits["ephemeral-storage"] field is immutable.
+          not is_update(input.review)
+
           general_violation[{"msg": msg, "field": "containers"}]
         }
 
         violation[{"msg": msg}] {
+          not is_update(input.review)
           general_violation[{"msg": msg, "field": "initContainers"}]
         }
 
@@ -212,6 +217,12 @@ spec:
           msg := sprintf("container <%v> ephemeral-storage limit <%v> is higher than the maximum allowed of <%v>", [container.name, storage_orig, max_storage_orig])
         }
       libs:
+        - |
+          package lib.exclude_update
+
+          is_update(review) {
+              review.operation == "UPDATE"
+          }
         - |
           package lib.exempt_container
 
@@ -458,6 +469,44 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/ephemeralstoragelimit/samples/container-must-have-ephemeral-storage-limit/example_disallowed_ephemeral_storage_limit_1Pi-initContainer.yaml
+```
+
+</details>
+<details>
+<summary>ephemeral-storage-limit-update</summary>
+
+```yaml
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: opa-allowed
+      labels:
+        owner: me.agilebank.demo
+    spec:
+      containers:
+        - name: opa
+          image: openpolicyagent/opa:0.9.2
+          args:
+            - "run"
+            - "--server"
+            - "--addr=localhost:8080"
+          resources:
+            limits:
+              cpu: "100m"
+              memory: "1Gi"
+              ephemeral-storage: "1Pi"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/ephemeralstoragelimit/samples/container-must-have-ephemeral-storage-limit/update.yaml
 ```
 
 </details>
