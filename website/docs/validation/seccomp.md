@@ -343,6 +343,9 @@ metadata:
   labels:
     app: nginx-seccomp
 spec:
+  securityContext:
+    seccompProfile:
+      type: Unconfined
   containers:
   - name: nginx
     image: nginx
@@ -421,6 +424,9 @@ metadata:
   labels:
     app: nginx-seccomp
 spec:
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault 
   containers:
   - name: nginx
     image: nginx
