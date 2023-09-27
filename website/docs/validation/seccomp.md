@@ -426,7 +426,7 @@ metadata:
 spec:
   securityContext:
     seccompProfile:
-      type: RuntimeDefault 
+      type: RuntimeDefault
   containers:
   - name: nginx
     image: nginx
