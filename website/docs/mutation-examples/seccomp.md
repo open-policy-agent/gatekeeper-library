@@ -7,23 +7,30 @@ title: seccomp
 
 ### Usage
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/mutation/pod-security-policy/seccomp/samples/mutation.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/mutation/pod-security-policy/seccomp/samples/mutation-securityContext.yaml
 ```
 ## Mutation Examples
 ```yaml
 apiVersion: mutations.gatekeeper.sh/v1alpha1
-kind: AssignMetadata
+kind: Assign
 metadata:
-  name: k8spspseccomp
+  name: k8spspseccompcontext
 spec:
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
   match:
     scope: Namespaced
     kinds:
-    - apiGroups: [""]
+    - apiGroups: ["*"]
       kinds: ["Pod"]
-  location: metadata.annotations."seccomp.security.alpha.kubernetes.io/pod"
+  location: "spec.securityContext.seccompProfile.type"
   parameters:
+    pathTests:
+    - subPath: "spec.securityContext.seccompProfile.type"
+      condition: MustNotExist
     assign:
-      value: runtime/default
+      value: RuntimeDefault
 
 ```
