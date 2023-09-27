@@ -1,7 +1,7 @@
 apiVersion: mutations.gatekeeper.sh/v1alpha1
 kind: AssignMetadata
 metadata:
-  name: k8spspseccomp
+  name: k8spspseccompannotation
 spec:
   match:
     scope: Namespaced
