@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"gopkg.in/yaml.v3"
+	"k8s.io/utils/strings/slices"
 )
 
 const (
@@ -27,6 +28,9 @@ const (
 	pspPattern           = `(\s*)(type:\s+'category',\s+label:\s+'Pod Security Policy',\s+collapsed:\s+true,\s+items:\s*\[\s)(\s*)([^\]]*,)`
 	mutationPattern      = `(\s*)(type:\s+'category',\s+label:\s+'Mutation',\s+collapsed:\s+true,\s+items:\s*\[\s)(\s*)([^\]]*,)`
 )
+
+// Skip including examples for the following Kinds.
+var skipExampleKinds = []string{"AdmissionReview"}
 
 // Suite ...
 // ToDo (nilekh): Get this struct from the Gatekeeper repo.
@@ -140,7 +144,20 @@ func main() {
 								fmt.Println("error while reading ", testCase.Object)
 								panic(err)
 							}
-							examples += fmt.Sprintf("<details>\n<summary>%s</summary>\n\n```yaml\n%s\n```\n\nUsage\n\n```shell\nkubectl apply -f %s\n```\n\n</details>\n", testCase.Name, exampleContent, exampleRawURL)
+
+							exampleResource := make(map[string]interface{})
+							err = yaml.Unmarshal(exampleContent, &exampleResource)
+							if err != nil {
+								fmt.Printf("error while unmarshaling: %v", exampleRawURL)
+								panic(err)
+							}
+
+							if exampleKind, ok := exampleResource["kind"].(string); !ok {
+								fmt.Printf("error while parsing kind: %v", exampleRawURL)
+								panic(err)
+							} else if !slices.Contains(skipExampleKinds, exampleKind) {
+								examples += fmt.Sprintf("<details>\n<summary>%s</summary>\n\n```yaml\n%s\n```\n\nUsage\n\n```shell\nkubectl apply -f %s\n```\n\n</details>\n", testCase.Name, exampleContent, exampleRawURL)
+							}
 						}
 
 						allExamples += fmt.Sprintf("<details>\n<summary>%s</summary><blockquote>\n\n%s\n%s\n\n</blockquote></details>", test.Name, constraintExample, examples)

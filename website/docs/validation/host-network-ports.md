@@ -251,39 +251,6 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 
 </details>
-<details>
-<summary>update</summary>
-
-```yaml
-kind: AdmissionReview
-apiVersion: admission.k8s.io/v1beta1
-request:
-  operation: "UPDATE"
-  object:
-    apiVersion: v1
-    kind: Pod
-    metadata:
-      name: nginx-host-networking-ports-disallowed
-      labels:
-        app: nginx-host-networking-ports
-    spec:
-      hostNetwork: true
-      containers:
-      - name: nginx
-        image: nginx
-        ports:
-        - containerPort: 9001
-          hostPort: 9001
-
-```
-
-Usage
-
-```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/update.yaml
-```
-
-</details>
 
 
 </blockquote></details>
