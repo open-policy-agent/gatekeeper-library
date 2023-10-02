@@ -16,7 +16,7 @@ metadata:
   name: k8spspallowedusers
   annotations:
     metadata.gatekeeper.sh/title: "Allowed Users"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Controls the user and group IDs of the container and some volumes.
       Corresponds to the `runAsUser`, `runAsGroup`, `supplementalGroups`, and
@@ -147,9 +147,13 @@ spec:
       rego: |
         package k8spspallowedusers
 
+        import data.lib.exclude_update.is_update
         import data.lib.exempt_container.is_exempt
 
         violation[{"msg": msg}] {
+          # runAsUser, runAsGroup, supplementalGroups, fsGroup fields are immutable.
+          not is_update(input.review)
+
           fields := ["runAsUser", "runAsGroup", "supplementalGroups", "fsGroup"]
           field := fields[_]
           container := input_containers[_]
@@ -272,6 +276,12 @@ spec:
             c := input.review.object.spec.ephemeralContainers[_]
         }
       libs:
+        - |
+          package lib.exclude_update
+
+          is_update(review) {
+              review.operation == "UPDATE"
+          }
         - |
           package lib.exempt_container
 
@@ -438,6 +448,42 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/users/samples/psp-pods-allowed-user-ranges/disallowed_ephemeral.yaml
+```
+
+</details>
+<details>
+<summary>update</summary>
+
+```yaml
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx-users-disallowed
+      labels:
+        app: nginx-users
+    spec:
+      securityContext:
+        supplementalGroups:
+          - 250
+        fsGroup: 250
+      containers:
+        - name: nginx
+          image: nginx
+          securityContext:
+            runAsUser: 250
+            runAsGroup: 250
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/users/samples/psp-pods-allowed-user-ranges/update.yaml
 ```
 
 </details>

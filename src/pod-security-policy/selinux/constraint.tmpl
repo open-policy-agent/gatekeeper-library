@@ -4,7 +4,7 @@ metadata:
   name: k8spspselinuxv2
   annotations:
     metadata.gatekeeper.sh/title: "SELinux V2"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Defines an allow-list of seLinuxOptions configurations for pod
       containers. Corresponds to a PodSecurityPolicy requiring SELinux configs.
@@ -59,5 +59,7 @@ spec:
       rego: |
 {{ file.Read "src/pod-security-policy/selinux/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
       libs:
+        - |
+{{ file.Read "src/pod-security-policy/selinux/lib_exclude_update.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}
         - |
 {{ file.Read "src/pod-security-policy/selinux/lib_exempt_container.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}

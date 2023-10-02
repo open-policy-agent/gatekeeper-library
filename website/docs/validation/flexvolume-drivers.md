@@ -16,7 +16,7 @@ metadata:
   name: k8spspflexvolumes
   annotations:
     metadata.gatekeeper.sh/title: "FlexVolumes"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Controls the allowlist of FlexVolume drivers. Corresponds to the
       `allowedFlexVolumes` field in PodSecurityPolicy. For more information,
@@ -51,7 +51,12 @@ spec:
       rego: |
         package k8spspflexvolumes
 
+        import data.lib.exclude_update.is_update
+
         violation[{"msg": msg, "details": {}}] {
+            # spec.volumes field is immutable.
+            not is_update(input.review)
+
             volume := input_flexvolumes[_]
             not input_flexvolumes_allowed(volume)
             msg := sprintf("FlexVolume %v is not allowed, pod: %v. Allowed drivers: %v", [volume, input.review.object.metadata.name, input.parameters.allowedFlexVolumes])
@@ -70,6 +75,13 @@ spec:
         has_field(object, field) = true {
             object[field]
         }
+      libs:
+        - |
+          package lib.exclude_update
+
+          is_update(review) {
+              review.operation == "UPDATE"
+          }
 
 ```
 
@@ -170,6 +182,43 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/flexvolume-drivers/samples/psp-flexvolume-drivers/example_disallowed.yaml
+```
+
+</details>
+<details>
+<summary>update</summary>
+
+```yaml
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx-flexvolume-driver-disallowed
+      labels:
+        app: nginx-flexvolume-driver
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        volumeMounts:
+        - mountPath: /test
+          name: test-volume
+          readOnly: true
+      volumes:
+      - name: test-volume
+        flexVolume:
+          driver: "example/testdriver" #"example/lvm"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/flexvolume-drivers/samples/psp-flexvolume-drivers/update.yaml
 ```
 
 </details>

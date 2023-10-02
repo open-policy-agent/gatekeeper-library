@@ -812,8 +812,11 @@ test_mixed_container_level_all_defined_mixed_in_range_mixed_rules {
   count(results) == 1
 }
 
-
-
+test_update {
+  input := {"review": object.union(review(null, [ctr("cont1", run_as_rule(150, 150, null, null))], null), {"operation": "UPDATE"}), "parameters": mixed_all_rules }
+  results := violation with input as input
+  count(results) == 0
+}
 
 
 ## Functions ##

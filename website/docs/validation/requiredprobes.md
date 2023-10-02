@@ -16,7 +16,7 @@ metadata:
   name: k8srequiredprobes
   annotations:
     metadata.gatekeeper.sh/title: "Required Probes"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: Requires Pods to have readiness and/or liveness probes.
 spec:
   crd:
@@ -42,11 +42,16 @@ spec:
       rego: |
         package k8srequiredprobes
 
+        import data.lib.exclude_update.is_update
+
         probe_type_set = probe_types {
             probe_types := {type | type := input.parameters.probeTypes[_]}
         }
 
         violation[{"msg": msg}] {
+            # Probe fields are immutable.
+            not is_update(input.review)
+
             container := input.review.object.spec.containers[_]
             probe := input.parameters.probes[_]
             probe_is_missing(container, probe)
@@ -70,6 +75,13 @@ spec:
         get_violation_message(container, review, probe) = msg {
             msg := sprintf("Container <%v> in your <%v> <%v> has no <%v>", [container.name, review.kind.kind, review.object.metadata.name, probe])
         }
+      libs:
+        - |
+          package lib.exclude_update
+
+          is_update(review) {
+              review.operation == "UPDATE"
+          }
 
 ```
 
@@ -241,6 +253,55 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredprobes/samples/must-have-probes/example_disallowed2.yaml
+```
+
+</details>
+<details>
+<summary>update</summary>
+
+```yaml
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: test-pod1
+    spec:
+      containers:
+      - name: nginx-1
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          # tcpSocket:
+          #   port: 80
+          # initialDelaySeconds: 5
+          # periodSeconds: 10
+        volumeMounts:
+        - mountPath: /tmp/cache
+          name: cache-volume
+      - name: tomcat
+        image: tomcat
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+      volumes:
+      - name: cache-volume
+        emptyDir: {}
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredprobes/samples/must-have-probes/update.yaml
 ```
 
 </details>

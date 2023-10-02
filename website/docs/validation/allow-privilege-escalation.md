@@ -16,7 +16,7 @@ metadata:
   name: k8spspallowprivilegeescalationcontainer
   annotations:
     metadata.gatekeeper.sh/title: "Allow Privilege Escalation in Container"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Controls restricting escalation to root privileges. Corresponds to the
       `allowPrivilegeEscalation` field in a PodSecurityPolicy. For more
@@ -51,9 +51,13 @@ spec:
       rego: |
         package k8spspallowprivilegeescalationcontainer
 
+        import data.lib.exclude_update.is_update
         import data.lib.exempt_container.is_exempt
 
         violation[{"msg": msg, "details": {}}] {
+            # spec.containers.securityContext.allowPrivilegeEscalation field is immutable.
+            not is_update(input.review)
+
             c := input_containers[_]
             not is_exempt(c)
             input_allow_privilege_escalation(c)
@@ -80,6 +84,12 @@ spec:
             object[field]
         }
       libs:
+        - |
+          package lib.exclude_update
+
+          is_update(review) {
+              review.operation == "UPDATE"
+          }
         - |
           package lib.exempt_container
 
@@ -210,6 +220,37 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/allow-privilege-escalation/samples/psp-allow-privilege-escalation-container/disallowed_ephemeral.yaml
+```
+
+</details>
+<details>
+<summary>update</summary>
+
+```yaml
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx-privilege-escalation-disallowed
+      labels:
+        app: nginx-privilege-escalation
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        securityContext:
+          allowPrivilegeEscalation: true
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/allow-privilege-escalation/samples/psp-allow-privilege-escalation-container/update.yaml
 ```
 
 </details>

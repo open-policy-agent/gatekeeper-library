@@ -73,6 +73,10 @@ updates:
         update-types:
         - "version-update:semver-major"
         - "version-update:semver-minor"
+    groups:
+      all:
+        patterns:
+        - "*"
 
   - package-ecosystem: github-actions
     directory: /

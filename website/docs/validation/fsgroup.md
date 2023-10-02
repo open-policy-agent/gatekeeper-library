@@ -16,7 +16,7 @@ metadata:
   name: k8spspfsgroup
   annotations:
     metadata.gatekeeper.sh/title: "FS Group"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Controls allocating an FSGroup that owns the Pod's volumes. Corresponds
       to the `fsGroup` field in a PodSecurityPolicy. For more information, see
@@ -59,7 +59,12 @@ spec:
       rego: |
         package k8spspfsgroup
 
+        import data.lib.exclude_update.is_update
+
         violation[{"msg": msg, "details": {}}] {
+            # spec.securityContext.fsGroup field is immutable.
+            not is_update(input.review)
+
             spec := input.review.object.spec
             not input_fsGroup_allowed(spec)
             msg := sprintf("The provided pod spec fsGroup is not allowed, pod: %v. Allowed fsGroup: %v", [input.review.object.metadata.name, input.parameters])
@@ -103,6 +108,13 @@ spec:
         has_field(object, field) = true {
             object[field]
         }
+      libs:
+        - |
+          package lib.exclude_update
+
+          is_update(review) {
+              review.operation == "UPDATE"
+          }
 
 ```
 
@@ -202,6 +214,42 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/fsgroup/samples/psp-fsgroup/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>update</summary>
+
+```yaml
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: fsgroup-disallowed
+    spec:
+      securityContext:
+        fsGroup: 2000 # directory will have group ID 2000
+      volumes:
+      - name: fsgroup-demo-vol
+        emptyDir: {}
+      containers:
+      - name: fsgroup-demo
+        image: busybox
+        command: [ "sh", "-c", "sleep 1h" ]
+        volumeMounts:
+        - name: fsgroup-demo-vol
+          mountPath: /data/demo
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/fsgroup/samples/psp-fsgroup/update.yaml
 ```
 
 </details>

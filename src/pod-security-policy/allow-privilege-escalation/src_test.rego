@@ -40,6 +40,11 @@ test_input_container_many_mixed_privilege_escalation_not_allowed_two {
     results := violation with input as input
     count(results) == 2
 }
+test_update {
+    input := { "review": object.union(input_review_priv, {"operation": "UPDATE"})}
+    results := violation with input as input
+    count(results) == 0
+}
 
 input_review = {
     "object": {

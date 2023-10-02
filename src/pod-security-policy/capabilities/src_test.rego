@@ -134,6 +134,12 @@ test_input_drop_literal_all_x2 {
    count(results) == 0
 }
 
+test_update {
+    input := { "review": object.union(input_review([cadd(["one"])]), {"operation": "UPDATE"}), "parameters": {"allowedCapabilities": []}}
+    results := violation with input as input
+    count(results) == 0
+}
+
 # init containers
 test_input_all_allowed {
     input := { "review": input_init_review([cadd(["one", "two"])]), "parameters": {"allowedCapabilities": ["*"]}}

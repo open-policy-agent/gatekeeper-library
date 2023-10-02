@@ -1,8 +1,12 @@
 package k8spspallowprivilegeescalationcontainer
 
+import data.lib.exclude_update.is_update
 import data.lib.exempt_container.is_exempt
 
 violation[{"msg": msg, "details": {}}] {
+    # spec.containers.securityContext.allowPrivilegeEscalation field is immutable.
+    not is_update(input.review)
+
     c := input_containers[_]
     not is_exempt(c)
     input_allow_privilege_escalation(c)

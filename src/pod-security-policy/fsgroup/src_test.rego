@@ -50,6 +50,11 @@ test_input_securitycontext_no_fsgroup_MayRunAs_allowed {
     results := violation with input as input
     count(results) == 0
 }
+test_update {
+    input := { "review": object.union(input_review_with_fsgroup, {"operation": "UPDATE"}), "parameters": input_parameters_in_list_mustrunas_outofrange}
+    results := violation with input as input
+    count(results) == 0
+}
 
 input_review = {
     "object": {

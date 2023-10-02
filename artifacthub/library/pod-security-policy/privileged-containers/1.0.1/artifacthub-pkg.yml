@@ -1,0 +1,22 @@
+version: 1.0.1
+name: k8spspprivilegedcontainer
+displayName: Privileged Container
+createdAt: "2023-05-23T09:47:31Z"
+description: Controls the ability of any container to enable privileged mode. Corresponds to the `privileged` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#privileged
+digest: c8e6071091c7442d217106f83cc8b63cfe3bf48f49196435c5f974ec5cc094d5
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/privileged-containers
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Privileged Container
+    Controls the ability of any container to enable privileged mode. Corresponds to the `privileged` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#privileged
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/pod-security-policy/privileged-containers/1.0.1/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library
