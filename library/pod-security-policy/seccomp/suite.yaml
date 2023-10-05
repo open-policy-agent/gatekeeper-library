@@ -11,7 +11,7 @@ tests:
     object: samples/psp-seccomp/example_disallowed2.yaml
     assertions:
     - violations: 1
-      message: "Seccomp profile 'unconfined' is not allowed for container 'nginx'. Found at: annotation seccomp.security.alpha.kubernetes.io/pod"
+      message: "Seccomp profile 'Unconfined' is not allowed for container 'nginx'. Found at: annotation seccomp.security.alpha.kubernetes.io/pod"
   - name: example-disallowed-container
     object: samples/psp-seccomp/example_disallowed.yaml
     assertions:
