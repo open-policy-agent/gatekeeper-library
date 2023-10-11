@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx-seccomp-disallowed2
+  name: nginx-seccomp-disallowed3
   labels:
     app: nginx-seccomp
 spec:

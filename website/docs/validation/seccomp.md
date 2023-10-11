@@ -470,7 +470,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx-seccomp-allowed2
+  name: nginx-seccomp-allowed3
   labels:
     app: nginx-seccomp
 spec:
@@ -497,7 +497,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx-seccomp-disallowed2
+  name: nginx-seccomp-disallowed3
   labels:
     app: nginx-seccomp
 spec:
