@@ -421,9 +421,6 @@ metadata:
   labels:
     app: nginx-seccomp
 spec:
-  securityContext:
-    seccompProfile:
-      type: RuntimeDefault
   containers:
   - name: nginx
     image: nginx
