@@ -343,9 +343,6 @@ metadata:
   labels:
     app: nginx-seccomp
 spec:
-  securityContext:
-    seccompProfile:
-      type: Unconfined
   containers:
   - name: nginx
     image: nginx
@@ -463,6 +460,60 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/disallowed_ephemeral.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-global-securityContext</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-allowed2
+  labels:
+    app: nginx-seccomp
+spec:
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/example_allowed3.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-global-securityContext</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-disallowed2
+  labels:
+    app: nginx-seccomp
+spec:
+  securityContext:
+    seccompProfile:
+      type: Unconfined
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/example_disallowed3.yaml
 ```
 
 </details>
