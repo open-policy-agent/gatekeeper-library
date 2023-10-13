@@ -382,8 +382,10 @@ spec:
         kinds: ["HorizontalPodAutoscaler"]
       - apiGroups: ["policy"]
         kinds: ["PodDisruptionBudget", "PodSecurityPolicy"]
+      - apiGroups: ["node.k8s.io"]
+        kinds: ["RuntimeClass"]
   parameters:
-    kvs: 
+    kvs:
       - deprecatedAPI: "batch/v1beta1"
         kinds: ["CronJob"]
         targetAPI: "batch/v1"
