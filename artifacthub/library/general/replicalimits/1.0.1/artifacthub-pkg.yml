@@ -3,7 +3,7 @@ name: k8sreplicalimits
 displayName: Replica Limits
 createdAt: "2023-03-31T20:34:16Z"
 description: Requires that objects with the field `spec.replicas` (Deployments, ReplicaSets, etc.) specify a number of replicas within defined ranges.
-digest: a8dc0e94f30cdf1f4aff2e69551744b6eaee3f4e60dba3393705f81363a249e5
+digest: 506ffc47aff782cfb7b239eb545c8181717b1ae9ca3646d2b3a3224d9dc52981
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/replicalimits
 keywords:

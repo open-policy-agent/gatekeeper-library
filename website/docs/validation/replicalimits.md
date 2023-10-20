@@ -58,7 +58,7 @@ spec:
         }
 
         input_replica_limit(spec) {
-            provided := input.review.object.spec.replicas
+            provided := object.get(spec, "replicas", 0)
             count(input.parameters.ranges) > 0
             range := input.parameters.ranges[_]
             value_within_range(range, provided)
@@ -92,6 +92,8 @@ spec:
     kinds:
       - apiGroups: ["apps"]
         kinds: ["Deployment"]
+      - apiGroups: ["autoscaling"]
+        kinds: ["Scale"]
   parameters:
     ranges:
     - min_replicas: 3
@@ -141,6 +143,26 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 
 </details>
 <details>
+<summary>example-scale-allowed</summary>
+
+```yaml
+apiVersion: autoscaling/v1
+kind: Scale
+metadata:
+  name: allowed-deployment
+spec:
+  replicas: 3
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/replicalimits/samples/replicalimits/example_scale_allowed.yaml
+```
+
+</details>
+<details>
 <summary>example-disallowed</summary>
 
 ```yaml
@@ -170,6 +192,168 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/replicalimits/samples/replicalimits/example_disallowed.yaml
+```
+
+</details>
+<details>
+<summary>example-scale-disallowed</summary>
+
+```yaml
+apiVersion: autoscaling/v1
+kind: Scale
+metadata:
+  name: allowed-deployment
+spec:
+  replicas: 100
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/replicalimits/samples/replicalimits/example_scale_disallowed.yaml
+```
+
+</details>
+
+
+</blockquote></details><details>
+<summary>replica-limit-zero</summary><blockquote>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sReplicaLimits
+metadata:
+  name: replica-limits
+spec:
+  match:
+    kinds:
+      - apiGroups: ["apps"]
+        kinds: ["Deployment"]
+      - apiGroups: ["autoscaling"]
+        kinds: ["Scale"]
+  parameters:
+    ranges:
+    - min_replicas: 0
+      max_replicas: 50
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/replicalimits/samples/replicalimits_zero/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: allowed-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 0
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/replicalimits/samples/replicalimits_zero/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>example-scale-allowed</summary>
+
+```yaml
+apiVersion: autoscaling/v1
+kind: Scale
+metadata:
+  name: allowed-deployment
+# kubectl scale deploy <name> --replicas=0 creates a Scale
+# resource with an empty spec, not replicas:0
+spec: {}
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/replicalimits/samples/replicalimits_zero/example_scale_allowed.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: disallowed-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 100
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/replicalimits/samples/replicalimits_zero/example_disallowed.yaml
+```
+
+</details>
+<details>
+<summary>example-scale-disallowed</summary>
+
+```yaml
+apiVersion: autoscaling/v1
+kind: Scale
+metadata:
+  name: allowed-deployment
+spec:
+  replicas: 100
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/replicalimits/samples/replicalimits_zero/example_scale_disallowed.yaml
 ```
 
 </details>
