@@ -1,0 +1,6 @@
+apiVersion: autoscaling/v1
+kind: Scale
+metadata:
+  name: allowed-deployment
+spec:
+  replicas: 3
