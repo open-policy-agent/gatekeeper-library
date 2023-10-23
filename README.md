@@ -86,3 +86,6 @@ Each new policy should contain:
 * run all tests with `./test.sh`
 * run single test with `opa test src/<folder>/src.rego src/<folder>/src_test.rego --verbose`
 * print results with `trace(sprintf("%v", [thing]))`
+
+
+TEST
