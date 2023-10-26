@@ -10,7 +10,7 @@ violation[{"msg": msg}] {
 }
 
 input_replica_limit(spec) {
-    provided := input.review.object.spec.replicas
+    provided := object.get(spec, "replicas", 0)
     count(input.parameters.ranges) > 0
     range := input.parameters.ranges[_]
     value_within_range(range, provided)

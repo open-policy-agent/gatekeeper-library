@@ -1,0 +1,7 @@
+apiVersion: autoscaling/v1
+kind: Scale
+metadata:
+  name: allowed-deployment
+# kubectl scale deploy <name> --replicas=0 creates a Scale
+# resource with an empty spec, not replicas:0
+spec: {}
