@@ -51,6 +51,7 @@ empty = {
 }
 
 review(replicas) = output {
+  replicas > 0
   output = {
     "kind": {
       "kind": "Deployment",
@@ -58,16 +59,31 @@ review(replicas) = output {
       "group": "apps",
     },
     "object": {
-    "metadata": {
+      "metadata": {
         "name": "nginx"
-    },
+      },
       "spec": {
         "replicas": replicas,
       },
     }
   }
 }
-
+review(replicas) = output {
+  replicas == 0
+  output = {
+    "kind": {
+      "kind": "Deployment",
+      "version": "v1",
+      "group": "apps",
+    },
+    "object": {
+      "metadata": {
+        "name": "nginx"
+      },
+      "spec": { },
+    }
+  }
+}
 input_parameters_valid_range = {
     "ranges": [
     {
