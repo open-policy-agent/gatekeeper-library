@@ -1,49 +1,49 @@
 package k8spsphostnetworkingports
 
 test_input_no_hostnetwork_no_port_is_allowed {
-    input := { "review": input_review, "parameters": input_parameters_ports}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_ports}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_no_hostnetwork_allowed_ports_is_allowed {
-    input := { "review": input_review_no_hostnetwork_allowed_ports, "parameters": input_parameters_ports}
-    results := violation with input as input
+    inp := { "review": input_review_no_hostnetwork_allowed_ports, "parameters": input_parameters_ports}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_no_hostnetwork_container_ports_not_allowed {
-    input := { "review": input_review_no_hostnetwork_container_ports_outofrange, "parameters": input_parameters_ports}
-    results := violation with input as input
+    inp := { "review": input_review_no_hostnetwork_container_ports_outofrange, "parameters": input_parameters_ports}
+    results := violation with input as inp
     count(results) > 0
 }
 test_input_with_hostnetwork_is_allowed {
-    input := { "review": input_review_with_hostnetwork_no_port, "parameters": input_parameters_ports}
-    results := violation with input as input
+    inp := { "review": input_review_with_hostnetwork_no_port, "parameters": input_parameters_ports}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_with_hostnetwork_constraint_no_hostnetwork_not_allowed {
-    input := { "review": input_review_with_hostnetwork_no_port, "parameters": input_parameters_ports_no_hostnetwork}
-    results := violation with input as input
+    inp := { "review": input_review_with_hostnetwork_no_port, "parameters": input_parameters_ports_no_hostnetwork}
+    results := violation with input as inp
     count(results) > 0
 }
 test_input_with_hostnetwork_constraint_no_hostnetwork_explicit {
-    input := { "review": input_review_no_hostnetwork_explicit, "parameters": input_parameters_ports_no_hostnetwork}
-    results := violation with input as input
+    inp := { "review": input_review_no_hostnetwork_explicit, "parameters": input_parameters_ports_no_hostnetwork}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_with_hostnetwork_container_ports_not_allowed {
-    input := { "review": input_review_with_hostnetwork_port_outofrange, "parameters": input_parameters_ports}
-    results := violation with input as input
+    inp := { "review": input_review_with_hostnetwork_port_outofrange, "parameters": input_parameters_ports}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_with_hostnetwork_container_ports_not_allowed_but_exempt {
-    input := { "review": input_review_with_hostnetwork_port_outofrange, "parameters": input_parameters_exempt}
-    results := violation with input as input
+    inp := { "review": input_review_with_hostnetwork_port_outofrange, "parameters": input_parameters_exempt}
+    results := violation with input as inp
     trace(sprintf("%v", [results]))
     count(results) == 0
 }
 test_update {
-    input := { "review": object.union(input_review_no_hostnetwork_container_ports_outofrange, {"operation": "UPDATE"}), "parameters": input_parameters_ports}
-    results := violation with input as input
+    inp := { "review": object.union(input_review_no_hostnetwork_container_ports_outofrange, {"operation": "UPDATE"}), "parameters": input_parameters_ports}
+    results := violation with input as inp
     count(results) == 0
 }
 
@@ -172,7 +172,7 @@ input_parameters_ports_no_hostnetwork = {
 }
 
 input_parameters_exempt = {
-    "exemptImages": ["nginx"], 
+    "exemptImages": ["nginx"],
     "hostNetwork": true,
     "min": 80,
     "max": 9000

@@ -1,0 +1,31 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: imagedigests
+tests:
+- name: container-image-must-have-digest
+  template: template.yaml
+  constraint: samples/container-image-must-have-digest/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/container-image-must-have-digest/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/container-image-must-have-digest/example_disallowed.yaml
+    assertions:
+    - violations: 2
+    - message: initContainer
+      violations: 1
+    - message: container
+      violations: 1
+  - name: disallowed-all
+    object: samples/container-image-must-have-digest/disallowed_all.yaml
+    assertions:
+    - violations: 3
+    - message: initContainer
+      violations: 1
+    - message: container
+      violations: 1
+    - message: ephemeralContainer
+      violations: 1

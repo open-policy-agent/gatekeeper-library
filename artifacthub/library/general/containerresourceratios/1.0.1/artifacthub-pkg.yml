@@ -1,0 +1,25 @@
+version: 1.0.1
+name: k8scontainerratios
+displayName: Container Ratios
+createdAt: "2023-10-30T20:59:58Z"
+description: |-
+    Sets a maximum ratio for container resource limits to requests.
+    https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+digest: 1a85e6bfea3820f092cdea95dfdb9d8b14fb48d90e565b0e432d5faca597b4d1
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/containerresourceratios
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Container Ratios
+    Sets a maximum ratio for container resource limits to requests.
+    https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/containerresourceratios/1.0.1/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

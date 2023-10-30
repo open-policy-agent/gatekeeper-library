@@ -1,0 +1,22 @@
+version: 1.0.2
+name: k8spspselinuxv2
+displayName: SELinux V2
+createdAt: "2023-10-30T21:00:02Z"
+description: Defines an allow-list of seLinuxOptions configurations for pod containers. Corresponds to a PodSecurityPolicy requiring SELinux configs. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#selinux
+digest: a472297f77af518459c368a2bf1c38c0fe6023f492fc6796fde75ad7a4ea131f
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/selinux
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # SELinux V2
+    Defines an allow-list of seLinuxOptions configurations for pod containers. Corresponds to a PodSecurityPolicy requiring SELinux configs. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#selinux
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/pod-security-policy/selinux/1.0.2/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

@@ -1,0 +1,25 @@
+version: 1.0.1
+name: k8sdisallowedtags
+displayName: Disallow tags
+createdAt: "2023-10-30T20:59:59Z"
+description: |-
+    Requires container images to have an image tag different from the ones in the specified list.
+    https://kubernetes.io/docs/concepts/containers/images/#image-names
+digest: c678f10ef73f11162ccc8ba6a5891cd033168273e386db9d5634179dc4cafa3c
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/disallowedtags
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Disallow tags
+    Requires container images to have an image tag different from the ones in the specified list.
+    https://kubernetes.io/docs/concepts/containers/images/#image-names
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/disallowedtags/1.0.1/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

@@ -16,7 +16,7 @@ metadata:
   name: k8spspforbiddensysctls
   annotations:
     metadata.gatekeeper.sh/title: "Forbidden Sysctls"
-    metadata.gatekeeper.sh/version: 1.1.2
+    metadata.gatekeeper.sh/version: 1.1.3
     description: >-
       Controls the `sysctl` profile used by containers. Corresponds to the
       `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy.
@@ -75,7 +75,7 @@ spec:
         }
 
         # * may be used to forbid all sysctls
-        forbidden_sysctl(sysctl) {
+        forbidden_sysctl(_) {
             input.parameters.forbiddenSysctls[_] == "*"
         }
 
@@ -90,7 +90,7 @@ spec:
         }
 
         # * may be used to allow all sysctls
-        allowed_sysctl(sysctl) {
+        allowed_sysctl(_) {
             input.parameters.allowedSysctls[_] == "*"
         }
 

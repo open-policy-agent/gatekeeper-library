@@ -1,44 +1,44 @@
 package k8sreplicalimits
 
 test_input_empty {
-    input := { "review": empty, "parameters": {}}
-    results := violation with input as input
+    inp := { "review": empty, "parameters": {}}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_within_required_replicas {
-    input := { "review": review(6), "parameters": input_parameters_valid_range}
-    results := violation with input as input
+    inp := { "review": review(6), "parameters": input_parameters_valid_range}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_exact_required_replicas_min {
-    input := { "review": review(5), "parameters": input_parameters_valid_range}
-    results := violation with input as input
+    inp := { "review": review(5), "parameters": input_parameters_valid_range}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_exact_required_replicas_max {
-    input := { "review": review(35), "parameters": input_parameters_valid_range}
-    results := violation with input as input
+    inp := { "review": review(35), "parameters": input_parameters_valid_range}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_not_enough_required_replicas {
-    input := { "review": review(1), "parameters": input_parameters_valid_range}
-    results := violation with input as input
+    inp := { "review": review(1), "parameters": input_parameters_valid_range}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_too_many_replicas {
-    input := { "review": review(100), "parameters": input_parameters_valid_range}
-    results := violation with input as input
+    inp := { "review": review(100), "parameters": input_parameters_valid_range}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_zero_replicas {
-    input := { "review": review(0), "parameters": input_parameters_zero_range}
-    results := violation with input as input
+    inp := { "review": review(0), "parameters": input_parameters_zero_range}
+    results := violation with input as inp
     count(results) == 0
 }
 

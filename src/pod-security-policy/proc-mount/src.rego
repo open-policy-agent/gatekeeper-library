@@ -18,7 +18,7 @@ input_proc_mount_type_allowed(allowedProcMount, c) {
     allowedProcMount == "default"
     lower(c.securityContext.procMount) == "default"
 }
-input_proc_mount_type_allowed(allowedProcMount, c) {
+input_proc_mount_type_allowed(allowedProcMount, _) {
     allowedProcMount == "unmasked"
 }
 

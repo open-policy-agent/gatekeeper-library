@@ -1,48 +1,48 @@
 package k8spspallowprivilegeescalationcontainer
 
 test_input_container_not_privilege_escalation_allowed {
-    input := { "review": input_review}
-    results := violation with input as input
+    inp := { "review": input_review}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_container_privilege_escalation_not_allowed {
-    input := { "review": input_review_priv}
-    results := violation with input as input
+    inp := { "review": input_review_priv}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_one_container_with_exemption {
-    input := { "review": input_review_priv, "parameters": {"exemptImages": ["one/*"]}}
-    results := violation with input as input
+    inp := { "review": input_review_priv, "parameters": {"exemptImages": ["one/*"]}}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_container_many_not_privilege_escalation_allowed {
-    input := { "review": input_review_many}
-    results := violation with input as input
+    inp := { "review": input_review_many}
+    results := violation with input as inp
     count(results) == 2
 }
 test_input_container_many_mixed_privilege_escalation_not_allowed {
-    input := { "review": input_review_many_mixed}
-    results := violation with input as input
+    inp := { "review": input_review_many_mixed}
+    results := violation with input as inp
     count(results) == 3
 }
 test_input_container_many_mixed_privilege_escalation_not_allowed_one_exempted {
-    input := { "review": input_review_many_mixed, "parameters": {"exemptImages": ["one/*"]}}
-    results := violation with input as input
+    inp := { "review": input_review_many_mixed, "parameters": {"exemptImages": ["one/*"]}}
+    results := violation with input as inp
     count(results) == 2
 }
 test_input_container_many_mixed_privilege_escalation_not_allowed_all_exempted {
-    input := { "review": input_review_many_mixed, "parameters": {"exemptImages": ["one/*", "two/*", "three/*"]}}
-    results := violation with input as input
+    inp := { "review": input_review_many_mixed, "parameters": {"exemptImages": ["one/*", "two/*", "three/*"]}}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_container_many_mixed_privilege_escalation_not_allowed_two {
-    input := { "review": input_review_many_mixed_two}
-    results := violation with input as input
+    inp := { "review": input_review_many_mixed_two}
+    results := violation with input as inp
     count(results) == 2
 }
 test_update {
-    input := { "review": object.union(input_review_priv, {"operation": "UPDATE"})}
-    results := violation with input as input
+    inp := { "review": object.union(input_review_priv, {"operation": "UPDATE"})}
+    results := violation with input as inp
     count(results) == 0
 }
 
@@ -140,7 +140,7 @@ input_containers_many = [
     "securityContext": {
       "runAsUser": "1000"
     }
-    
+
 }]
 
 input_containers_many_mixed = [
