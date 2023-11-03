@@ -263,37 +263,6 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 
 </details>
-<details>
-<summary>update</summary>
-
-```yaml
-kind: AdmissionReview
-apiVersion: admission.k8s.io/v1beta1
-request:
-  operation: "UPDATE"
-  object:
-    apiVersion: v1
-    kind: Pod
-    metadata:
-      name: nginx-proc-mount-disallowed
-      labels:
-        app: nginx-proc-mount
-    spec:
-      containers:
-      - name: nginx
-        image: nginx
-        securityContext:
-          procMount: Unmasked #Default
-
-```
-
-Usage
-
-```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/proc-mount/samples/psp-proc-mount/update.yaml
-```
-
-</details>
 
 
 </blockquote></details>

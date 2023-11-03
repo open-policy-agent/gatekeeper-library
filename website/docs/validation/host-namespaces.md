@@ -151,37 +151,6 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 
 </details>
-<details>
-<summary>update</summary>
-
-```yaml
-kind: AdmissionReview
-apiVersion: admission.k8s.io/v1beta1
-request:
-  operation: "UPDATE"
-  object:
-    apiVersion: v1
-    kind: Pod
-    metadata:
-      name: nginx-host-namespace-disallowed
-      labels:
-        app: nginx-host-namespace
-    spec:
-      hostPID: true
-      hostIPC: true
-      containers:
-      - name: nginx
-        image: nginx
-
-```
-
-Usage
-
-```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-namespaces/samples/psp-host-namespace/update.yaml
-```
-
-</details>
 
 
 </blockquote></details>
