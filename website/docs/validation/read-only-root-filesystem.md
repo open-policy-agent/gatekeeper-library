@@ -226,37 +226,6 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 
 </details>
-<details>
-<summary>update</summary>
-
-```yaml
-kind: AdmissionReview
-apiVersion: admission.k8s.io/v1beta1
-request:
-  operation: "UPDATE"
-  object:
-    apiVersion: v1
-    kind: Pod
-    metadata:
-      name: nginx-readonlyrootfilesystem-disallowed
-      labels:
-        app: nginx-readonlyrootfilesystem
-    spec:
-      containers:
-      - name: nginx
-        image: nginx
-        securityContext:
-          readOnlyRootFilesystem: false
-
-```
-
-Usage
-
-```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/read-only-root-filesystem/samples/psp-readonlyrootfilesystem/update.yaml
-```
-
-</details>
 
 
 </blockquote></details>

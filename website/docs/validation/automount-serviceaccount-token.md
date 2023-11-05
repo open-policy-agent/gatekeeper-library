@@ -162,36 +162,6 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 
 </details>
-<details>
-<summary>update</summary>
-
-```yaml
-kind: AdmissionReview
-apiVersion: admission.k8s.io/v1beta1
-request:
-  operation: "UPDATE"
-  object:
-    apiVersion: v1
-    kind: Pod
-    metadata:
-      name: nginx-automountserviceaccounttoken-update
-      labels:
-        app: nginx-automountserviceaccounttoken
-    spec:
-      automountServiceAccountToken: true
-      containers:
-        - name: nginx
-          image: nginx
-
-```
-
-Usage
-
-```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/automount-serviceaccount-token/samples/automount-serviceaccount-token/update.yaml
-```
-
-</details>
 
 
 </blockquote></details>
