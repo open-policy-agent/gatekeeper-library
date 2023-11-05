@@ -305,6 +305,28 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 
 </details>
 <details>
+<summary>example-scale-allowed</summary>
+
+```yaml
+apiVersion: autoscaling/v1
+kind: Scale
+metadata:
+  name: allowed-deployment
+# kubectl scale deploy <name> --replicas=0 creates a Scale
+# resource with an empty spec, not replicas:0
+spec:
+  replicas: 0
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/replicalimits/samples/replicalimits_zero/example_scale_allowed2.yaml
+```
+
+</details>
+<details>
 <summary>example-disallowed</summary>
 
 ```yaml

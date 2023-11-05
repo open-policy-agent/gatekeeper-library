@@ -35,6 +35,10 @@ tests:
     object: samples/replicalimits_zero/example_scale_allowed.yaml
     assertions:
     - violations: no
+  - name: example-scale-allowed
+    object: samples/replicalimits_zero/example_scale_allowed2.yaml
+    assertions:
+    - violations: no
   - name: example-disallowed
     object: samples/replicalimits_zero/example_disallowed.yaml
     assertions:
