@@ -6,7 +6,7 @@ title: Storage Class
 # Storage Class
 
 ## Description
-Requires storage classes to be specified when used. Only Gatekeeper 3.9+ is supported.
+Requires storage classes to be specified when used. Only Gatekeeper 3.9+ and non-ephemeral containers are supported.
 
 ## Template
 ```yaml
@@ -16,7 +16,7 @@ metadata:
   name: k8sstorageclass
   annotations:
     metadata.gatekeeper.sh/title: "Storage Class"
-    metadata.gatekeeper.sh/version: 1.1.1
+    metadata.gatekeeper.sh/version: 1.1.2
     metadata.gatekeeper.sh/requires-sync-data: |
       "[
         [
@@ -28,7 +28,7 @@ metadata:
         ]
       ]"
     description: >-
-      Requires storage classes to be specified when used. Only Gatekeeper 3.9+ is supported.
+      Requires storage classes to be specified when used. Only Gatekeeper 3.9+ and non-ephemeral containers are supported.
 spec:
   crd:
     spec:
@@ -163,8 +163,6 @@ spec:
           "statefulset did not specify a storage class name.",
           []
         )
-
-        #FIXME pod generic ephemeral might be good to validate some day too.
 
 ```
 
