@@ -18,6 +18,12 @@ test_input_pod_automountserviceaccounttoken_not_defined {
     count(results) > 0
 }
 
+test_update {
+    input := {"review": object.union(input_review_enabled_automountserviceaccounttoken, {"operation": "UPDATE"})}
+    results := violation with input as input
+    count(results) == 0
+}
+
 input_review_disabled_automountserviceaccounttoken = {"object": {
     "metadata": {"name": "nginx"},
     "spec": {

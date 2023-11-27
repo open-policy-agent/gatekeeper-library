@@ -4,7 +4,7 @@ metadata:
   name: k8spsphostnetworkingports
   annotations:
     metadata.gatekeeper.sh/title: "Host Networking Ports"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Controls usage of host network namespace by pod containers. Specific
       ports must be specified. Corresponds to the `hostNetwork` and
@@ -49,5 +49,7 @@ spec:
       rego: |
 {{ file.Read "src/pod-security-policy/host-network-ports/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
       libs:
+        - |
+{{ file.Read "src/pod-security-policy/host-network-ports/lib_exclude_update.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}
         - |
 {{ file.Read "src/pod-security-policy/host-network-ports/lib_exempt_container.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}

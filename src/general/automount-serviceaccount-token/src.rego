@@ -1,6 +1,11 @@
 package k8sautomountserviceaccounttoken
 
+import data.lib.exclude_update.is_update
+
 violation[{"msg": msg}] {
+    # spec.automountServiceAccountToken and spec.containers.volumeMounts fields are immutable.
+    not is_update(input.review)
+
     obj := input.review.object
     mountServiceAccountToken(obj.spec)
     msg := sprintf("Automounting service account token is disallowed, pod: %v", [obj.metadata.name])

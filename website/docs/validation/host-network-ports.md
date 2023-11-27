@@ -16,7 +16,7 @@ metadata:
   name: k8spsphostnetworkingports
   annotations:
     metadata.gatekeeper.sh/title: "Host Networking Ports"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Controls usage of host network namespace by pod containers. Specific
       ports must be specified. Corresponds to the `hostNetwork` and
@@ -61,9 +61,13 @@ spec:
       rego: |
         package k8spsphostnetworkingports
 
+        import data.lib.exclude_update.is_update
         import data.lib.exempt_container.is_exempt
 
         violation[{"msg": msg, "details": {}}] {
+            # spec.hostNetwork field is immutable.
+            not is_update(input.review)
+
             input_share_hostnetwork(input.review.object)
             msg := sprintf("The specified hostNetwork and hostPort are not allowed, pod: %v. Allowed values: %v", [input.review.object.metadata.name, input.parameters])
         }
@@ -98,6 +102,12 @@ spec:
             not is_exempt(c)
         }
       libs:
+        - |
+          package lib.exclude_update
+
+          is_update(review) {
+              review.operation == "UPDATE"
+          }
         - |
           package lib.exempt_container
 

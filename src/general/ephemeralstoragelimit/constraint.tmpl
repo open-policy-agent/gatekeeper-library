@@ -4,7 +4,7 @@ metadata:
   name: k8scontainerephemeralstoragelimit
   annotations:
     metadata.gatekeeper.sh/title: "Container ephemeral storage limit"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Requires containers to have an ephemeral storage limit set and constrains
       the limit to be within the specified maximum values.
@@ -38,5 +38,7 @@ spec:
       rego: |
 {{ file.Read "src/general/ephemeralstoragelimit/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
       libs:
+        - |
+{{ file.Read "src/general/ephemeralstoragelimit/lib_exclude_update.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}
         - |
 {{ file.Read "src/general/ephemeralstoragelimit/lib_exempt_container.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}

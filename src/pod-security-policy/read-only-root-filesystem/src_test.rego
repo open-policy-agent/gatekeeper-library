@@ -25,6 +25,11 @@ test_input_container_many_mixed_readonlyrootfilesystem_not_allowed_two_but_exemp
     results := violation with input as input
     count(results) == 0
 }
+test_update {
+    input := { "review": object.union(input_review, {"operation": "UPDATE"})}
+    results := violation with input as input
+    count(results) == 0
+}
 
 input_review = {
     "object": {

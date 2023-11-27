@@ -1,6 +1,11 @@
 package k8spspvolumetypes
 
+import data.lib.exclude_update.is_update
+
 violation[{"msg": msg, "details": {}}] {
+    # spec.volumes field is immutable.
+    not is_update(input.review)
+
     volume_fields := {x | input.review.object.spec.volumes[_][x]; x != "name"}
     field := volume_fields[_]
     not input_volume_type_allowed(field)

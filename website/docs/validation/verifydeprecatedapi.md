@@ -238,9 +238,9 @@ spec:
         kinds: ["IngressClass"]
       - apiGroups: ["rbac.authorization.k8s.io"]
         kinds: ["ClusterRole", "ClusterRoleBinding", "Role", "RoleBinding"]
-      - apiGroups: ["scheduling.k8s.io/v1beta1"]
+      - apiGroups: ["scheduling.k8s.io"]
         kinds: ["PriorityClass"]
-      - apiGroups: ["storage.k8s.io/v1beta1"]
+      - apiGroups: ["storage.k8s.io"]
         kinds: ["CSIDriver", "CSINode", "StorageClass", "VolumeAttachment"]
   parameters:
     kvs:
@@ -382,8 +382,10 @@ spec:
         kinds: ["HorizontalPodAutoscaler"]
       - apiGroups: ["policy"]
         kinds: ["PodDisruptionBudget", "PodSecurityPolicy"]
+      - apiGroups: ["node.k8s.io"]
+        kinds: ["RuntimeClass"]
   parameters:
-    kvs: 
+    kvs:
       - deprecatedAPI: "batch/v1beta1"
         kinds: ["CronJob"]
         targetAPI: "batch/v1"

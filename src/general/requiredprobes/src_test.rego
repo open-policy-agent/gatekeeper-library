@@ -335,6 +335,14 @@ test_two_ctrs_empty_liveness_in_ctr_two_both_empty_probes_in_ctr_one {
     count(results) == 3
 }
 
+test_update {
+    kind := kinds[_]
+    input := {"review": object.union(review([{"name": "my-container","image": "my-image:latest", "livenessProbe": {"tcpSocket": {"port":80}}}]), {"operation": "UPDATE"}),
+              "parameters": parameters}
+    results := violation with input as input
+    count(results) == 0
+}
+
 review(containers) = obj {
     obj = {
             "kind": {
