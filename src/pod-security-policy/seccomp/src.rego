@@ -28,7 +28,7 @@ violation[{"msg": msg}] {
     msg := get_message(result.profile, result.file, name, result.location, allowed_profiles)
 }
 
-get_message(profile, file, name, location, allowed_profiles) = message {
+get_message(profile, _, name, location, allowed_profiles) = message {
     not profile == "Localhost"
     message := sprintf("Seccomp profile '%v' is not allowed for container '%v'. Found at: %v. Allowed profiles: %v", [profile, name, location, allowed_profiles])
 }
@@ -51,7 +51,7 @@ input_wildcard_allowed_files {
 }
 
 # Simple allowed Profiles
-allowed_profile(profile, file, allowed) {
+allowed_profile(profile, _, allowed) {
     not startswith(lower(profile), "localhost")
     profile == allowed[_]
 }
@@ -66,20 +66,20 @@ allowed_profile(profile, file, allowed) {
 }
 
 # seccomp Localhost with wildcard
-allowed_profile(profile, file, allowed) {
+allowed_profile(profile, _, allowed) {
     profile == "Localhost"
     input_wildcard_allowed_files
     profile == allowed[_]
 }
 
 # annotation localhost with wildcard
-allowed_profile(profile, file, allowed) {
+allowed_profile(profile, _, allowed) {
     "localhost/*" == allowed[_]
     startswith(profile, "localhost/")
 }
 
 # annotation localhost without wildcard
-allowed_profile(profile, file, allowed) {
+allowed_profile(profile, _, allowed) {
     startswith(profile, "localhost/")
     profile == allowed[_]
 }

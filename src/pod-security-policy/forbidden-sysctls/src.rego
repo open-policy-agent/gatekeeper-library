@@ -21,7 +21,7 @@ violation[{"msg": msg, "details": {}}] {
 }
 
 # * may be used to forbid all sysctls
-forbidden_sysctl(sysctl) {
+forbidden_sysctl(_) {
     input.parameters.forbiddenSysctls[_] == "*"
 }
 
@@ -36,7 +36,7 @@ forbidden_sysctl(sysctl) {
 }
 
 # * may be used to allow all sysctls
-allowed_sysctl(sysctl) {
+allowed_sysctl(_) {
     input.parameters.allowedSysctls[_] == "*"
 }
 

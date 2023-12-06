@@ -75,12 +75,9 @@ missing_drop_capabilities(container) {
   count(all - dropped) > 0
 }
 
-get_default(obj, param, _default) = out {
-  out = obj[param]
-}
+get_default(obj, param, _) := obj[param]
 
-get_default(obj, param, _default) = out {
+get_default(obj, param, _default) := _default {
   not obj[param]
   not obj[param] == false
-  out = _default
 }

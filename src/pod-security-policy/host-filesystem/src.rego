@@ -12,7 +12,7 @@ violation[{"msg": msg, "details": {}}] {
     msg := sprintf("HostPath volume %v is not allowed, pod: %v. Allowed path: %v", [volume, input.review.object.metadata.name, allowedPaths])
 }
 
-input_hostpath_violation(allowedPaths, volume) {
+input_hostpath_violation(allowedPaths, _) {
     # An empty list means all host paths are blocked
     allowedPaths == []
 }
