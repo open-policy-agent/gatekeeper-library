@@ -133,6 +133,11 @@ test_input_seLinux_options_many_not_allowed_not_in_list_double_seccontext {
     count(results) == 3
 }
 
+test_input_seLinux_options_update {
+    input := { "review": object.union(input_review, {"operation": "UPDATE"}), "parameters": input_parameters_in_list_subset}
+    results := violation with input as input
+    count(results) == 0
+}
 
 input_review = {
     "object": {

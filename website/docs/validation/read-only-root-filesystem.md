@@ -16,7 +16,7 @@ metadata:
   name: k8spspreadonlyrootfilesystem
   annotations:
     metadata.gatekeeper.sh/title: "Read Only Root Filesystem"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Requires the use of a read-only root file system by pod containers.
       Corresponds to the `readOnlyRootFilesystem` field in a
@@ -52,9 +52,13 @@ spec:
       rego: |
         package k8spspreadonlyrootfilesystem
 
+        import data.lib.exclude_update.is_update
         import data.lib.exempt_container.is_exempt
 
         violation[{"msg": msg, "details": {}}] {
+            # spec.containers.readOnlyRootFilesystem field is immutable.
+            not is_update(input.review)
+
             c := input_containers[_]
             not is_exempt(c)
             input_read_only_root_fs(c)
@@ -83,6 +87,12 @@ spec:
             object[field]
         }
       libs:
+        - |
+          package lib.exclude_update
+
+          is_update(review) {
+              review.operation == "UPDATE"
+          }
         - |
           package lib.exempt_container
 

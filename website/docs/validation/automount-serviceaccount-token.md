@@ -16,7 +16,7 @@ metadata:
   name: k8spspautomountserviceaccounttokenpod
   annotations:
     metadata.gatekeeper.sh/title: "Automount Service Account Token for Pod"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Controls the ability of any Pod to enable automountServiceAccountToken.
 spec:
@@ -34,7 +34,12 @@ spec:
       rego: |
         package k8sautomountserviceaccounttoken
 
+        import data.lib.exclude_update.is_update
+
         violation[{"msg": msg}] {
+            # spec.automountServiceAccountToken and spec.containers.volumeMounts fields are immutable.
+            not is_update(input.review)
+
             obj := input.review.object
             mountServiceAccountToken(obj.spec)
             msg := sprintf("Automounting service account token is disallowed, pod: %v", [obj.metadata.name])
@@ -64,6 +69,13 @@ spec:
         has_key(x, k) {
             _ = x[k]
         }
+      libs:
+        - |
+          package lib.exclude_update
+
+          is_update(review) {
+              review.operation == "UPDATE"
+          }
 
 ```
 

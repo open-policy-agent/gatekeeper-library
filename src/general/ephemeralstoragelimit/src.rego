@@ -1,5 +1,6 @@
 package k8scontainerephemeralstoragelimit
 
+import data.lib.exclude_update.is_update
 import data.lib.exempt_container.is_exempt
 
 missing(obj, field) = true {
@@ -112,10 +113,14 @@ canonify_storage(orig) = new {
 }
 
 violation[{"msg": msg}] {
+  # spec.containers.resources.limits["ephemeral-storage"] field is immutable.
+  not is_update(input.review)
+
   general_violation[{"msg": msg, "field": "containers"}]
 }
 
 violation[{"msg": msg}] {
+  not is_update(input.review)
   general_violation[{"msg": msg, "field": "initContainers"}]
 }
 
