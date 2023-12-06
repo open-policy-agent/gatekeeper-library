@@ -1,4 +1,4 @@
-apiVersion: mutations.gatekeeper.sh/v1alpha1
+apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
   name: k8spsprunasuser
@@ -15,7 +15,7 @@ spec:
     assign:
       value: 1000
 ---
-apiVersion: mutations.gatekeeper.sh/v1alpha1
+apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
   name: k8spsprunasuser-init
