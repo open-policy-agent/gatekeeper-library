@@ -1,0 +1,17 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: disallowinteractive
+tests:
+- name: disallow-interactive
+  template: template.yaml
+  constraint: samples/no-interactive-containers/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/no-interactive-containers/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/no-interactive-containers/example_disallowed.yaml
+    assertions:
+    - violations: yes

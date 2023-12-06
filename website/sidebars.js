@@ -31,6 +31,7 @@ module.exports = {
             'validation/disallowanonymous',
             'validation/disallowedrepos',
             'validation/disallowedtags',
+            'validation/disallowinteractive',
             'validation/ephemeralstoragelimit',
             'validation/externalip',
             'validation/horizontalpodautoscaler',
