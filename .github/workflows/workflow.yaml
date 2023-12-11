@@ -45,7 +45,7 @@ jobs:
     strategy:
       matrix:
         os: [ "ubuntu-latest", "macos-latest" ]
-        opa: [ "v0.42.2" ]
+        opa: [ "v0.44.0", "v0.57.1" ]
     name: Unit test on ${{ matrix.os }} opa ${{ matrix.opa }}
     steps:
       - name: Harden Runner

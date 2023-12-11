@@ -1,26 +1,26 @@
 package k8sautomountserviceaccounttoken
 
 test_input_pod_not_automountserviceaccounttoken_allowed {
-    input := {"review": input_review_disabled_automountserviceaccounttoken}
-    results := violation with input as input
+    inp := {"review": input_review_disabled_automountserviceaccounttoken}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_pod_automountserviceaccounttoken_not_allowed {
-    input := {"review": input_review_enabled_automountserviceaccounttoken}
-    results := violation with input as input
+    inp := {"review": input_review_enabled_automountserviceaccounttoken}
+    results := violation with input as inp
     count(results) > 0
 }
 
 test_input_pod_automountserviceaccounttoken_not_defined {
-    input := {"review": input_review_no_automountserviceaccounttoken_defined_and_enabled_volumemount}
-    results := violation with input as input
+    inp := {"review": input_review_no_automountserviceaccounttoken_defined_and_enabled_volumemount}
+    results := violation with input as inp
     count(results) > 0
 }
 
 test_update {
-    input := {"review": object.union(input_review_enabled_automountserviceaccounttoken, {"operation": "UPDATE"})}
-    results := violation with input as input
+    inp := {"review": object.union(input_review_enabled_automountserviceaccounttoken, {"operation": "UPDATE"})}
+    results := violation with input as inp
     count(results) == 0
 }
 

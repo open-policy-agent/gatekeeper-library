@@ -16,7 +16,7 @@ metadata:
   name: noupdateserviceaccount
   annotations:
     metadata.gatekeeper.sh/title: "Block updating Service Account"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: "Blocks updating the service account on resources that abstract over Pods. This policy is ignored in audit mode."
 spec:
   crd:
@@ -42,13 +42,15 @@ spec:
     rego: |
       package noupdateserviceaccount
 
-      privileged(userInfo, allowedUsers, allowedGroups) {
+      privileged(userInfo, allowedUsers, _) {
         # Allow if the user is in allowedUsers.
         # Use object.get so omitted parameters can't cause policy bypass by
         # evaluating to undefined.
         username := object.get(userInfo, "username", "")
         allowedUsers[_] == username
-      } {
+      }
+
+      privileged(userInfo, _, allowedGroups) {
         # Allow if the user's groups intersect allowedGroups.
         # Use object.get so omitted parameters can't cause policy bypass by
         # evaluating to undefined.

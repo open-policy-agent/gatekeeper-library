@@ -16,7 +16,7 @@ metadata:
   name: k8spspselinuxv2
   annotations:
     metadata.gatekeeper.sh/title: "SELinux V2"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.0.2
     description: >-
       Defines an allow-list of seLinuxOptions configurations for pod
       containers. Corresponds to a PodSecurityPolicy requiring SELinux configs.
@@ -106,7 +106,7 @@ spec:
         field_allowed(field, options, params) {
             params[field] == options[field]
         }
-        field_allowed(field, options, params) {
+        field_allowed(field, options, _) {
             not has_field(options, field)
         }
 

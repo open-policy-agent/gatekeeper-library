@@ -16,7 +16,7 @@ metadata:
   name: k8spsphostnetworkingports
   annotations:
     metadata.gatekeeper.sh/title: "Host Networking Ports"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.0.2
     description: >-
       Controls usage of host network namespace by pod containers. Specific
       ports must be specified. Corresponds to the `hostNetwork` and
@@ -77,12 +77,12 @@ spec:
             o.spec.hostNetwork
         }
 
-        input_share_hostnetwork(o) {
+        input_share_hostnetwork(_) {
             hostPort := input_containers[_].ports[_].hostPort
             hostPort < input.parameters.min
         }
 
-        input_share_hostnetwork(o) {
+        input_share_hostnetwork(_) {
             hostPort := input_containers[_].ports[_].hostPort
             hostPort > input.parameters.max
         }

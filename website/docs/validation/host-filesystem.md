@@ -16,7 +16,7 @@ metadata:
   name: k8spsphostfilesystem
   annotations:
     metadata.gatekeeper.sh/title: "Host Filesystem"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.0.2
     description: >-
       Controls usage of the host filesystem. Corresponds to the
       `allowedHostPaths` field in a PodSecurityPolicy. For more information,
@@ -66,7 +66,7 @@ spec:
             msg := sprintf("HostPath volume %v is not allowed, pod: %v. Allowed path: %v", [volume, input.review.object.metadata.name, allowedPaths])
         }
 
-        input_hostpath_violation(allowedPaths, volume) {
+        input_hostpath_violation(allowedPaths, _) {
             # An empty list means all host paths are blocked
             allowedPaths == []
         }

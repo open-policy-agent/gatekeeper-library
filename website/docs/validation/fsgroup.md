@@ -16,7 +16,7 @@ metadata:
   name: k8spspfsgroup
   annotations:
     metadata.gatekeeper.sh/title: "FS Group"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.0.2
     description: >-
       Controls allocating an FSGroup that owns the Pod's volumes. Corresponds
       to the `fsGroup` field in a PodSecurityPolicy. For more information, see
@@ -70,7 +70,7 @@ spec:
             msg := sprintf("The provided pod spec fsGroup is not allowed, pod: %v. Allowed fsGroup: %v", [input.review.object.metadata.name, input.parameters])
         }
 
-        input_fsGroup_allowed(spec) {
+        input_fsGroup_allowed(_) {
             # RunAsAny - No range is required. Allows any fsGroup ID to be specified.
             input.parameters.rule == "RunAsAny"
         }

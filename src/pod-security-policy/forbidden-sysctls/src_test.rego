@@ -1,116 +1,116 @@
 package k8spspforbiddensysctls
 
 test_input_sysctls_forbidden_all {
-    input := { "review": input_review, "parameters": input_parameters_wildcard}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_wildcard}
+    results := violation with input as inp
     count(results) == 2
 }
 
 test_input_sysctls_forbidden_in_list {
-    input := { "review": input_review, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 2
 }
 
 test_input_sysctls_forbidden_in_list_mixed {
-    input := { "review": input_review, "parameters": input_parameters_one_in_list}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_one_in_list}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_sysctls_forbidden_not_in_list {
-    input := { "review": input_review, "parameters": input_parameters_not_in_list}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_not_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_sysctls_forbidden_in_list_wildcard {
-    input := { "review": input_review, "parameters": input_parameters_in_list_wildcard}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_in_list_wildcard}
+    results := violation with input as inp
     count(results) == 2
 }
 
 test_input_sysctls_forbidden_in_list_wildcard_mixed {
-    input := { "review": input_review, "parameters": input_parameters_one_in_list_wildcard}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_one_in_list_wildcard}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_sysctls_forbidden_not_in_list_wildcard {
-    input := { "review": input_review, "parameters": input_parameters_not_in_list_wildcard}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_not_in_list_wildcard}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_sysctls_empty_forbidden {
-    input := { "review": input_review, "parameters": input_parameters_empty}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_empty}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_seccontext_empty_wildcard {
-    input := { "review": input_review_seccontext_empty, "parameters": input_parameters_wildcard}
-    results := violation with input as input
+    inp := { "review": input_review_seccontext_empty, "parameters": input_parameters_wildcard}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_sysctls_empty_wildcard {
-    input := { "review": input_review_sysctls_empty, "parameters": input_parameters_wildcard}
-    results := violation with input as input
+    inp := { "review": input_review_sysctls_empty, "parameters": input_parameters_wildcard}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_seccontext_null_wildcard {
-    input := { "review": input_review_seccontext_null, "parameters": input_parameters_wildcard}
-    results := violation with input as input
+    inp := { "review": input_review_seccontext_null, "parameters": input_parameters_wildcard}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_seccontext_empty_empty_forbidden {
-    input := { "review": input_review_seccontext_empty, "parameters": input_parameters_empty}
-    results := violation with input as input
+    inp := { "review": input_review_seccontext_empty, "parameters": input_parameters_empty}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_sysctls_empty_empty_forbidden {
-    input := { "review": input_review_sysctls_empty, "parameters": input_parameters_empty}
-    results := violation with input as input
+    inp := { "review": input_review_sysctls_empty, "parameters": input_parameters_empty}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_seccontext_null_empty_forbidden {
-    input := { "review": input_review_seccontext_null, "parameters": input_parameters_empty}
-    results := violation with input as input
+    inp := { "review": input_review_seccontext_null, "parameters": input_parameters_empty}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_init_sysctls_forbidden_all {
-    input := { "review": input_init_review, "parameters": input_parameters_wildcard}
-    results := violation with input as input
+    inp := { "review": input_init_review, "parameters": input_parameters_wildcard}
+    results := violation with input as inp
     count(results) == 2
 }
 
 test_input_init_sysctls_forbidden_in_list {
-    input := { "review": input_init_review, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_init_review, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 2
 }
 
 test_input_init_sysctls_forbidden_in_list_mixed {
-    input := { "review": input_init_review, "parameters": input_parameters_one_in_list}
-    results := violation with input as input
+    inp := { "review": input_init_review, "parameters": input_parameters_one_in_list}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_init_sysctls_forbidden_not_in_list {
-    input := { "review": input_init_review, "parameters": input_parameters_not_in_list}
-    results := violation with input as input
+    inp := { "review": input_init_review, "parameters": input_parameters_not_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_sysctls_allowed_all {
-    input := { "review": input_review, "parameters": input_parameters_sysctls_allowed_all}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_sysctls_allowed_all}
+    results := violation with input as inp
     count(results) == 0
 }
 
@@ -118,44 +118,44 @@ test_input_sysctls_allowed_all {
 # This is in contrast to unspecified allowedSysctls which does not
 # place any restrictions by itself.
 test_input_sysctls_allowed_empty {
-    input := { "review": input_review, "parameters": input_parameters_sysctls_allowed_empty}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_sysctls_allowed_empty}
+    results := violation with input as inp
     count(results) == 2
 }
 
 test_input_sysctls_allowed_exact {
-    input := { "review": input_review, "parameters": input_parameters_sysctls_allowed_exact}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_sysctls_allowed_exact}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_sysctls_allowed_wildcards {
-    input := { "review": input_review, "parameters": input_parameters_sysctls_allowed_wildcards}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_sysctls_allowed_wildcards}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_sysctls_some_allowed_exact {
-    input := { "review": input_review, "parameters": input_parameters_sysctls_some_allowed_exact}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_sysctls_some_allowed_exact}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_sysctls_some_allowed_wildcards {
-    input := { "review": input_review, "parameters": input_parameters_sysctls_some_allowed_wildcards}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_sysctls_some_allowed_wildcards}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_sysctls_allowed_and_forbidden {
-    input := { "review": input_review, "parameters": input_parameters_sysctls_allowed_and_forbidden}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_sysctls_allowed_and_forbidden}
+    results := violation with input as inp
     count(results) == 2
 }
 
 test_update {
-    input := { "review": object.union(input_review, {"operation": "UPDATE"}), "parameters": input_parameters_wildcard}
-    results := violation with input as input
+    inp := { "review": object.union(input_review, {"operation": "UPDATE"}), "parameters": input_parameters_wildcard}
+    results := violation with input as inp
     count(results) == 0
 }
 

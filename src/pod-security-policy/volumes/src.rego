@@ -13,7 +13,7 @@ violation[{"msg": msg, "details": {}}] {
 }
 
 # * may be used to allow all volume types
-input_volume_type_allowed(field) {
+input_volume_type_allowed(_) {
     input.parameters.volumes[_] == "*"
 }
 

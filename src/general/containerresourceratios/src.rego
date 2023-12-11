@@ -24,14 +24,14 @@ canonify_cpu(orig) = new {
 canonify_cpu(orig) = new {
   not is_number(orig)
   not endswith(orig, "m")
-  re_match("^[0-9]+$", orig)
+  regex.match("^[0-9]+$", orig)
   new := to_number(orig) * 1000
 }
 
 canonify_cpu(orig) = new {
   not is_number(orig)
   not endswith(orig, "m")
-  re_match("^[0-9]+[.][0-9]+$", orig)
+  regex.match("^[0-9]+[.][0-9]+$", orig)
   new := to_number(orig) * 1000
 }
 
@@ -128,7 +128,7 @@ canonify_mem(orig) = new {
   not is_number(orig)
   suffix := get_suffix(orig)
   raw := replace(orig, suffix, "")
-  re_match("^[0-9]+(\\.[0-9]+)?$", raw)
+  regex.match("^[0-9]+(\\.[0-9]+)?$", raw)
   new := to_number(raw) * mem_multiple(suffix)
 }
 

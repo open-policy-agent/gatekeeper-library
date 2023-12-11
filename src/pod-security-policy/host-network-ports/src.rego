@@ -16,12 +16,12 @@ input_share_hostnetwork(o) {
     o.spec.hostNetwork
 }
 
-input_share_hostnetwork(o) {
+input_share_hostnetwork(_) {
     hostPort := input_containers[_].ports[_].hostPort
     hostPort < input.parameters.min
 }
 
-input_share_hostnetwork(o) {
+input_share_hostnetwork(_) {
     hostPort := input_containers[_].ports[_].hostPort
     hostPort > input.parameters.max
 }

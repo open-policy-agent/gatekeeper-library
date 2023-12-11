@@ -47,11 +47,11 @@ get_user_violation(params, container) = msg {
   msg := sprintf("Container %v is attempting to run without a required securityContext/runAsNonRoot or securityContext/runAsUser != 0", [container.name])
 }
 
-accept_users("RunAsAny", provided_user) {true}
+accept_users("RunAsAny", _)
 
-accept_users("MustRunAsNonRoot", provided_user) = res {res := provided_user != 0}
+accept_users("MustRunAsNonRoot", provided_user) := provided_user != 0
 
-accept_users("MustRunAs", provided_user) = res  {
+accept_users("MustRunAs", provided_user) := res  {
   ranges := input.parameters.runAsUser.ranges
   res := is_in_range(provided_user, ranges)
 }
@@ -80,18 +80,15 @@ get_violation(field, params, container) = msg {
   msg := sprintf("Container %v is attempting to run without a required securityContext/%v. Allowed %v: %v", [container.name, field, field, params])
 }
 
-accept_value("RunAsAny", provided_value, ranges) {true}
+accept_value("RunAsAny", _, _)
 
-accept_value("MayRunAs", provided_value, ranges) = res { res := is_in_range(provided_value, ranges)}
+accept_value("MayRunAs", provided_value, ranges) := is_in_range(provided_value, ranges)
 
-accept_value("MustRunAs", provided_value, ranges) = res { res := is_in_range(provided_value, ranges)}
+accept_value("MustRunAs", provided_value, ranges) := is_in_range(provided_value, ranges)
 
 
 # If container level is provided, that takes precedence
-get_field_value(field, container, review) = out {
-  container_value := get_seccontext_field(field, container)
-  out := container_value
-}
+get_field_value(field, container, _) := get_seccontext_field(field, container)
 
 # If no container level exists, use pod level
 get_field_value(field, container, review) = out {

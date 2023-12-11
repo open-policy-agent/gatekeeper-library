@@ -11,7 +11,7 @@ violation[{"msg": msg, "details": {}}] {
     msg := sprintf("The provided pod spec fsGroup is not allowed, pod: %v. Allowed fsGroup: %v", [input.review.object.metadata.name, input.parameters])
 }
 
-input_fsGroup_allowed(spec) {
+input_fsGroup_allowed(_) {
     # RunAsAny - No range is required. Allows any fsGroup ID to be specified.
     input.parameters.rule == "RunAsAny"
 }

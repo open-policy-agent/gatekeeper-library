@@ -35,7 +35,7 @@ input_seLinuxOptions_allowed(options) {
 field_allowed(field, options, params) {
     params[field] == options[field]
 }
-field_allowed(field, options, params) {
+field_allowed(field, options, _) {
     not has_field(options, field)
 }
 

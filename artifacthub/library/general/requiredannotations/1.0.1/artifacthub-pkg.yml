@@ -1,0 +1,22 @@
+version: 1.0.1
+name: k8srequiredannotations
+displayName: Required Annotations
+createdAt: "2023-10-30T21:00:00Z"
+description: Requires resources to contain specified annotations, with values matching provided regular expressions.
+digest: 332839ec5e037ea20aa5b9a204ad2490ad76d05f5d2b961ace5e90c7b8c864be
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/requiredannotations
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Required Annotations
+    Requires resources to contain specified annotations, with values matching provided regular expressions.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/requiredannotations/1.0.1/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library
