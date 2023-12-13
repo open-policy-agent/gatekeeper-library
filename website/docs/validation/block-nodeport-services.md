@@ -46,7 +46,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>block-nodeport-services</summary><blockquote>
+<summary>block-nodeport-services</summary>
 
 <details>
 <summary>constraint</summary>
@@ -98,4 +98,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

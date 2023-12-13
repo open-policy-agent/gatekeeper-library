@@ -111,7 +111,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>privileged-containers-disallowed</summary><blockquote>
+<summary>privileged-containers-disallowed</summary>
 
 <details>
 <summary>constraint</summary>
@@ -218,4 +218,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

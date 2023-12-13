@@ -91,7 +91,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>flexvolume-drivers</summary><blockquote>
+<summary>flexvolume-drivers</summary>
 
 <details>
 <summary>constraint</summary>
@@ -187,4 +187,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

@@ -60,7 +60,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>allowed-ip</summary><blockquote>
+<summary>allowed-ip</summary>
 
 <details>
 <summary>constraint</summary>
@@ -147,4 +147,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

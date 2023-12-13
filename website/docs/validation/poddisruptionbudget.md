@@ -110,7 +110,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>pod-disruption-budget</summary><blockquote>
+<summary>pod-disruption-budget</summary>
 
 <details>
 <summary>constraint</summary>
@@ -380,4 +380,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

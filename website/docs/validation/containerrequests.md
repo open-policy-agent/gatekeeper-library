@@ -284,7 +284,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>container-requests</summary><blockquote>
+<summary>container-requests</summary>
 
 <details>
 <summary>constraint</summary>
@@ -379,4 +379,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

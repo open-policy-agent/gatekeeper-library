@@ -160,7 +160,7 @@ func main() {
 							}
 						}
 
-						allExamples += fmt.Sprintf("<details>\n<summary>%s</summary><blockquote>\n\n%s\n%s\n\n</blockquote></details>", test.Name, constraintExample, examples)
+						allExamples += fmt.Sprintf("<details>\n<summary>%s</summary>\n\n%s\n%s\n\n</details>", test.Name, constraintExample, examples)
 					}
 
 					templateContent, err := os.ReadFile(filepath.Join(pwd, "template.md"))

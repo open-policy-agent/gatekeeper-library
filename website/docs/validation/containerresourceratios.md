@@ -333,7 +333,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>memory-ratio-only</summary><blockquote>
+<summary>memory-ratio-only</summary>
 
 <details>
 <summary>constraint</summary>
@@ -433,8 +433,8 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details><details>
-<summary>memory-and-cpu-ratios</summary><blockquote>
+</details><details>
+<summary>memory-and-cpu-ratios</summary>
 
 <details>
 <summary>constraint</summary>
@@ -535,4 +535,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

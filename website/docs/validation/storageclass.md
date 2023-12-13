@@ -172,7 +172,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>storageclass</summary><blockquote>
+<summary>storageclass</summary>
 
 <details>
 <summary>constraint</summary>
@@ -413,8 +413,8 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details><details>
-<summary>storageclass-allowlist</summary><blockquote>
+</details><details>
+<summary>storageclass-allowlist</summary>
 
 <details>
 <summary>constraint</summary>
@@ -500,4 +500,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>
