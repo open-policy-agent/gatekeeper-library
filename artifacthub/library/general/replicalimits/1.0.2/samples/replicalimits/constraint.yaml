@@ -7,6 +7,8 @@ spec:
     kinds:
       - apiGroups: ["apps"]
         kinds: ["Deployment"]
+      - apiGroups: ["autoscaling"]
+        kinds: ["Scale"]
   parameters:
     ranges:
     - min_replicas: 3

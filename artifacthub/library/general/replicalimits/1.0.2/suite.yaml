@@ -11,7 +11,39 @@ tests:
     object: samples/replicalimits/example_allowed.yaml
     assertions:
     - violations: no
+  - name: example-scale-allowed
+    object: samples/replicalimits/example_scale_allowed.yaml
+    assertions:
+    - violations: no
   - name: example-disallowed
     object: samples/replicalimits/example_disallowed.yaml
+    assertions:
+    - violations: yes
+  - name: example-scale-disallowed
+    object: samples/replicalimits/example_scale_disallowed.yaml
+    assertions:
+    - violations: yes
+- name: replica-limit-zero
+  template: template.yaml
+  constraint: samples/replicalimits_zero/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/replicalimits_zero/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-scale-allowed
+    object: samples/replicalimits_zero/example_scale_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-scale-allowed
+    object: samples/replicalimits_zero/example_scale_allowed2.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/replicalimits_zero/example_disallowed.yaml
+    assertions:
+    - violations: yes
+  - name: example-scale-disallowed
+    object: samples/replicalimits_zero/example_scale_disallowed.yaml
     assertions:
     - violations: yes
