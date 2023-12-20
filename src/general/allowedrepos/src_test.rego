@@ -1,75 +1,75 @@
 package k8sallowedrepos
 
 test_input_allowed_container {
-    input := { "review": input_review(input_container_allowed), "parameters": {"repos": ["allowed"]}}
-    results := violation with input as input
+    inp := { "review": input_review(input_container_allowed), "parameters": {"repos": ["allowed"]}}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_allowed_container_x2 {
-    input := { "review": input_review(input_container_allowed), "parameters": {"repos": ["other", "allowed"]}}
-    results := violation with input as input
+    inp := { "review": input_review(input_container_allowed), "parameters": {"repos": ["other", "allowed"]}}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_allowed_dual_container {
-    input := { "review": input_review(input_container_dual_allowed), "parameters": {"repos": ["allowed"]}}
-    results := violation with input as input
+    inp := { "review": input_review(input_container_dual_allowed), "parameters": {"repos": ["allowed"]}}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_denied_container {
-    input := { "review": input_review(input_container_denied), "parameters": {"repos": ["allowed"]}}
-    results := violation with input as input
+    inp := { "review": input_review(input_container_denied), "parameters": {"repos": ["allowed"]}}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_denied_container_x2 {
-    input := { "review": input_review(input_container_denied), "parameters": {"repos": ["other", "allowed"]}}
-    results := violation with input as input
+    inp := { "review": input_review(input_container_denied), "parameters": {"repos": ["other", "allowed"]}}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_denied_dual_container {
-    input := { "review": input_review(input_container_dual_denied), "parameters": {"repos": ["allowed"]}}
-    results := violation with input as input
+    inp := { "review": input_review(input_container_dual_denied), "parameters": {"repos": ["allowed"]}}
+    results := violation with input as inp
     count(results) == 2
 }
 test_input_denied_mixed_container {
-    input := { "review": input_review(array.concat(input_container_allowed, input_container_denied)), "parameters": {"repos": ["allowed"]}}
-    results := violation with input as input
+    inp := { "review": input_review(array.concat(input_container_allowed, input_container_denied)), "parameters": {"repos": ["allowed"]}}
+    results := violation with input as inp
     count(results) == 1
 }
 
 # init containers
 test_input_allowed_container {
-    input := { "review": input_init_review(input_container_allowed), "parameters": {"repos": ["allowed"]}}
-    results := violation with input as input
+    inp := { "review": input_init_review(input_container_allowed), "parameters": {"repos": ["allowed"]}}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_allowed_container_x2 {
-    input := { "review": input_init_review(input_container_allowed), "parameters": {"repos": ["other", "allowed"]}}
-    results := violation with input as input
+    inp := { "review": input_init_review(input_container_allowed), "parameters": {"repos": ["other", "allowed"]}}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_allowed_dual_container {
-    input := { "review": input_init_review(input_container_dual_allowed), "parameters": {"repos": ["allowed"]}}
-    results := violation with input as input
+    inp := { "review": input_init_review(input_container_dual_allowed), "parameters": {"repos": ["allowed"]}}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_denied_container {
-    input := { "review": input_init_review(input_container_denied), "parameters": {"repos": ["allowed"]}}
-    results := violation with input as input
+    inp := { "review": input_init_review(input_container_denied), "parameters": {"repos": ["allowed"]}}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_denied_container_x2 {
-    input := { "review": input_init_review(input_container_denied), "parameters": {"repos": ["other", "allowed"]}}
-    results := violation with input as input
+    inp := { "review": input_init_review(input_container_denied), "parameters": {"repos": ["other", "allowed"]}}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_denied_dual_container {
-    input := { "review": input_init_review(input_container_dual_denied), "parameters": {"repos": ["allowed"]}}
-    results := violation with input as input
+    inp := { "review": input_init_review(input_container_dual_denied), "parameters": {"repos": ["allowed"]}}
+    results := violation with input as inp
     count(results) == 2
 }
 test_input_denied_mixed_container {
-    input := { "review": input_init_review(array.concat(input_container_allowed, input_container_denied)), "parameters": {"repos": ["allowed"]}}
-    results := violation with input as input
+    inp := { "review": input_init_review(array.concat(input_container_allowed, input_container_denied)), "parameters": {"repos": ["allowed"]}}
+    results := violation with input as inp
     count(results) == 1
 }
 

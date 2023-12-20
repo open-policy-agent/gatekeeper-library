@@ -1,141 +1,141 @@
 package k8spspselinux
 
 test_input_seLinux_options_allowed_in_list {
-    input := { "review": input_review, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_seLinux_options_allowed_in_list_subset {
-    input := { "review": input_review, "parameters": input_parameters_in_list_subset}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_in_list_subset}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_seLinux_options_allowed_in_list_split_list {
-    input := { "review": input_review, "parameters": input_parameters_in_list_split_two}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_in_list_split_two}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_seLinux_option_not_allowed_not_in_list {
-    input := { "review": input_review, "parameters": input_parameters_not_in_list}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_not_in_list}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_seLinux_options_empty {
-    input := { "review": input_review, "parameters": input_parameters_empty}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_empty}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_seLinux_option_two_empty {
-    input := { "review": input_review_two , "parameters": input_parameters_empty}
-    results := violation with input as input
+    inp := { "review": input_review_two , "parameters": input_parameters_empty}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_seLinux_options_no_security_context {
-    input := { "review": input_review_no_security_context, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_no_security_context, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_seLinux_options_two_allowed_in_list {
-    input := { "review": input_review_two, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_two, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_seLinux_options_two_subset_allowed_in_list {
-    input := { "review": input_review_two_subset, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_two_subset, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_seLinux_options_subset_allowed_in_list_subset {
-    input := { "review": input_review_two_subset, "parameters": input_parameters_in_list_subset}
-    results := violation with input as input
+    inp := { "review": input_review_two_subset, "parameters": input_parameters_in_list_subset}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_seLinux_options_subset_allowed_in_list_split_subset {
-    input := { "review": input_review_two_subset, "parameters": input_parameters_in_list_split_subset}
-    results := violation with input as input
+    inp := { "review": input_review_two_subset, "parameters": input_parameters_in_list_split_subset}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_seLinux_options_allowed_in_list_split_subset {
-    input := { "review": input_review, "parameters": input_parameters_in_list_split_subset}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_in_list_split_subset}
+    results := violation with input as inp
     count(results) == 1
 }
 
 
 test_input_seLinux_options_two_subset_not_allowed_not_in_list {
-    input := { "review": input_review_two_subset, "parameters": input_parameters_not_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_two_subset, "parameters": input_parameters_not_in_list}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_seLinux_option_two_not_allowed_not_in_list {
-    input := { "review": input_review_two, "parameters": input_parameters_not_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_two, "parameters": input_parameters_not_in_list}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_seLinux_options_many_allowed_in_list {
-    input := { "review": input_review_many, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_many, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_seLinux_options_many_not_allowed_not_in_list {
-    input := { "review": input_review_many, "parameters": input_parameters_not_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_many, "parameters": input_parameters_not_in_list}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_seLinux_options_many_not_allowed_not_in_list_but_exempt {
-    input := { "review": input_review_many, "parameters": input_parameters_exempt}
-    results := violation with input as input
+    inp := { "review": input_review_many, "parameters": input_parameters_exempt}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_seLinux_options_many_not_allowed_not_in_list_two {
-    input := { "review": input_review_many, "parameters": input_parameters_not_in_list_two}
-    results := violation with input as input
+    inp := { "review": input_review_many, "parameters": input_parameters_not_in_list_two}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_seLinux_option_two_allowed_in_list_subset {
-    input := { "review": input_review_two , "parameters": input_parameters_in_list_subset}
-    results := violation with input as input
+    inp := { "review": input_review_two , "parameters": input_parameters_in_list_subset}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_seLinux_option_two_not_allowed_not_in_list_subset {
-    input := { "review": input_review_two , "parameters": input_parameters_not_in_list_two}
-    results := violation with input as input
+    inp := { "review": input_review_two , "parameters": input_parameters_not_in_list_two}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_seLinux_options_many_allowed_in_list_double_seccontext {
-    input := { "review": input_review_many_double_seccontext, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_many_double_seccontext, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_seLinux_options_many_not_allowed_not_in_list_double_seccontext {
-    input := { "review": input_review_many_double_seccontext, "parameters": input_parameters_not_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_many_double_seccontext, "parameters": input_parameters_not_in_list}
+    results := violation with input as inp
     count(results) == 3
 }
 
 test_input_seLinux_options_update {
-    input := { "review": object.union(input_review, {"operation": "UPDATE"}), "parameters": input_parameters_in_list_subset}
-    results := violation with input as input
+    inp := { "review": object.union(input_review, {"operation": "UPDATE"}), "parameters": input_parameters_in_list_subset}
+    results := violation with input as inp
     count(results) == 0
 }
 

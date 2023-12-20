@@ -1,49 +1,49 @@
 package k8sexternalips
 
 test_input_non_svc {
-    input := {"review": non_svc, "parameters": {"allowedIPs": ["1.2.3.4"]}}
-    results := violation with input as input
+    inp := {"review": non_svc, "parameters": {"allowedIPs": ["1.2.3.4"]}}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_no_external_ip {
-    input := {"review": non_externalip_svc, "parameters": {"allowedIPs": ["1.2.3.4"]}}
-    results := violation with input as input
+    inp := {"review": non_externalip_svc, "parameters": {"allowedIPs": ["1.2.3.4"]}}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_no_violations_externalip {
-    input := {"review": externalip_svc(["1.2.3.4"]), "parameters": {"allowedIPs": ["1.2.3.4"]}}
-    results := violation with input as input
+    inp := {"review": externalip_svc(["1.2.3.4"]), "parameters": {"allowedIPs": ["1.2.3.4"]}}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_no_violations_externalip_multiple {
-    input := {"review": externalip_svc(["1.2.3.4", "203.0.113.0"]), "parameters": {"allowedIPs": ["1.1.1.1", "203.0.113.0", "1.2.3.4", "203.0.113.1"]}}
-    results := violation with input as input
+    inp := {"review": externalip_svc(["1.2.3.4", "203.0.113.0"]), "parameters": {"allowedIPs": ["1.1.1.1", "203.0.113.0", "1.2.3.4", "203.0.113.1"]}}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_no_violations_empty {
-    input := {"review": externalip_svc([]), "parameters": {"allowedIPs": []}}
-    results := violation with input as input
+    inp := {"review": externalip_svc([]), "parameters": {"allowedIPs": []}}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_violations_externalip {
-    input := {"review": externalip_svc(["203.0.113.0"]), "parameters": {"allowedIPs": ["1.1.1.1", "1.2.3.4"]}}
-    results := violation with input as input
+    inp := {"review": externalip_svc(["203.0.113.0"]), "parameters": {"allowedIPs": ["1.1.1.1", "1.2.3.4"]}}
+    results := violation with input as inp
     results
     count(results) == 1
 }
 test_input_violations_none_allowed {
-    input := {"review": externalip_svc(["203.0.113.0"]), "parameters": {"allowedIPs": []}}
-    results := violation with input as input
+    inp := {"review": externalip_svc(["203.0.113.0"]), "parameters": {"allowedIPs": []}}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_violations_partial {
-    input := {"review": externalip_svc(["1.2.3.4", "203.0.113.0"]), "parameters": {"allowedIPs": ["1.1.1.1", "1.2.3.4", "203.0.113.1"]}}
-    results := violation with input as input
+    inp := {"review": externalip_svc(["1.2.3.4", "203.0.113.0"]), "parameters": {"allowedIPs": ["1.1.1.1", "1.2.3.4", "203.0.113.1"]}}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_violations_multiple {
-    input := {"review": externalip_svc(["1.2.3.4", "203.0.113.0"]), "parameters": {"allowedIPs": ["1.1.1.1", "203.0.113.1"]}}
-    results := violation with input as input
+    inp := {"review": externalip_svc(["1.2.3.4", "203.0.113.0"]), "parameters": {"allowedIPs": ["1.1.1.1", "203.0.113.1"]}}
+    results := violation with input as inp
     count(results) == 1 # Multiple failing IPs reported in single error message.
 }
 

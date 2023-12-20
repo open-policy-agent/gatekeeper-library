@@ -1,73 +1,73 @@
 package k8spspprocmount
 
 test_input_container_not_proc_mount_allowed {
-    input := { "review": input_review, "parameters": input_parameters_default}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_default}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_container_proc_mount_not_allowed {
-    input := { "review": input_review_unmasked, "parameters": input_parameters_default}
-    results := violation with input as input
+    inp := { "review": input_review_unmasked, "parameters": input_parameters_default}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_container_proc_mount_not_allowed_null_param {
-    input := { "review": input_review_unmasked, "parameters": null }
-    results := violation with input as input
+    inp := { "review": input_review_unmasked, "parameters": null }
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_container_proc_mount_not_allowed_missing_param {
-    input := { "review": input_review_unmasked }
-    results := violation with input as input
+    inp := { "review": input_review_unmasked }
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_container_many_not_proc_mount_allowed {
-    input := { "review": input_review_many, "parameters": input_parameters_default}
-    results := violation with input as input
+    inp := { "review": input_review_many, "parameters": input_parameters_default}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_container_many_mixed_proc_mount_not_allowed {
-    input := { "review": input_review_many_mixed, "parameters": input_parameters_default}
-    results := violation with input as input
+    inp := { "review": input_review_many_mixed, "parameters": input_parameters_default}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_container_many_mixed_proc_mount_not_allowed_two {
-    input := { "review": input_review_many_mixed_two, "parameters": input_parameters_default}
-    results := violation with input as input
+    inp := { "review": input_review_many_mixed_two, "parameters": input_parameters_default}
+    results := violation with input as inp
     count(results) == 2
 }
 test_input_container_many_mixed_proc_mount_not_allowed_two_but_exempt {
-    input := { "review": input_review_many_mixed_two, "parameters": input_parameters_exempt}
-    results := violation with input as input
+    inp := { "review": input_review_many_mixed_two, "parameters": input_parameters_exempt}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_container_proc_mount_case_insensitive {
-    input := { "review": input_review, "parameters": input_parameters_default_lower}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_default_lower}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_container_proc_mount_case_invalid_procMount {
-    input := { "review": input_review, "parameters": input_parameters_invalid_procMount}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_invalid_procMount}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_container_not_proc_mount_unmasked {
-    input := { "review": input_review, "parameters": input_parameters_unmasked}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_unmasked}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_container_proc_mount_unmasked {
-    input := { "review": input_review_unmasked, "parameters": input_parameters_unmasked}
-    results := violation with input as input
+    inp := { "review": input_review_unmasked, "parameters": input_parameters_unmasked}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_container_many_mixed_proc_mount_allowed_two {
-    input := { "review": input_review_many_mixed_two, "parameters": input_parameters_unmasked}
-    results := violation with input as input
+    inp := { "review": input_review_many_mixed_two, "parameters": input_parameters_unmasked}
+    results := violation with input as inp
     count(results) == 0
 }
 test_update {
-    input := { "review": object.union(input_review_unmasked, {"operation": "UPDATE"}), "parameters": input_parameters_default}
-    results := violation with input as input
+    inp := { "review": object.union(input_review_unmasked, {"operation": "UPDATE"}), "parameters": input_parameters_default}
+    results := violation with input as inp
     count(results) == 0
 }
 

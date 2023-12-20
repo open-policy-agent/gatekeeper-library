@@ -1,13 +1,10 @@
 package k8srequiredlabels
 
-get_message(parameters, _default) = msg {
+get_message(parameters, _default) := _default {
   not parameters.message
-  msg := _default
 }
 
-get_message(parameters, _default) = msg {
-  msg := parameters.message
-}
+get_message(parameters, _) := parameters.message
 
 violation[{"msg": msg, "details": {"missing_labels": missing}}] {
   provided := {label | input.review.object.metadata.labels[label]}
@@ -24,7 +21,7 @@ violation[{"msg": msg}] {
   expected.key == key
   # do not match if allowedRegex is not defined, or is an empty string
   expected.allowedRegex != ""
-  not re_match(expected.allowedRegex, value)
+  not regex.match(expected.allowedRegex, value)
   def_msg := sprintf("Label <%v: %v> does not satisfy allowed regex: %v", [key, value, expected.allowedRegex])
   msg := get_message(input.parameters, def_msg)
 }

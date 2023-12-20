@@ -22,7 +22,7 @@ jobs:
       matrix:
         folder: [artifacthub, require-sync, validate, website]
     steps:
-      - uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe # v4.1.0
+      - uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5.0.0
         with:
           go-version: '1.20'
           cache: false
@@ -30,5 +30,5 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@3a919529898de77ec3da873e3063ca4b10e7f5cc # v3.7.0
         with:
-          version: v1.54.2
+          version: v1.55.2
           working-directory: scripts/${{ matrix.folder }}

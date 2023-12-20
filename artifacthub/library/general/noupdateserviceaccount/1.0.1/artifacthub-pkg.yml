@@ -1,0 +1,22 @@
+version: 1.0.1
+name: noupdateserviceaccount
+displayName: Block updating Service Account
+createdAt: "2023-10-30T21:00:00Z"
+description: Blocks updating the service account on resources that abstract over Pods. This policy is ignored in audit mode.
+digest: ebe8c51d51643cc8d55a2f315f19326db6c81c1fba9c0e0bfb9914b657a67203
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/noupdateserviceaccount
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Block updating Service Account
+    Blocks updating the service account on resources that abstract over Pods. This policy is ignored in audit mode.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/noupdateserviceaccount/1.0.1/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

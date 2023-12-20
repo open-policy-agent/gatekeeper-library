@@ -16,7 +16,7 @@ metadata:
   name: k8spspcapabilities
   annotations:
     metadata.gatekeeper.sh/title: "Capabilities"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.0.2
     description: >-
       Controls Linux capabilities on containers. Corresponds to the
       `allowedCapabilities` and `requiredDropCapabilities` fields in a
@@ -137,14 +137,11 @@ spec:
           count(all - dropped) > 0
         }
 
-        get_default(obj, param, _default) = out {
-          out = obj[param]
-        }
+        get_default(obj, param, _) := obj[param]
 
-        get_default(obj, param, _default) = out {
+        get_default(obj, param, _default) := _default {
           not obj[param]
           not obj[param] == false
-          out = _default
         }
       libs:
         - |

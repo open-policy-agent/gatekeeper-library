@@ -1,0 +1,17 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: containerrequests
+tests:
+- name: container-requests
+  template: template.yaml
+  constraint: samples/container-must-have-requests/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/container-must-have-requests/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/container-must-have-requests/example_disallowed.yaml
+    assertions:
+    - violations: yes

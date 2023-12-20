@@ -1,38 +1,38 @@
 package k8spspprivileged
 
 test_input_container_not_privileged_allowed {
-    input := { "review": input_review}
-    results := violation with input as input
+    inp := { "review": input_review}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_container_privileged_not_allowed {
-    input := { "review": input_review_priv}
-    results := violation with input as input
+    inp := { "review": input_review_priv}
+    results := violation with input as inp
     count(results) > 0
 }
 test_input_container_many_not_privileged_allowed {
-    input := { "review": input_review_many}
-    results := violation with input as input
+    inp := { "review": input_review_many}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_container_many_mixed_privileged_not_allowed {
-    input := { "review": input_review_many_mixed}
-    results := violation with input as input
+    inp := { "review": input_review_many_mixed}
+    results := violation with input as inp
     count(results) > 0
 }
 test_input_container_many_mixed_privileged_not_allowed_two {
-    input := { "review": input_review_many_mixed_two}
-    results := violation with input as input
+    inp := { "review": input_review_many_mixed_two}
+    results := violation with input as inp
     count(results) == 2
 }
 test_input_container_many_mixed_privileged_not_allowed_two_but_exempt {
-    input := { "review": input_review_many_mixed_two, "parameters": {"exemptImages": ["nginx"]}}
-    results := violation with input as input
+    inp := { "review": input_review_many_mixed_two, "parameters": {"exemptImages": ["nginx"]}}
+    results := violation with input as inp
     count(results) == 0
 }
 test_update {
-    input := { "review": object.union(input_review_priv, {"operation": "UPDATE"})}
-    results := violation with input as input
+    inp := { "review": object.union(input_review_priv, {"operation": "UPDATE"})}
+    results := violation with input as inp
     count(results) == 0
 }
 
