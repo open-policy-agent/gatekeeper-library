@@ -13,6 +13,10 @@ violation[{"msg": msg, "details": {}}] {
 
 input_share_hostnetwork(o) {
     not input.parameters.hostNetwork
+
+    c := input_containers[_]
+    not is_exempt(c)
+
     o.spec.hostNetwork
 }
 
