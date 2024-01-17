@@ -107,7 +107,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>disallow-interactive</summary><blockquote>
+<summary>disallow-interactive</summary>
 
 <details>
 <summary>constraint</summary>
@@ -187,4 +187,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

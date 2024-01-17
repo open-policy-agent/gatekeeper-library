@@ -72,7 +72,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>unique-ingress-host</summary><blockquote>
+<summary>unique-ingress-host</summary>
 
 <details>
 <summary>constraint</summary>
@@ -213,4 +213,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

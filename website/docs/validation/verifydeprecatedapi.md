@@ -86,7 +86,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>verifydeprecatedapi-1.16</summary><blockquote>
+<summary>verifydeprecatedapi-1.16</summary>
 
 <details>
 <summary>constraint</summary>
@@ -204,8 +204,8 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details><details>
-<summary>verifydeprecatedapi-1.22</summary><blockquote>
+</details><details>
+<summary>verifydeprecatedapi-1.22</summary>
 
 <details>
 <summary>constraint</summary>
@@ -358,8 +358,8 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details><details>
-<summary>verifydeprecatedapi-1.25</summary><blockquote>
+</details><details>
+<summary>verifydeprecatedapi-1.25</summary>
 
 <details>
 <summary>constraint</summary>
@@ -489,8 +489,8 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details><details>
-<summary>verifydeprecatedapi-1.26</summary><blockquote>
+</details><details>
+<summary>verifydeprecatedapi-1.26</summary>
 
 <details>
 <summary>constraint</summary>
@@ -599,8 +599,8 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details><details>
-<summary>verifydeprecatedapi-1.27</summary><blockquote>
+</details><details>
+<summary>verifydeprecatedapi-1.27</summary>
 
 <details>
 <summary>constraint</summary>
@@ -673,8 +673,8 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details><details>
-<summary>verifydeprecatedapi-1.29</summary><blockquote>
+</details><details>
+<summary>verifydeprecatedapi-1.29</summary>
 
 <details>
 <summary>constraint</summary>
@@ -778,4 +778,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

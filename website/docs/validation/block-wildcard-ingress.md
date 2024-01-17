@@ -53,7 +53,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>block-wildcard-ingress</summary><blockquote>
+<summary>block-wildcard-ingress</summary>
 
 <details>
 <summary>constraint</summary>
@@ -212,4 +212,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

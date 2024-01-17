@@ -78,7 +78,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>must-have-set-of-annotations</summary><blockquote>
+<summary>must-have-set-of-annotations</summary>
 
 <details>
 <summary>constraint</summary>
@@ -168,4 +168,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

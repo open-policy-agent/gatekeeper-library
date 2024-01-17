@@ -83,7 +83,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>host-path-disallowed</summary><blockquote>
+<summary>host-path-disallowed</summary>
 
 <details>
 <summary>constraint</summary>
@@ -197,4 +197,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

@@ -122,7 +122,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>container-limits-and-requests</summary><blockquote>
+<summary>container-limits-and-requests</summary>
 
 <details>
 <summary>constraint</summary>
@@ -289,8 +289,8 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details><details>
-<summary>container-cpu-requests-memory-limits-and-requests</summary><blockquote>
+</details><details>
+<summary>container-cpu-requests-memory-limits-and-requests</summary>
 
 <details>
 <summary>constraint</summary>
@@ -486,8 +486,8 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details><details>
-<summary>no-enforcements</summary><blockquote>
+</details><details>
+<summary>no-enforcements</summary>
 
 <details>
 <summary>constraint</summary>
@@ -645,4 +645,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

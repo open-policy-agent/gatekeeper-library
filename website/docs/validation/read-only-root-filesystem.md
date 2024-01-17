@@ -122,7 +122,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>require-read-only-root-filesystem</summary><blockquote>
+<summary>require-read-only-root-filesystem</summary>
 
 <details>
 <summary>constraint</summary>
@@ -228,4 +228,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

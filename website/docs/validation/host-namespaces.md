@@ -73,7 +73,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>host-namespace</summary><blockquote>
+<summary>host-namespace</summary>
 
 <details>
 <summary>constraint</summary>
@@ -153,4 +153,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>
