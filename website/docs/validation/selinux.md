@@ -163,7 +163,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>require-matching-selinux-options</summary><blockquote>
+<summary>require-matching-selinux-options</summary>
 
 <details>
 <summary>constraint</summary>
@@ -287,4 +287,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

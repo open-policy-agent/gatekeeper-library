@@ -91,7 +91,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>tls-required</summary><blockquote>
+<summary>tls-required</summary>
 
 <details>
 <summary>constraint</summary>
@@ -182,8 +182,8 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details><details>
-<summary>tls-optional</summary><blockquote>
+</details><details>
+<summary>tls-optional</summary>
 
 <details>
 <summary>constraint</summary>
@@ -275,4 +275,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

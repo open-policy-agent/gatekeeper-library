@@ -109,7 +109,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>disallowed-tags</summary><blockquote>
+<summary>disallowed-tags</summary>
 
 <details>
 <summary>constraint</summary>
@@ -335,4 +335,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

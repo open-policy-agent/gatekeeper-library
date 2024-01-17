@@ -102,7 +102,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>container-image-must-have-digest</summary><blockquote>
+<summary>container-image-must-have-digest</summary>
 
 <details>
 <summary>constraint</summary>
@@ -231,4 +231,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

@@ -89,7 +89,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>unique-service-selector</summary><blockquote>
+<summary>unique-service-selector</summary>
 
 <details>
 <summary>constraint</summary>
@@ -162,4 +162,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>
