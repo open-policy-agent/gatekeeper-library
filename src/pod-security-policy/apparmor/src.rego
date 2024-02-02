@@ -14,6 +14,10 @@ input_apparmor_allowed(container, metadata) {
     get_annotation_for(container, metadata) == input.parameters.allowedProfiles[_]
 }
 
+input_apparmor_allowed(container, metadata) {
+    get_annotation_for(container, metadata) == "unconfined"
+}
+
 input_containers[c] {
     c := input.review.object.spec.containers[_]
 }

@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx-apparmor-disallowed
+  name: nginx-apparmor-allowed
   annotations:
     # apparmor.security.beta.kubernetes.io/pod: unconfined # runtime/default
-    container.apparmor.security.beta.kubernetes.io/nginx: localhost/disallowprofile
+    container.apparmor.security.beta.kubernetes.io/nginx: runtime/default
   labels:
     app: nginx-apparmor
 spec:

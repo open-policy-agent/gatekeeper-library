@@ -60,8 +60,14 @@ test_input_apparmor_containers_not_allowed_not_in_list_mixed_no_annotation {
     count(results) == 2
 }
 
-test_input_apparmor_containers_not_allowed_not_in_list_mixed {
+test_input_apparmor_containers_in_list_mixed {
     inp := { "review": input_review_containers_mixed, "parameters": input_parameters_in_list}
+    results := violation with input as inp
+    count(results) == 0
+}
+
+test_input_apparmor_containers_not_allowed_not_in_list_mixed {
+    inp := { "review": input_review_containers_mixed, "parameters": input_parameters_not_in_list}
     results := violation with input as inp
     count(results) == 1
 }
