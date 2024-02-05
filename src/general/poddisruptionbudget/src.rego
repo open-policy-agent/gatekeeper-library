@@ -41,18 +41,57 @@ violation[{"msg": msg}] {
   )
 }
 
-valid_pdb_min_available(obj, pdb) {
+min_available(obj, pdb) = new if {
+  endswith(pdb.spec.minAvailable, "%")
+  # convert % to a number, if this is 50%, then 50/100 = 0.5
+  per := to_number(replace(pdb.spec.minAvailable, "%", "")) / 100
+  # round up to the nearest integer based on replicas
+  # if replicas is 3, then 3 * 0.5 = 1.5, ceil(1.5) = 2
+  new := ceil(obj.spec.replicas * per)
+}
+
+min_available(obj, pdb) = new if {
+  is_number(pdb.spec.minAvailable)
+  new := object.get(pdb.spec, "minAvailable", -1)
+}
+
+min_available(obj, pdb) = new if {
   # default to -1 if minAvailable is not set so valid_pdb_min_available is always true
   # for objects with >= 0 replicas. If minAvailable defaults to >= 0, objects with
   # replicas field might violate this constraint if they are equal to the default set here
-  min_available := object.get(pdb.spec, "minAvailable", -1)
-  obj.spec.replicas > min_available
+  not pdb.spec.minAvailable
+  new := -1
 }
 
-valid_pdb_max_unavailable(pdb) {
+valid_pdb_min_available(obj, pdb) {
+  obj.spec.replicas > min_available(obj, pdb)
+}
+
+max_unavailable(obj, pdb) = new if {
+  # if its a percentage, it will return the number of pods that need
+  # to be available rounded down (that's how Kubernetes calculates it).
+  # if its a number, return that number, if unset return default of 1
+  endswith(pdb.spec.maxUnavailable, "%")
+  # convert % to a number, if this is 50%, then 50/100 = 0.5
+  per := to_number(replace(pdb.spec.maxUnavailable, "%", "")) / 100
+  # round down to the nearest integer based on replicas
+  # if replicas is 3, then 3 * 0.5 = 1.5, ceil(1.5) = 2
+  new := ceil(obj.spec.replicas * per)
+}
+
+max_unavailable(obj, pdb) = new if {
+  is_number(pdb.spec.maxUnavailable)
+  new := object.get(pdb.spec, "maxUnavailable", 1)
+}
+
+max_unavailable(obj, pdb) = new if {
   # default to 1 if maxUnavailable is not set so valid_pdb_max_unavailable always returns true.
   # If maxUnavailable defaults to 0, it violates this constraint because all pods needs to be
   # available and no pods can be evicted voluntarily
-  max_unavailable := object.get(pdb.spec, "maxUnavailable", 1)
-  max_unavailable > 0
+  not pdb.spec.maxUnavailable
+  new := 1
+}
+
+valid_pdb_max_unavailable(pdb) {
+  max_unavailable(obj, pdb) > 0
 }
