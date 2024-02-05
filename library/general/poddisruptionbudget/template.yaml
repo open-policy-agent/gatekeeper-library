@@ -99,7 +99,6 @@ spec:
           obj.spec.replicas > min_available(obj, pdb)
         }
 
-
         max_unavailable(obj, pdb) = new if {
           # if its a percentage, it will return the number of pods that need
           # to be available rounded down (that's how Kubernetes calculates it).
