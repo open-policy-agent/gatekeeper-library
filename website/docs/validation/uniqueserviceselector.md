@@ -149,7 +149,7 @@ spec:
   ports:
     - port: 443
   selector:
-    key: value
+    key: other-value
 
 ```
 

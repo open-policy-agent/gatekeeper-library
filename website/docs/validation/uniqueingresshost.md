@@ -109,7 +109,7 @@ metadata:
   namespace: default
 spec:
   rules:
-  - host: example-allowed-host.example.com
+  - host: example-unique-host.example.com
     http:
       paths:
       - pathType: Prefix
@@ -119,7 +119,7 @@ spec:
             name: nginx
             port:
               number: 80
-  - host: example-allowed-host1.example.com
+  - host: example-another-unique-host.example.com
     http:
       paths:
       - pathType: Prefix
@@ -150,7 +150,7 @@ metadata:
   namespace: default
 spec:
   rules:
-  - host: example-host.example.com
+  - host: example-unique-host.example.com
     http:
       paths:
       - pathType: Prefix
@@ -181,7 +181,7 @@ metadata:
   namespace: default
 spec:
   rules:
-  - host: example-host2.example.com
+  - host: example-another-unique-host.example.com
     http:
       paths:
       - pathType: Prefix
@@ -191,7 +191,7 @@ spec:
             name: nginx
             port:
               number: 80
-  - host: example-host3.example.com
+  - host: example-totally-unique-host.example.com
     http:
       paths:
       - pathType: Prefix
