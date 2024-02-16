@@ -14,12 +14,12 @@ tests:
   - name: example-disallowed
     object: samples/unique-ingress-host/example_disallowed.yaml
     inventory:
-    - samples/unique-ingress-host/example_inventory_disallowed.yaml
+    - samples/unique-ingress-host/example_allowed.yaml
     assertions:
     - violations: yes
   - name: example-disallowed2
     object: samples/unique-ingress-host/example_disallowed2.yaml
     inventory:
-    - samples/unique-ingress-host/example_inventory_disallowed2.yaml
+    - samples/unique-ingress-host/example_allowed.yaml
     assertions:
     - violations: yes

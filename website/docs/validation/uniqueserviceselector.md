@@ -119,7 +119,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 apiVersion: v1
 kind: Service
 metadata:
-  name: gatekeeper-test-service-disallowed
+  name: gatekeeper-test-service-allowed
   namespace: default
 spec:
   ports:
@@ -153,7 +153,7 @@ spec:
 
 ```
 
-Usage
+Usagea
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/uniqueserviceselector/samples/unique-service-selector/example_disallowed.yaml
