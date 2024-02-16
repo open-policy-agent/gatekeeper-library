@@ -5,7 +5,7 @@ metadata:
   namespace: default
 spec:
   rules:
-  - host: example-host.example.com
+  - host: example-unique-host.example.com
     http:
       paths:
       - pathType: Prefix
