@@ -104,6 +104,7 @@ setup() {
           fi
         done
 
+
         for allowed in "$sample"/example_allowed*.yaml; do
           if [[ -e "$allowed" ]]; then
             # apply resource
@@ -111,7 +112,7 @@ setup() {
             assert_match 'created' "$output"
             assert_success
             # delete resource
-            kubectl delete --ignore-not-found -f "$allowed"
+            # kubectl delete --ignore-not-found -f "$allowed"
           fi
         done
 
@@ -123,6 +124,12 @@ setup() {
             assert_failure
             # delete resource
             run kubectl delete --ignore-not-found -f "$disallowed"
+          fi
+        done
+
+        for allowed in "$sample"/example_allowed*.yaml; do
+          if [[ -e "$allowed" ]]; then
+            kubectl delete --ignore-not-found -f "$allowed"
           fi
         done
 
