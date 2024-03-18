@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/open-policy-agent/frameworks/constraint v0.0.0-20231030230613-2e0cb3d68575
-	github.com/open-policy-agent/gatekeeper/v3 v3.14.0
+	github.com/open-policy-agent/gatekeeper/v3 v3.14.1
 	k8s.io/apimachinery v0.27.11
 )
 
