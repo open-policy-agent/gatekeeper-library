@@ -16,7 +16,7 @@ metadata:
   name: k8spspselinuxv2
   annotations:
     metadata.gatekeeper.sh/title: "SELinux V2"
-    metadata.gatekeeper.sh/version: 1.0.2
+    metadata.gatekeeper.sh/version: 1.0.3
     description: >-
       Defines an allow-list of seLinuxOptions configurations for pod
       containers. Corresponds to a PodSecurityPolicy requiring SELinux configs.
@@ -92,7 +92,7 @@ spec:
             not is_exempt(c)
             has_field(c.securityContext, "seLinuxOptions")
             not input_seLinuxOptions_allowed(c.securityContext.seLinuxOptions)
-            msg := sprintf("SELinux options is not allowed, pod: %v, container %v. Allowed options: %v", [input.review.object.metadata.name, c.name, input.parameters.allowedSELinuxOptions])
+            msg := sprintf("SELinux options is not allowed, pod: %v, container: %v. Allowed options: %v", [input.review.object.metadata.name, c.name, input.parameters.allowedSELinuxOptions])
         }
 
         input_seLinuxOptions_allowed(options) {

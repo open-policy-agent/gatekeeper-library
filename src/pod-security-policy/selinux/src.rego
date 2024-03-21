@@ -21,7 +21,7 @@ violation[{"msg": msg, "details": {}}] {
     not is_exempt(c)
     has_field(c.securityContext, "seLinuxOptions")
     not input_seLinuxOptions_allowed(c.securityContext.seLinuxOptions)
-    msg := sprintf("SELinux options is not allowed, pod: %v, container %v. Allowed options: %v", [input.review.object.metadata.name, c.name, input.parameters.allowedSELinuxOptions])
+    msg := sprintf("SELinux options is not allowed, pod: %v, container: %v. Allowed options: %v", [input.review.object.metadata.name, c.name, input.parameters.allowedSELinuxOptions])
 }
 
 input_seLinuxOptions_allowed(options) {
