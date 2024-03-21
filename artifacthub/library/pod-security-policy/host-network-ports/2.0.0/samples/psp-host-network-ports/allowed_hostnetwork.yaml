@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: host-networking-ports-allowed
+  labels:
+    app: host-networking-ports
+spec:
+  hostNetwork: true
+  containers:
+  - name: helloworld
+    image: hello-world:linux
+    ports:
+    - containerPort: 9001
+      hostPort: 9001

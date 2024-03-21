@@ -16,7 +16,7 @@ metadata:
   name: k8spsphostnetworkingports
   annotations:
     metadata.gatekeeper.sh/title: "Host Networking Ports"
-    metadata.gatekeeper.sh/version: 1.0.2
+    metadata.gatekeeper.sh/version: 2.0.0
     description: >-
       Controls usage of host network namespace by pod containers. Specific
       ports must be specified. Corresponds to the `hostNetwork` and
@@ -39,7 +39,7 @@ spec:
           properties:
             exemptImages:
               description: >-
-                Any container that uses an image that matches an entry in this list will be excluded
+                Any pods that contains a container using a listed image will be excluded
                 from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
 
                 It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
@@ -74,6 +74,10 @@ spec:
 
         input_share_hostnetwork(o) {
             not input.parameters.hostNetwork
+
+            c := input_containers[_]
+            not is_exempt(c)
+
             o.spec.hostNetwork
         }
 
@@ -156,6 +160,8 @@ spec:
     hostNetwork: true
     min: 80
     max: 9000
+    exemptImages:
+      - hello-world:*
 
 ```
 
