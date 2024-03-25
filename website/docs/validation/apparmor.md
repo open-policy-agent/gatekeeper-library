@@ -16,7 +16,7 @@ metadata:
   name: k8spspapparmor
   annotations:
     metadata.gatekeeper.sh/title: "App Armor"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Configures an allow-list of AppArmor profiles for use by containers.
       This corresponds to specific annotations applied to a PodSecurityPolicy.
@@ -69,6 +69,10 @@ spec:
 
         input_apparmor_allowed(container, metadata) {
             get_annotation_for(container, metadata) == input.parameters.allowedProfiles[_]
+        }
+
+        input_apparmor_allowed(container, metadata) {
+            get_annotation_for(container, metadata) == "unconfined"
         }
 
         input_containers[c] {
@@ -175,6 +179,33 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 
 </details>
 <details>
+<summary>example-allowed-unconfined</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-apparmor-allowed
+  annotations:
+    # apparmor.security.beta.kubernetes.io/pod: unconfined # runtime/default
+    container.apparmor.security.beta.kubernetes.io/nginx: unconfined
+  labels:
+    app: nginx-apparmor
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/apparmor/samples/psp-apparmor/example_allowed_unconfined.yaml
+```
+
+</details>
+<details>
 <summary>example-disallowed</summary>
 
 ```yaml
@@ -184,7 +215,7 @@ metadata:
   name: nginx-apparmor-disallowed
   annotations:
     # apparmor.security.beta.kubernetes.io/pod: unconfined # runtime/default
-    container.apparmor.security.beta.kubernetes.io/nginx: unconfined
+    container.apparmor.security.beta.kubernetes.io/nginx: localhost/disallowprofile
   labels:
     app: nginx-apparmor
 spec:
@@ -211,7 +242,7 @@ metadata:
   name: nginx-apparmor-disallowed
   annotations:
     # apparmor.security.beta.kubernetes.io/pod: unconfined # runtime/default
-    container.apparmor.security.beta.kubernetes.io/nginx: unconfined
+    container.apparmor.security.beta.kubernetes.io/nginx: localhost/disallowprofile
   labels:
     app: nginx-apparmor
 spec:
