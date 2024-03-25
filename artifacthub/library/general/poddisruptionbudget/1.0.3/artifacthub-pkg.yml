@@ -5,7 +5,7 @@ createdAt: "2023-06-12T20:47:47Z"
 description: |-
     Disallow the following scenarios when deploying PodDisruptionBudgets or resources that implement the replica subresource (e.g. Deployment, ReplicationController, ReplicaSet, StatefulSet): 1. Deployment of PodDisruptionBudgets with .spec.maxUnavailable == 0 2. Deployment of PodDisruptionBudgets with .spec.minAvailable == .spec.replicas of the resource with replica subresource This will prevent PodDisruptionBudgets from blocking voluntary disruptions such as node draining.
     https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
-digest: b5f0b45b6b1894cf43f6b40970557afb9549b6541760c9481bc8acfc3c572815
+digest: 5422abc78e79bf29dbb2ec46806c60919f2c2d5a4510cc77f6724fd2328ce63d
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/poddisruptionbudget
 keywords:

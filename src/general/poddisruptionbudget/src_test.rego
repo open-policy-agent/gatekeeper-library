@@ -13,6 +13,12 @@ test_input_pdb_0_max_unavailable {
   count(results) == 1
 }
 
+test_input_pdb_0_max_unavailable_percent {
+  inp := {"review": input_pdb_max_unavailable("0%")}
+  results := violation with input as inp
+  count(results) == 1
+}
+
 test_input_pdb_1_max_unavailable {
   inp := {"review": input_pdb_max_unavailable(1)}
   results := violation with input as inp
@@ -26,9 +32,23 @@ test_input_deployment_1_replica_pdb_1_min_available {
   count(results) == 1
 }
 
+test_input_deployment_1_replica_pdb_1_min_available_percent {
+  inp := {"review": input_deployment(1)}
+  inv := inv_pdb_min_available("100%")
+  results := violation with input as inp with data.inventory as inv
+  count(results) == 1
+}
+
 test_input_deployment_2_replicas_pdb_1_min_available {
   inp := {"review": input_deployment(2)}
   inv := inv_pdb_min_available(1)
+  results := violation with input as inp with data.inventory as inv
+  count(results) == 0
+}
+
+test_input_deployment_2_replicas_pdb_1_min_available_percent {
+  inp := {"review": input_deployment(2)}
+  inv := inv_pdb_min_available("50%")
   results := violation with input as inp with data.inventory as inv
   count(results) == 0
 }
@@ -40,9 +60,23 @@ test_input_deployment_pdb_0_max_unavailable {
   count(results) == 1
 }
 
+test_input_deployment_pdb_0_max_unavailable_percent {
+  inp := {"review": input_deployment(2)}
+  inv := inv_pdb_max_unavailable("0%")
+  results := violation with input as inp with data.inventory as inv
+  count(results) == 1
+}
+
 test_input_deployment_pdb_1_max_unavailable {
   inp := {"review": input_deployment(2)}
   inv := inv_pdb_max_unavailable(1)
+  results := violation with input as inp with data.inventory as inv
+  count(results) == 0
+}
+
+test_input_deployment_pdb_1_max_unavailable_percent {
+  inp := {"review": input_deployment(2)}
+  inv := inv_pdb_max_unavailable("50%")
   results := violation with input as inp with data.inventory as inv
   count(results) == 0
 }
