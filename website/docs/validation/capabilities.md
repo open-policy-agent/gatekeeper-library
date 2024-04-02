@@ -80,7 +80,7 @@ spec:
           container := input.review.object.spec.containers[_]
           not is_exempt(container)
           missing_drop_capabilities(container)
-          msg := sprintf("container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
+          msg := sprintf("container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"" capabilities, [container.name, input.parameters.requiredDropCapabilities])
         }
 
 
