@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/open-policy-agent/frameworks/constraint v0.0.0-20231030230613-2e0cb3d68575
 	github.com/open-policy-agent/gatekeeper/v3 v3.14.1
-	k8s.io/apimachinery v0.27.12
+	k8s.io/apimachinery v0.27.13
 )
 
 require (
@@ -95,11 +95,11 @@ require (
 	go.opentelemetry.io/proto/otlp v1.0.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/mod v0.14.0 // indirect
-	golang.org/x/net v0.19.0 // indirect
+	golang.org/x/net v0.23.0 // indirect
 	golang.org/x/oauth2 v0.10.0 // indirect
 	golang.org/x/sync v0.5.0 // indirect
-	golang.org/x/sys v0.15.0 // indirect
-	golang.org/x/term v0.15.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/term v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.3.0 // indirect
