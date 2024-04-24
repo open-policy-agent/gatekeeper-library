@@ -1,26 +1,26 @@
 package k8svolumerequests
 
 test_input_no_sizeLimit {
-    input := {"review": container([{"emptyDir": {}, "name": "test"}]), "parameters": {"volumesizelimit": "3Gi"}}
-    results := violation with input as input
+    inp := {"review": container([{"emptyDir": {}, "name": "test"}]), "parameters": {"volumesizelimit": "3Gi"}}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_with_sizeLimit_lower {
-    input := {"review": container([vol("2Gi", "test")]), "parameters": {"volumesizelimit": "3Gi"}}
-    results := violation with input as input
+    inp := {"review": container([vol("2Gi", "test")]), "parameters": {"volumesizelimit": "3Gi"}}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_with_sizeLimit_higher {
-    input := {"review": container([vol("5Gi", "test")]), "parameters": {"volumesizelimit": "3Gi"}}
-    results := violation with input as input
+    inp := {"review": container([vol("5Gi", "test")]), "parameters": {"volumesizelimit": "3Gi"}}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_with_sizeLimit_muti_higher {
-    input := {"review": container([vol("5Gi", "test"), vol("1Gi", "test1")]), "parameters": {"volumesizelimit": "3Gi"}}
-    results := violation with input as input
+    inp := {"review": container([vol("5Gi", "test"), vol("1Gi", "test1")]), "parameters": {"volumesizelimit": "3Gi"}}
+    results := violation with input as inp
     count(results) == 1
 }
 

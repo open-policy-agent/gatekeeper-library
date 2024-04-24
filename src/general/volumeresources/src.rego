@@ -113,6 +113,6 @@ canonify_size(orig) = new {
 	not is_number(orig)
 	suffix := get_suffix(orig)
 	raw := replace(orig, suffix, "")
-	re_match("^[0-9]+(\\.[0-9]+)?$", raw)
+	regex.match("^[0-9]+(\\.[0-9]+)?$", raw)
 	new := to_number(raw) * size_multiple(suffix)
 }
