@@ -3,7 +3,7 @@ name: k8svolumeresources
 displayName: Container emptyDir Volume Resources
 createdAt: "2024-04-24T10:00:57Z"
 description: Container emptyDir volume resources to be within the specified maximum values.
-digest: 6332ca74d3e3e312d73e79f5d4bf294fccd732829a48a08d9adffa03c21826a0
+digest: 306b42db8c3d85fd748dd143c1b271624884519a4a18fe1292620d82e04bf4f7
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/volumeresources
 keywords:
