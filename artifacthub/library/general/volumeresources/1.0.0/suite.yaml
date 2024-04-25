@@ -1,0 +1,21 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: volumeresources
+tests:
+- name: volumeresources
+  template: template.yaml
+  constraint: samples/container-emptydir-limit/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/container-emptydir-limit/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/container-emptydir-limit/example_disallowed.yaml
+    assertions:
+    - violations: yes
+  - name: example-disallowed-muti
+    object: samples/container-emptydir-limit/example_disallowed_muti.yaml
+    assertions:
+    - violations: yes

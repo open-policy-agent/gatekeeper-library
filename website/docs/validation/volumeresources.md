@@ -183,3 +183,169 @@ spec:
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/volumeresources/template.yaml
 ```
 ## Examples
+<details>
+<summary>volumeresources</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sVolumeRequests
+metadata:
+  name: container-emptydir-limit
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+      - apiGroups: ["apps"]
+        kinds: ["Deployment", "DaemonSet", "StatefulSet"]
+  parameters:
+    volumesizelimit: 1Gi
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/volumeresources/samples/container-emptydir-limit/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: allowed-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: /demo
+          name: demo-volume
+      volumes:
+      - name: demo-volume
+        emptyDir: 
+          sizeLimit: 16Mi
+          medium: Memory
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/volumeresources/samples/container-emptydir-limit/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: disallowed-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: /demo
+          name: demo-volume
+      volumes:
+      - name: demo-volume
+        emptyDir: {}
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/volumeresources/samples/container-emptydir-limit/example_disallowed.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-muti</summary>
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: disallowed-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: /demo
+          name: demo-volume
+        - mountPath: /demo-1
+          name: demo-volume-1
+      volumes:
+      - name: demo-volume
+        emptyDir: 
+          sizeLimit: 16Mi
+          medium: Memory
+      - name: demo-volume-1
+        emptyDir: 
+          sizeLimit: 2Gi
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/volumeresources/samples/container-emptydir-limit/example_disallowed_muti.yaml
+```
+
+</details>
+
+
+</details>

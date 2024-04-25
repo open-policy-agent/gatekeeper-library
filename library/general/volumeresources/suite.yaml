@@ -12,10 +12,10 @@ tests:
     assertions:
     - violations: no
   - name: example-disallowed
-    object: samples/container-emptydir-limit/example-disallowed.yaml
+    object: samples/container-emptydir-limit/example_disallowed.yaml
     assertions:
     - violations: yes
   - name: example-disallowed-muti
-    object: samples/container-emptydir-limit/example-disallowed-muti.yaml
+    object: samples/container-emptydir-limit/example_disallowed_muti.yaml
     assertions:
     - violations: yes
