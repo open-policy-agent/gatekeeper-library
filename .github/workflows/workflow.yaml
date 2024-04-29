@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     name: "Test scripts"
     steps:
-      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
       - name: Unit test
         run: |
           make unit-test
@@ -30,7 +30,7 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
       - name: Generate templates and docs
         run: |
           make generate generate-website-docs generate-artifacthub-artifacts
@@ -53,7 +53,7 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
       - run: |
           binary=$([[ "$OSTYPE" == "darwin"* ]] && echo "opa_darwin_amd64" || echo "opa_linux_amd64")
           sudo curl -L -o /usr/local/bin/opa https://github.com/open-policy-agent/opa/releases/download/${{ matrix.opa }}/$binary
@@ -74,7 +74,7 @@ jobs:
           egress-policy: audit
 
       - name: Check out code into the Go module directory
-        uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
+        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
 
       - name: Bootstrap integration test
         run: |
@@ -108,7 +108,7 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
       - name: Run script
         run: |
           make require-suites
@@ -121,7 +121,7 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
       - name: Run script
         run: |
           make require-sync
@@ -134,6 +134,6 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
       - run: |
           make verify-gator-dockerized
