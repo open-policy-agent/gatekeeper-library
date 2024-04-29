@@ -1,0 +1,25 @@
+version: 1.0.4
+name: k8spoddisruptionbudget
+displayName: Pod Disruption Budget
+createdAt: "2023-06-12T20:47:47Z"
+description: |-
+    Disallow the following scenarios when deploying PodDisruptionBudgets or resources that implement the replica subresource (e.g. Deployment, ReplicationController, ReplicaSet, StatefulSet): 1. Deployment of PodDisruptionBudgets with .spec.maxUnavailable == 0 2. Deployment of PodDisruptionBudgets with .spec.minAvailable == .spec.replicas of the resource with replica subresource This will prevent PodDisruptionBudgets from blocking voluntary disruptions such as node draining.
+    https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
+digest: 13e278751ca1c53c905cc7d1126e182e8212a0724d1b05ca363870fb92daf926
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/poddisruptionbudget
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Pod Disruption Budget
+    Disallow the following scenarios when deploying PodDisruptionBudgets or resources that implement the replica subresource (e.g. Deployment, ReplicationController, ReplicaSet, StatefulSet): 1. Deployment of PodDisruptionBudgets with .spec.maxUnavailable == 0 2. Deployment of PodDisruptionBudgets with .spec.minAvailable == .spec.replicas of the resource with replica subresource This will prevent PodDisruptionBudgets from blocking voluntary disruptions such as node draining.
+    https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/poddisruptionbudget/1.0.4/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library
