@@ -16,7 +16,7 @@ metadata:
   name: k8spspallowprivilegeescalationcontainer
   annotations:
     metadata.gatekeeper.sh/title: "Allow Privilege Escalation in Container"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.0.2
     description: >-
       Controls restricting escalation to root privileges. Corresponds to the
       `allowPrivilegeEscalation` field in a PodSecurityPolicy. For more
@@ -48,6 +48,35 @@ spec:
                 type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: containers
+            expression: 'has(object.spec.containers) ? object.spec.containers : []'
+          - name: initContainers
+            expression: 'has(object.spec.initContainers) ? object.spec.initContainers : []'
+          - name: ephemeralContainers
+            expression: 'has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers : []'
+          - name: exemptImages
+            expression: |
+              !has(variables.params.exemptImages) ? [] :
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                  // we can use the regex substitution because docker images do not allow "." as a valid character
+                  variables.params.exemptImages.exists(exemption, container.image == exemption || (exemption.endsWith("*") && string(container.image).matches("^" + string(variables.params.exemptImages).replace("*", ".*") + "$")))
+              )
+          - name: badContainers
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+              !(container.image in variables.exemptImages) && (
+                  !has(container.securityContext) ||
+                  !has(container.securityContext.allowPrivilegeEscalation) ||
+                  container.securityContext.allowPrivilegeEscalation != false
+              )
+              )
+          validations:
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badContainers) == 0'
+            messageExpression: '"Privilege escalation container is not allowed: " + variables.badContainers.map(c, c.image).join(", ")'
       rego: |
         package k8spspallowprivilegeescalationcontainer
 

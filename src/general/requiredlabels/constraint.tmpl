@@ -4,7 +4,7 @@ metadata:
   name: k8srequiredlabels
   annotations:
     metadata.gatekeeper.sh/title: "Required Labels"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.0.2
     description: >-
       Requires resources to contain specified labels, with values matching
       provided regular expressions.
@@ -38,5 +38,9 @@ spec:
                       the regular expression.
   targets:
     - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+{{ file.Read "src/general/requiredlabels/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
       rego: |
 {{ file.Read "src/general/requiredlabels/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}

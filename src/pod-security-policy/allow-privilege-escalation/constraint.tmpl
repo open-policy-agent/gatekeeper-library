@@ -4,7 +4,7 @@ metadata:
   name: k8spspallowprivilegeescalationcontainer
   annotations:
     metadata.gatekeeper.sh/title: "Allow Privilege Escalation in Container"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.0.2
     description: >-
       Controls restricting escalation to root privileges. Corresponds to the
       `allowPrivilegeEscalation` field in a PodSecurityPolicy. For more
@@ -36,6 +36,10 @@ spec:
                 type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+{{ file.Read "src/pod-security-policy/allow-privilege-escalation/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
       rego: |
 {{ file.Read "src/pod-security-policy/allow-privilege-escalation/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
       libs:

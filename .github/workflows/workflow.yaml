@@ -65,7 +65,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        gatekeeper: [ "release-3.13", "release-3.14" ]
+        gatekeeper: [ "3.14.2", "3.15.1" ]
+        engine: [ "cel", "rego" ]
     name: "Integration test on Gatekeeper ${{ matrix.gatekeeper }}"
     steps:
       - name: Harden Runner
@@ -81,7 +82,7 @@ jobs:
           mkdir -p $GITHUB_WORKSPACE/bin
           echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
           make integration-bootstrap
-          make deploy GATEKEEPER_VERSION=${{ matrix.gatekeeper }}
+          make deploy GATEKEEPER_VERSION=${{ matrix.gatekeeper }} POLICY_ENGINE=${{ matrix.engine }}
 
       - name: Run integration test
         run: |
@@ -127,7 +128,10 @@ jobs:
           make require-sync
   gator-verify:
     runs-on: ubuntu-latest
-    name: "Verify assertions in suite.yaml files"
+    strategy:
+      matrix:
+        engine: [ "cel", "rego" ]
+    name: "Verify assertions in suite.yaml files for ${{ matrix.engine }} policies"
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
@@ -136,4 +140,4 @@ jobs:
 
       - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
       - run: |
-          make verify-gator-dockerized
+          make verify-gator-dockerized POLICY_ENGINE=${{ matrix.engine }}
