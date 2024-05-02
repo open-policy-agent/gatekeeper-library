@@ -34,7 +34,7 @@ integration-bootstrap:
 deploy:
 	helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts
 ifeq ($(POLICY_ENGINE), rego)
-	helm install gatekeeper/gatekeeper --name-template=gatekeeper --namespace gatekeeper-system --create-namespace --version=${GATEKEEPER_VERSION}
+	helm install gatekeeper/gatekeeper --name-template=gatekeeper --namespace gatekeeper-system --create-namespace --version=${GATEKEEPER_VERSION} --set enableK8sNativeValidation=false
 else ifeq ($(POLICY_ENGINE), cel)
 	helm install gatekeeper/gatekeeper --name-template=gatekeeper --namespace gatekeeper-system --create-namespace --version=${GATEKEEPER_VERSION} --set enableK8sNativeValidation=true
 endif
@@ -48,7 +48,7 @@ test-integration:
 .PHONY: verify-gator
 verify-gator:
 ifeq ($(POLICY_ENGINE), rego)
-	gator verify ./...
+	gator verify ./... --experimental-enable-k8s-native-validation=false
 else ifeq ($(POLICY_ENGINE), cel)
 	gator verify ./... --experimental-enable-k8s-native-validation=true
 endif
@@ -56,7 +56,7 @@ endif
 .PHONY: verify-gator-dockerized
 verify-gator-dockerized: __build-gator
 ifeq ($(POLICY_ENGINE), rego)
-	$(docker) run -i -v $(shell pwd):/gatekeeper-library gator-container verify ./...
+	$(docker) run -i -v $(shell pwd):/gatekeeper-library gator-container verify ./... --experimental-enable-k8s-native-validation=false
 else ifeq ($(POLICY_ENGINE), cel)
 	$(docker) run -i -v $(shell pwd):/gatekeeper-library gator-container verify ./... --experimental-enable-k8s-native-validation=true
 endif
