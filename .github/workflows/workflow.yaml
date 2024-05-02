@@ -97,7 +97,7 @@ jobs:
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         if: ${{ always() }}
         with:
-          name: logs-int-test-${{ matrix.gatekeeper }}
+          name: logs-int-test-${{ matrix.gatekeeper }}-${{ matrix.engine }}
           path: |
             logs-*.json
   require_suites:
