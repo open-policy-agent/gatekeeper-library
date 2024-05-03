@@ -42,5 +42,7 @@ spec:
       - engine: K8sNativeValidation
         source:
 {{ file.Read "src/general/requiredlabels/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
-      rego: |
-{{ file.Read "src/general/requiredlabels/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
+      - engine: Rego
+        source:
+          rego: |
+{{ file.Read "src/general/requiredlabels/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}
