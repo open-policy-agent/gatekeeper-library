@@ -3,7 +3,7 @@ name: k8srequiredlabels
 displayName: Required Labels
 createdAt: "2024-05-02T19:01:02Z"
 description: Requires resources to contain specified labels, with values matching provided regular expressions.
-digest: e41978589a21f07237a098331543f99ede07098acac8d80a4d44cc050a1ad618
+digest: cdb14cb125780aa34641e23998403049748d74bf78239382e959cc844ed0d15e
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/requiredlabels
 keywords:
