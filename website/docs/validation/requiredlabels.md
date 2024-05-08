@@ -51,13 +51,6 @@ spec:
   targets:
     - target: admission.k8s.gatekeeper.sh
       code:
-      - engine: K8sNativeValidation
-        source:
-          validations:
-          - expression: '(has(request.operation) && request.operation == "DELETE") ||(has(object.metadata) && variables.params.labels.all(entry, has(object.metadata.labels) && entry.key in object.metadata.labels))'
-            messageExpression: '"object missing required label, requires all of: " + variables.params.labels.map(entry, entry.key).join(", ")'
-          - expression: '[object, oldObject].exists(obj, obj != null && !variables.params.labels.exists(entry, has(obj.metadata.labels) && entry.key in obj.metadata.labels && !string(obj.metadata.labels[entry.key]).matches(string(entry.allowedRegex))))'
-            message: "regex mismatch"
       - engine: Rego
         source:
           rego: |

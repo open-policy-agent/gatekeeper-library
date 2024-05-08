@@ -37,9 +37,6 @@ spec:
   targets:
     - target: admission.k8s.gatekeeper.sh
       code:
-      - engine: K8sNativeValidation
-        source:
-{{ file.Read "src/pod-security-policy/allow-privilege-escalation/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
       - engine: Rego
         source:
           rego: |
