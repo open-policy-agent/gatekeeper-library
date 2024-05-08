@@ -3,7 +3,7 @@ KIND_VERSION ?= 0.17.0
 # note: k8s version pinned since KIND image availability lags k8s releases
 KUBERNETES_VERSION ?= 1.26.0
 KUSTOMIZE_VERSION ?= 4.5.5
-GATEKEEPER_VERSION ?= 3.15.1
+GATEKEEPER_VERSION ?= release-3.15
 BATS_VERSION ?= 1.8.2
 GATOR_VERSION ?= 3.15.1
 GOMPLATE_VERSION ?= 3.11.6
@@ -32,15 +32,18 @@ integration-bootstrap:
 	TERM=dumb ${GITHUB_WORKSPACE}/bin/kind create cluster --image kindest/node:v${KUBERNETES_VERSION} --wait 5m --config=test/kind_config.yaml
 
 deploy:
-	helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts
+	wget https://raw.githubusercontent.com/open-policy-agent/gatekeeper/${GATEKEEPER_VERSION}/deploy/gatekeeper.yaml
 ifeq ($(POLICY_ENGINE), rego)
-	helm install gatekeeper/gatekeeper --name-template=gatekeeper --namespace gatekeeper-system --create-namespace --version=${GATEKEEPER_VERSION} --set enableK8sNativeValidation=false
+	sed -i '/- args:/a \ \ \ \ \ \ \ \ - --validate-template-rego=true' gatekeeper.yaml 
+	sed -i '/- args:/a \ \ \ \ \ \ \ \ - --experimental-enable-k8s-native-validation=false' gatekeeper.yaml 
 else ifeq ($(POLICY_ENGINE), cel)
-	helm install gatekeeper/gatekeeper --name-template=gatekeeper --namespace gatekeeper-system --create-namespace --version=${GATEKEEPER_VERSION} --set enableK8sNativeValidation=true
+	sed -i '/- args:/a \ \ \ \ \ \ \ \ - --validate-template-rego=false' gatekeeper.yaml 
+	sed -i '/- args:/a \ \ \ \ \ \ \ \ - --experimental-enable-k8s-native-validation=true' gatekeeper.yaml 
 endif
+	kubectl apply -f gatekeeper.yaml
 
 uninstall:
-	helm delete gatekeeper --namespace gatekeeper-system
+	kubectl delete -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper/${GATEKEEPER_VERSION}/deploy/gatekeeper.yaml
 
 test-integration:
 	bats -t test/bats/test.bats
