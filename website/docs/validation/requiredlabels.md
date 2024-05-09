@@ -167,6 +167,26 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 
 </details>
+<details>
+<summary>example-disallowed-label-value</summary>
+
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: disallowed-namespace
+  labels:
+    owner: user
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredlabels/samples/all-must-have-owner/example_disallowed_label_value.yaml
+```
+
+</details>
 
 
 </details>
