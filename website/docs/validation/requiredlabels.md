@@ -51,6 +51,13 @@ spec:
   targets:
     - target: admission.k8s.gatekeeper.sh
       code:
+      - engine: K8sNativeValidation
+        source:
+          validations:
+          - expression: '(has(object.metadata) && variables.params.labels.all(entry, has(object.metadata.labels) && entry.key in object.metadata.labels))'
+            messageExpression: '"missing required label, requires all of: " + variables.params.labels.map(entry, entry.key).join(", ")'
+          - expression: '(has(object.metadata) && !variables.params.labels.all(entry, has(object.metadata.labels) && entry.key in object.metadata.labels && !string(object.metadata.labels[entry.key]).matches(string(entry.allowedRegex))))'
+            message: "regex mismatch"
       - engine: Rego
         source:
           rego: |
@@ -81,6 +88,7 @@ spec:
               def_msg := sprintf("Label <%v: %v> does not satisfy allowed regex: %v", [key, value, expected.allowedRegex])
               msg := get_message(input.parameters, def_msg)
             }
+
 
 ```
 

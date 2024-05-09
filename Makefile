@@ -37,8 +37,12 @@ ifeq ($(POLICY_ENGINE), rego)
 	sed -i '/- args:/a \ \ \ \ \ \ \ \ - --validate-template-rego=true' gatekeeper.yaml 
 	sed -i '/- args:/a \ \ \ \ \ \ \ \ - --experimental-enable-k8s-native-validation=false' gatekeeper.yaml 
 else ifeq ($(POLICY_ENGINE), cel)
+ifeq ($(GATEKEEPER_VERSION), release-3.16)
+	sed -i '/- args:/a \ \ \ \ \ \ \ \ - --experimental-enable-k8s-native-validation=true' gatekeeper.yaml
+else
 	sed -i '/- args:/a \ \ \ \ \ \ \ \ - --validate-template-rego=false' gatekeeper.yaml 
-	sed -i '/- args:/a \ \ \ \ \ \ \ \ - --experimental-enable-k8s-native-validation=true' gatekeeper.yaml 
+	sed -i '/- args:/a \ \ \ \ \ \ \ \ - --experimental-enable-k8s-native-validation=true' gatekeeper.yaml
+endif
 endif
 	kubectl apply -f gatekeeper.yaml
 

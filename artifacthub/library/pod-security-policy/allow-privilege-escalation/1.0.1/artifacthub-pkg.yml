@@ -1,9 +1,9 @@
 version: 1.0.1
 name: k8spspallowprivilegeescalationcontainer
 displayName: Allow Privilege Escalation in Container
-createdAt: "2023-05-23T09:47:31Z"
+createdAt: "2024-05-09T18:32:02Z"
 description: Controls restricting escalation to root privileges. Corresponds to the `allowPrivilegeEscalation` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#privilege-escalation
-digest: a3c63022c554318dcc9589828a7b135c80740772375b071dfc0625fdaea91f66
+digest: 4180fd8f3c065c492585922900aa50ff5990fa3384365725a087b2c36bcb0b0c
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/allow-privilege-escalation
 keywords:
