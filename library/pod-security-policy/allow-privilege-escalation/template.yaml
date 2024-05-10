@@ -51,7 +51,7 @@ spec:
               !has(variables.params.exemptImages) ? [] :
                 (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
                   // we can use the regex substitution because docker images do not allow "." as a valid character
-                  variables.params.exemptImages.exists(exemption, container.image == exemption || (exemption.endsWith("*") && string(container.image).matches("^" + string(variables.params.exemptImages).replace("*", ".*") + "$")))
+                  variables.params.exemptImages.exists(exemption, container.image == exemption || (exemption.endsWith("*") && string(container.image).matches("^" + string(exemption).replace("*", ".*") + "$")))
                 )
           - name: badContainers
             expression: |
