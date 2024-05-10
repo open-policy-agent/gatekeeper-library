@@ -56,7 +56,7 @@ spec:
           - name: badContainers
             expression: |
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
-                !(container.image in variables.exemptImages) && (
+                !(container in variables.exemptImages) && (
                   !has(container.securityContext) ||
                   !has(container.securityContext.allowPrivilegeEscalation) ||
                   container.securityContext.allowPrivilegeEscalation != false
