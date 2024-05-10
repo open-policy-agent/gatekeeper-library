@@ -54,9 +54,9 @@ spec:
       - engine: K8sNativeValidation
         source:
           validations:
-          - expression: '(has(object.metadata) && variables.params.labels.all(entry, has(object.metadata.labels) && entry.key in object.metadata.labels))'
+          - expression: '(has(object.metadata) && variables.params.labels.exists_one(entry, has(object.metadata.labels) && entry.key in object.metadata.labels))'
             messageExpression: '"missing required label, requires all of: " + variables.params.labels.map(entry, entry.key).join(", ")'
-          - expression: '(has(object.metadata) && !variables.params.labels.all(entry, has(object.metadata.labels) && entry.key in object.metadata.labels && !string(object.metadata.labels[entry.key]).matches(string(entry.allowedRegex))))'
+          - expression: '(has(object.metadata) && variables.params.labels.exists_one(entry, has(object.metadata.labels) && entry.key in object.metadata.labels && string(object.metadata.labels[entry.key]).matches(string(entry.allowedRegex))))'
             message: "regex mismatch"
       - engine: Rego
         source:
@@ -177,6 +177,7 @@ metadata:
   name: disallowed-namespace
   labels:
     owner: user
+    test: test
 
 ```
 
