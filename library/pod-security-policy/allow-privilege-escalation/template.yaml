@@ -52,11 +52,11 @@ spec:
                 (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
                   // we can use the regex substitution because docker images do not allow "." as a valid character
                   variables.params.exemptImages.exists(exemption, container.image == exemption || (exemption.endsWith("*") && string(container.image).matches("^" + string(exemption).replace("*", ".*") + "$")))
-                )
+                ).map(container, container.image)
           - name: badContainers
             expression: |
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
-                !(container in variables.exemptImages) && (
+                !(container.image in variables.exemptImages) && (
                   !has(container.securityContext) ||
                   !has(container.securityContext.allowPrivilegeEscalation) ||
                   container.securityContext.allowPrivilegeEscalation != false
