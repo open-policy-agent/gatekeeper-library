@@ -14,8 +14,8 @@ tests:
   - name: example-disallowed
     object: samples/all-must-have-owner/example_disallowed.yaml
     assertions:
-    - violations: no
+    - violations: yes
   - name: example-disallowed-label-value
     object: samples/all-must-have-owner/example_disallowed_label_value.yaml
     assertions:
-    - violations: no
+    - violations: yes

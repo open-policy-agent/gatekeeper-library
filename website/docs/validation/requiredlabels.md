@@ -177,7 +177,6 @@ metadata:
   name: disallowed-namespace
   labels:
     owner: user
-    test: test
 
 ```
 
