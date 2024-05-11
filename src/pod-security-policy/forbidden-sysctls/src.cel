@@ -1,0 +1,16 @@
+variables:
+- name: sysctls
+  expression: '!has(object.spec.securityContext) ? [] : !has(object.spec.securityContext.sysctls) ? [] : object.spec.securityContext.sysctls'
+- name: forbiddenSysctls
+  expression: |
+    !has(variables.params.forbiddenSysctls) ? [] :
+    variables.sysctls.filter(sysctl,
+        variables.params.forbiddenSysctls.exists(forbiddenSysctl, sysctl.name == forbiddenSysctl || (forbiddenSysctl.endsWith("*") && string(sysctl.name).matches("^" + string(forbiddenSysctl).replace("*", ".*") + "$"))))
+- name: allowedSysctls
+  expression: |
+    !has(variables.params.allowedSysctls) ? [] :
+    variables.sysctls.filter(sysctl,
+        variables.params.allowedSysctls.exists(allowedSysctl, sysctl.name == allowedSysctl || (allowedSysctl == "*") || (string(sysctl.name).matches("^" + allowedSysctl + "$"))))
+validations:
+- expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.sysctls) == 0 || size(variables.forbiddenSysctls) == 0 && (size(variables.allowedSysctls) == 0 || size(variables.allowedSysctls) == size(variables.sysctls))'
+  messageExpression: '"The sysctl is not allowed for pod: " + object.metadata.name + ", forbidden: " + variables.forbiddenSysctls.map(c, c.name).join(", ") + ", allowed: " + variables.allowedSysctls.map(c, c.name).join(", ") '
