@@ -76,11 +76,11 @@ jobs:
           egress-policy: audit
 
       - name: Check out code into the Go module directory
-        if: ${{ matrix.gatekeeper == '3.15.1' &&  matrix.engine == 'rego' }} || ${{ matrix.gatekeeper == '3.16.0' }}
+        if: ${{ (matrix.gatekeeper == '3.15.1' && matrix.engine == 'rego') || matrix.gatekeeper == '3.16.0' }}
         uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
 
       - name: Bootstrap integration test
-        if: ${{ matrix.gatekeeper == '3.15.1' &&  matrix.engine == 'rego' }} || ${{ matrix.gatekeeper == '3.16.0' }}
+        if: ${{ (matrix.gatekeeper == '3.15.1' && matrix.engine == 'rego') || matrix.gatekeeper == '3.16.0' }}
         run: |
           mkdir -p $GITHUB_WORKSPACE/bin
           echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
@@ -88,12 +88,12 @@ jobs:
           make deploy GATEKEEPER_VERSION=${{ matrix.gatekeeper }} POLICY_ENGINE=${{ matrix.engine }}
 
       - name: Run integration test
-        if: ${{ matrix.gatekeeper == '3.15.1' &&  matrix.engine == 'rego' }} || ${{ matrix.gatekeeper == '3.16.0' }}
+        if: ${{ (matrix.gatekeeper == '3.15.1' && matrix.engine == 'rego') || matrix.gatekeeper == '3.16.0' }}
         run: |
           make test-integration
 
       - name: Save logs
-        if: ${{ matrix.gatekeeper == '3.15.1' &&  matrix.engine == 'rego' }} || ${{ matrix.gatekeeper == '3.16.0' }}
+        if: ${{ (matrix.gatekeeper == '3.15.1' && matrix.engine == 'rego') || matrix.gatekeeper == '3.16.0' }}
         run: |
           kubectl logs -n gatekeeper-system -l control-plane=controller-manager --tail=-1 > logs-controller.json
           kubectl logs -n gatekeeper-system -l control-plane=audit-controller --tail=-1 > logs-audit.json
