@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: fsgroup-allowed
+  name: fsgroup-disallowed
 spec:
   securityContext:
     fsGroup: 500 # directory will have group ID 500
