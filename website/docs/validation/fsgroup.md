@@ -16,7 +16,7 @@ metadata:
   name: k8spspfsgroup
   annotations:
     metadata.gatekeeper.sh/title: "FS Group"
-    metadata.gatekeeper.sh/version: 1.0.2
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Controls allocating an FSGroup that owns the Pod's volumes. Corresponds
       to the `fsGroup` field in a PodSecurityPolicy. For more information, see
@@ -56,65 +56,79 @@ spec:
                     type: integer
   targets:
     - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8spspfsgroup
+      code:
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: fsGroup
+            expression: '!has(object.spec.securityContext) ? "" : !has(object.spec.securityContext.fsGroup) ? "" : object.spec.securityContext.fsGroup'
+          - name: input_fsGroup_allowed
+            expression: |
+              !has(variables.params.rule) ? true : variables.params.rule == "RunAsAny" ? true : variables.params.rule == "MayRunAs" && variables.fsGroup == "" ? true : (variables.params.rule == "MayRunAs" || variables.params.rule == "MustRunAs") && has(variables.params.ranges) && size(variables.params.ranges) > 0 ? variables.params.ranges.all(range, range.min <= variables.fsGroup && range.max >= variables.fsGroup) : false
+          validations:
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || variables.input_fsGroup_allowed'
+            messageExpression: '"The provided pod spec fsGroup is not allowed, pod: " + object.metadata.name + ". Allowed fsGroup: " + variables.params.rule'
+      - engine: Rego
+        source:
+          rego: |
+            package k8spspfsgroup
 
-        import data.lib.exclude_update.is_update
+            import data.lib.exclude_update.is_update
 
-        violation[{"msg": msg, "details": {}}] {
-            # spec.securityContext.fsGroup field is immutable.
-            not is_update(input.review)
+            violation[{"msg": msg, "details": {}}] {
+                # spec.securityContext.fsGroup field is immutable.
+                not is_update(input.review)
 
-            spec := input.review.object.spec
-            not input_fsGroup_allowed(spec)
-            msg := sprintf("The provided pod spec fsGroup is not allowed, pod: %v. Allowed fsGroup: %v", [input.review.object.metadata.name, input.parameters])
-        }
+                spec := input.review.object.spec
+                not input_fsGroup_allowed(spec)
+                msg := sprintf("The provided pod spec fsGroup is not allowed, pod: %v. Allowed fsGroup: %v", [input.review.object.metadata.name, input.parameters])
+            }
 
-        input_fsGroup_allowed(_) {
-            # RunAsAny - No range is required. Allows any fsGroup ID to be specified.
-            input.parameters.rule == "RunAsAny"
-        }
-        input_fsGroup_allowed(spec) {
-            # MustRunAs - Validates pod spec fsgroup against all ranges
-            input.parameters.rule == "MustRunAs"
-            fg := spec.securityContext.fsGroup
-            count(input.parameters.ranges) > 0
-            range := input.parameters.ranges[_]
-            value_within_range(range, fg)
-        }
-        input_fsGroup_allowed(spec) {
-            # MayRunAs - Validates pod spec fsgroup against all ranges or allow pod spec fsgroup to be left unset
-            input.parameters.rule == "MayRunAs"
-            not has_field(spec, "securityContext")
-        }
-        input_fsGroup_allowed(spec) {
-            # MayRunAs - Validates pod spec fsgroup against all ranges or allow pod spec fsgroup to be left unset
-            input.parameters.rule == "MayRunAs"
-            not spec.securityContext.fsGroup
-        }
-        input_fsGroup_allowed(spec) {
-            # MayRunAs - Validates pod spec fsgroup against all ranges or allow pod spec fsgroup to be left unset
-            input.parameters.rule == "MayRunAs"
-            fg := spec.securityContext.fsGroup
-            count(input.parameters.ranges) > 0
-            range := input.parameters.ranges[_]
-            value_within_range(range, fg)
-        }
-        value_within_range(range, value) {
-            range.min <= value
-            range.max >= value
-        }
-        # has_field returns whether an object has a field
-        has_field(object, field) = true {
-            object[field]
-        }
-      libs:
-        - |
-          package lib.exclude_update
+            input_fsGroup_allowed(_) {
+                # RunAsAny - No range is required. Allows any fsGroup ID to be specified.
+                input.parameters.rule == "RunAsAny"
+            }
+            input_fsGroup_allowed(spec) {
+                # MustRunAs - Validates pod spec fsgroup against all ranges
+                input.parameters.rule == "MustRunAs"
+                fg := spec.securityContext.fsGroup
+                count(input.parameters.ranges) > 0
+                range := input.parameters.ranges[_]
+                value_within_range(range, fg)
+            }
+            input_fsGroup_allowed(spec) {
+                # MayRunAs - Validates pod spec fsgroup against all ranges or allow pod spec fsgroup to be left unset
+                input.parameters.rule == "MayRunAs"
+                not has_field(spec, "securityContext")
+            }
+            input_fsGroup_allowed(spec) {
+                # MayRunAs - Validates pod spec fsgroup against all ranges or allow pod spec fsgroup to be left unset
+                input.parameters.rule == "MayRunAs"
+                not spec.securityContext.fsGroup
+            }
+            input_fsGroup_allowed(spec) {
+                # MayRunAs - Validates pod spec fsgroup against all ranges or allow pod spec fsgroup to be left unset
+                input.parameters.rule == "MayRunAs"
+                fg := spec.securityContext.fsGroup
+                count(input.parameters.ranges) > 0
+                range := input.parameters.ranges[_]
+                value_within_range(range, fg)
+            }
+            value_within_range(range, value) {
+                range.min <= value
+                range.max >= value
+            }
+            # has_field returns whether an object has a field
+            has_field(object, field) = true {
+                object[field]
+            }
+          libs:
+            - |
+              package lib.exclude_update
 
-          is_update(review) {
-              review.operation == "UPDATE"
-          }
+              is_update(review) {
+                  review.operation == "UPDATE"
+              }
 
 ```
 
@@ -193,7 +207,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 apiVersion: v1
 kind: Pod
 metadata:
-  name: fsgroup-disallowed
+  name: fsgroup-allowed
 spec:
   securityContext:
     fsGroup: 500 # directory will have group ID 500
@@ -214,6 +228,155 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/fsgroup/samples/psp-fsgroup/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed2-nofsgroup</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fsgroup-allowed
+spec:
+  volumes:
+    - name: fsgroup-demo-vol
+      emptyDir: {}
+  containers:
+    - name: fsgroup-demo
+      image: busybox
+      command: ["sh", "-c", "sleep 1h"]
+      volumeMounts:
+        - name: fsgroup-demo-vol
+          mountPath: /data/demo
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/fsgroup/samples/psp-fsgroup/example_allowed2.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>fsgroup2</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPFSGroup
+metadata:
+  name: psp-fsgroup
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    rule: "MustRunAs" #"MustRunAs" #"MayRunAs", "RunAsAny"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/fsgroup/samples/psp-fsgroup/constraint2.yaml
+```
+
+</details>
+
+<details>
+<summary>example-allowed-is-disallowed-constraint2</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fsgroup-allowed
+spec:
+  volumes:
+    - name: fsgroup-demo-vol
+      emptyDir: {}
+  containers:
+    - name: fsgroup-demo
+      image: busybox
+      command: ["sh", "-c", "sleep 1h"]
+      volumeMounts:
+        - name: fsgroup-demo-vol
+          mountPath: /data/demo
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/fsgroup/samples/psp-fsgroup/example_allowed2.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>fsgroup3</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPFSGroup
+metadata:
+  name: psp-fsgroup
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    rule: "MayRunAs" #"MustRunAs" #"MayRunAs", "RunAsAny"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/fsgroup/samples/psp-fsgroup/constraint3.yaml
+```
+
+</details>
+
+<details>
+<summary>example-allowed-constraint3</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fsgroup-allowed
+spec:
+  volumes:
+    - name: fsgroup-demo-vol
+      emptyDir: {}
+  containers:
+    - name: fsgroup-demo
+      image: busybox
+      command: ["sh", "-c", "sleep 1h"]
+      volumeMounts:
+        - name: fsgroup-demo-vol
+          mountPath: /data/demo
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/fsgroup/samples/psp-fsgroup/example_allowed2.yaml
 ```
 
 </details>
