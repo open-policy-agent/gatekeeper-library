@@ -1,9 +1,9 @@
-version: 1.0.2
+version: 1.1.0
 name: k8srequiredlabels
 displayName: Required Labels
-createdAt: "2024-05-02T19:01:02Z"
+createdAt: "2024-05-10T23:29:29Z"
 description: Requires resources to contain specified labels, with values matching provided regular expressions.
-digest: 0bd026da84bf4f57a45d34661a9641c96eca580ccee7b3ab5f10b952f9106362
+digest: 84897cdfe60dbe9c1726581fe0626d254477a176b143a2cff36b5cf24465e8b8
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/requiredlabels
 keywords:
@@ -16,7 +16,7 @@ readme: |-
 install: |-
     ### Usage
     ```shell
-    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/requiredlabels/1.0.2/template.yaml
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/requiredlabels/1.1.0/template.yaml
     ```
 provider:
     name: Gatekeeper Library
