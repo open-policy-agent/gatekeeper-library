@@ -3,8 +3,6 @@ kind: Pod
 metadata:
   name: fsgroup-allowed
 spec:
-  securityContext:
-    fsGroup: 500 # directory will have group ID 500
   volumes:
     - name: fsgroup-demo-vol
       emptyDir: {}

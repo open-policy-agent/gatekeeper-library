@@ -15,7 +15,27 @@ tests:
         object: samples/psp-fsgroup/example_allowed.yaml
         assertions:
           - violations: no
+      - name: example-allowed2-nofsgroup
+        object: samples/psp-fsgroup/example_allowed2.yaml
+        assertions:
+          - violations: no
       - name: update
         object: samples/psp-fsgroup/update.yaml
+        assertions:
+          - violations: no
+  - name: fsgroup2
+    template: template.yaml
+    constraint: samples/psp-fsgroup/constraint2.yaml
+    cases:
+      - name: example-allowed-is-disallowed-constraint2
+        object: samples/psp-fsgroup/example_allowed2.yaml
+        assertions:
+          - violations: yes
+  - name: fsgroup3
+    template: template.yaml
+    constraint: samples/psp-fsgroup/constraint3.yaml
+    cases:
+      - name: example-allowed-constraint3
+        object: samples/psp-fsgroup/example_allowed2.yaml
         assertions:
           - violations: no
