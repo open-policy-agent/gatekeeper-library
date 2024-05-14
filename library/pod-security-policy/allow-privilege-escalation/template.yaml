@@ -46,13 +46,20 @@ spec:
             expression: 'has(object.spec.initContainers) ? object.spec.initContainers : []'
           - name: ephemeralContainers
             expression: 'has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers : []'
-          - name: exemptImages
+          - name: exemptImagePrefixes
             expression: |
               !has(variables.params.exemptImages) ? [] :
-                (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
-                  // we can use the regex substitution because docker images do not allow "." as a valid character
-                  variables.params.exemptImages.exists(exemption, container.image == exemption || (exemption.endsWith("*") && string(container.image).matches("^" + string(exemption).replace("*", ".*") + "$")))
-                ).map(container, container.image)
+                variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+          - name: exemptImageExplicit
+            expression: |
+              !has(variables.params.exemptImages) ? [] : 
+                variables.params.exemptImages.filter(image, !image.endsWith("*"))
+          - name: exemptImages
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                container in variables.exemptImageExplicit ||
+                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))
+              ).map(container, container.image)
           - name: badContainers
             expression: |
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
