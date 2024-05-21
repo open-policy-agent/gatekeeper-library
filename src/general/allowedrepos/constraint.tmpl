@@ -4,9 +4,9 @@ metadata:
   name: k8sallowedrepos
   annotations:
     metadata.gatekeeper.sh/title: "Allowed Repositories"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 2.0.0
     description: >-
-      Requires container images to begin with a string from the specified list.
+      Requires container images to begin with a string from the specified list of repoisors/regestries or images name.
 spec:
   crd:
     spec:
@@ -18,7 +18,12 @@ spec:
           type: object
           properties:
             repos:
-              description: The list of prefixes a container image is allowed to have.
+              description: The allowed prefixes for repositories or registries of a container image.
+              type: array
+              items:
+                type: string
+            images:
+              description: The allowed prefixes for the names of container images.
               type: array
               items:
                 type: string

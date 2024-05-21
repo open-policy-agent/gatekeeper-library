@@ -14,3 +14,9 @@ spec:
         limits:
           cpu: "100m"
           memory: "30Mi"
+    - name: opa
+      image: ubuntu:latest
+      resources:
+        limits:
+          cpu: "200m"
+          memory: "50Mi"

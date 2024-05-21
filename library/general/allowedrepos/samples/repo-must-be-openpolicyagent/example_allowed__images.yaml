@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-allowed
+spec:
+  containers:
+    - name: image
+      image: ubuntu
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "30Mi"
+    - name: image_with_digest
+      image: ubuntu@sha256:26c68657ccce2cb0a31b330cb0be2b5e108d467f641c62e13ab40cbec258c68d
+      resources:
+        limits:
+          cpu: "200m"
+          memory: "50Mi"
+    - name: image_with_version
+      image: ubuntu:20.04
+      resources:
+        limits:
+          cpu: "200m"
+          memory: "50Mi"
