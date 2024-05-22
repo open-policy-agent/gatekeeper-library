@@ -51,7 +51,7 @@ tests:
           - violations: 2
           - message: container
       - name: disallowed-repository-images
-        object: samples/repo-must-be-openpolicyagent/example_images.yaml
+        object: samples/repo-must-be-openpolicyagent/example_disallowed_images.yaml
         assertions:
           - violations: 2
           - message: container

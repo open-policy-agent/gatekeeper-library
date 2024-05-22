@@ -6,7 +6,19 @@ metadata:
     metadata.gatekeeper.sh/title: "Allowed Repositories"
     metadata.gatekeeper.sh/version: 2.0.0
     description: >-
-      Requires container images to begin with a string from the specified list of repoisors/regestries or images name.
+      Require container images to begin with a string from a specified list of repositories or registries,
+      or match specific image names. 
+      The rule has been improved to allow users to distinguish between repository names, registry names, and image names,
+      preventing bypass methods that existed in the past.
+      For example, the rule now appends a trailing slash to repository or registry names if one is not already present.
+      This enhancement is crucial for security, as it helps prevent attackers from bypassing controls by creating subdomains or
+      malicious repositories that begin with the same name as those declared in the constraint file. Without the slash,
+      a defined registry like fictional.registry.example could be exploited by an attacker setting up a malicious registry at
+      fictional.registry.example.malicious.com. Similarly, defining a repository as "myrepo" might allow an attacker to bypass
+      restrictions by creating a repository named "myrepoevil" on DockerHub.
+      Additionally, this policy checks Docker image names to ensure they either match the names specified in the constraint file,
+      end with a colon (:) for <image-name>:<tag> format, or with an at symbol (@) for <image-name>@<digest> format.
+      This prevents attackers from using variations of valid image names to circumvent security controls.
 spec:
   crd:
     spec:
