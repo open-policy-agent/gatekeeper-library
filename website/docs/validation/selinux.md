@@ -16,7 +16,7 @@ metadata:
   name: k8spspselinuxv2
   annotations:
     metadata.gatekeeper.sh/title: "SELinux V2"
-    metadata.gatekeeper.sh/version: 1.0.3
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Defines an allow-list of seLinuxOptions configurations for pod
       containers. Corresponds to a PodSecurityPolicy requiring SELinux configs.
@@ -68,92 +68,146 @@ spec:
                     description: "An SELinux user."
   targets:
     - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8spspselinux
+      code:
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: notViolatingSELinuxOptions
+            expression: |
+              has(object.spec.securityContext) && has(object.spec.securityContext.seLinuxOptions) ? 
+                (has(variables.params.allowedSELinuxOptions) ? 
+                (
+                  (has(variables.params.allowedSELinuxOptions.level) && has(object.spec.securityContext.seLinuxOptions.level) && (object.spec.securityContext.seLinuxOptions.level == variables.params.allowedSELinuxOptions.level)) &&
+                  (has(variables.params.allowedSELinuxOptions.role) && has(object.spec.securityContext.seLinuxOptions.role) && (object.spec.securityContext.seLinuxOptions.role == variables.params.allowedSELinuxOptions.role)) &&
+                  (has(variables.params.allowedSELinuxOptions.type) && has(object.spec.securityContext.seLinuxOptions.type) && (object.spec.securityContext.seLinuxOptions.type == variables.params.allowedSELinuxOptions.type)) &&
+                  (has(variables.params.allowedSELinuxOptions.user) && has(object.spec.securityContext.seLinuxOptions.user) && (object.spec.securityContext.seLinuxOptions.user == variables.params.allowedSELinuxOptions.user))
+                ) :  
+                (!has(object.spec.securityContext.seLinuxOptions.level) && !has(object.spec.securityContext.seLinuxOptions.role) && !has(object.spec.securityContext.seLinuxOptions.type) && !has(object.spec.securityContext.seLinuxOptions.user))) 
+                : true
+          - name: containers
+            expression: 'has(object.spec.containers) ? object.spec.containers.filter(c, has(c.securityContext) && has(c.securityContext.seLinuxOptions)) : []'
+          - name: initContainers
+            expression: 'has(object.spec.initContainers) ? object.spec.initContainers.filter(c, has(c.securityContext) && has(c.securityContext.seLinuxOptions)) : []'
+          - name: ephemeralContainers
+            expression: 'has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers.filter(c, has(c.securityContext) && has(c.securityContext.seLinuxOptions)) : []'
+          - name: exemptImagePrefixes
+            expression: |
+              !has(variables.params.exemptImages) ? [] :
+                variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+          - name: exemptImageExplicit
+            expression: |
+              !has(variables.params.exemptImages) ? [] : 
+                variables.params.exemptImages.filter(image, !image.endsWith("*"))
+          - name: exemptImages
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                container.image in variables.exemptImageExplicit ||
+                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption)))
+          - name: badContainers
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(c, !(c.image in variables.exemptImages) && (has(c.securityContext.seLinuxOptions) ? (
+                has(variables.params.allowedSELinuxOptions) ? 
+                (
+                  !(has(variables.params.allowedSELinuxOptions.level) && has(c.securityContext.seLinuxOptions.level) && (c.securityContext.seLinuxOptions.level == variables.params.allowedSELinuxOptions.level)) ||
+                  !(has(variables.params.allowedSELinuxOptions.role) && has(c.securityContext.seLinuxOptions.role) && (c.securityContext.seLinuxOptions.role == variables.params.allowedSELinuxOptions.role)) ||
+                  !(has(variables.params.allowedSELinuxOptions.type) && has(c.securityContext.seLinuxOptions.type) && (c.securityContext.seLinuxOptions.type == variables.params.allowedSELinuxOptions.type)) ||
+                  !(has(variables.params.allowedSELinuxOptions.user) && has(c.securityContext.seLinuxOptions.user) && (c.securityContext.seLinuxOptions.user == variables.params.allowedSELinuxOptions.user))
+                ) : (has(c.securityContext.seLinuxOptions.level) || has(c.securityContext.seLinuxOptions.role) || has(c.securityContext.seLinuxOptions.type) || has(c.securityContext.seLinuxOptions.user))
+                ) : false
+              ))
+          validations:
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || variables.notViolatingSELinuxOptions'
+            messageExpression: '"SELinux options is not allowed, pod: " + object.metadata.name + ". Allowed options: " + variables.params.allowedSELinuxOptions'
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badContainers) == 0'
+            messageExpression: '"SELinux options is not allowed, pod: " + object.metadata.name + ", container: " + variables.badContainers.map(c, c.name).join(", ")'
+      - engine: Rego
+        source:
+          rego: |
+            package k8spspselinux
 
-        import data.lib.exclude_update.is_update
-        import data.lib.exempt_container.is_exempt
+            import data.lib.exclude_update.is_update
+            import data.lib.exempt_container.is_exempt
 
-        # Disallow top level custom SELinux options
-        violation[{"msg": msg, "details": {}}] {
-            # spec.securityContext.seLinuxOptions field is immutable.
-            not is_update(input.review)
+            # Disallow top level custom SELinux options
+            violation[{"msg": msg, "details": {}}] {
+                # spec.securityContext.seLinuxOptions field is immutable.
+                not is_update(input.review)
 
-            has_field(input.review.object.spec.securityContext, "seLinuxOptions")
-            not input_seLinuxOptions_allowed(input.review.object.spec.securityContext.seLinuxOptions)
-            msg := sprintf("SELinux options is not allowed, pod: %v. Allowed options: %v", [input.review.object.metadata.name, input.parameters.allowedSELinuxOptions])
-        }
-        # Disallow container level custom SELinux options
-        violation[{"msg": msg, "details": {}}] {
-            # spec.containers.securityContext.seLinuxOptions field is immutable.
-            not is_update(input.review)
+                has_field(input.review.object.spec.securityContext, "seLinuxOptions")
+                not input_seLinuxOptions_allowed(input.review.object.spec.securityContext.seLinuxOptions)
+                msg := sprintf("SELinux options is not allowed, pod: %v. Allowed options: %v", [input.review.object.metadata.name, input.parameters.allowedSELinuxOptions])
+            }
+            # Disallow container level custom SELinux options
+            violation[{"msg": msg, "details": {}}] {
+                # spec.containers.securityContext.seLinuxOptions field is immutable.
+                not is_update(input.review)
 
-            c := input_security_context[_]
-            not is_exempt(c)
-            has_field(c.securityContext, "seLinuxOptions")
-            not input_seLinuxOptions_allowed(c.securityContext.seLinuxOptions)
-            msg := sprintf("SELinux options is not allowed, pod: %v, container: %v. Allowed options: %v", [input.review.object.metadata.name, c.name, input.parameters.allowedSELinuxOptions])
-        }
+                c := input_security_context[_]
+                not is_exempt(c)
+                has_field(c.securityContext, "seLinuxOptions")
+                not input_seLinuxOptions_allowed(c.securityContext.seLinuxOptions)
+                msg := sprintf("SELinux options is not allowed, pod: %v, container: %v. Allowed options: %v", [input.review.object.metadata.name, c.name, input.parameters.allowedSELinuxOptions])
+            }
 
-        input_seLinuxOptions_allowed(options) {
-            params := input.parameters.allowedSELinuxOptions[_]
-            field_allowed("level", options, params)
-            field_allowed("role", options, params)
-            field_allowed("type", options, params)
-            field_allowed("user", options, params)
-        }
+            input_seLinuxOptions_allowed(options) {
+                params := input.parameters.allowedSELinuxOptions[_]
+                field_allowed("level", options, params)
+                field_allowed("role", options, params)
+                field_allowed("type", options, params)
+                field_allowed("user", options, params)
+            }
 
-        field_allowed(field, options, params) {
-            params[field] == options[field]
-        }
-        field_allowed(field, options, _) {
-            not has_field(options, field)
-        }
+            field_allowed(field, options, params) {
+                params[field] == options[field]
+            }
+            field_allowed(field, options, _) {
+                not has_field(options, field)
+            }
 
-        input_security_context[c] {
-            c := input.review.object.spec.containers[_]
-            has_field(c.securityContext, "seLinuxOptions")
-        }
-        input_security_context[c] {
-            c := input.review.object.spec.initContainers[_]
-            has_field(c.securityContext, "seLinuxOptions")
-        }
-        input_security_context[c] {
-            c := input.review.object.spec.ephemeralContainers[_]
-            has_field(c.securityContext, "seLinuxOptions")
-        }
+            input_security_context[c] {
+                c := input.review.object.spec.containers[_]
+                has_field(c.securityContext, "seLinuxOptions")
+            }
+            input_security_context[c] {
+                c := input.review.object.spec.initContainers[_]
+                has_field(c.securityContext, "seLinuxOptions")
+            }
+            input_security_context[c] {
+                c := input.review.object.spec.ephemeralContainers[_]
+                has_field(c.securityContext, "seLinuxOptions")
+            }
 
-        # has_field returns whether an object has a field
-        has_field(object, field) = true {
-            object[field]
-        }
-      libs:
-        - |
-          package lib.exclude_update
+            # has_field returns whether an object has a field
+            has_field(object, field) = true {
+                object[field]
+            }
+          libs:
+            - |
+              package lib.exclude_update
 
-          is_update(review) {
-              review.operation == "UPDATE"
-          }
-        - |
-          package lib.exempt_container
+              is_update(review) {
+                  review.operation == "UPDATE"
+              }
+            - |
+              package lib.exempt_container
 
-          is_exempt(container) {
-              exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
-              img := container.image
-              exemption := exempt_images[_]
-              _matches_exemption(img, exemption)
-          }
+              is_exempt(container) {
+                  exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+                  img := container.image
+                  exemption := exempt_images[_]
+                  _matches_exemption(img, exemption)
+              }
 
-          _matches_exemption(img, exemption) {
-              not endswith(exemption, "*")
-              exemption == img
-          }
+              _matches_exemption(img, exemption) {
+                  not endswith(exemption, "*")
+                  exemption == img
+              }
 
-          _matches_exemption(img, exemption) {
-              endswith(exemption, "*")
-              prefix := trim_suffix(exemption, "*")
-              startswith(img, prefix)
-          }
+              _matches_exemption(img, exemption) {
+                  endswith(exemption, "*")
+                  prefix := trim_suffix(exemption, "*")
+                  startswith(img, prefix)
+              }
 
 ```
 
