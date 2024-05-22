@@ -65,29 +65,35 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        gatekeeper: [ "release-3.13", "release-3.14" ]
-    name: "Integration test on Gatekeeper ${{ matrix.gatekeeper }}"
+        gatekeeper: [ "3.15.1", "3.16.2" ]
+        engine: [ "cel", "rego" ]
+    name: "Integration test on Gatekeeper ${{ matrix.gatekeeper }} for ${{ matrix.engine }} policies"
     steps:
       - name: Harden Runner
+        if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }} # remove this condition once 3.17 is out
         uses: step-security/harden-runner@a4aa98b93cab29d9b1101a6143fb8bce00e2eac4 # v2.7.1
         with:
           egress-policy: audit
 
       - name: Check out code into the Go module directory
+        if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }}
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
       - name: Bootstrap integration test
+        if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }}
         run: |
           mkdir -p $GITHUB_WORKSPACE/bin
           echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
           make integration-bootstrap
-          make deploy GATEKEEPER_VERSION=${{ matrix.gatekeeper }}
+          make deploy GATEKEEPER_VERSION=${{ matrix.gatekeeper }} POLICY_ENGINE=${{ matrix.engine }}
 
       - name: Run integration test
+        if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }}
         run: |
           make test-integration
 
       - name: Save logs
+        if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }}
         run: |
           kubectl logs -n gatekeeper-system -l control-plane=controller-manager --tail=-1 > logs-controller.json
           kubectl logs -n gatekeeper-system -l control-plane=audit-controller --tail=-1 > logs-audit.json
@@ -96,7 +102,7 @@ jobs:
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         if: ${{ always() }}
         with:
-          name: logs-int-test-${{ matrix.gatekeeper }}
+          name: logs-int-test-${{ matrix.gatekeeper }}-${{ matrix.engine }}
           path: |
             logs-*.json
   require_suites:
@@ -127,7 +133,10 @@ jobs:
           make require-sync
   gator-verify:
     runs-on: ubuntu-latest
-    name: "Verify assertions in suite.yaml files"
+    strategy:
+      matrix:
+        engine: [ "cel", "rego" ]
+    name: "Verify assertions in suite.yaml files for ${{ matrix.engine }} policies"
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@a4aa98b93cab29d9b1101a6143fb8bce00e2eac4 # v2.7.1
@@ -136,4 +145,4 @@ jobs:
 
       - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - run: |
-          make verify-gator-dockerized
+          make verify-gator-dockerized POLICY_ENGINE=${{ matrix.engine }}
