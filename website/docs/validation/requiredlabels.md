@@ -16,7 +16,7 @@ metadata:
   name: k8srequiredlabels
   annotations:
     metadata.gatekeeper.sh/title: "Required Labels"
-    metadata.gatekeeper.sh/version: 1.1.0
+    metadata.gatekeeper.sh/version: 1.1.1
     description: >-
       Requires resources to contain specified labels, with values matching
       provided regular expressions.
@@ -54,9 +54,9 @@ spec:
       - engine: K8sNativeValidation
         source:
           validations:
-          - expression: '(has(object.metadata) && variables.params.labels.all(entry, has(object.metadata.labels) && entry.key in object.metadata.labels))'
+          - expression: '(has(variable.anyObject.metadata) && variables.params.labels.all(entry, has(variable.anyObject.metadata.labels) && entry.key in variable.anyObject.metadata.labels))'
             messageExpression: '"missing required label, requires all of: " + variables.params.labels.map(entry, entry.key).join(", ")'
-          - expression: '(has(object.metadata) && variables.params.labels.all(entry, has(object.metadata.labels) && entry.key in object.metadata.labels && string(object.metadata.labels[entry.key]).matches(string(entry.allowedRegex))))'
+          - expression: '(has(variable.anyObject.metadata) && variables.params.labels.all(entry, has(variable.anyObject.metadata.labels) && entry.key in variable.anyObject.metadata.labels && string(variable.anyObject.metadata.labels[entry.key]).matches(string(entry.allowedRegex))))'
             message: "regex mismatch"
       - engine: Rego
         source:
