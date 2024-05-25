@@ -3,7 +3,7 @@ name: k8spspvolumetypes
 displayName: Volume Types
 createdAt: "2024-05-14T00:55:44Z"
 description: Restricts mountable volume types to those specified by the user. Corresponds to the `volumes` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
-digest: f27f6759e3fc2969cddea91ad3b1b0d06554d63c6b9137e35e89a5e8dbd458d9
+digest: cf81297bf562f15dc11e9c56a6e78c7e0345934cea0ae6285735d9bc66a366f1
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/volumes
 keywords:

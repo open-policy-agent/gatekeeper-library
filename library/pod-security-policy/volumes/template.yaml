@@ -37,13 +37,13 @@ spec:
         source:
           variables:
           - name: volumes
-            expression: 'has(object.spec.volumes) && has(request.operation) && request.operation != "UPDATE" ? object.spec.volumes : []'
+            expression: 'has(variables.anyObject.spec.volumes) && has(request.operation) && request.operation != "UPDATE" ? variables.anyObject.spec.volumes : []'
           - name: badVolumes
             expression: |
               variables.params.volumes.exists(entry, entry == "*") ? [] : variables.volumes.map(e, e.map(k, k != "name", k)).map(k, k[0]).filter(entry, !(entry in variables.params.volumes))
           validations:
           - expression: 'size(variables.badVolumes) == 0'
-            messageExpression: '"The volume type " + variables.badVolumes.join(", ") + " is not allowed, pod: " + object.metadata.name + ". Allowed volume types: " + variables.params.volumes.join(", ")'
+            messageExpression: '"The volume type " + variables.badVolumes.join(", ") + " is not allowed, pod: " + variables.anyObject.metadata.name + ". Allowed volume types: " + variables.params.volumes.join(", ")'
       - engine: Rego
         source:
           rego: |

@@ -74,22 +74,22 @@ spec:
           variables:
           - name: notViolatingSELinuxOptions
             expression: |
-              has(object.spec.securityContext) && has(object.spec.securityContext.seLinuxOptions) ? 
+              has(variables.anyObject.spec.securityContext) && has(variables.anyObject.spec.securityContext.seLinuxOptions) ? 
                 (has(variables.params.allowedSELinuxOptions) ? 
                 (
-                  (has(variables.params.allowedSELinuxOptions.level) && has(object.spec.securityContext.seLinuxOptions.level) && (object.spec.securityContext.seLinuxOptions.level == variables.params.allowedSELinuxOptions.level)) &&
-                  (has(variables.params.allowedSELinuxOptions.role) && has(object.spec.securityContext.seLinuxOptions.role) && (object.spec.securityContext.seLinuxOptions.role == variables.params.allowedSELinuxOptions.role)) &&
-                  (has(variables.params.allowedSELinuxOptions.type) && has(object.spec.securityContext.seLinuxOptions.type) && (object.spec.securityContext.seLinuxOptions.type == variables.params.allowedSELinuxOptions.type)) &&
-                  (has(variables.params.allowedSELinuxOptions.user) && has(object.spec.securityContext.seLinuxOptions.user) && (object.spec.securityContext.seLinuxOptions.user == variables.params.allowedSELinuxOptions.user))
+                  (has(variables.params.allowedSELinuxOptions.level) && has(variables.anyObject.spec.securityContext.seLinuxOptions.level) && (variables.anyObject.spec.securityContext.seLinuxOptions.level == variables.params.allowedSELinuxOptions.level)) &&
+                  (has(variables.params.allowedSELinuxOptions.role) && has(variables.anyObject.spec.securityContext.seLinuxOptions.role) && (variables.anyObject.spec.securityContext.seLinuxOptions.role == variables.params.allowedSELinuxOptions.role)) &&
+                  (has(variables.params.allowedSELinuxOptions.type) && has(variables.anyObject.spec.securityContext.seLinuxOptions.type) && (variables.anyObject.spec.securityContext.seLinuxOptions.type == variables.params.allowedSELinuxOptions.type)) &&
+                  (has(variables.params.allowedSELinuxOptions.user) && has(variables.anyObject.spec.securityContext.seLinuxOptions.user) && (variables.anyObject.spec.securityContext.seLinuxOptions.user == variables.params.allowedSELinuxOptions.user))
                 ) :  
-                (!has(object.spec.securityContext.seLinuxOptions.level) && !has(object.spec.securityContext.seLinuxOptions.role) && !has(object.spec.securityContext.seLinuxOptions.type) && !has(object.spec.securityContext.seLinuxOptions.user))) 
+                (!has(variables.anyObject.spec.securityContext.seLinuxOptions.level) && !has(variables.anyObject.spec.securityContext.seLinuxOptions.role) && !has(variables.anyObject.spec.securityContext.seLinuxOptions.type) && !has(variables.anyObject.spec.securityContext.seLinuxOptions.user))) 
                 : true
           - name: containers
-            expression: 'has(object.spec.containers) ? object.spec.containers.filter(c, has(c.securityContext) && has(c.securityContext.seLinuxOptions)) : []'
+            expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers.filter(c, has(c.securityContext) && has(c.securityContext.seLinuxOptions)) : []'
           - name: initContainers
-            expression: 'has(object.spec.initContainers) ? object.spec.initContainers.filter(c, has(c.securityContext) && has(c.securityContext.seLinuxOptions)) : []'
+            expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers.filter(c, has(c.securityContext) && has(c.securityContext.seLinuxOptions)) : []'
           - name: ephemeralContainers
-            expression: 'has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers.filter(c, has(c.securityContext) && has(c.securityContext.seLinuxOptions)) : []'
+            expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers.filter(c, has(c.securityContext) && has(c.securityContext.seLinuxOptions)) : []'
           - name: exemptImagePrefixes
             expression: |
               !has(variables.params.exemptImages) ? [] :
@@ -117,9 +117,9 @@ spec:
               ))
           validations:
           - expression: '(has(request.operation) && request.operation == "UPDATE") || variables.notViolatingSELinuxOptions'
-            messageExpression: '"SELinux options is not allowed, pod: " + object.metadata.name + ". Allowed options: " + variables.params.allowedSELinuxOptions'
+            messageExpression: '"SELinux options is not allowed, pod: " + variables.anyObject.metadata.name + ". Allowed options: " + variables.params.allowedSELinuxOptions'
           - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badContainers) == 0'
-            messageExpression: '"SELinux options is not allowed, pod: " + object.metadata.name + ", container: " + variables.badContainers.map(c, c.name).join(", ")'
+            messageExpression: '"SELinux options is not allowed, pod: " + variables.anyObject.metadata.name + ", container: " + variables.badContainers.map(c, c.name).join(", ")'
       - engine: Rego
         source:
           rego: |
