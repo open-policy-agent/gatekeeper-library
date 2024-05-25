@@ -11,8 +11,24 @@ tests:
         object: samples/psp-apparmor/example_allowed.yaml
         assertions:
           - violations: no
+      - name: example-allowed-container
+        object: samples/psp-apparmor/example_allowed_container.yaml
+        assertions:
+          - violations: no
+      - name: example-allowed-pod
+        object: samples/psp-apparmor/example_allowed_pod.yaml
+        assertions:
+          - violations: no
+      - name: example-allowed-override
+        object: samples/psp-apparmor/example_allowed_override.yaml
+        assertions:
+          - violations: no
       - name: example-disallowed
         object: samples/psp-apparmor/example_disallowed.yaml
+        assertions:
+          - violations: yes
+      - name: example-disallowed-override
+        object: samples/psp-apparmor/example_disallowed_override.yaml
         assertions:
           - violations: yes
       - name: disallowed-ephemeral

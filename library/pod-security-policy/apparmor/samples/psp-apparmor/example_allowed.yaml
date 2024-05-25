@@ -4,7 +4,7 @@ metadata:
   name: nginx-apparmor-allowed
   annotations:
     # apparmor.security.beta.kubernetes.io/pod: unconfined # runtime/default
-    container.apparmor.security.beta.kubernetes.io/nginx: runtime/default
+    container.apparmor.security.beta.kubernetes.io/nginx: localhost/custom
   labels:
     app: nginx-apparmor
 spec:
