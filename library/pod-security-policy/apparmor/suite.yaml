@@ -31,6 +31,10 @@ tests:
         object: samples/psp-apparmor/example_disallowed_override.yaml
         assertions:
           - violations: yes
+      - name: example-disallowed-no-profile
+        object: samples/psp-apparmor/example_disallowed_no_profile.yaml
+        assertions:
+          - violations: yes
       - name: disallowed-ephemeral
         object: samples/psp-apparmor/disallowed_ephemeral.yaml
         assertions:
