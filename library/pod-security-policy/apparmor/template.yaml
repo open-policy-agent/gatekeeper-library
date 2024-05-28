@@ -139,7 +139,7 @@ spec:
                 profile := object.get(container, ["securityContext", "appArmorProfile"], null)
                 profile == null
                 not pod.metadata.annotations[sprintf("container.apparmor.security.beta.kubernetes.io/%v", [container.name])]
-                out := canonicalize_apparmor_profile(object.get(pod, ["securityContext", "appArmorProfile"], null))
+                out := canonicalize_apparmor_profile(object.get(pod, ["spec", "securityContext", "appArmorProfile"], null))
             }
 
             canonicalize_apparmor_profile(profile) = out {
