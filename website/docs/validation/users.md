@@ -16,7 +16,7 @@ metadata:
   name: k8spspallowedusers
   annotations:
     metadata.gatekeeper.sh/title: "Allowed Users"
-    metadata.gatekeeper.sh/version: 1.0.2
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Controls the user and group IDs of the container and some volumes.
       Corresponds to the `runAsUser`, `runAsGroup`, `supplementalGroups`, and
@@ -144,161 +144,344 @@ spec:
                         description: "The maximum group ID in the range, inclusive."
   targets:
     - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8spspallowedusers
+      code:
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: containers
+            expression: 'has(object.spec.containers) ? object.spec.containers : []'
+          - name: initContainers
+            expression: 'has(object.spec.initContainers) ? object.spec.initContainers : []'
+          - name: ephemeralContainers
+            expression: 'has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers : []'
+          - name: exemptImagePrefixes
+            expression: |
+              !has(variables.params.exemptImages) ? [] :
+                variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+          - name: exemptImageExplicit
+            expression: |
+              !has(variables.params.exemptImages) ? [] : 
+                variables.params.exemptImages.filter(image, !image.endsWith("*"))
+          - name: exemptImages
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                container.image in variables.exemptImageExplicit ||
+                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption)))
+          - name: badContainers
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                !(container.image in variables.exemptImages))
+          - name: podRunAsUser
+            expression: |
+              object.kind == "Pod" ? 
+                (has(object.spec.securityContext) && has(object.spec.securityContext.runAsUser) ? object.spec.securityContext.runAsUser : null)
+              : null
+          - name: missingRequiredRunAsUserContainers
+            expression: |
+              variables.badContainers.filter(container, 
+                has(variables.params.runAsUser) && has(variables.params.runAsUser.rule) && (variables.params.runAsUser.rule == "MustRunAs") &&
+                !((has(container.securityContext) && has(container.securityContext.runAsUser)) || 
+                  (variables.podRunAsUser != null)))
+          - name: missingRequiredRunAsNonRootContainers
+            expression: |
+              variables.badContainers.filter(container, 
+                has(variables.params.runAsUser) && has(variables.params.runAsUser.rule) && (variables.params.runAsUser.rule == "MustRunAsNonRoot") && ((has(container.securityContext) && !(has(container.securityContext.runAsUser) || has(container.securityContext.runAsNonRoot))) ?
+                  (has(object.spec.securityContext) && !(has(object.spec.securityContext.runAsUser) || has(object.spec.securityContext.runAsNonRoot))) : false
+                ))
+          - name: processedRunAsUserContainers
+            expression: (variables.missingRequiredRunAsNonRootContainers + variables.missingRequiredRunAsUserContainers).map(container, container.name)
+          - name: invalidRunAsUserContainers
+            expression: |
+              variables.badContainers.filter(container, 
+                !(container.name in variables.processedRunAsUserContainers) &&
+                has(variables.params.runAsUser) && has(variables.params.runAsUser.rule) ? 
+                (
+                  variables.params.runAsUser.rule == "RunAsAny" ? false :
+                  (
+                    variables.params.runAsUser.rule == "MustRunAsNonRoot" ?
+                    (
+                      has(container.securityContext) && has(container.securityContext.runAsUser) ? (container.securityContext.runAsUser == 0) : 
+                        (variables.podRunAsUser == null) || variables.podRunAsUser == 0
+                    ) :
+                    (
+                      variables.params.runAsUser.rule == "MustRunAs" ?
+                      (
+                        has(container.securityContext) && has(container.securityContext.runAsUser) ? !variables.params.runAsUser.ranges.all(range, container.securityContext.runAsUser >= range.min && container.securityContext.runAsUser <= range.max) :
+                          variables.podRunAsUser == null || !variables.params.runAsUser.ranges.all(range, variables.podRunAsUser >= range.min && variables.podRunAsUser <= range.max)
+                      ) : false
+                    )
+                  )
+                ) : false
+              )
+          - name: podRunAsGroup
+            expression: |
+              object.kind == "Pod" ? 
+                (has(object.spec.securityContext) && has(object.spec.securityContext.runAsGroup) ? object.spec.securityContext.runAsGroup : null)
+              : null
+          - name: missingRequiredRunAsGroupContainers
+            expression: |
+              variables.badContainers.filter(container, 
+                has(variables.params.runAsGroup) && has(variables.params.runAsGroup.rule) && (variables.params.runAsGroup.rule == "MustRunAs") &&
+                !((has(container.securityContext) && has(container.securityContext.runAsGroup)) || 
+                  (variables.podRunAsGroup != null))
+              )
+          - name: invalidRunAsGroupContainers
+            expression: |
+              variables.badContainers.filter(container, 
+                !(variables.missingRequiredRunAsGroupContainers.exists(c, c.name == container.name)) &&
+                (
+                  has(variables.params.runAsGroup) && has(variables.params.runAsGroup.rule) ? 
+                  (
+                    variables.params.runAsGroup.rule == "RunAsAny" ? false :
+                    (
+                      (variables.params.runAsGroup.rule == "MustRunAs" || variables.params.runAsGroup.rule == "MayRunAs") && 
+                      (
+                        has(container.securityContext) && has(container.securityContext.runAsGroup) ? 
+                          !variables.params.runAsGroup.ranges.all(range, container.securityContext.runAsGroup >= range.min && container.securityContext.runAsGroup <= range.max) : 
+                          variables.podRunAsGroup == null || !variables.params.runAsGroup.ranges.all(range, variables.podRunAsGroup >= range.min && variables.podRunAsGroup <= range.max)
+                      )
+                    )
+                  )
+                  : false
+                )
+              )
+          - name: podRunAsFsGroup
+            expression: |
+              object.kind == "Pod" ? 
+                (has(object.spec.securityContext) && has(object.spec.securityContext.fsGroup) ? object.spec.securityContext.fsGroup : null)
+              : null
+          - name: missingRequiredFsGroupContainers
+            expression: |
+              variables.badContainers.filter(container, 
+                has(variables.params.fsGroup) && has(variables.params.fsGroup.rule) && (variables.params.fsGroup.rule == "MustRunAs") &&
+                !((has(container.securityContext) && has(container.securityContext.fsGroup)) || 
+                  (variables.podRunAsFsGroup != null))
+              )
+          - name: invalidRunAsFsGroupContainers
+            expression: |
+              variables.badContainers.filter(container, 
+                !(variables.missingRequiredFsGroupContainers.exists(c, c.name == container.name)) &&
+                (
+                  has(variables.params.fsGroup) && has(variables.params.fsGroup.rule) ? 
+                  (
+                    variables.params.fsGroup.rule == "RunAsAny" ? false :
+                    (
+                      (variables.params.fsGroup.rule == "MustRunAs" || variables.params.fsGroup.rule == "MayRunAs") && 
+                      (
+                        has(container.securityContext) && has(container.securityContext.fsGroup) ? 
+                          !variables.params.fsGroup.ranges.all(range, container.securityContext.fsGroup >= range.min && container.securityContext.fsGroup <= range.max) : 
+                          variables.podRunAsFsGroup == null || !variables.params.fsGroup.ranges.all(range, variables.podRunAsFsGroup >= range.min && variables.podRunAsFsGroup <= range.max)
+                      )
+                    )
+                  )
+                  : false
+                )
+              )
+          - name: podRunAsSupplementalGroups
+            expression: |
+              object.kind == "Pod" ? 
+                (has(object.spec.securityContext) && has(object.spec.securityContext.supplementalGroups) ? object.spec.securityContext.supplementalGroups : null)
+              : null
+          - name: missingRequiredSupplementalGroupsContainers
+            expression: |
+              variables.badContainers.filter(container, 
+                has(variables.params.supplementalGroups) && has(variables.params.supplementalGroups.rule) && (variables.params.supplementalGroups.rule == "MustRunAs") &&
+                !((has(container.securityContext) && has(container.securityContext.supplementalGroups)) || 
+                  (variables.podRunAsSupplementalGroups != null)))
+          - name: invalidSupplimentalGroupsContainers
+            expression: |
+              variables.badContainers.filter(container, 
+                !(variables.missingRequiredSupplementalGroupsContainers.exists(c, c.name == container.name)) &&
+                (
+                  has(variables.params.supplementalGroups) && has(variables.params.supplementalGroups.rule) ? 
+                  (
+                    variables.params.supplementalGroups.rule == "RunAsAny" ? false :
+                    (
+                      (variables.params.supplementalGroups.rule == "MustRunAs" || variables.params.supplementalGroups.rule == "MayRunAs") && 
+                      (
+                        has(container.securityContext) && has(container.securityContext.supplementalGroups) ? 
+                          !variables.params.supplementalGroups.ranges.all(range, container.securityContext.supplementalGroups.all(gp, gp>= range.min && gp <= range.max)) : 
+                          variables.podRunAsSupplementalGroups == null || !variables.params.supplementalGroups.ranges.all(range, variables.podRunAsSupplementalGroups.all(gp, gp >= range.min && gp <= range.max))
+                      )
+                    )
+                  )
+                  : false
+                )
+              )
+          validations:
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.missingRequiredRunAsUserContainers) == 0'
+            messageExpression: '"Containers " + variables.missingRequiredRunAsUserContainers.map(c, c.name).join(", ") + " are attempting to run without a required securityContext/runAsUser"'
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.missingRequiredRunAsNonRootContainers) == 0'
+            messageExpression: '"Containers " + variables.missingRequiredRunAsNonRootContainers.map(c, c.name).join(", ") + " are attempting to run without a required securityContext/runAsNonRoot or securityContext/runAsUser != 0"'
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.invalidRunAsUserContainers) == 0'
+            messageExpression: '"Containers " + variables.invalidRunAsUserContainers.map(c, c.name).join(", ") + " are attempting to run as disallowed user. Allowed runAsUser: " + variables.params.runAsUser.ranges.map(range, range.min + "-" + range.max).join(", ")'
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.missingRequiredRunAsGroupContainers) == 0'
+            messageExpression: '"Containers " + variables.missingRequiredRunAsGroupContainers.map(c, c.name).join(", ") + " are attempting to run without a required securityContext/runAsGroup. Allowed runAsGroup: " + variables.params.runAsGroup.ranges.map(range, range.min + "-" + range.max).join(", ")'
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.invalidRunAsGroupContainers) == 0'
+            messageExpression: '"Containers " + variables.invalidRunAsGroupContainers.map(c, c.name).join(", ") + " are attempting to run as disallowed group. Allowed runAsGroup: " + variables.params.runAsGroup.ranges.map(range, range.min + "-" + range.max).join(", ")'
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.missingRequiredFsGroupContainers) == 0'
+            messageExpression: '"Containers " + variables.missingRequiredFsGroupContainers.map(c, c.name).join(", ") + " are attempting to run without a required securityContext/fsGroup. Allowed fsGroup: " + variables.params.fsGroup.ranges.map(range, range.min + "-" + range.max).join(", ")'
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.invalidRunAsFsGroupContainers) == 0'
+            messageExpression: '"Containers " + variables.invalidRunAsFsGroupContainers.map(c, c.name).join(", ") + " are attempting to run as disallowed fsGroup. Allowed fsGroup: " + variables.params.fsGroup.ranges.map(range, range.min + "-" + range.max).join(", ")'
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.missingRequiredSupplementalGroupsContainers) == 0'
+            messageExpression: '"Containers " + variables.missingRequiredSupplementalGroupsContainers.map(c, c.name).join(", ") + " are attempting to run without a required securityContext/supplementalGroups. Allowed supplementalGroups: " + variables.params.supplementalGroups.ranges.map(range, range.min + "-" + range.max).join(", ")'
+      - engine: Rego
+        source:
+          rego: |
+            package k8spspallowedusers
 
-        import data.lib.exclude_update.is_update
-        import data.lib.exempt_container.is_exempt
+            import data.lib.exclude_update.is_update
+            import data.lib.exempt_container.is_exempt
 
-        violation[{"msg": msg}] {
-          # runAsUser, runAsGroup, supplementalGroups, fsGroup fields are immutable.
-          not is_update(input.review)
+            violation[{"msg": msg}] {
+              # runAsUser, runAsGroup, supplementalGroups, fsGroup fields are immutable.
+              not is_update(input.review)
 
-          fields := ["runAsUser", "runAsGroup", "supplementalGroups", "fsGroup"]
-          field := fields[_]
-          container := input_containers[_]
-          not is_exempt(container)
-          msg := get_type_violation(field, container)
-        }
+              fields := ["runAsUser", "runAsGroup", "supplementalGroups", "fsGroup"]
+              field := fields[_]
+              container := input_containers[_]
+              not is_exempt(container)
+              msg := get_type_violation(field, container)
+            }
 
-        get_type_violation(field, container) = msg {
-          field == "runAsUser"
-          params := input.parameters[field]
-          msg := get_user_violation(params, container)
-        }
+            get_type_violation(field, container) = msg {
+              field == "runAsUser"
+              params := input.parameters[field]
+              msg := get_user_violation(params, container)
+            }
 
-        get_type_violation(field, container) = msg {
-          field != "runAsUser"
-          params := input.parameters[field]
-          msg := get_violation(field, params, container)
-        }
+            get_type_violation(field, container) = msg {
+              field != "runAsUser"
+              params := input.parameters[field]
+              msg := get_violation(field, params, container)
+            }
 
-        # RunAsUser (separate due to "MustRunAsNonRoot")
-        get_user_violation(params, container) = msg {
-          rule := params.rule
-          provided_user := get_field_value("runAsUser", container, input.review)
-          not accept_users(rule, provided_user)
-          msg := sprintf("Container %v is attempting to run as disallowed user %v. Allowed runAsUser: %v", [container.name, provided_user, params])
-        }
+            # RunAsUser (separate due to "MustRunAsNonRoot")
+            get_user_violation(params, container) = msg {
+              rule := params.rule
+              provided_user := get_field_value("runAsUser", container, input.review)
+              not accept_users(rule, provided_user)
+              msg := sprintf("Container %v is attempting to run as disallowed user %v. Allowed runAsUser: %v", [container.name, provided_user, params])
+            }
 
-        get_user_violation(params, container) = msg {
-          not get_field_value("runAsUser", container, input.review)
-          params.rule = "MustRunAs"
-          msg := sprintf("Container %v is attempting to run without a required securityContext/runAsUser", [container.name])
-        }
+            get_user_violation(params, container) = msg {
+              not get_field_value("runAsUser", container, input.review)
+              params.rule = "MustRunAs"
+              msg := sprintf("Container %v is attempting to run without a required securityContext/runAsUser", [container.name])
+            }
 
-        get_user_violation(params, container) = msg {
-          params.rule = "MustRunAsNonRoot"
-          not get_field_value("runAsUser", container, input.review)
-          not get_field_value("runAsNonRoot", container, input.review)
-          msg := sprintf("Container %v is attempting to run without a required securityContext/runAsNonRoot or securityContext/runAsUser != 0", [container.name])
-        }
+            get_user_violation(params, container) = msg {
+              params.rule = "MustRunAsNonRoot"
+              not get_field_value("runAsUser", container, input.review)
+              not get_field_value("runAsNonRoot", container, input.review)
+              msg := sprintf("Container %v is attempting to run without a required securityContext/runAsNonRoot or securityContext/runAsUser != 0", [container.name])
+            }
 
-        accept_users("RunAsAny", _)
+            accept_users("RunAsAny", _)
 
-        accept_users("MustRunAsNonRoot", provided_user) := provided_user != 0
+            accept_users("MustRunAsNonRoot", provided_user) := provided_user != 0
 
-        accept_users("MustRunAs", provided_user) := res  {
-          ranges := input.parameters.runAsUser.ranges
-          res := is_in_range(provided_user, ranges)
-        }
+            accept_users("MustRunAs", provided_user) := res  {
+              ranges := input.parameters.runAsUser.ranges
+              res := is_in_range(provided_user, ranges)
+            }
 
-        # Group Options
-        get_violation(field, params, container) = msg {
-          rule := params.rule
-          provided_value := get_field_value(field, container, input.review)
-          not is_array(provided_value)
-          not accept_value(rule, provided_value, params.ranges)
-          msg := sprintf("Container %v is attempting to run as disallowed group %v. Allowed %v: %v", [container.name, provided_value, field, params])
-        }
-        # SupplementalGroups is array value
-        get_violation(field, params, container) = msg {
-          rule := params.rule
-          array_value := get_field_value(field, container, input.review)
-          is_array(array_value)
-          provided_value := array_value[_]
-          not accept_value(rule, provided_value, params.ranges)
-          msg := sprintf("Container %v is attempting to run with disallowed supplementalGroups %v. Allowed %v: %v", [container.name, array_value, field, params])
-        }
+            # Group Options
+            get_violation(field, params, container) = msg {
+              rule := params.rule
+              provided_value := get_field_value(field, container, input.review)
+              not is_array(provided_value)
+              not accept_value(rule, provided_value, params.ranges)
+              msg := sprintf("Container %v is attempting to run as disallowed group %v. Allowed %v: %v", [container.name, provided_value, field, params])
+            }
+            # SupplementalGroups is array value
+            get_violation(field, params, container) = msg {
+              rule := params.rule
+              array_value := get_field_value(field, container, input.review)
+              is_array(array_value)
+              provided_value := array_value[_]
+              not accept_value(rule, provided_value, params.ranges)
+              msg := sprintf("Container %v is attempting to run with disallowed supplementalGroups %v. Allowed %v: %v", [container.name, array_value, field, params])
+            }
 
-        get_violation(field, params, container) = msg {
-          not get_field_value(field, container, input.review)
-          params.rule == "MustRunAs"
-          msg := sprintf("Container %v is attempting to run without a required securityContext/%v. Allowed %v: %v", [container.name, field, field, params])
-        }
+            get_violation(field, params, container) = msg {
+              not get_field_value(field, container, input.review)
+              params.rule == "MustRunAs"
+              msg := sprintf("Container %v is attempting to run without a required securityContext/%v. Allowed %v: %v", [container.name, field, field, params])
+            }
 
-        accept_value("RunAsAny", _, _)
+            accept_value("RunAsAny", _, _)
 
-        accept_value("MayRunAs", provided_value, ranges) := is_in_range(provided_value, ranges)
+            accept_value("MayRunAs", provided_value, ranges) := is_in_range(provided_value, ranges)
 
-        accept_value("MustRunAs", provided_value, ranges) := is_in_range(provided_value, ranges)
+            accept_value("MustRunAs", provided_value, ranges) := is_in_range(provided_value, ranges)
 
 
-        # If container level is provided, that takes precedence
-        get_field_value(field, container, _) := get_seccontext_field(field, container)
+            # If container level is provided, that takes precedence
+            get_field_value(field, container, _) := get_seccontext_field(field, container)
 
-        # If no container level exists, use pod level
-        get_field_value(field, container, review) = out {
-          not has_seccontext_field(field, container)
-          review.kind.kind == "Pod"
-          pod_value := get_seccontext_field(field, review.object.spec)
-          out := pod_value
-        }
+            # If no container level exists, use pod level
+            get_field_value(field, container, review) = out {
+              not has_seccontext_field(field, container)
+              review.kind.kind == "Pod"
+              pod_value := get_seccontext_field(field, review.object.spec)
+              out := pod_value
+            }
 
-        # Helper Functions
-        is_in_range(val, ranges) = res {
-          matching := {1 | val >= ranges[j].min; val <= ranges[j].max}
-          res := count(matching) > 0
-        }
+            # Helper Functions
+            is_in_range(val, ranges) = res {
+              matching := {1 | val >= ranges[j].min; val <= ranges[j].max}
+              res := count(matching) > 0
+            }
 
-        has_seccontext_field(field, obj) {
-          get_seccontext_field(field, obj)
-        }
+            has_seccontext_field(field, obj) {
+              get_seccontext_field(field, obj)
+            }
 
-        has_seccontext_field(field, obj) {
-          get_seccontext_field(field, obj) == false
-        }
+            has_seccontext_field(field, obj) {
+              get_seccontext_field(field, obj) == false
+            }
 
-        get_seccontext_field(field, obj) = out {
-          out = obj.securityContext[field]
-        }
+            get_seccontext_field(field, obj) = out {
+              out = obj.securityContext[field]
+            }
 
-        input_containers[c] {
-          c := input.review.object.spec.containers[_]
-        }
-        input_containers[c] {
-          c := input.review.object.spec.initContainers[_]
-        }
-        input_containers[c] {
-            c := input.review.object.spec.ephemeralContainers[_]
-        }
-      libs:
-        - |
-          package lib.exclude_update
+            input_containers[c] {
+              c := input.review.object.spec.containers[_]
+            }
+            input_containers[c] {
+              c := input.review.object.spec.initContainers[_]
+            }
+            input_containers[c] {
+                c := input.review.object.spec.ephemeralContainers[_]
+            }
+          libs:
+            - |
+              package lib.exclude_update
 
-          is_update(review) {
-              review.operation == "UPDATE"
-          }
-        - |
-          package lib.exempt_container
+              is_update(review) {
+                  review.operation == "UPDATE"
+              }
+              - |
+              package lib.exempt_container
 
-          is_exempt(container) {
-              exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
-              img := container.image
-              exemption := exempt_images[_]
-              _matches_exemption(img, exemption)
-          }
+              is_exempt(container) {
+                  exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+                  img := container.image
+                  exemption := exempt_images[_]
+                  _matches_exemption(img, exemption)
+              }
 
-          _matches_exemption(img, exemption) {
-              not endswith(exemption, "*")
-              exemption == img
-          }
+              _matches_exemption(img, exemption) {
+                  not endswith(exemption, "*")
+                  exemption == img
+              }
 
-          _matches_exemption(img, exemption) {
-              endswith(exemption, "*")
-              prefix := trim_suffix(exemption, "*")
-              startswith(img, prefix)
-          }
+              _matches_exemption(img, exemption) {
+                  endswith(exemption, "*")
+                  prefix := trim_suffix(exemption, "*")
+                  startswith(img, prefix)
+              }
 
 ```
 
@@ -325,7 +508,7 @@ spec:
         kinds: ["Pod"]
   parameters:
     runAsUser:
-      rule: MustRunAs # MustRunAsNonRoot # RunAsAny 
+      rule: MustRunAsNonRoot # MustRunAsNonRoot # RunAsAny 
       ranges:
         - min: 100
           max: 200
