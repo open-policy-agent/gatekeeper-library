@@ -456,13 +456,13 @@ spec:
                 c := input.review.object.spec.ephemeralContainers[_]
             }
           libs:
-            - |
+          - |
               package lib.exclude_update
 
               is_update(review) {
                   review.operation == "UPDATE"
               }
-              - |
+          - |
               package lib.exempt_container
 
               is_exempt(container) {
