@@ -149,11 +149,11 @@ spec:
         source:
           variables:
           - name: containers
-            expression: 'has(object.spec.containers) ? object.spec.containers : []'
+            expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
           - name: initContainers
-            expression: 'has(object.spec.initContainers) ? object.spec.initContainers : []'
+            expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
           - name: ephemeralContainers
-            expression: 'has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers : []'
+            expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
           - name: exemptImagePrefixes
             expression: |
               !has(variables.params.exemptImages) ? [] :
@@ -173,8 +173,8 @@ spec:
                 !(container.image in variables.exemptImages))
           - name: podRunAsUser
             expression: |
-              object.kind == "Pod" ? 
-                (has(object.spec.securityContext) && has(object.spec.securityContext.runAsUser) ? object.spec.securityContext.runAsUser : null)
+              variables.anyObject.kind == "Pod" ? 
+                (has(variables.anyObject.spec.securityContext) && has(variables.anyObject.spec.securityContext.runAsUser) ? variables.anyObject.spec.securityContext.runAsUser : null)
               : null
           - name: missingRequiredRunAsUserContainers
             expression: |
@@ -186,7 +186,7 @@ spec:
             expression: |
               variables.badContainers.filter(container, 
                 has(variables.params.runAsUser) && has(variables.params.runAsUser.rule) && (variables.params.runAsUser.rule == "MustRunAsNonRoot") && ((has(container.securityContext) && !(has(container.securityContext.runAsUser) || has(container.securityContext.runAsNonRoot))) ?
-                  (has(object.spec.securityContext) && !(has(object.spec.securityContext.runAsUser) || has(object.spec.securityContext.runAsNonRoot))) : false
+                  (has(variables.anyObject.spec.securityContext) && !(has(variables.anyObject.spec.securityContext.runAsUser) || has(variables.anyObject.spec.securityContext.runAsNonRoot))) : false
                 ))
           - name: processedRunAsUserContainers
             expression: (variables.missingRequiredRunAsNonRootContainers + variables.missingRequiredRunAsUserContainers).map(container, container.name)
@@ -215,8 +215,8 @@ spec:
               )
           - name: podRunAsGroup
             expression: |
-              object.kind == "Pod" ? 
-                (has(object.spec.securityContext) && has(object.spec.securityContext.runAsGroup) ? object.spec.securityContext.runAsGroup : null)
+              variables.anyObject.kind == "Pod" ? 
+                (has(variables.anyObject.spec.securityContext) && has(variables.anyObject.spec.securityContext.runAsGroup) ? variables.anyObject.spec.securityContext.runAsGroup : null)
               : null
           - name: missingRequiredRunAsGroupContainers
             expression: |
@@ -247,8 +247,8 @@ spec:
               )
           - name: podRunAsFsGroup
             expression: |
-              object.kind == "Pod" ? 
-                (has(object.spec.securityContext) && has(object.spec.securityContext.fsGroup) ? object.spec.securityContext.fsGroup : null)
+              variables.anyObject.kind == "Pod" ? 
+                (has(variables.anyObject.spec.securityContext) && has(variables.anyObject.spec.securityContext.fsGroup) ? variables.anyObject.spec.securityContext.fsGroup : null)
               : null
           - name: missingRequiredFsGroupContainers
             expression: |
@@ -279,8 +279,8 @@ spec:
               )
           - name: podRunAsSupplementalGroups
             expression: |
-              object.kind == "Pod" ? 
-                (has(object.spec.securityContext) && has(object.spec.securityContext.supplementalGroups) ? object.spec.securityContext.supplementalGroups : null)
+              variables.anyObject.kind == "Pod" ? 
+                (has(variables.anyObject.spec.securityContext) && has(variables.anyObject.spec.securityContext.supplementalGroups) ? variables.anyObject.spec.securityContext.supplementalGroups : null)
               : null
           - name: missingRequiredSupplementalGroupsContainers
             expression: |
