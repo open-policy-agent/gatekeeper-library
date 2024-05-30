@@ -1,0 +1,178 @@
+variables:
+- name: containers
+  expression: 'has(object.spec.containers) ? object.spec.containers : []'
+- name: initContainers
+  expression: 'has(object.spec.initContainers) ? object.spec.initContainers : []'
+- name: ephemeralContainers
+  expression: 'has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers : []'
+- name: exemptImagePrefixes
+  expression: |
+    !has(variables.params.exemptImages) ? [] :
+      variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+- name: exemptImageExplicit
+  expression: |
+    !has(variables.params.exemptImages) ? [] : 
+      variables.params.exemptImages.filter(image, !image.endsWith("*"))
+- name: exemptImages
+  expression: |
+    (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+      container.image in variables.exemptImageExplicit ||
+      variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption)))
+- name: badContainers
+  expression: |
+    (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+      !(container.image in variables.exemptImages))
+- name: podRunAsUser
+  expression: |
+    object.kind == "Pod" ? 
+      (has(object.spec.securityContext) && has(object.spec.securityContext.runAsUser) ? object.spec.securityContext.runAsUser : null)
+    : null
+- name: missingRequiredRunAsUserContainers
+  expression: |
+    variables.badContainers.filter(container, 
+      has(variables.params.runAsUser) && has(variables.params.runAsUser.rule) && (variables.params.runAsUser.rule == "MustRunAs") &&
+      !((has(container.securityContext) && has(container.securityContext.runAsUser)) || 
+        (variables.podRunAsUser != null)))
+- name: missingRequiredRunAsNonRootContainers
+  expression: |
+    variables.badContainers.filter(container, 
+      has(variables.params.runAsUser) && has(variables.params.runAsUser.rule) && (variables.params.runAsUser.rule == "MustRunAsNonRoot") && ((has(container.securityContext) && !(has(container.securityContext.runAsUser) || has(container.securityContext.runAsNonRoot))) ?
+        (has(object.spec.securityContext) && !(has(object.spec.securityContext.runAsUser) || has(object.spec.securityContext.runAsNonRoot))) : false
+      ))
+- name: processedRunAsUserContainers
+  expression: (variables.missingRequiredRunAsNonRootContainers + variables.missingRequiredRunAsUserContainers).map(container, container.name)
+- name: invalidRunAsUserContainers
+  expression: |
+    variables.badContainers.filter(container, 
+      !(container.name in variables.processedRunAsUserContainers) &&
+      has(variables.params.runAsUser) && has(variables.params.runAsUser.rule) ? 
+      (
+        variables.params.runAsUser.rule == "RunAsAny" ? false :
+        (
+          variables.params.runAsUser.rule == "MustRunAsNonRoot" ?
+          (
+            has(container.securityContext) && has(container.securityContext.runAsUser) ? (container.securityContext.runAsUser == 0) : 
+              (variables.podRunAsUser == null) || variables.podRunAsUser == 0
+          ) :
+          (
+            variables.params.runAsUser.rule == "MustRunAs" ?
+            (
+              has(container.securityContext) && has(container.securityContext.runAsUser) ? !variables.params.runAsUser.ranges.all(range, container.securityContext.runAsUser >= range.min && container.securityContext.runAsUser <= range.max) :
+                variables.podRunAsUser == null || !variables.params.runAsUser.ranges.all(range, variables.podRunAsUser >= range.min && variables.podRunAsUser <= range.max)
+            ) : false
+          )
+        )
+      ) : false
+    )
+- name: podRunAsGroup
+  expression: |
+    object.kind == "Pod" ? 
+      (has(object.spec.securityContext) && has(object.spec.securityContext.runAsGroup) ? object.spec.securityContext.runAsGroup : null)
+    : null
+- name: missingRequiredRunAsGroupContainers
+  expression: |
+    variables.badContainers.filter(container, 
+      has(variables.params.runAsGroup) && has(variables.params.runAsGroup.rule) && (variables.params.runAsGroup.rule == "MustRunAs") &&
+      !((has(container.securityContext) && has(container.securityContext.runAsGroup)) || 
+        (variables.podRunAsGroup != null))
+    )
+- name: invalidRunAsGroupContainers
+  expression: |
+    variables.badContainers.filter(container, 
+      !(variables.missingRequiredRunAsGroupContainers.exists(c, c.name == container.name)) &&
+      (
+        has(variables.params.runAsGroup) && has(variables.params.runAsGroup.rule) ? 
+        (
+          variables.params.runAsGroup.rule == "RunAsAny" ? false :
+          (
+            (variables.params.runAsGroup.rule == "MustRunAs" || variables.params.runAsGroup.rule == "MayRunAs") && 
+            (
+              has(container.securityContext) && has(container.securityContext.runAsGroup) ? 
+                !variables.params.runAsGroup.ranges.all(range, container.securityContext.runAsGroup >= range.min && container.securityContext.runAsGroup <= range.max) : 
+                variables.podRunAsGroup == null || !variables.params.runAsGroup.ranges.all(range, variables.podRunAsGroup >= range.min && variables.podRunAsGroup <= range.max)
+            )
+          )
+        )
+        : false
+      )
+    )
+- name: podRunAsFsGroup
+  expression: |
+    object.kind == "Pod" ? 
+      (has(object.spec.securityContext) && has(object.spec.securityContext.fsGroup) ? object.spec.securityContext.fsGroup : null)
+    : null
+- name: missingRequiredFsGroupContainers
+  expression: |
+    variables.badContainers.filter(container, 
+      has(variables.params.fsGroup) && has(variables.params.fsGroup.rule) && (variables.params.fsGroup.rule == "MustRunAs") &&
+      !((has(container.securityContext) && has(container.securityContext.fsGroup)) || 
+        (variables.podRunAsFsGroup != null))
+    )
+- name: invalidRunAsFsGroupContainers
+  expression: |
+    variables.badContainers.filter(container, 
+      !(variables.missingRequiredFsGroupContainers.exists(c, c.name == container.name)) &&
+      (
+        has(variables.params.fsGroup) && has(variables.params.fsGroup.rule) ? 
+        (
+          variables.params.fsGroup.rule == "RunAsAny" ? false :
+          (
+            (variables.params.fsGroup.rule == "MustRunAs" || variables.params.fsGroup.rule == "MayRunAs") && 
+            (
+              has(container.securityContext) && has(container.securityContext.fsGroup) ? 
+                !variables.params.fsGroup.ranges.all(range, container.securityContext.fsGroup >= range.min && container.securityContext.fsGroup <= range.max) : 
+                variables.podRunAsFsGroup == null || !variables.params.fsGroup.ranges.all(range, variables.podRunAsFsGroup >= range.min && variables.podRunAsFsGroup <= range.max)
+            )
+          )
+        )
+        : false
+      )
+    )
+- name: podRunAsSupplementalGroups
+  expression: |
+    object.kind == "Pod" ? 
+      (has(object.spec.securityContext) && has(object.spec.securityContext.supplementalGroups) ? object.spec.securityContext.supplementalGroups : null)
+    : null
+- name: missingRequiredSupplementalGroupsContainers
+  expression: |
+    variables.badContainers.filter(container, 
+      has(variables.params.supplementalGroups) && has(variables.params.supplementalGroups.rule) && (variables.params.supplementalGroups.rule == "MustRunAs") &&
+      !((has(container.securityContext) && has(container.securityContext.supplementalGroups)) || 
+        (variables.podRunAsSupplementalGroups != null)))
+- name: invalidSupplimentalGroupsContainers
+  expression: |
+    variables.badContainers.filter(container, 
+      !(variables.missingRequiredSupplementalGroupsContainers.exists(c, c.name == container.name)) &&
+      (
+        has(variables.params.supplementalGroups) && has(variables.params.supplementalGroups.rule) ? 
+        (
+          variables.params.supplementalGroups.rule == "RunAsAny" ? false :
+          (
+            (variables.params.supplementalGroups.rule == "MustRunAs" || variables.params.supplementalGroups.rule == "MayRunAs") && 
+            (
+              has(container.securityContext) && has(container.securityContext.supplementalGroups) ? 
+                !variables.params.supplementalGroups.ranges.all(range, container.securityContext.supplementalGroups.all(gp, gp>= range.min && gp <= range.max)) : 
+                variables.podRunAsSupplementalGroups == null || !variables.params.supplementalGroups.ranges.all(range, variables.podRunAsSupplementalGroups.all(gp, gp >= range.min && gp <= range.max))
+            )
+          )
+        )
+        : false
+      )
+    )
+validations:
+- expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.missingRequiredRunAsUserContainers) == 0'
+  messageExpression: '"Containers " + variables.missingRequiredRunAsUserContainers.map(c, c.name).join(", ") + " are attempting to run without a required securityContext/runAsUser"'
+- expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.missingRequiredRunAsNonRootContainers) == 0'
+  messageExpression: '"Containers " + variables.missingRequiredRunAsNonRootContainers.map(c, c.name).join(", ") + " are attempting to run without a required securityContext/runAsNonRoot or securityContext/runAsUser != 0"'
+- expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.invalidRunAsUserContainers) == 0'
+  messageExpression: '"Containers " + variables.invalidRunAsUserContainers.map(c, c.name).join(", ") + " are attempting to run as disallowed user. Allowed runAsUser: " + variables.params.runAsUser.ranges.map(range, range.min + "-" + range.max).join(", ")'
+- expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.missingRequiredRunAsGroupContainers) == 0'
+  messageExpression: '"Containers " + variables.missingRequiredRunAsGroupContainers.map(c, c.name).join(", ") + " are attempting to run without a required securityContext/runAsGroup. Allowed runAsGroup: " + variables.params.runAsGroup.ranges.map(range, range.min + "-" + range.max).join(", ")'
+- expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.invalidRunAsGroupContainers) == 0'
+  messageExpression: '"Containers " + variables.invalidRunAsGroupContainers.map(c, c.name).join(", ") + " are attempting to run as disallowed group. Allowed runAsGroup: " + variables.params.runAsGroup.ranges.map(range, range.min + "-" + range.max).join(", ")'
+- expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.missingRequiredFsGroupContainers) == 0'
+  messageExpression: '"Containers " + variables.missingRequiredFsGroupContainers.map(c, c.name).join(", ") + " are attempting to run without a required securityContext/fsGroup. Allowed fsGroup: " + variables.params.fsGroup.ranges.map(range, range.min + "-" + range.max).join(", ")'
+- expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.invalidRunAsFsGroupContainers) == 0'
+  messageExpression: '"Containers " + variables.invalidRunAsFsGroupContainers.map(c, c.name).join(", ") + " are attempting to run as disallowed fsGroup. Allowed fsGroup: " + variables.params.fsGroup.ranges.map(range, range.min + "-" + range.max).join(", ")'
+- expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.missingRequiredSupplementalGroupsContainers) == 0'
+  messageExpression: '"Containers " + variables.missingRequiredSupplementalGroupsContainers.map(c, c.name).join(", ") + " are attempting to run without a required securityContext/supplementalGroups. Allowed supplementalGroups: " + variables.params.supplementalGroups.ranges.map(range, range.min + "-" + range.max).join(", ")'

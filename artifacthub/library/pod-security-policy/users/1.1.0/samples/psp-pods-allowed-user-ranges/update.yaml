@@ -1,0 +1,22 @@
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx-users-disallowed
+      labels:
+        app: nginx-users
+    spec:
+      securityContext:
+        supplementalGroups:
+          - 250
+        fsGroup: 250
+      containers:
+        - name: nginx
+          image: nginx
+          securityContext:
+            runAsUser: 250
+            runAsGroup: 250
