@@ -77,12 +77,14 @@ spec:
               has(variables.anyObject.spec.securityContext) && has(variables.anyObject.spec.securityContext.seLinuxOptions) ? 
                 (has(variables.params.allowedSELinuxOptions) ? 
                 (
-                  (has(variables.params.allowedSELinuxOptions.level) && has(variables.anyObject.spec.securityContext.seLinuxOptions.level) && (variables.anyObject.spec.securityContext.seLinuxOptions.level == variables.params.allowedSELinuxOptions.level)) &&
-                  (has(variables.params.allowedSELinuxOptions.role) && has(variables.anyObject.spec.securityContext.seLinuxOptions.role) && (variables.anyObject.spec.securityContext.seLinuxOptions.role == variables.params.allowedSELinuxOptions.role)) &&
-                  (has(variables.params.allowedSELinuxOptions.type) && has(variables.anyObject.spec.securityContext.seLinuxOptions.type) && (variables.anyObject.spec.securityContext.seLinuxOptions.type == variables.params.allowedSELinuxOptions.type)) &&
-                  (has(variables.params.allowedSELinuxOptions.user) && has(variables.anyObject.spec.securityContext.seLinuxOptions.user) && (variables.anyObject.spec.securityContext.seLinuxOptions.user == variables.params.allowedSELinuxOptions.user))
+                  variables.params.allowedSELinuxOptions.exists(opts,
+                    (has(opts.level) ? has(variables.anyObject.spec.securityContext.seLinuxOptions.level) && (variables.anyObject.spec.securityContext.seLinuxOptions.level == opts.level) : !has(variables.anyObject.spec.securityContext.seLinuxOptions.level)) &&
+                    (has(opts.role) ? has(variables.anyObject.spec.securityContext.seLinuxOptions.role) && (variables.anyObject.spec.securityContext.seLinuxOptions.role == opts.role) : !has(variables.anyObject.spec.securityContext.seLinuxOptions.role)) &&
+                    (has(opts.type) ? has(variables.anyObject.spec.securityContext.seLinuxOptions.type) && (variables.anyObject.spec.securityContext.seLinuxOptions.type == opts.type) : !has(variables.anyObject.spec.securityContext.seLinuxOptions.type)) &&
+                    (has(opts.user) ? has(variables.anyObject.spec.securityContext.seLinuxOptions.user) && (variables.anyObject.spec.securityContext.seLinuxOptions.user == opts.user) : !has(variables.anyObject.spec.securityContext.seLinuxOptions.user))
+                  )
                 ) :  
-                (!has(variables.anyObject.spec.securityContext.seLinuxOptions.level) && !has(variables.anyObject.spec.securityContext.seLinuxOptions.role) && !has(variables.anyObject.spec.securityContext.seLinuxOptions.type) && !has(variables.anyObject.spec.securityContext.seLinuxOptions.user))) 
+                true) 
                 : true
           - name: containers
             expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers.filter(c, has(c.securityContext) && has(c.securityContext.seLinuxOptions)) : []'
@@ -108,13 +110,15 @@ spec:
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(c, !(c.image in variables.exemptImages) && (has(c.securityContext.seLinuxOptions) ? (
                 has(variables.params.allowedSELinuxOptions) ? 
                 (
-                  !(has(variables.params.allowedSELinuxOptions.level) && has(c.securityContext.seLinuxOptions.level) && (c.securityContext.seLinuxOptions.level == variables.params.allowedSELinuxOptions.level)) ||
-                  !(has(variables.params.allowedSELinuxOptions.role) && has(c.securityContext.seLinuxOptions.role) && (c.securityContext.seLinuxOptions.role == variables.params.allowedSELinuxOptions.role)) ||
-                  !(has(variables.params.allowedSELinuxOptions.type) && has(c.securityContext.seLinuxOptions.type) && (c.securityContext.seLinuxOptions.type == variables.params.allowedSELinuxOptions.type)) ||
-                  !(has(variables.params.allowedSELinuxOptions.user) && has(c.securityContext.seLinuxOptions.user) && (c.securityContext.seLinuxOptions.user == variables.params.allowedSELinuxOptions.user))
-                ) : (has(c.securityContext.seLinuxOptions.level) || has(c.securityContext.seLinuxOptions.role) || has(c.securityContext.seLinuxOptions.type) || has(c.securityContext.seLinuxOptions.user))
-                ) : false
-              ))
+                  !variables.params.allowedSELinuxOptions.exists(opts,
+                    (has(opts.level) ? has(c.securityContext.seLinuxOptions.level) && (c.securityContext.seLinuxOptions.level == opts.level) : !has(c.securityContext.seLinuxOptions.level)) &&
+                    (has(opts.role) ? has(c.securityContext.seLinuxOptions.role) && (c.securityContext.seLinuxOptions.role == opts.role) : !has(c.securityContext.seLinuxOptions.role)) &&
+                    (has(opts.type) ? has(c.securityContext.seLinuxOptions.type) && (c.securityContext.seLinuxOptions.type == opts.type) : !has(c.securityContext.seLinuxOptions.type)) &&
+                    (has(opts.user) ? has(c.securityContext.seLinuxOptions.user) && (c.securityContext.seLinuxOptions.user == opts.user) : !has(c.securityContext.seLinuxOptions.user))
+                  )
+                ) : false)
+                : false)
+              )
           validations:
           - expression: '(has(request.operation) && request.operation == "UPDATE") || variables.notViolatingSELinuxOptions'
             messageExpression: '"SELinux options is not allowed, pod: " + variables.anyObject.metadata.name + ". Allowed options: " + variables.params.allowedSELinuxOptions'
