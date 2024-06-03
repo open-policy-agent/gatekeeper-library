@@ -94,11 +94,11 @@ spec:
                 "localhost": "Localhost",
               }
           - name: containers
-            expression: 'has(object.spec.containers) ? object.spec.containers : []'
+            expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
           - name: initContainers
-            expression: 'has(object.spec.initContainers) ? object.spec.initContainers : []'
+            expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
           - name: ephemeralContainers
-            expression: 'has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers : []'
+            expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
           - name: allowAllProfiles
             expression: |
               has(variables.params.allowAllProfiles) && variables.params.allowAllProfiles.exists(profile, profile == "*")
@@ -144,20 +144,20 @@ spec:
               variables.inputAllowedProfiles + variables.translatedProfiles.filter(profile, !(profile in variables.inputAllowedProfiles))
           - name: hasPodSecurityContext
             expression: |
-              has(object.spec.securityContext) && has(object.spec.securityContext.seccompProfile)
+              has(variables.anyObject.spec.securityContext) && has(variables.anyObject.spec.securityContext.seccompProfile)
           - name: hasPodAnnotations
             expression: |
-              has(object.metadata.annotations) && ("seccomp.security.alpha.kubernetes.io/pod" in object.metadata.annotations)
+              has(variables.anyObject.metadata.annotations) && ("seccomp.security.alpha.kubernetes.io/pod" in variables.anyObject.metadata.annotations)
           - name: podAnnotationsProfiles
             expression: |
               variables.badContainers.filter(container, 
                 !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
-                !(has(object.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in object.metadata.annotations)) && 
+                !(has(variables.anyObject.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations)) && 
                 !variables.hasPodSecurityContext && 
                 variables.hasPodAnnotations 
               ).map(container, {
                 "container" : container.name,
-                "profile" : object.metadata.annotations["seccomp.security.alpha.kubernetes.io/pod"],
+                "profile" : variables.anyObject.metadata.annotations["seccomp.security.alpha.kubernetes.io/pod"],
                 "file" : dyn(""),
                 "location" : dyn("annotation seccomp.security.alpha.kubernetes.io/pod"),
               })
@@ -166,16 +166,16 @@ spec:
               variables.badContainers.filter(container, 
                 !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
                 !variables.hasPodSecurityContext && 
-                has(object.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in object.metadata.annotations)
+                has(variables.anyObject.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations)
               ).map(container, {
                 "container" : container.name,
-                "profile" : object.metadata.annotations["container.seccomp.security.alpha.kubernetes.io/" + container.name],
+                "profile" : variables.anyObject.metadata.annotations["container.seccomp.security.alpha.kubernetes.io/" + container.name],
                 "file" : dyn(""),
                 "location" : dyn("annotation container.seccomp.security.alpha.kubernetes.io/" + container.name),
               })
           - name: podLocalHostProfile
             expression: |
-              has(object.spec.securityContext) && has(object.spec.securityContext.seccompProfile) && has(object.spec.securityContext.seccompProfile.localhostProfile) ? object.spec.securityContext.seccompProfile.localhostProfile : ""
+              has(variables.anyObject.spec.securityContext) && has(variables.anyObject.spec.securityContext.seccompProfile) && has(variables.anyObject.spec.securityContext.seccompProfile.localhostProfile) ? variables.anyObject.spec.securityContext.seccompProfile.localhostProfile : ""
           - name: podSecurityContextProfiles
             expression: |
               variables.badContainers.filter(container, 
@@ -183,7 +183,7 @@ spec:
                 variables.hasPodSecurityContext
               ).map(container, {
                 "container" : container.name,
-                "profile" : object.spec.securityContext.seccompProfile.type,
+                "profile" : variables.anyObject.spec.securityContext.seccompProfile.type,
                 "file" : variables.podLocalHostProfile,
                 "location" : dyn("pod securityContext"),
               })
@@ -201,7 +201,7 @@ spec:
             expression: |
               variables.badContainers.filter(container, 
                 !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
-                !(has(object.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in object.metadata.annotations)) && 
+                !(has(variables.anyObject.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations)) && 
                 !variables.hasPodSecurityContext && 
                 !variables.hasPodAnnotations 
               ).map(container, {
