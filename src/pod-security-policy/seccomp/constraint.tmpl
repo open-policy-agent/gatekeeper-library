@@ -4,7 +4,7 @@ metadata:
   name: k8spspseccomp
   annotations:
     metadata.gatekeeper.sh/title: "Seccomp"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Controls the seccomp profile used by containers. Corresponds to the
       `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on
@@ -67,6 +67,10 @@ spec:
                 type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
+      code: 
+      - engine: K8sNativeValidation
+        source:
+{{ file.Read "src/pod-security-policy/seccomp/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
       rego: |
 {{ file.Read "src/pod-security-policy/seccomp/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
       libs:

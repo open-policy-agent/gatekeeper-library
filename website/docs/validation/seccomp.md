@@ -16,7 +16,7 @@ metadata:
   name: k8spspseccomp
   annotations:
     metadata.gatekeeper.sh/title: "Seccomp"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Controls the seccomp profile used by containers. Corresponds to the
       `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on
@@ -79,6 +79,195 @@ spec:
                 type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
+      code: 
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: namingTranslation
+            expression: |
+              {
+                "Unconfined": "unconfined",
+                "Localhost": "localhost",
+                "runtime/default": "RuntimeDefault",
+                "docker/default": "RuntimeDefault",
+                "unconfined": "Unconfined",
+                "localhost": "Localhost",
+              }
+          - name: containers
+            expression: 'has(object.spec.containers) ? object.spec.containers : []'
+          - name: initContainers
+            expression: 'has(object.spec.initContainers) ? object.spec.initContainers : []'
+          - name: ephemeralContainers
+            expression: 'has(object.spec.ephemeralContainers) ? object.spec.ephemeralContainers : []'
+          - name: allowAllProfiles
+            expression: |
+              has(variables.params.allowAllProfiles) && variables.params.allowAllProfiles.exists(profile, profile == "*")
+          - name: exemptImagePrefixes
+            expression: |
+              !has(variables.params.exemptImages) ? [] :
+                variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+          - name: exemptImageExplicit
+            expression: |
+              !has(variables.params.exemptImages) ? [] : 
+                variables.params.exemptImages.filter(image, !image.endsWith("*"))
+          - name: exemptImages
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                container.image in variables.exemptImageExplicit ||
+                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption)))
+          - name: badContainers
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                !variables.allowAllProfiles &&
+                !(container.image in variables.exemptImages))
+          - name: RuntimeDefaultProfiles
+            expression: |
+              has(variables.params.allowedProfiles) && variables.params.allowedProfiles.exists(profile, profile == "RuntimeDefault") ? ["runtime/default", "docker/default"] : []
+          - name: inputAllowedProfiles
+            expression: |
+              !has(variables.params.allowedProfiles) ? [] : variables.params.allowedProfiles
+          - name: allowedLocalhostFiles
+            expression: |
+              has(variables.params.allowedLocalhostFiles) ? variables.params.allowedLocalhostFiles : []
+          - name: translatedProfiles
+            expression: |
+              !has(variables.params.allowedProfiles) ? [] :
+                (
+                  (variables.params.allowedProfiles.filter(profile,
+                  !profile.lowerAscii().startsWith("localhost")).map(profile, variables.namingTranslation[profile]).filter(profile, !(profile in variables.inputAllowedProfiles))) + 
+                  (variables.params.allowedProfiles.exists(profile, profile == "RuntimeDefault") ? ["runtime/default", "docker/default"] : []) +
+                  (variables.params.allowedProfiles.exists(profile, profile == "Localhost") ? variables.allowedLocalhostFiles.map(file, "localhost/" + file) : []) +
+                  (variables.params.allowedProfiles.exists(profile, profile.startsWith("localhost")) ? ["Localhost"] : [])
+                )        
+          - name: allowedProfiles
+            expression: |
+              variables.inputAllowedProfiles + variables.translatedProfiles.filter(profile, !(profile in variables.inputAllowedProfiles))
+          - name: hasPodSecurityContext
+            expression: |
+              has(object.spec.securityContext) && has(object.spec.securityContext.seccompProfile)
+          - name: hasPodAnnotations
+            expression: |
+              has(object.metadata.annotations) && ("seccomp.security.alpha.kubernetes.io/pod" in object.metadata.annotations)
+          - name: podAnnotationsProfiles
+            expression: |
+              variables.badContainers.filter(container, 
+                !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
+                !(has(object.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in object.metadata.annotations)) && 
+                !variables.hasPodSecurityContext && 
+                variables.hasPodAnnotations 
+              ).map(container, {
+                "container" : container.name,
+                "profile" : object.metadata.annotations["seccomp.security.alpha.kubernetes.io/pod"],
+                "file" : dyn(""),
+                "location" : dyn("annotation seccomp.security.alpha.kubernetes.io/pod"),
+              })
+          - name: containerAnnotationsProfiles
+            expression: |
+              variables.badContainers.filter(container, 
+                !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
+                !variables.hasPodSecurityContext && 
+                has(object.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in object.metadata.annotations)
+              ).map(container, {
+                "container" : container.name,
+                "profile" : object.metadata.annotations["container.seccomp.security.alpha.kubernetes.io/" + container.name],
+                "file" : dyn(""),
+                "location" : dyn("annotation container.seccomp.security.alpha.kubernetes.io/" + container.name),
+              })
+          - name: podLocalHostProfile
+            expression: |
+              has(object.spec.securityContext) && has(object.spec.securityContext.seccompProfile) && has(object.spec.securityContext.seccompProfile.localhostProfile) ? object.spec.securityContext.seccompProfile.localhostProfile : ""
+          - name: podSecurityContextProfiles
+            expression: |
+              variables.badContainers.filter(container, 
+                !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
+                variables.hasPodSecurityContext
+              ).map(container, {
+                "container" : container.name,
+                "profile" : object.spec.securityContext.seccompProfile.type,
+                "file" : variables.podLocalHostProfile,
+                "location" : dyn("pod securityContext"),
+              })
+          - name: containerSecurityContextProfiles
+            expression: |
+              variables.badContainers.filter(container, 
+                has(container.securityContext) && has(container.securityContext.seccompProfile)
+              ).map(container, {
+                "container" : container.name,
+                "profile" : container.securityContext.seccompProfile.type,
+                "file" : has(container.securityContext.seccompProfile.localhostProfile) ? container.securityContext.seccompProfile.localhostProfile : dyn(""),
+                "location" : dyn("container securityContext"),
+              })
+          - name: containerProfilesMissing
+            expression: |
+              variables.badContainers.filter(container, 
+                !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
+                !(has(object.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in object.metadata.annotations)) && 
+                !variables.hasPodSecurityContext && 
+                !variables.hasPodAnnotations 
+              ).map(container, {
+                "container" : container.name,
+                "profile" : dyn("not configured"),
+                "file" : dyn(""),
+                "location" : dyn("no explicit profile found"),
+              })
+          - name: allBadContainerProfiles
+            expression: |
+              variables.podAnnotationsProfiles + variables.containerAnnotationsProfiles + variables.podSecurityContextProfiles + variables.containerSecurityContextProfiles + variables.containerProfilesMissing
+          - name: allowAllLocalhostFiles
+            expression: |
+              has(variables.params.allowedLocalhostFiles) ? variables.params.allowedLocalhostFiles.exists(file, file == "*") : 
+                has(variables.params.allowedProfiles) ? variables.params.allowedProfiles.exists(profile, profile == "localhost/*") : false
+          - name: allowedFiles
+            expression: |
+              has(variables.params.allowedLocalhostFiles) ? variables.params.allowedLocalhostFiles : [] +
+              variables.inputAllowedProfiles.filter(profile, profile.startsWith("localhost/")).map(profile, profile.replace("localhost/", ""))
+          - name: containersWithAllowedProfiles
+            expression: |
+              variables.allBadContainerProfiles.filter(badContainerProfile, 
+                variables.allowAllProfiles || 
+                (
+                  !badContainerProfile.profile.lowerAscii().startsWith("localhost") && 
+                  variables.allowedProfiles.exists(allowedProfile, allowedProfile == badContainerProfile.profile)
+                ) ||
+                (
+                  badContainerProfile.profile == "Localhost" &&
+                  !variables.allowAllLocalhostFiles &&
+                  variables.allowedProfiles.exists(allowedProfile, allowedProfile == badContainerProfile.profile) &&
+                  variables.allowedFiles.exists(file, file == badContainerProfile.file)
+                ) ||
+                (
+                  badContainerProfile.profile == "Localhost" &&
+                  variables.allowAllLocalhostFiles &&
+                  variables.allowedProfiles.exists(allowedProfile, allowedProfile == badContainerProfile.profile)
+                ) || 
+                (
+                  variables.allowedProfiles.exists(allowedProfile, allowedProfile == "localhost/*") &&
+                  badContainerProfile.profile.startsWith("localhost/")
+                ) ||
+                (
+                  badContainerProfile.profile.startsWith("localhost/") &&
+                  variables.allowedProfiles.exists(allowedProfile, allowedProfile == badContainerProfile.profile)
+                ) 
+              ).map(profile, profile.container)
+          - name: badContainerProfilesWithoutFiles
+            expression: |
+              variables.allBadContainerProfiles.filter(badContainerProfile, 
+                !variables.containersWithAllowedProfiles.exists(container, container == badContainerProfile.container) &&
+                badContainerProfile.profile != "Localhost"
+              ).map(badProfile, "Seccomp profile '" + badProfile.profile + "' is not allowed for container '" + badProfile.container + "'. Found at: " + badProfile.location + ". Allowed profiles: " + variables.allowedProfiles.join(", "))
+          - name: badContainerProfilesWithFiles
+            expression: |
+              variables.allBadContainerProfiles.filter(badContainerProfile, 
+                !variables.containersWithAllowedProfiles.exists(container, container == badContainerProfile.container) &&
+                badContainerProfile.profile == "Localhost"
+              ).map(badProfile, "Seccomp profile '" + badProfile.profile + "' With file '" + badProfile.file + "' is not allowed for container '" + badProfile.container + "'. Found at: " + badProfile.location + ". Allowed profiles: " + variables.allowedProfiles.join(", "))
+          validations:
+          - expression: 'size(variables.badContainerProfilesWithoutFiles) == 0'
+            messageExpression: |
+              variables.badContainerProfilesWithoutFiles.join("\n")
+          - expression: 'size(variables.badContainerProfilesWithFiles) == 0'
+            messageExpression: |
+              variables.badContainerProfilesWithFiles.join("\n")
       rego: |
         package k8spspseccomp
 
