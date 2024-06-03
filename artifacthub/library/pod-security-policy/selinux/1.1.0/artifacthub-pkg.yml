@@ -3,7 +3,7 @@ name: k8spspselinuxv2
 displayName: SELinux V2
 createdAt: "2024-05-20T18:10:16Z"
 description: Defines an allow-list of seLinuxOptions configurations for pod containers. Corresponds to a PodSecurityPolicy requiring SELinux configs. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#selinux
-digest: fc1b59a39438cd81c6e376bfa5370afbfca109c31d67b2f14e6e2bfa4fa64960
+digest: 918674d346e8a939fb19033fd15a2044fdf05d929c35d9ce66ceae3545129ba8
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/selinux
 keywords:

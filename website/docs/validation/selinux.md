@@ -72,12 +72,12 @@ spec:
       - engine: K8sNativeValidation
         source:
           variables:
-          - name: notViolatingSELinuxOptions
+          - name: usingAllowedSELinuxOptions
             expression: |
               has(variables.anyObject.spec.securityContext) && has(variables.anyObject.spec.securityContext.seLinuxOptions) ? 
                 (has(variables.params.allowedSELinuxOptions) ? 
                 (
-                  variables.params.allowedSELinuxOptions.exists(opts,
+                  variables.params.allowedSELinuxOptions.all(opts,
                     (has(opts.level) ? has(variables.anyObject.spec.securityContext.seLinuxOptions.level) && (variables.anyObject.spec.securityContext.seLinuxOptions.level == opts.level) : !has(variables.anyObject.spec.securityContext.seLinuxOptions.level)) &&
                     (has(opts.role) ? has(variables.anyObject.spec.securityContext.seLinuxOptions.role) && (variables.anyObject.spec.securityContext.seLinuxOptions.role == opts.role) : !has(variables.anyObject.spec.securityContext.seLinuxOptions.role)) &&
                     (has(opts.type) ? has(variables.anyObject.spec.securityContext.seLinuxOptions.type) && (variables.anyObject.spec.securityContext.seLinuxOptions.type == opts.type) : !has(variables.anyObject.spec.securityContext.seLinuxOptions.type)) &&
@@ -110,7 +110,7 @@ spec:
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(c, !(c.image in variables.exemptImages) && (has(c.securityContext.seLinuxOptions) ? (
                 has(variables.params.allowedSELinuxOptions) ? 
                 (
-                  !variables.params.allowedSELinuxOptions.exists(opts,
+                  !variables.params.allowedSELinuxOptions.all(opts,
                     (has(opts.level) ? has(c.securityContext.seLinuxOptions.level) && (c.securityContext.seLinuxOptions.level == opts.level) : !has(c.securityContext.seLinuxOptions.level)) &&
                     (has(opts.role) ? has(c.securityContext.seLinuxOptions.role) && (c.securityContext.seLinuxOptions.role == opts.role) : !has(c.securityContext.seLinuxOptions.role)) &&
                     (has(opts.type) ? has(c.securityContext.seLinuxOptions.type) && (c.securityContext.seLinuxOptions.type == opts.type) : !has(c.securityContext.seLinuxOptions.type)) &&
@@ -120,7 +120,7 @@ spec:
                 : false)
               )
           validations:
-          - expression: '(has(request.operation) && request.operation == "UPDATE") || variables.notViolatingSELinuxOptions'
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || variables.usingAllowedSELinuxOptions'
             messageExpression: '"SELinux options is not allowed, pod: " + variables.anyObject.metadata.name + ". Allowed options: " + variables.params.allowedSELinuxOptions'
           - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badContainers) == 0'
             messageExpression: '"SELinux options is not allowed, pod: " + variables.anyObject.metadata.name + ", container: " + variables.badContainers.map(c, c.name).join(", ")'
