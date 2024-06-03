@@ -71,8 +71,10 @@ spec:
       - engine: K8sNativeValidation
         source:
 {{ file.Read "src/pod-security-policy/seccomp/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
-      rego: |
-{{ file.Read "src/pod-security-policy/seccomp/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
-      libs:
-        - |
-{{ file.Read "src/pod-security-policy/seccomp/lib_exempt_container.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+      - engine: Rego
+        source:
+          rego: |
+{{ file.Read "src/pod-security-policy/seccomp/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}
+          libs:
+            - |
+{{ file.Read "src/pod-security-policy/seccomp/lib_exempt_container.rego" | strings.Indent 14 | strings.TrimSuffix "\n" }}
