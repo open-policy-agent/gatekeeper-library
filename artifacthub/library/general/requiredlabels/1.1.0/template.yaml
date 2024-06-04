@@ -1,22 +1,10 @@
----
-id: requiredlabels
-title: Required Labels
----
-
-# Required Labels
-
-## Description
-Requires resources to contain specified labels, with values matching provided regular expressions.
-
-## Template
-```yaml
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
   name: k8srequiredlabels
   annotations:
     metadata.gatekeeper.sh/title: "Required Labels"
-    metadata.gatekeeper.sh/version: 1.1.1
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Requires resources to contain specified labels, with values matching
       provided regular expressions.
@@ -54,9 +42,9 @@ spec:
       - engine: K8sNativeValidation
         source:
           validations:
-          - expression: '(has(variables.anyObject.metadata) && variables.params.labels.all(entry, has(variables.anyObject.metadata.labels) && entry.key in variables.anyObject.metadata.labels))'
+          - expression: '(has(object.metadata) && variables.params.labels.all(entry, has(object.metadata.labels) && entry.key in object.metadata.labels))'
             messageExpression: '"missing required label, requires all of: " + variables.params.labels.map(entry, entry.key).join(", ")'
-          - expression: '(has(variables.anyObject.metadata) && variables.params.labels.all(entry, has(variables.anyObject.metadata.labels) && entry.key in variables.anyObject.metadata.labels && string(variables.anyObject.metadata.labels[entry.key]).matches(string(entry.allowedRegex))))'
+          - expression: '(has(object.metadata) && variables.params.labels.all(entry, has(object.metadata.labels) && entry.key in object.metadata.labels && string(object.metadata.labels[entry.key]).matches(string(entry.allowedRegex))))'
             message: "regex mismatch"
       - engine: Rego
         source:
@@ -89,104 +77,3 @@ spec:
               msg := get_message(input.parameters, def_msg)
             }
 
-
-```
-
-### Usage
-```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredlabels/template.yaml
-```
-## Examples
-<details>
-<summary>must-have-owner</summary>
-
-<details>
-<summary>constraint</summary>
-
-```yaml
-apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sRequiredLabels
-metadata:
-  name: all-must-have-owner
-spec:
-  match:
-    kinds:
-      - apiGroups: [""]
-        kinds: ["Namespace"]
-  parameters:
-    message: "All namespaces must have an `owner` label that points to your company username"
-    labels:
-      - key: owner
-        allowedRegex: "^[a-zA-Z]+.agilebank.demo$"
-
-```
-
-Usage
-
-```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredlabels/samples/all-must-have-owner/constraint.yaml
-```
-
-</details>
-
-<details>
-<summary>example-allowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: allowed-namespace
-  labels:
-    owner: user.agilebank.demo
-
-```
-
-Usage
-
-```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredlabels/samples/all-must-have-owner/example_allowed.yaml
-```
-
-</details>
-<details>
-<summary>example-disallowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: disallowed-namespace
-
-```
-
-Usage
-
-```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredlabels/samples/all-must-have-owner/example_disallowed.yaml
-```
-
-</details>
-<details>
-<summary>example-disallowed-label-value</summary>
-
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: disallowed-namespace
-  labels:
-    owner: user
-
-```
-
-Usage
-
-```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/requiredlabels/samples/all-must-have-owner/example_disallowed_label_value.yaml
-```
-
-</details>
-
-
-</details>
