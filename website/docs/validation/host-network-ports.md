@@ -86,9 +86,9 @@ spec:
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
                 !(container.image in variables.exemptImages) &&
                 (
-                  (has(variables.params.hostNetwork) && variables.params.hostNetwork ? (has(variables.anyObject.spec.hostNetwork) && variables.anyObject.spec.hostNetwork) : false) ||
-                  (container.ports.all(port, has(port.hostPort) && port.hostPort < variables.params.min)) ||
-                  (container.ports.all(port, has(port.hostPort) && port.hostPort > variables.params.max))
+                  (has(variables.params.hostNetwork) && !variables.params.hostNetwork ? (has(variables.anyObject.spec.hostNetwork) && variables.anyObject.spec.hostNetwork) : false) ||
+                  (container.ports.all(port, has(port.hostPort) && has(variables.params.min) && port.hostPort < variables.params.min)) ||
+                  (container.ports.all(port, has(port.hostPort) && has(variables.params.max) && port.hostPort > variables.params.max))
                 )
               )
           validations:
@@ -201,6 +201,120 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-host-networking-ports-disallowed
+  labels:
+    app: nginx-host-networking-ports
+spec:
+  hostNetwork: true
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 9001
+      hostPort: 9001
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/example_disallowed.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-host-networking-ports-allowed
+  labels:
+    app: nginx-host-networking-ports
+spec:
+  hostNetwork: false
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 9000
+      hostPort: 80
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>disallowed-ephemeral</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-host-networking-ports-disallowed
+  labels:
+    app: nginx-host-networking-ports
+spec:
+  hostNetwork: true
+  ephemeralContainers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 9001
+      hostPort: 9001
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/disallowed_ephemeral.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>use-of-host-network-blocked</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostNetworkingPorts
+metadata:
+  name: psp-host-network
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    hostNetwork: false
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/constraint_block_host_network.yaml
 ```
 
 </details>
