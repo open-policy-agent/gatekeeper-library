@@ -16,7 +16,7 @@ metadata:
   name: k8spsphostfilesystem
   annotations:
     metadata.gatekeeper.sh/title: "Host Filesystem"
-    metadata.gatekeeper.sh/version: 1.0.2
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Controls usage of the host filesystem. Corresponds to the
       `allowedHostPaths` field in a PodSecurityPolicy. For more information,
@@ -51,113 +51,148 @@ spec:
                     description: "when set to true, any container volumeMounts matching the pathPrefix must include `readOnly: true`."
   targets:
     - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8spsphostfilesystem
+      code:
+      - engine: K8sNativeValidation
+        source: 
+          variables:
+          - name: containers
+            expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+          - name: initContainers
+            expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+          - name: ephemeralContainers
+            expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+          - name: allContainers
+            expression: 'variables.containers + variables.initContainers + variables.ephemeralContainers'
+          - name: allowedHostPaths
+            expression: |
+              has(variables.params) ? (has(variables.params.allowedHostPaths) ? variables.params.allowedHostPaths : []) : []
+          - name: volumes
+            expression: |
+              variables.anyObject.spec.volumes.filter(volume, has(volume.hostPath))
+          - name: badHostPaths
+            expression: |
+              variables.volumes.filter(volume, 
+                (size(variables.allowedHostPaths) == 0) ||
+                !(variables.allowedHostPaths.exists(allowedHostPath, 
+                    volume.hostPath.path.startsWith(allowedHostPath.pathPrefix) && (
+                    !(allowedHostPath.readOnly == true) ||
+                      (allowedHostPath.readOnly && !variables.allContainers.exists(c, 
+                      c.volumeMounts.exists(m, m.name == volume.name && !m.readOnly))))))
+              ).map(volume, "{ hostPath: { path : " + volume.hostPath.path + " }, name: " + volume.name + "}").map(volume, "HostPath volume " + volume + " is not allowed, pod: " + variables.anyObject.metadata.name + ". Allowed path: " + variables.allowedHostPaths.map(path, "{ pathPrefix: " + path.pathPrefix + ", readOnly: " + path.readOnly + "}").join(", "))
+          validations:
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badHostPaths) == 0'
+            messageExpression: 'variables.badHostPaths.join("\n")'
 
-        import data.lib.exclude_update.is_update
+              
+      - engine: Rego
+        source:
+          rego: |
+            package k8spsphostfilesystem
 
-        violation[{"msg": msg, "details": {}}] {
-            # spec.volumes field is immutable.
-            not is_update(input.review)
+            import data.lib.exclude_update.is_update
 
-            volume := input_hostpath_volumes[_]
-            allowedPaths := get_allowed_paths(input)
-            input_hostpath_violation(allowedPaths, volume)
-            msg := sprintf("HostPath volume %v is not allowed, pod: %v. Allowed path: %v", [volume, input.review.object.metadata.name, allowedPaths])
-        }
+            violation[{"msg": msg, "details": {}}] {
+                # spec.volumes field is immutable.
+                not is_update(input.review)
 
-        input_hostpath_violation(allowedPaths, _) {
-            # An empty list means all host paths are blocked
-            allowedPaths == []
-        }
-        input_hostpath_violation(allowedPaths, volume) {
-            not input_hostpath_allowed(allowedPaths, volume)
-        }
+                volume := input_hostpath_volumes[_]
+                allowedPaths := get_allowed_paths(input)
+                input_hostpath_violation(allowedPaths, volume)
+                msg := sprintf("HostPath volume %v is not allowed, pod: %v. Allowed path: %v", [volume, input.review.object.metadata.name, allowedPaths])
+            }
 
-        get_allowed_paths(arg) = out {
-            not arg.parameters
-            out = []
-        }
-        get_allowed_paths(arg) = out {
-            not arg.parameters.allowedHostPaths
-            out = []
-        }
-        get_allowed_paths(arg) = out {
-            out = arg.parameters.allowedHostPaths
-        }
+            input_hostpath_violation(allowedPaths, _) {
+                # An empty list means all host paths are blocked
+                allowedPaths == []
+            }
+            input_hostpath_violation(allowedPaths, volume) {
+                not input_hostpath_allowed(allowedPaths, volume)
+            }
 
-        input_hostpath_allowed(allowedPaths, volume) {
-            allowedHostPath := allowedPaths[_]
-            path_matches(allowedHostPath.pathPrefix, volume.hostPath.path)
-            not allowedHostPath.readOnly == true
-        }
+            get_allowed_paths(arg) = out {
+                not arg.parameters
+                out = []
+            }
+            get_allowed_paths(arg) = out {
+                not arg.parameters.allowedHostPaths
+                out = []
+            }
+            get_allowed_paths(arg) = out {
+                out = arg.parameters.allowedHostPaths
+            }
 
-        input_hostpath_allowed(allowedPaths, volume) {
-            allowedHostPath := allowedPaths[_]
-            path_matches(allowedHostPath.pathPrefix, volume.hostPath.path)
-            allowedHostPath.readOnly
-            not writeable_input_volume_mounts(volume.name)
-        }
+            input_hostpath_allowed(allowedPaths, volume) {
+                allowedHostPath := allowedPaths[_]
+                path_matches(allowedHostPath.pathPrefix, volume.hostPath.path)
+                not allowedHostPath.readOnly == true
+            }
 
-        writeable_input_volume_mounts(volume_name) {
-            container := input_containers[_]
-            mount := container.volumeMounts[_]
-            mount.name == volume_name
-            not mount.readOnly
-        }
+            input_hostpath_allowed(allowedPaths, volume) {
+                allowedHostPath := allowedPaths[_]
+                path_matches(allowedHostPath.pathPrefix, volume.hostPath.path)
+                allowedHostPath.readOnly
+                not writeable_input_volume_mounts(volume.name)
+            }
 
-        # This allows "/foo", "/foo/", "/foo/bar" etc., but
-        # disallows "/fool", "/etc/foo" etc.
-        path_matches(prefix, path) {
-            a := path_array(prefix)
-            b := path_array(path)
-            prefix_matches(a, b)
-        }
-        path_array(p) = out {
-            p != "/"
-            out := split(trim(p, "/"), "/")
-        }
-        # This handles the special case for "/", since
-        # split(trim("/", "/"), "/") == [""]
-        path_array("/") = []
+            writeable_input_volume_mounts(volume_name) {
+                container := input_containers[_]
+                mount := container.volumeMounts[_]
+                mount.name == volume_name
+                not mount.readOnly
+            }
 
-        prefix_matches(a, b) {
-            count(a) <= count(b)
-            not any_not_equal_upto(a, b, count(a))
-        }
+            # This allows "/foo", "/foo/", "/foo/bar" etc., but
+            # disallows "/fool", "/etc/foo" etc.
+            path_matches(prefix, path) {
+                a := path_array(prefix)
+                b := path_array(path)
+                prefix_matches(a, b)
+            }
+            path_array(p) = out {
+                p != "/"
+                out := split(trim(p, "/"), "/")
+            }
+            # This handles the special case for "/", since
+            # split(trim("/", "/"), "/") == [""]
+            path_array("/") = []
 
-        any_not_equal_upto(a, b, n) {
-            a[i] != b[i]
-            i < n
-        }
+            prefix_matches(a, b) {
+                count(a) <= count(b)
+                not any_not_equal_upto(a, b, count(a))
+            }
 
-        input_hostpath_volumes[v] {
-            v := input.review.object.spec.volumes[_]
-            has_field(v, "hostPath")
-        }
+            any_not_equal_upto(a, b, n) {
+                a[i] != b[i]
+                i < n
+            }
 
-        # has_field returns whether an object has a field
-        has_field(object, field) = true {
-            object[field]
-        }
-        input_containers[c] {
-            c := input.review.object.spec.containers[_]
-        }
+            input_hostpath_volumes[v] {
+                v := input.review.object.spec.volumes[_]
+                has_field(v, "hostPath")
+            }
 
-        input_containers[c] {
-            c := input.review.object.spec.initContainers[_]
-        }
+            # has_field returns whether an object has a field
+            has_field(object, field) = true {
+                object[field]
+            }
+            input_containers[c] {
+                c := input.review.object.spec.containers[_]
+            }
 
-        input_containers[c] {
-            c := input.review.object.spec.ephemeralContainers[_]
-        }
-      libs:
-        - |
-          package lib.exclude_update
+            input_containers[c] {
+                c := input.review.object.spec.initContainers[_]
+            }
 
-          is_update(review) {
-              review.operation == "UPDATE"
-          }
+            input_containers[c] {
+                c := input.review.object.spec.ephemeralContainers[_]
+            }
+          libs:
+            - |
+              package lib.exclude_update
+
+              is_update(review) {
+                  review.operation == "UPDATE"
+              }
 
 ```
 
