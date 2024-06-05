@@ -82,7 +82,7 @@ spec:
               ).map(container, container.name)
           validations:
           - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badContainers) == 0'
-            messageExpression: '"only read-only root filesystem container is allowed: " + variabales.badContainers.join(", ")'
+            messageExpression: '"only read-only root filesystem container is allowed: " + variables.badContainers.join(", ")'
             
       - engine: Rego
         source:
