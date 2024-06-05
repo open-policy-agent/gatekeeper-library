@@ -16,7 +16,7 @@ metadata:
   name: k8spspprivilegedcontainer
   annotations:
     metadata.gatekeeper.sh/title: "Privileged Container"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Controls the ability of any container to enable privileged mode.
       Corresponds to the `privileged` field in a PodSecurityPolicy. For more
@@ -48,60 +48,94 @@ spec:
                 type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8spspprivileged
+      code:
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: containers
+            expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+          - name: initContainers
+            expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+          - name: ephemeralContainers
+            expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+          - name: exemptImagePrefixes
+            expression: |
+              !has(variables.params.exemptImages) ? [] :
+                variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+          - name: exemptImageExplicit
+            expression: |
+              !has(variables.params.exemptImages) ? [] : 
+                variables.params.exemptImages.filter(image, !image.endsWith("*"))
+          - name: exemptImages
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                container.image in variables.exemptImageExplicit ||
+                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption)))
+          - name: badContainers
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                !(container.image in variables.exemptImages) &&
+                (has(container.securityContext) && has(container.securityContext.privileged) && container.securityContext.privileged == true)
+              ).map(container, "Privileged container is not allowed: " + container.name +", securityContext: " + container.securityContext)
+          validations:
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badContainers) == 0'
+            messageExpression: 'variables.badContainers.join("\n")' 
+      - engine: Rego
+        source:
+          rego: |
+            package k8spspprivileged
 
-        import data.lib.exclude_update.is_update
-        import data.lib.exempt_container.is_exempt
+            import data.lib.exclude_update.is_update
+            import data.lib.exempt_container.is_exempt
 
-        violation[{"msg": msg, "details": {}}] {
-            # spec.containers.privileged field is immutable.
-            not is_update(input.review)
+            violation[{"msg": msg, "details": {}}] {
+                # spec.containers.privileged field is immutable.
+                not is_update(input.review)
 
-            c := input_containers[_]
-            not is_exempt(c)
-            c.securityContext.privileged
-            msg := sprintf("Privileged container is not allowed: %v, securityContext: %v", [c.name, c.securityContext])
-        }
+                c := input_containers[_]
+                not is_exempt(c)
+                c.securityContext.privileged
+                msg := sprintf("Privileged container is not allowed: %v, securityContext: %v", [c.name, c.securityContext])
+            }
 
-        input_containers[c] {
-            c := input.review.object.spec.containers[_]
-        }
+            input_containers[c] {
+                c := input.review.object.spec.containers[_]
+            }
 
-        input_containers[c] {
-            c := input.review.object.spec.initContainers[_]
-        }
+            input_containers[c] {
+                c := input.review.object.spec.initContainers[_]
+            }
 
-        input_containers[c] {
-            c := input.review.object.spec.ephemeralContainers[_]
-        }
-      libs:
-        - |
-          package lib.exclude_update
+            input_containers[c] {
+                c := input.review.object.spec.ephemeralContainers[_]
+            }
+          libs:
+            - |
+              package lib.exclude_update
 
-          is_update(review) {
-              review.operation == "UPDATE"
-          }
-        - |
-          package lib.exempt_container
+              is_update(review) {
+                  review.operation == "UPDATE"
+              }
+            - |
+              package lib.exempt_container
 
-          is_exempt(container) {
-              exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
-              img := container.image
-              exemption := exempt_images[_]
-              _matches_exemption(img, exemption)
-          }
+              is_exempt(container) {
+                  exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+                  img := container.image
+                  exemption := exempt_images[_]
+                  _matches_exemption(img, exemption)
+              }
 
-          _matches_exemption(img, exemption) {
-              not endswith(exemption, "*")
-              exemption == img
-          }
+              _matches_exemption(img, exemption) {
+                  not endswith(exemption, "*")
+                  exemption == img
+              }
 
-          _matches_exemption(img, exemption) {
-              endswith(exemption, "*")
-              prefix := trim_suffix(exemption, "*")
-              startswith(img, prefix)
-          }
+              _matches_exemption(img, exemption) {
+                  endswith(exemption, "*")
+                  prefix := trim_suffix(exemption, "*")
+                  startswith(img, prefix)
+              }
 
 ```
 
