@@ -3,7 +3,6 @@ package k8spspapparmor
 import data.lib.exempt_container.is_exempt
 
 violation[{"msg": msg, "details": {}}] {
-    metadata := input.review.object.metadata
     container := input_containers[_]
     not is_exempt(container)
     not input_apparmor_allowed(input.review.object, container)

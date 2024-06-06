@@ -81,7 +81,7 @@ spec:
                   (container.securityContext.appArmorProfile.type == "RuntimeDefault" ? "runtime/default" :
                     container.securityContext.appArmorProfile.type == "Unconfined" ? "unconfined" : 
                       container.securityContext.appArmorProfile.type == "Localhost" ? "localhost/" + container.securityContext.appArmorProfile.localhostProfile : "") :
-                  has(variables.anyObject.metadata.annotations) && has(variables.anyObject.metadata.annotations) && ("container.apparmor.security.beta.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations ?
+                  has(variables.anyObject.metadata.annotations) && ("container.apparmor.security.beta.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations ?
                     variables.anyObject.metadata.annotations["container.apparmor.security.beta.kubernetes.io/" + container.name] :
                       variables.canonicalPodAppArmor
               ])
@@ -114,7 +114,6 @@ spec:
             import data.lib.exempt_container.is_exempt
 
             violation[{"msg": msg, "details": {}}] {
-                metadata := input.review.object.metadata
                 container := input_containers[_]
                 not is_exempt(container)
                 not input_apparmor_allowed(input.review.object, container)
