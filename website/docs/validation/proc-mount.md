@@ -238,6 +238,7 @@ metadata:
   labels:
     app: nginx-proc-mount
 spec:
+  hostUsers: false
   containers:
   - name: nginx
     image: nginx
@@ -264,6 +265,7 @@ metadata:
   labels:
     app: nginx-proc-mount
 spec:
+  hostUsers: false
   containers:
   - name: nginx
     image: nginx
@@ -290,6 +292,7 @@ metadata:
   labels:
     app: nginx-proc-mount
 spec:
+  hostUsers: false
   ephemeralContainers:
   - name: nginx
     image: nginx
