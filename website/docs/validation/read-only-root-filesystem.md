@@ -16,7 +16,7 @@ metadata:
   name: k8spspreadonlyrootfilesystem
   annotations:
     metadata.gatekeeper.sh/title: "Read Only Root Filesystem"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Requires the use of a read-only root file system by pod containers.
       Corresponds to the `readOnlyRootFilesystem` field in a
@@ -49,70 +49,107 @@ spec:
                 type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8spspreadonlyrootfilesystem
+      code:
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: containers
+            expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+          - name: initContainers
+            expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+          - name: ephemeralContainers
+            expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+          - name: exemptImagePrefixes
+            expression: |
+              !has(variables.params.exemptImages) ? [] :
+                variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+          - name: exemptImageExplicit
+            expression: |
+              !has(variables.params.exemptImages) ? [] : 
+                variables.params.exemptImages.filter(image, !image.endsWith("*"))
+          - name: exemptImages
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                container.image in variables.exemptImageExplicit ||
+                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption)))
+          - name: badContainers
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                !(container.image in variables.exemptImages) && 
+                (!has(container.securityContext) ||
+                !has(container.securityContext.readOnlyRootFilesystem) ||
+                container.securityContext.readOnlyRootFilesystem != true)
+              ).map(container, container.name)
+          validations:
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badContainers) == 0'
+            messageExpression: '"only read-only root filesystem container is allowed: " + variables.badContainers.join(", ")'
+            
+      - engine: Rego
+        source:
+          rego: |
+            package k8spspreadonlyrootfilesystem
 
-        import data.lib.exclude_update.is_update
-        import data.lib.exempt_container.is_exempt
+            import data.lib.exclude_update.is_update
+            import data.lib.exempt_container.is_exempt
 
-        violation[{"msg": msg, "details": {}}] {
-            # spec.containers.readOnlyRootFilesystem field is immutable.
-            not is_update(input.review)
+            violation[{"msg": msg, "details": {}}] {
+                # spec.containers.readOnlyRootFilesystem field is immutable.
+                not is_update(input.review)
 
-            c := input_containers[_]
-            not is_exempt(c)
-            input_read_only_root_fs(c)
-            msg := sprintf("only read-only root filesystem container is allowed: %v", [c.name])
-        }
+                c := input_containers[_]
+                not is_exempt(c)
+                input_read_only_root_fs(c)
+                msg := sprintf("only read-only root filesystem container is allowed: %v", [c.name])
+            }
 
-        input_read_only_root_fs(c) {
-            not has_field(c, "securityContext")
-        }
-        input_read_only_root_fs(c) {
-            not c.securityContext.readOnlyRootFilesystem == true
-        }
+            input_read_only_root_fs(c) {
+                not has_field(c, "securityContext")
+            }
+            input_read_only_root_fs(c) {
+                not c.securityContext.readOnlyRootFilesystem == true
+            }
 
-        input_containers[c] {
-            c := input.review.object.spec.containers[_]
-        }
-        input_containers[c] {
-            c := input.review.object.spec.initContainers[_]
-        }
-        input_containers[c] {
-            c := input.review.object.spec.ephemeralContainers[_]
-        }
+            input_containers[c] {
+                c := input.review.object.spec.containers[_]
+            }
+            input_containers[c] {
+                c := input.review.object.spec.initContainers[_]
+            }
+            input_containers[c] {
+                c := input.review.object.spec.ephemeralContainers[_]
+            }
 
-        # has_field returns whether an object has a field
-        has_field(object, field) = true {
-            object[field]
-        }
-      libs:
-        - |
-          package lib.exclude_update
+            # has_field returns whether an object has a field
+            has_field(object, field) = true {
+                object[field]
+            }
+          libs:
+            - |
+              package lib.exclude_update
 
-          is_update(review) {
-              review.operation == "UPDATE"
-          }
-        - |
-          package lib.exempt_container
+              is_update(review) {
+                  review.operation == "UPDATE"
+              }
+            - |
+              package lib.exempt_container
 
-          is_exempt(container) {
-              exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
-              img := container.image
-              exemption := exempt_images[_]
-              _matches_exemption(img, exemption)
-          }
+              is_exempt(container) {
+                  exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+                  img := container.image
+                  exemption := exempt_images[_]
+                  _matches_exemption(img, exemption)
+              }
 
-          _matches_exemption(img, exemption) {
-              not endswith(exemption, "*")
-              exemption == img
-          }
+              _matches_exemption(img, exemption) {
+                  not endswith(exemption, "*")
+                  exemption == img
+              }
 
-          _matches_exemption(img, exemption) {
-              endswith(exemption, "*")
-              prefix := trim_suffix(exemption, "*")
-              startswith(img, prefix)
-          }
+              _matches_exemption(img, exemption) {
+                  endswith(exemption, "*")
+                  prefix := trim_suffix(exemption, "*")
+                  startswith(img, prefix)
+              }
 
 ```
 
