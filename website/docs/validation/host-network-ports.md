@@ -86,7 +86,7 @@ spec:
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
                 !(container.image in variables.exemptImages) &&
                 (
-                  (has(variables.params.hostNetwork) && !variables.params.hostNetwork ? (has(variables.anyObject.spec.hostNetwork) && variables.anyObject.spec.hostNetwork) : false) ||
+                  (!has(variables.params.hostNetwork) || !variables.params.hostNetwork ? (has(variables.anyObject.spec.hostNetwork) && variables.anyObject.spec.hostNetwork) : false) ||
                   (container.ports.all(port, has(port.hostPort) && has(variables.params.min) && port.hostPort < variables.params.min)) ||
                   (container.ports.all(port, has(port.hostPort) && has(variables.params.max) && port.hostPort > variables.params.max))
                 )
