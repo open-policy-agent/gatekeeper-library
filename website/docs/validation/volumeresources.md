@@ -19,7 +19,6 @@ metadata:
     metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Container emptyDir volume resources to be within the specified maximum values.
-
 spec:
   crd:
     spec:
@@ -39,14 +38,14 @@ spec:
         package k8svolumerequests
 
         violation[{"msg": msg}] {
-            vols := input.review.object.spec.template.spec.volumes[_]
+            vols := input.review.object.spec.volumes[_]
             emptydir := vols.emptyDir
             not has_key(emptydir, "sizeLimit")
             msg := sprintf("Volume '%v' is not allowed, do not have set sizelimit", [vols.name])
         }
 
         violation[{"msg": msg}] {
-            vols := input.review.object.spec.template.spec.volumes[_]
+            vols := input.review.object.spec.volumes[_]
             emptydir_orig := vols.emptyDir.sizeLimit
             size := canonify_size(emptydir_orig)
             max_size_orig := input.parameters.volumesizelimit
@@ -190,6 +189,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 <summary>constraint</summary>
 
 ```yaml
+---
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sVolumeRequests
 metadata:
@@ -200,7 +200,7 @@ spec:
       - apiGroups: [""]
         kinds: ["Pod"]
       - apiGroups: ["apps"]
-        kinds: ["Deployment", "DaemonSet", "StatefulSet"]
+        kinds: ["Deployment", "DaemonSet", "ReplicaSet", "StatefulSet"]
   parameters:
     volumesizelimit: 1Gi
 

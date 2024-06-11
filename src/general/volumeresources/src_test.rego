@@ -25,7 +25,7 @@ test_input_with_sizeLimit_muti_higher {
 }
 
 container(volumes) = output {
-    output = {"object": {"spec": {"template": {"spec": {"volumes": volumes}}}}}
+    output = {"object": {"spec": {"volumes": volumes}}}
 }
 
 vol(size, name) = out {

@@ -19,3 +19,11 @@ tests:
     object: samples/container-emptydir-limit/example_disallowed_muti.yaml
     assertions:
     - violations: yes
+  - name: example-disallowed-pod
+    object: samples/container-emptydir-limit/example_disallowed_muti.yaml
+    assertions:
+    - violations: yes
+  - name: example-allowed-pod
+    object: samples/container-emptydir-limit/example_allowed_pod.yaml
+    assertions:
+    - violations: no

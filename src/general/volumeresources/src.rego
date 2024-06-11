@@ -1,14 +1,14 @@
 package k8svolumerequests
 
 violation[{"msg": msg}] {
-    vols := input.review.object.spec.template.spec.volumes[_]
+    vols := input.review.object.spec.volumes[_]
     emptydir := vols.emptyDir
     not has_key(emptydir, "sizeLimit")
     msg := sprintf("Volume '%v' is not allowed, do not have set sizelimit", [vols.name])
 }
 
 violation[{"msg": msg}] {
-    vols := input.review.object.spec.template.spec.volumes[_]
+    vols := input.review.object.spec.volumes[_]
     emptydir_orig := vols.emptyDir.sizeLimit
     size := canonify_size(emptydir_orig)
     max_size_orig := input.parameters.volumesizelimit
