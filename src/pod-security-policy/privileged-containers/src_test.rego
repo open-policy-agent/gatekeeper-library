@@ -20,12 +20,12 @@ test_input_container_many_mixed_privileged_not_allowed {
     results := violation with input as inp
     count(results) > 0
 }
-test_input_container_many_mixed_privileged_not_allowed_two {
+test_input_container_many_mixed_privileged_not_allowed_three {
     inp := { "review": input_review_many_mixed_two}
     results := violation with input as inp
     count(results) == 2
 }
-test_input_container_many_mixed_privileged_not_allowed_two_but_exempt {
+test_input_container_many_mixed_privileged_not_allowed_three_but_exempt {
     inp := { "review": input_review_many_mixed_two, "parameters": {"exemptImages": ["nginx"]}}
     results := violation with input as inp
     count(results) == 0
@@ -138,5 +138,11 @@ input_containers_many_mixed = [
     "image": "nginx",
     "securityContext": {
       "privileged": true
+    }
+},
+{
+    "name": "nginx2",
+    "image": "nginx",
+    "securityContext": {
     }
 }]
