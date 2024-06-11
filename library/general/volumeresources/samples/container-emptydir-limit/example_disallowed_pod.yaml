@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: allowed-pod
+  name: disallowed-pod
   labels:
-    app: allowed-pod
+    app: disallowed-pod
 spec:
   containers:
-  - name: allowed-pod
+  - name: disallowed-pod
     image: nginx:1.14.2
     ports:
     - containerPort: 80

@@ -20,7 +20,7 @@ tests:
     assertions:
     - violations: yes
   - name: example-disallowed-pod
-    object: samples/container-emptydir-limit/example_disallowed_muti.yaml
+    object: samples/container-emptydir-limit/example_disallowed_pod.yaml
     assertions:
     - violations: yes
   - name: example-allowed-pod
