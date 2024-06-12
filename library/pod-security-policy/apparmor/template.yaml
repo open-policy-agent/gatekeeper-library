@@ -52,8 +52,6 @@ spec:
             expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
           - name: ephemeralContainers
             expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
-          - name: allContainers
-            expression: 'variables.containers + variables.initContainers + variables.ephemeralContainers'
           - name: podAppArmor
             expression: 'has(variables.anyObject.spec.securityContext) && has(variables.anyObject.spec.securityContext.appArmorProfile) ? variables.anyObject.spec.securityContext.appArmorProfile : null'
           - name: canonicalPodAppArmor
@@ -62,9 +60,33 @@ spec:
                 variables.podAppArmor.type == "RuntimeDefault" ? "runtime/default" :
                   variables.podAppArmor.type == "Unconfined" ? "unconfined" : 
                     variables.podAppArmor.type == "Localhost" ? "localhost/" + variables.podAppArmor.localhostProfile : ""
+          # break this mapping up by container type (regular/init/ephemeral) to avoid problems with name collisions,
+          # which may be a problem when running shift-left (no K8s API server to enforce uniqueness of container names)
           - name: appArmorByContainer
             expression: |
-              variables.allContainers.map(container, [container.name,
+              variables.containers.map(container, [container.name,
+                has(container.securityContext) && has(container.securityContext.appArmorProfile) ?
+                  (container.securityContext.appArmorProfile.type == "RuntimeDefault" ? "runtime/default" :
+                    container.securityContext.appArmorProfile.type == "Unconfined" ? "unconfined" : 
+                      container.securityContext.appArmorProfile.type == "Localhost" ? "localhost/" + container.securityContext.appArmorProfile.localhostProfile : "") :
+                  has(variables.anyObject.metadata.annotations) && ("container.apparmor.security.beta.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations ?
+                    variables.anyObject.metadata.annotations["container.apparmor.security.beta.kubernetes.io/" + container.name] :
+                      variables.canonicalPodAppArmor
+              ])
+          - name: appArmorByInitContainer
+            expression: |
+              variables.initContainers.map(container, [container.name,
+                has(container.securityContext) && has(container.securityContext.appArmorProfile) ?
+                  (container.securityContext.appArmorProfile.type == "RuntimeDefault" ? "runtime/default" :
+                    container.securityContext.appArmorProfile.type == "Unconfined" ? "unconfined" : 
+                      container.securityContext.appArmorProfile.type == "Localhost" ? "localhost/" + container.securityContext.appArmorProfile.localhostProfile : "") :
+                  has(variables.anyObject.metadata.annotations) && ("container.apparmor.security.beta.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations ?
+                    variables.anyObject.metadata.annotations["container.apparmor.security.beta.kubernetes.io/" + container.name] :
+                      variables.canonicalPodAppArmor
+              ])
+          - name: appArmorByEphemeralContainer
+            expression: |
+              variables.ephemeralContainers.map(container, [container.name,
                 has(container.securityContext) && has(container.securityContext.appArmorProfile) ?
                   (container.securityContext.appArmorProfile.type == "RuntimeDefault" ? "runtime/default" :
                     container.securityContext.appArmorProfile.type == "Unconfined" ? "unconfined" : 
@@ -89,9 +111,21 @@ spec:
               ).map(container, container.image)
           validations:
           - expression: |
-              variables.allContainers.all(container,
+              variables.containers.all(container,
                 (container.image in variables.exemptImages) ||
                 variables.appArmorByContainer.exists(pair, pair[0] == container.name && pair[1] in variables.params.allowedProfiles)
+              )
+            messageExpression: '"AppArmor profile is not allowed. Allowed Profiles: " + variables.params.allowedProfiles.join(", ")'
+          - expression: |
+              variables.initContainers.all(container,
+                (container.image in variables.exemptImages) ||
+                variables.appArmorByInitContainer.exists(pair, pair[0] == container.name && pair[1] in variables.params.allowedProfiles)
+              )
+            messageExpression: '"AppArmor profile is not allowed. Allowed Profiles: " + variables.params.allowedProfiles.join(", ")'
+          - expression: |
+              variables.ephemeralContainers.all(container,
+                (container.image in variables.exemptImages) ||
+                variables.appArmorByEphemeralContainer.exists(pair, pair[0] == container.name && pair[1] in variables.params.allowedProfiles)
               )
             messageExpression: '"AppArmor profile is not allowed. Allowed Profiles: " + variables.params.allowedProfiles.join(", ")'
       - engine: Rego
