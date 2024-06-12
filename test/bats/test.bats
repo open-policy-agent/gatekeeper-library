@@ -107,6 +107,8 @@ setup() {
         for allowed in "$sample"/example_allowed*.yaml; do
           if [[ -e "$allowed" ]]; then
             # apply resource
+            echo "Applying ${allowed} with contents:"
+            cat ${allowed}
             run kubectl apply -f "$allowed"
             assert_match 'created' "$output"
             assert_success
@@ -118,6 +120,8 @@ setup() {
         for disallowed in "$sample"/example_disallowed*.yaml; do
           if [[ -e "$disallowed" ]]; then
             # apply resource
+            echo "Applying ${disallowed} with contents:"
+            cat ${disallowed}
             run kubectl apply -f "$disallowed"
             assert_match_either 'denied the request' 'no matches for kind' "${output}"
             assert_failure
