@@ -23,7 +23,7 @@ input_containers[c] {
     c := input.review.object.spec.ephemeralContainers[_]
 }
 
-get_apparmor_profile(pod, container) = out {
+get_apparmor_profile(_, container) = out {
     profile := object.get(container, ["securityContext", "appArmorProfile"], null)
     profile != null
     out := canonicalize_apparmor_profile(profile)
