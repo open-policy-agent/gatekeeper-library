@@ -238,6 +238,7 @@ metadata:
   labels:
     app: nginx-proc-mount
 spec:
+  hostUsers: false
   containers:
   - name: nginx
     image: nginx
@@ -260,10 +261,11 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx-proc-mount-disallowed
+  name: nginx-proc-mount-allowed
   labels:
     app: nginx-proc-mount
 spec:
+  hostUsers: false
   containers:
   - name: nginx
     image: nginx
@@ -290,6 +292,7 @@ metadata:
   labels:
     app: nginx-proc-mount
 spec:
+  hostUsers: false
   ephemeralContainers:
   - name: nginx
     image: nginx
