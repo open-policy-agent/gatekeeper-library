@@ -1,20 +1,25 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: allowed-pod
+  name: disallowed-muti-pod
   labels:
-    app: allowed-pod
+    app: disallowed-muti-pod
 spec:
   containers:
-  - name: allowed-pod
+  - name: disallowed-muti-pod
     image: nginx:1.14.2
     ports:
     - containerPort: 80
     volumeMounts:
     - mountPath: /demo
       name: demo-volume
+    - mountPath: /demo-1
+      name: demo-volume-1
   volumes:
   - name: demo-volume
     emptyDir: 
       sizeLimit: 16Mi
       medium: Memory
+  - name: demo-volume-1
+    emptyDir: 
+      sizeLimit: 2Gi

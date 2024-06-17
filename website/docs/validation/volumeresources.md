@@ -199,8 +199,6 @@ spec:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
-      - apiGroups: ["apps"]
-        kinds: ["Deployment", "DaemonSet", "ReplicaSet", "StatefulSet"]
   parameters:
     volumesizelimit: 1Gi
 
@@ -215,134 +213,104 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 <details>
-<summary>example-allowed</summary>
+<summary>example-allowed-pod</summary>
 
 ```yaml
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
-  name: allowed-deployment
+  name: allowed-pod
   labels:
-    app: nginx
+    app: allowed-pod
 spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:1.14.2
-        ports:
-        - containerPort: 80
-        volumeMounts:
-        - mountPath: /demo
-          name: demo-volume
-      volumes:
-      - name: demo-volume
-        emptyDir: 
-          sizeLimit: 16Mi
-          medium: Memory
-
+  containers:
+  - name: allowed-pod
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - mountPath: /demo
+      name: demo-volume
+  volumes:
+  - name: demo-volume
+    emptyDir: 
+      sizeLimit: 16Mi
+      medium: Memory
 ```
 
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/volumeresources/samples/container-emptydir-limit/example_allowed.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/volumeresources/samples/container-emptydir-limit/example_allowed_pod.yaml
 ```
 
 </details>
 <details>
-<summary>example-disallowed</summary>
+<summary>example-disallowed-miss-pod</summary>
 
 ```yaml
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
-  name: disallowed-deployment
+  name: disallowed-miss-pod
   labels:
-    app: nginx
+    app: disallowed-miss-pod
 spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:1.14.2
-        ports:
-        - containerPort: 80
-        volumeMounts:
-        - mountPath: /demo
-          name: demo-volume
-      volumes:
-      - name: demo-volume
-        emptyDir: {}
-
+  containers:
+  - name: disallowed-miss-pod
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - mountPath: /demo
+      name: demo-volume
+  volumes:
+  - name: demo-volume
+    emptyDir: {}
 ```
 
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/volumeresources/samples/container-emptydir-limit/example_disallowed.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/volumeresources/samples/container-emptydir-limit/example_disallowed_miss_pod.yaml
 ```
 
 </details>
 <details>
-<summary>example-disallowed-muti</summary>
+<summary>example-disallowed-muti-pod</summary>
 
 ```yaml
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
-  name: disallowed-deployment
+  name: disallowed-muti-pod
   labels:
-    app: nginx
+    app: disallowed-muti-pod
 spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:1.14.2
-        ports:
-        - containerPort: 80
-        volumeMounts:
-        - mountPath: /demo
-          name: demo-volume
-        - mountPath: /demo-1
-          name: demo-volume-1
-      volumes:
-      - name: demo-volume
-        emptyDir: 
-          sizeLimit: 16Mi
-          medium: Memory
-      - name: demo-volume-1
-        emptyDir: 
-          sizeLimit: 2Gi
-
+  containers:
+  - name: disallowed-muti-pod
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - mountPath: /demo
+      name: demo-volume
+    - mountPath: /demo-1
+      name: demo-volume-1
+  volumes:
+  - name: demo-volume
+    emptyDir: 
+      sizeLimit: 16Mi
+      medium: Memory
+  - name: demo-volume-1
+    emptyDir: 
+      sizeLimit: 2Gi
 ```
 
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/volumeresources/samples/container-emptydir-limit/example_disallowed_muti.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/volumeresources/samples/container-emptydir-limit/example_disallowed_muti_pod.yaml
 ```
 
 </details>

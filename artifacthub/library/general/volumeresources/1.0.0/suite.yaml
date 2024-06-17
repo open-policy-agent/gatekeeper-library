@@ -7,15 +7,15 @@ tests:
   template: template.yaml
   constraint: samples/container-emptydir-limit/constraint.yaml
   cases:
-  - name: example-allowed
-    object: samples/container-emptydir-limit/example_allowed.yaml
+  - name: example-allowed-pod
+    object: samples/container-emptydir-limit/example_allowed_pod.yaml
     assertions:
     - violations: no
-  - name: example-disallowed
-    object: samples/container-emptydir-limit/example_disallowed.yaml
+  - name: example-disallowed-miss-pod
+    object: samples/container-emptydir-limit/example_disallowed_miss_pod.yaml
     assertions:
     - violations: yes
-  - name: example-disallowed-muti
-    object: samples/container-emptydir-limit/example_disallowed_muti.yaml
+  - name: example-disallowed-muti-pod
+    object: samples/container-emptydir-limit/example_disallowed_muti_pod.yaml
     assertions:
     - violations: yes
