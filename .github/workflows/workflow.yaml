@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     name: "Test scripts"
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - name: Unit test
         run: |
           make unit-test
@@ -26,11 +26,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@f086349bfa2bd1361f7909c78558e816508cdc10 # v2.8.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - name: Generate templates and docs
         run: |
           make generate generate-website-docs generate-artifacthub-artifacts
@@ -49,11 +49,11 @@ jobs:
     name: Unit test on ${{ matrix.os }} opa ${{ matrix.opa }}
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@f086349bfa2bd1361f7909c78558e816508cdc10 # v2.8.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - run: |
           binary=$([[ "$OSTYPE" == "darwin"* ]] && echo "opa_darwin_amd64" || echo "opa_linux_amd64")
           sudo curl -L -o /usr/local/bin/opa https://github.com/open-policy-agent/opa/releases/download/${{ matrix.opa }}/$binary
@@ -71,13 +71,13 @@ jobs:
     steps:
       - name: Harden Runner
         if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }} # remove this condition once 3.17 is out
-        uses: step-security/harden-runner@f086349bfa2bd1361f7909c78558e816508cdc10 # v2.8.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
         with:
           egress-policy: audit
 
       - name: Check out code into the Go module directory
         if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }}
-        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
       - name: Bootstrap integration test
         if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }}
@@ -110,11 +110,11 @@ jobs:
     name: "Require a suite.yaml file alongside every template.yaml"
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@f086349bfa2bd1361f7909c78558e816508cdc10 # v2.8.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - name: Run script
         run: |
           make require-suites
@@ -123,11 +123,11 @@ jobs:
     name: "Require a sync.yaml file and metadata.gatekeeper.sh/requires-sync-data annotation for every template.yaml using data.inventory"
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@f086349bfa2bd1361f7909c78558e816508cdc10 # v2.8.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - name: Run script
         run: |
           make require-sync
@@ -141,11 +141,11 @@ jobs:
     steps:
       - name: Harden Runner
         if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }} # remove this condition once 3.17 is out
-        uses: step-security/harden-runner@f086349bfa2bd1361f7909c78558e816508cdc10 # v2.8.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }}
 
       - run: |
