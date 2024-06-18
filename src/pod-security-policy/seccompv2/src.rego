@@ -107,6 +107,7 @@ get_allowed_profiles[allowed] {
 
 # Container profile as defined in pod annotation
 get_profile(container) = {"profile": profile, "file": "", "location": location} {
+    input.parameters.allowAnnotations
     not has_securitycontext_container(container)
     not has_annotation(get_container_annotation_key(container.name))
     not has_securitycontext_pod
@@ -116,6 +117,7 @@ get_profile(container) = {"profile": profile, "file": "", "location": location} 
 
 # Container profile as defined in container annotation
 get_profile(container) = {"profile": profile, "file": "", "location": location} {
+    input.parameters.allowAnnotations
     not has_securitycontext_container(container)
     not has_securitycontext_pod
     container_annotation := get_container_annotation_key(container.name)
@@ -144,8 +146,17 @@ get_profile(container) = {"profile": profile, "file": file, "location": location
 get_profile(container) = {"profile": "not configured", "file": "", "location": "no explicit profile found"} {
     not has_securitycontext_container(container)
     not has_securitycontext_pod
-    not has_annotation(get_container_annotation_key(container.name))
+    allow_annotations(container.name)
+}
+
+allow_annotations(name) {
+    input.parameters.allowAnnotations
+    not has_annotation(get_container_annotation_key(name))
     not has_annotation(pod_annotation_key)
+}
+
+allow_annotations(name) {
+    not input.parameters.allowAnnotations
 }
 
 has_annotation(annotation) {

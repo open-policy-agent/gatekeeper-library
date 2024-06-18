@@ -1,20 +1,32 @@
+---
+id: seccompv2
+title: Seccomp V2
+---
+
+# Seccomp V2
+
+## Description
+Controls the seccomp profile used by containers. Corresponds to the `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccompv2
+
+## Template
+```yaml
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
-  name: k8spspseccomp
+  name: k8spspseccompv2
   annotations:
-    metadata.gatekeeper.sh/title: "Seccomp"
-    metadata.gatekeeper.sh/version: 1.1.0
+    metadata.gatekeeper.sh/title: "Seccomp V2"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Controls the seccomp profile used by containers. Corresponds to the
       `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on
       a PodSecurityPolicy. For more information, see
-      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccomp
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccompv2
 spec:
   crd:
     spec:
       names:
-        kind: K8sPSPSeccomp
+        kind: K8sPSPSeccompV2
       validation:
         # Schema for the `parameters` field
         openAPIV3Schema:
@@ -23,8 +35,13 @@ spec:
             Controls the seccomp profile used by containers. Corresponds to the
             `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on
             a PodSecurityPolicy. For more information, see
-            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccomp
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccompv2
           properties:
+            allowAnnotations:
+              description: >-
+                Allow reading security contexts from annotations. If set to true, the policy will read security contexts from annotations when missing in spec.
+              type: boolean
+              default: true
             exemptImages:
               description: >-
                 Any container that uses an image that matches an entry in this list will be excluded
@@ -131,6 +148,7 @@ spec:
           - name: podAnnotationsProfiles
             expression: |
               variables.unverifiedContainers.filter(container, 
+                variables.params.allowAnnotations &&
                 !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
                 !(has(variables.anyObject.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations)) && 
                 !variables.hasPodSecurityContext && 
@@ -144,6 +162,7 @@ spec:
           - name: containerAnnotationsProfiles
             expression: |
               variables.unverifiedContainers.filter(container, 
+                variables.params.allowAnnotations &&
                 !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
                 !variables.hasPodSecurityContext && 
                 has(variables.anyObject.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations)
@@ -189,9 +208,10 @@ spec:
             expression: |
               variables.unverifiedContainers.filter(container, 
                 !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
-                !(has(variables.anyObject.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations)) && 
                 !variables.hasPodSecurityContext && 
-                !variables.hasPodAnnotations 
+                ((!variables.params.allowAnnotations) ||
+                !(has(variables.anyObject.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations)) && 
+                !variables.hasPodAnnotations)
               ).map(container, {
                 "container" : container.name,
                 "profile" : dyn("not configured"),
@@ -368,6 +388,7 @@ spec:
 
             # Container profile as defined in pod annotation
             get_profile(container) = {"profile": profile, "file": "", "location": location} {
+                input.parameters.allowAnnotations
                 not has_securitycontext_container(container)
                 not has_annotation(get_container_annotation_key(container.name))
                 not has_securitycontext_pod
@@ -377,6 +398,7 @@ spec:
 
             # Container profile as defined in container annotation
             get_profile(container) = {"profile": profile, "file": "", "location": location} {
+                input.parameters.allowAnnotations
                 not has_securitycontext_container(container)
                 not has_securitycontext_pod
                 container_annotation := get_container_annotation_key(container.name)
@@ -405,8 +427,17 @@ spec:
             get_profile(container) = {"profile": "not configured", "file": "", "location": "no explicit profile found"} {
                 not has_securitycontext_container(container)
                 not has_securitycontext_pod
-                not has_annotation(get_container_annotation_key(container.name))
+                allow_annotations(container.name)
+            }
+
+            allow_annotations(name) {
+                input.parameters.allowAnnotations
+                not has_annotation(get_container_annotation_key(name))
                 not has_annotation(pod_annotation_key)
+            }
+
+            allow_annotations(name) {
+                not input.parameters.allowAnnotations
             }
 
             has_annotation(annotation) {
@@ -472,3 +503,153 @@ spec:
                   prefix := trim_suffix(exemption, "*")
                   startswith(img, prefix)
               }
+
+```
+
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/template.yaml
+```
+## Examples
+<details>
+<summary>default-seccomp-required</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPSeccompV2
+metadata:
+  name: psp-seccomp
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    allowAnnotations: false
+    allowedProfiles:
+    - runtime/default
+    - docker/default
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-disallowed-global</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-disallowed2
+  labels:
+    app: nginx-seccomp
+spec:
+  securityContext:
+    seccompProfile:
+      type: Unconfined
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/example_disallowed2.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-container</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-disallowed
+  labels:
+    app: nginx-seccomp
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      seccompProfile:
+        type: Unconfined
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/example_disallowed.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-container</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-allowed
+  labels:
+    app: nginx-seccomp
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>disallowed-ephemeral</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-disallowed
+  annotations:
+    seccomp.security.alpha.kubernetes.io/pod: runtime/default
+  labels:
+    app: nginx-seccomp
+spec:
+  ephemeralContainers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/disallowed_ephemeral.yaml
+```
+
+</details>
+
+
+</details>

@@ -59,6 +59,7 @@ variables:
 - name: podAnnotationsProfiles
   expression: |
     variables.unverifiedContainers.filter(container, 
+      variables.params.allowAnnotations &&
       !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
       !(has(variables.anyObject.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations)) && 
       !variables.hasPodSecurityContext && 
@@ -72,6 +73,7 @@ variables:
 - name: containerAnnotationsProfiles
   expression: |
     variables.unverifiedContainers.filter(container, 
+      variables.params.allowAnnotations &&
       !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
       !variables.hasPodSecurityContext && 
       has(variables.anyObject.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations)
@@ -117,9 +119,10 @@ variables:
   expression: |
     variables.unverifiedContainers.filter(container, 
       !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
-      !(has(variables.anyObject.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations)) && 
       !variables.hasPodSecurityContext && 
-      !variables.hasPodAnnotations 
+      ((!variables.params.allowAnnotations) ||
+      !(has(variables.anyObject.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations)) && 
+      !variables.hasPodAnnotations)
     ).map(container, {
       "container" : container.name,
       "profile" : dyn("not configured"),
