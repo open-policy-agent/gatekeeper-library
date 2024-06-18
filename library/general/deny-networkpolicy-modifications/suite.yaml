@@ -1,0 +1,25 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: denynetworkpolicymodifications
+tests:
+- name: allow-user-policies 
+  template: template.yaml
+  constraint: samples/networkpolicyenforced/constraint.yaml
+  cases:
+  - name: example-allow-custom-policy
+    object: samples/networkpolicyenforced/example_allow_custom_policy.yaml
+    assertions:
+    - violations: no
+  - name: example-deny-global-policy
+    object: samples/networkpolicyenforced/example_deny_global_policy.yaml
+    assertions:
+    - violations: yes
+  - name: example-allow-by-username-policy
+    object: samples/networkpolicyenforced/example_allow_by_user_policy.yaml
+    assertions:
+    - violations: no
+  - name: example-allow-by-group-policy
+    object: samples/networkpolicyenforced/example_allow_by_group_policy.yaml
+    assertions:
+    - violations: no

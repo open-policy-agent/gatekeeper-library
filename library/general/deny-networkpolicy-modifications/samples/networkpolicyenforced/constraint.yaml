@@ -1,0 +1,16 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: DenyNetworkPolicyModifications
+metadata:
+  name: denynetworkpolicymodifications
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups:
+          - "*"
+        kinds:
+          - NetworkPolicy
+  parameters:
+    global-policy:
+      allowedGroups: ['network-admins']
+      allowedUsers: ['network-admin']

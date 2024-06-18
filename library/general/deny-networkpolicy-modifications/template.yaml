@@ -1,0 +1,57 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: denynetworkpolicymodifications
+  annotations:
+    metadata.gatekeeper.sh/title: "Deny Global/Admin Network Policies from modification"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: "Deny updating the NetworkPolicies that are used on Global or Administrative level even if the users fulfill kubernetes RBAC access to them. This policy is ignored in audit mode."
+spec:
+  crd:
+    spec:
+      names:
+        kind: DenyNetworkPolicyModifications
+      validation:
+        legacySchema: true
+        #  type: object
+        #  properties:
+        #    policyname:
+        #      type: object
+        #      properties:
+        #        allowedGroups:
+        #          description: Groups that should be allowed to bypass the policy.
+        #          type: array
+        #          items:
+        #            type: string
+        #        allowedUsers:
+        #          description: Users that should be allowed to bypass the policy.
+        #          type: array
+        #          items:
+        #            type: string
+  targets:
+    - rego: |
+        package DenyNetworkPolicyModifications
+        privileged(userInfo, allowedUsers, _) {
+          # Allow if the user is in allowedUsers.
+          username := object.get(userInfo, "username", "")
+          allowedUsers[_] == username
+        } 
+        privileged(userInfo, _, allowedGroups) {
+          # Allow if the user's groups intersect allowedGroups.
+          userGroups := object.get(userInfo, "groups", [])
+          groups := {g | g := userGroups[_]}
+          allowed := {g | g := allowedGroups[_]}
+          intersection := groups & allowed
+          count(intersection) > 0
+        }
+        violation[{"msg": msg}] {
+          params := object.get(input, "parameters", {})
+          policyName := input.review.object.metadata.name
+          input.review.kind.kind == "NetworkPolicy"
+          allowedUsers := object.get(params[policyName], "allowedUsers", [])
+          allowedGroups := object.get(params[policyName], "allowedGroups", [])
+          not privileged(input.review.userInfo, allowedUsers, allowedGroups)
+          msg := sprintf("User %v is not allowed to create/modify NetworkPolicy %v", 
+                         [input.review.userInfo.username, policyName])
+        }
+      target: admission.k8s.gatekeeper.sh
