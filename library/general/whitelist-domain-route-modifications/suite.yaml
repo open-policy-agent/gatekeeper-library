@@ -1,0 +1,21 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: denyrouteperdomainpolicy
+tests:
+- name: allow-user-domains
+  template: template.yaml
+  constraint: samples/domaintoroutepolicyenforced/constraint.yaml
+  cases:
+  - name: example-deny-notwhitelisted-domain
+    object: samples/domaintoroutepolicyenforced/example_deny_notwhitelisted-domain.yaml
+    assertions:
+    - violations: yes
+  - name: example-allow-by-username-notwhitelisted-domain
+    object: samples/domaintoroutepolicyenforced/example_allow_by_user_domain.yaml
+    assertions:
+    - violations: no
+  - name: example-allow-by-group-notwhitelisted-domain
+    object: samples/domaintoroutepolicyenforced/example_allow_by_group_domain.yaml
+    assertions:
+    - violations: no

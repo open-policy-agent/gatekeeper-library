@@ -1,0 +1,38 @@
+apiVersion: admission.k8s.io/v1
+kind: AdmissionReview
+request:
+  dryRun: true
+  kind:
+    group: route.openshift.io
+    kind: Route
+    version: v1
+  namespace: default
+  object:
+    apiVersion: v1
+    kind: Route
+    metadata:
+      name: test
+      namespace: default
+    spec:
+      host: host.somedomain.com
+      port:
+        targetPort: http-8080
+      to:
+        kind: Service
+        name: mockbin
+        weight: 100
+      wildcardPolicy: None
+  operation: CREATE
+  resource:
+    group: route.openshift.io
+    resource: Route
+    version: v1
+  requestKind:
+    group: ""
+    version: v1
+  uid: unittest
+  userInfo:
+    groups:
+    - developers
+    username: network-admin
+    uid: unittest

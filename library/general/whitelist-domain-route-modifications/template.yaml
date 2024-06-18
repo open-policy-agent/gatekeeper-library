@@ -1,0 +1,69 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: denyrouteperdomainpolicy
+  annotations:
+    metadata.gatekeeper.sh/title: "Deny not whitelisted domains for Route creation or modification"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: "Deny not whitelisted domains for Routes even if the users fulfill kubernetes RBAC access to them. This policy is ignored in audit mode."
+spec:
+  crd:
+    spec:
+      names:
+        kind: DenyRoutePerDomainPolicy
+      validation:
+        legacySchema: true
+        #  type: object
+        #  properties:
+        #    domainname:
+        #      type: object
+        #      properties:
+        #        allowedGroups:
+        #          description: Groups that should be allowed to bypass the policy.
+        #          type: array
+        #          items:
+        #            type: string
+        #        allowedUsers:
+        #          description: Users that should be allowed to bypass the policy.
+        #          type: array
+        #          items:
+        #            type: string
+  targets:
+    - rego: |
+        package DenyRoutePerDomainPolicy
+        privileged(userInfo, allowedUsers, _) {
+          # Allow if the user is in allowedUsers.
+          username := object.get(userInfo, "username", "")
+          allowedUsers[_] == username
+        } 
+        privileged(userInfo, _, allowedGroups) {
+          # Allow if the user's groups intersect allowedGroups.
+          userGroups := object.get(userInfo, "groups", [])
+          groups := {g | g := userGroups[_]}
+          allowed := {g | g := allowedGroups[_]}
+          intersection := groups & allowed
+          count(intersection) > 0
+        }
+        violation[{"msg": msg}] {
+          params := object.get(input, "parameters", {})
+          routeName := input.review.object.spec.host
+          idx := indexof(routeName, ".")
+          domain := substring(routeName, idx + 1, count(routeName))
+          input.review.kind.kind == "Route"
+          not params[domain]
+          msg := sprintf("User %v is not allowed to create/modify Route %v in domain %v",
+                         [input.review.userInfo.username, routeName, domain])
+        }
+        violation[{"msg": msg}] {
+          params := object.get(input, "parameters", {})
+          routeName := input.review.object.spec.host
+          idx := indexof(routeName, ".")
+          domain := substring(routeName, idx + 1, count(routeName))
+          allowedUsers := object.get(params[domain], "allowedUsers", [])
+          allowedGroups := object.get(params[domain], "allowedGroups", [])
+          input.review.kind.kind == "Route"
+          not privileged(input.review.userInfo, allowedUsers, allowedGroups)
+          msg := sprintf("User %v is not allowed to create/modify Route %v in domain %v %v %v",
+                         [input.review.userInfo.username, routeName, domain, allowedUsers, allowedGroups])
+        }
+      target: admission.k8s.gatekeeper.sh
