@@ -84,6 +84,7 @@ get_allowed_profiles[allowed] {
 
 # Container profile as defined in pod annotation
 get_profile(container) = {"profile": profile, "file": "", "location": location} {
+    input.parameters.allowAnnotations
     not has_securitycontext_container(container)
     not has_annotation(get_container_annotation_key(container.name))
     not has_securitycontext_pod
@@ -95,6 +96,7 @@ get_profile(container) = {"profile": profile, "file": "", "location": location} 
 get_profile(container) = {"profile": profile, "file": "", "location": location} {
     not has_securitycontext_container(container)
     not has_securitycontext_pod
+    input.parameters.allowAnnotations
     container_annotation := get_container_annotation_key(container.name)
     has_annotation(container_annotation)
     profile := input.review.object.metadata.annotations[container_annotation]
