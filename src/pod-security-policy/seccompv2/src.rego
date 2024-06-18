@@ -23,7 +23,7 @@ violation[{"msg": msg}] {
 }
 
 get_message(profile, _, name, location, allowed_profiles) = message {
-    not profile == "Localhost"
+    profile != "Localhost"
     message := sprintf("Seccomp profile '%v' is not allowed for container '%v'. Found at: %v. Allowed profiles: %v", [profile, name, location, allowed_profiles])
 }
 
@@ -46,23 +46,7 @@ input_wildcard_allowed_files {
 
 # Simple allowed Profiles
 allowed_profile(profile, _, allowed) {
-    not startswith(lower(profile), "localhost")
-    profile == allowed[_]
-}
-
-# seccomp Localhost without wildcard
-allowed_profile(profile, file, allowed) {
-    profile == "Localhost"
-    not input_wildcard_allowed_files
-    profile == allowed[_]
-    allowed_files := {x | x := object.get(input.parameters, "allowedLocalhostFiles", [])[_]} | get_annotation_localhost_files
-    file == allowed_files[_]
-}
-
-# seccomp Localhost with wildcard
-allowed_profile(profile, _, allowed) {
-    profile == "Localhost"
-    input_wildcard_allowed_files
+    not startswith(profile, "localhost/")
     profile == allowed[_]
 }
 
@@ -78,13 +62,6 @@ allowed_profile(profile, _, allowed) {
     profile == allowed[_]
 }
 
-# Localhost files from annotation scheme
-get_annotation_localhost_files[file] {
-    profile := input.parameters.allowedProfiles[_]
-    startswith(profile, "localhost/")
-    file := replace(profile, "localhost/", "")
-}
-
 # The profiles explicitly in the list
 get_allowed_profiles[allowed] {
     allowed := input.parameters.allowedProfiles[_]
@@ -93,7 +70,7 @@ get_allowed_profiles[allowed] {
 # The simply translated profiles
 get_allowed_profiles[allowed] {
     profile := input.parameters.allowedProfiles[_]
-    not startswith(lower(profile), "localhost")
+    profile != "Localhost"
     allowed := naming_translation[profile][_]
 }
 
@@ -107,7 +84,6 @@ get_allowed_profiles[allowed] {
 
 # Container profile as defined in pod annotation
 get_profile(container) = {"profile": profile, "file": "", "location": location} {
-    input.parameters.allowAnnotations
     not has_securitycontext_container(container)
     not has_annotation(get_container_annotation_key(container.name))
     not has_securitycontext_pod
@@ -117,7 +93,6 @@ get_profile(container) = {"profile": profile, "file": "", "location": location} 
 
 # Container profile as defined in container annotation
 get_profile(container) = {"profile": profile, "file": "", "location": location} {
-    input.parameters.allowAnnotations
     not has_securitycontext_container(container)
     not has_securitycontext_pod
     container_annotation := get_container_annotation_key(container.name)
@@ -129,7 +104,7 @@ get_profile(container) = {"profile": profile, "file": "", "location": location} 
 # Container profile as defined in pods securityContext
 get_profile(container) = {"profile": profile, "file": file, "location": location} {
     not has_securitycontext_container(container)
-    profile := canonicalize_seccomp_profile(input.review.object.spec.securityContext.seccompProfile.type)
+    profile := canonicalize_seccomp_profile(input.review.object.spec.securityContext.seccompProfile)
     file := object.get(input.review.object.spec.securityContext.seccompProfile, "localhostProfile", "")
     location := "pod securityContext"
 }
@@ -137,7 +112,7 @@ get_profile(container) = {"profile": profile, "file": file, "location": location
 # Container profile as defined in containers securityContext
 get_profile(container) = {"profile": profile, "file": file, "location": location} {
     has_securitycontext_container(container)
-    profile := canonicalize_seccomp_profile(container.securityContext.seccompProfile.type)
+    profile := canonicalize_seccomp_profile(container.securityContext.seccompProfile)
     file := object.get(container.securityContext.seccompProfile, "localhostProfile", "")
     location := "container securityContext"
 }
@@ -188,16 +163,16 @@ input_containers[container.name] = container {
 }
 
 canonicalize_seccomp_profile(profile) = out {
-    profile == "RuntimeDefault"
+    profile.type == "RuntimeDefault"
     out := "runtime/default"
 }
 
 canonicalize_seccomp_profile(profile) = out {
-    profile == "Unconfined"
+    profile.type == "Unconfined"
     out := "unconfined"
 }
 
 canonicalize_seccomp_profile(profile) = out {
-    profile = "Localhost"
-    out := "localhost"
+    profile.type = "Localhost"
+    out := sprintf("localhost/%s", [profile.localhostProfile])
 }
