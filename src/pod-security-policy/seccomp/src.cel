@@ -1,10 +1,4 @@
 variables:
-- name: namingTranslation
-  expression: |
-    {
-      "Unconfined": "unconfined",
-      "Localhost": "localhost",
-    }
 - name: containers
   expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
 - name: initContainers
@@ -41,7 +35,7 @@ variables:
 - name: allowedProfilesTranslation
   expression: |
     (variables.inputAllowedProfiles.filter(profile,
-    profile != "Localhost").map(profile, (profile in variables.namingTranslation) ? variables.namingTranslation[profile] : profile)) + 
+    profile != "Localhost").map(profile, profile == "Unconfined" ? "unconfined" : profile)) + 
     (variables.inputAllowedProfiles.exists(profile, profile == "RuntimeDefault") ? ["runtime/default", "docker/default"] : [])
 - name: allowSecurityContextLocalhost
   expression: |
@@ -92,7 +86,8 @@ variables:
 - name: canonicalPodSecurityContextProfile
   expression: |
     has(variables.hasPodSeccomp) && has(variables.anyObject.spec.securityContext.seccompProfile.type) ? 
-      (variables.anyObject.spec.securityContext.seccompProfile.type == "RuntimeDefault" ? "runtime/default" : 
+      (variables.anyObject.spec.securityContext.seccompProfile.type == "RuntimeDefault" ? (
+        variables.allowedProfiles.exists(profile, profile == "runtime/default") ? "runtime/default" : variables.allowedProfiles.exists(profile, profile == "docker/default") ? "docker/default" : "runtime/default") : 
       variables.anyObject.spec.securityContext.seccompProfile.type == "Unconfined" ? "unconfined" : variables.anyObject.spec.securityContext.seccompProfile.type == "Localhost" ? "localhost/" + variables.anyObject.spec.securityContext.seccompProfile.localhostProfile : "")
       : ""
 - name: podSecurityContextProfiles
@@ -112,7 +107,8 @@ variables:
       has(container.securityContext) && has(container.securityContext.seccompProfile)
     ).map(container, {
       "container" : container.name,
-      "profile" : dyn(has(container.securityContext.seccompProfile.type) ? (container.securityContext.seccompProfile.type == "RuntimeDefault" ? "runtime/default" : 
+      "profile" : dyn(has(container.securityContext.seccompProfile.type) ? (container.securityContext.seccompProfile.type == "RuntimeDefault" ? (
+        variables.allowedProfiles.exists(profile, profile == "runtime/default") ? "runtime/default" : variables.allowedProfiles.exists(profile, profile == "docker/default") ? "docker/default" : "runtime/default") : 
       container.securityContext.seccompProfile.type == "Unconfined" ? "unconfined" : container.securityContext.seccompProfile.type == "Loclhost" ? "localhost/" + container.securityContext.seccompProfile.localhostProfile : "")
       : ""),
       "file" : has(container.securityContext.seccompProfile.localhostProfile) ? container.securityContext.seccompProfile.localhostProfile : dyn(""),
