@@ -11,3 +11,5 @@ spec:
     hostNetwork: true
     min: 80
     max: 9000
+    exemptImages:
+    - "nginx"
