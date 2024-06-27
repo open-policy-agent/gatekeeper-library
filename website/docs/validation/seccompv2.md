@@ -270,13 +270,13 @@ spec:
                 profile := input.parameters.allowedProfiles[_]
                 not contains(profile, "/")
                 file := object.get(input.parameters, "allowedLocalhostFiles", [])[_]
-                allowed := canonicalize_seccomp_profile({"type": profile, "localhostProfile": file}, "")
+                allowed := canonicalize_seccomp_profile({"type": profile, "localhostProfile": file}, "")[_]
             }
 
             # Container profile as defined in pods securityContext
             get_profile(container) = {"profile": profile, "file": file, "location": location} {
                 not has_securitycontext_container(container)
-                profile := canonicalize_seccomp_profile(input.review.object.spec.securityContext.seccompProfile, "runtime/default")
+                profile := canonicalize_seccomp_profile(input.review.object.spec.securityContext.seccompProfile, canonicalize_runtime_default_profile)[_]
                 file := object.get(input.review.object.spec.securityContext.seccompProfile, "localhostProfile", "")
                 location := "pod securityContext"
             }
@@ -284,7 +284,7 @@ spec:
             # Container profile as defined in containers securityContext
             get_profile(container) = {"profile": profile, "file": file, "location": location} {
                 has_securitycontext_container(container)
-                profile := canonicalize_seccomp_profile(container.securityContext.seccompProfile, "runtime/default")
+                profile := canonicalize_seccomp_profile(container.securityContext.seccompProfile, canonicalize_runtime_default_profile)[_]
                 file := object.get(container.securityContext.seccompProfile, "localhostProfile", "")
                 location := "container securityContext"
             }
@@ -317,12 +317,12 @@ spec:
 
             canonicalize_runtime_default_profile() = out {
                 "runtime/default" == input.parameters.allowedProfiles[_]
-                out := "runtime/default"
+                out := ["runtime/default"]
             } else = out {
                 "docker/default" == input.parameters.allowedProfiles[_]
-                out := "docker/default"
+                out := ["docker/default"]
             } else = out {
-                out := "runtime/default"
+                out := ["runtime/default"]
             }
 
             canonicalize_seccomp_profile(profile, def) = out {
@@ -335,10 +335,10 @@ spec:
                 out := canonicalize_runtime_default_profile
             } else = out {
                 profile.type == "Localhost"
-                out := sprintf("localhost/%s", [profile.localhostProfile])
+                out := [sprintf("localhost/%s", [profile.localhostProfile])]
             } else = out {
                 profile.type == "Unconfined"
-                out := "unconfined"
+                out := ["unconfined"]
             } 
           libs:
             - |
