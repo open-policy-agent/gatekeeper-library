@@ -197,9 +197,6 @@ spec:
     hostNetwork: true
     min: 80
     max: 9000
-    exemptImages:
-    - "nginx"
-
 ```
 
 Usage
@@ -314,6 +311,8 @@ spec:
         kinds: ["Pod"]
   parameters:
     hostNetwork: false
+    exemptImages:
+    - "nginx"
 ```
 
 Usage

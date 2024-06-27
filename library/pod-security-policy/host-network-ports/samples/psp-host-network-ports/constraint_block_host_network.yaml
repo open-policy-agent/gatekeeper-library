@@ -9,3 +9,5 @@ spec:
         kinds: ["Pod"]
   parameters:
     hostNetwork: false
+    exemptImages:
+    - "nginx"
