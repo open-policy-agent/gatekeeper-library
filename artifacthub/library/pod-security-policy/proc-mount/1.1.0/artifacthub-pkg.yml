@@ -1,0 +1,22 @@
+version: 1.1.0
+name: k8spspprocmount
+displayName: Proc Mount
+createdAt: "2024-06-04T00:44:32Z"
+description: Controls the allowed `procMount` types for the container. Corresponds to the `allowedProcMountTypes` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#allowedprocmounttypes
+digest: e42186f9f55856caa0970db8069acb9df8d844bf4f969297389581f214931978
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/proc-mount
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Proc Mount
+    Controls the allowed `procMount` types for the container. Corresponds to the `allowedProcMountTypes` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#allowedprocmounttypes
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/pod-security-policy/proc-mount/1.1.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

@@ -17,7 +17,7 @@ metadata:
   name: k8spoddisruptionbudget
   annotations:
     metadata.gatekeeper.sh/title: "Pod Disruption Budget"
-    metadata.gatekeeper.sh/version: 1.0.3
+    metadata.gatekeeper.sh/version: 1.0.4
     metadata.gatekeeper.sh/requires-sync-data: |
       "[
         [
@@ -124,7 +124,7 @@ spec:
   match:
     kinds:
       - apiGroups: ["apps"]
-        kinds: ["Deployment", "ReplicaSet", "StatefulSet"]
+        kinds: ["Deployment", "StatefulSet"]
       - apiGroups: ["policy"]
         kinds: ["PodDisruptionBudget"]
       - apiGroups: [""]
