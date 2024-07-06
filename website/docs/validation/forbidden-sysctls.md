@@ -16,7 +16,7 @@ metadata:
   name: k8spspforbiddensysctls
   annotations:
     metadata.gatekeeper.sh/title: "Forbidden Sysctls"
-    metadata.gatekeeper.sh/version: 1.1.3
+    metadata.gatekeeper.sh/version: 1.2.0
     description: >-
       Controls the `sysctl` profile used by containers. Corresponds to the
       `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy.
@@ -51,65 +51,100 @@ spec:
                 type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8spspforbiddensysctls
+      code:
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: sysctls
+            expression: '!has(variables.anyObject.spec.securityContext) ? [] : !has(variables.anyObject.spec.securityContext.sysctls) ? [] : variables.anyObject.spec.securityContext.sysctls'
+          - name: allowedSysctlPrefixes
+            expression: |
+              !has(variables.params.allowedSysctls) ? [] : variables.params.allowedSysctls.filter(sysctl, sysctl.endsWith("*")).map(sysctl, string(sysctl).replace("*", ""))
+          - name: allowedSysctlExplicit
+            expression: |
+              !has(variables.params.allowedSysctls) ? [] : 
+                variables.params.allowedSysctls.filter(sysctl, !sysctl.endsWith("*"))
+          - name: forbiddenSysctlPrefixes
+            expression: |
+              !has(variables.params.forbiddenSysctls) ? [] : variables.params.forbiddenSysctls.filter(sysctl, sysctl.endsWith("*")).map(sysctl, string(sysctl).replace("*", ""))
+          - name: forbiddenSysctlExplicit
+            expression: |
+              !has(variables.params.forbiddenSysctls) ? [] : 
+                variables.params.forbiddenSysctls.filter(sysctl, !sysctl.endsWith("*"))
+          - name: allAllowed
+            expression: '!has(variables.params.allowedSysctls) ? true : false'
+          - name: violatingSysctls
+            expression: |
+              (variables.sysctls.filter(sysctl,
+                (sysctl.name in variables.forbiddenSysctlExplicit ||
+                variables.forbiddenSysctlPrefixes.exists(fsp, string(sysctl.name).startsWith(fsp))) ||
+                (!variables.allAllowed &&
+                !(sysctl.name in variables.allowedSysctlExplicit) &&
+                !variables.allowedSysctlPrefixes.exists(asp, string(sysctl.name).startsWith(asp)))))
+          validations:
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.violatingSysctls) == 0'
+            messageExpression: '"The sysctl is not allowed for pod: " + variables.anyObject.metadata.name + ", forbidden: " + variables.forbiddenSysctls.map(c, c).join(", ") + ", allowed: " + variables.allowedSysctls.map(c, c).join(", ")'
+      - engine: Rego
+        source:
+          rego: |
+            package k8spspforbiddensysctls
 
-        import data.lib.exclude_update.is_update
+            import data.lib.exclude_update.is_update
 
-        # Block if forbidden
-        violation[{"msg": msg, "details": {}}] {
-            # spec.securityContext.sysctls field is immutable.
-            not is_update(input.review)
+            # Block if forbidden
+            violation[{"msg": msg, "details": {}}] {
+                # spec.securityContext.sysctls field is immutable.
+                not is_update(input.review)
 
-            sysctl := input.review.object.spec.securityContext.sysctls[_].name
-            forbidden_sysctl(sysctl)
-            msg := sprintf("The sysctl %v is not allowed, pod: %v. Forbidden sysctls: %v", [sysctl, input.review.object.metadata.name, input.parameters.forbiddenSysctls])
-        }
+                sysctl := input.review.object.spec.securityContext.sysctls[_].name
+                forbidden_sysctl(sysctl)
+                msg := sprintf("The sysctl %v is not allowed, pod: %v. Forbidden sysctls: %v", [sysctl, input.review.object.metadata.name, input.parameters.forbiddenSysctls])
+            }
 
-        # Block if not explicitly allowed
-        violation[{"msg": msg, "details": {}}] {
-            not is_update(input.review)
-            sysctl := input.review.object.spec.securityContext.sysctls[_].name
-            not allowed_sysctl(sysctl)
-            msg := sprintf("The sysctl %v is not explicitly allowed, pod: %v. Allowed sysctls: %v", [sysctl, input.review.object.metadata.name, input.parameters.allowedSysctls])
-        }
+            # Block if not explicitly allowed
+            violation[{"msg": msg, "details": {}}] {
+                not is_update(input.review)
+                sysctl := input.review.object.spec.securityContext.sysctls[_].name
+                not allowed_sysctl(sysctl)
+                msg := sprintf("The sysctl %v is not explicitly allowed, pod: %v. Allowed sysctls: %v", [sysctl, input.review.object.metadata.name, input.parameters.allowedSysctls])
+            }
 
-        # * may be used to forbid all sysctls
-        forbidden_sysctl(_) {
-            input.parameters.forbiddenSysctls[_] == "*"
-        }
+            # * may be used to forbid all sysctls
+            forbidden_sysctl(_) {
+                input.parameters.forbiddenSysctls[_] == "*"
+            }
 
-        forbidden_sysctl(sysctl) {
-            input.parameters.forbiddenSysctls[_] == sysctl
-        }
+            forbidden_sysctl(sysctl) {
+                input.parameters.forbiddenSysctls[_] == sysctl
+            }
 
-        forbidden_sysctl(sysctl) {
-            forbidden := input.parameters.forbiddenSysctls[_]
-            endswith(forbidden, "*")
-            startswith(sysctl, trim_suffix(forbidden, "*"))
-        }
+            forbidden_sysctl(sysctl) {
+                forbidden := input.parameters.forbiddenSysctls[_]
+                endswith(forbidden, "*")
+                startswith(sysctl, trim_suffix(forbidden, "*"))
+            }
 
-        # * may be used to allow all sysctls
-        allowed_sysctl(_) {
-            input.parameters.allowedSysctls[_] == "*"
-        }
+            # * may be used to allow all sysctls
+            allowed_sysctl(_) {
+                input.parameters.allowedSysctls[_] == "*"
+            }
 
-        allowed_sysctl(sysctl) {
-            input.parameters.allowedSysctls[_] == sysctl
-        }
+            allowed_sysctl(sysctl) {
+                input.parameters.allowedSysctls[_] == sysctl
+            }
 
-        allowed_sysctl(sysctl) {
-            allowed := input.parameters.allowedSysctls[_]
-            endswith(allowed, "*")
-            startswith(sysctl, trim_suffix(allowed, "*"))
-        }
-      libs:
-        - |
-          package lib.exclude_update
+            allowed_sysctl(sysctl) {
+                allowed := input.parameters.allowedSysctls[_]
+                endswith(allowed, "*")
+                startswith(sysctl, trim_suffix(allowed, "*"))
+            }
+          libs:
+            - |
+              package lib.exclude_update
 
-          is_update(review) {
-              review.operation == "UPDATE"
-          }
+              is_update(review) {
+                  review.operation == "UPDATE"
+              }
 
 ```
 
@@ -147,6 +182,191 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-forbidden-sysctls-disallowed
+  labels:
+    app: nginx-forbidden-sysctls
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+  securityContext:
+    sysctls:
+      - name: kernel.msgmax
+        value: "65536"
+      - name: net.core.somaxconn
+        value: "1024"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/example_disallowed.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-forbidden-sysctls-disallowed
+  labels:
+    app: nginx-forbidden-sysctls
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+  securityContext:
+    sysctls:
+      - name: net.core.somaxconn
+        value: "1024"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/example_allowed.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>forbidden-sysctls2</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPForbiddenSysctls
+metadata:
+  name: psp-forbidden-sysctls
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    forbiddenSysctls:
+    - "*" # * forbid all sysctls
+    allowedSysctls:
+    - "*" # allows all sysctls. allowedSysctls is optional.
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/constraint2.yaml
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-forbidden-sysctls-disallowed
+  labels:
+    app: nginx-forbidden-sysctls
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+  securityContext:
+    sysctls:
+      - name: kernel.msgmax
+        value: "65536"
+      - name: net.core.somaxconn
+        value: "1024"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/example_disallowed.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-forbidden-sysctls-disallowed
+  labels:
+    app: nginx-forbidden-sysctls
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+  securityContext:
+    sysctls:
+      - name: net.core.somaxconn
+        value: "1024"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/example_allowed.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>forbidden-sysctls3</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPForbiddenSysctls
+metadata:
+  name: psp-forbidden-sysctls
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    forbiddenSysctls:
+    # - "*" # * may be used to forbid all sysctls
+    - kernel.*
+    allowedSysctls:
+    - "net.*" # allows all sysctls. allowedSysctls is optional.
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/constraint3.yaml
 ```
 
 </details>
