@@ -155,7 +155,7 @@ spec:
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
                 container.image in variables.exemptImageExplicit ||
                 variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption)))
-          - name: badContainers
+          - name: candidateContainers
             expression: |
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
                 !(container.image in variables.exemptImages))
@@ -166,21 +166,21 @@ spec:
               : null
           - name: missingRequiredRunAsUserContainers
             expression: |
-              variables.badContainers.filter(container, 
+              variables.candidateContainers.filter(container, 
                 has(variables.params.runAsUser) && has(variables.params.runAsUser.rule) && (variables.params.runAsUser.rule == "MustRunAs") &&
                 !((has(container.securityContext) && has(container.securityContext.runAsUser)) || 
                   (variables.podRunAsUser != null)))
           - name: missingRequiredRunAsNonRootContainers
             expression: |
-              variables.badContainers.filter(container, 
-                has(variables.params.runAsUser) && has(variables.params.runAsUser.rule) && (variables.params.runAsUser.rule == "MustRunAsNonRoot") && ((has(container.securityContext) && !(has(container.securityContext.runAsUser) || has(container.securityContext.runAsNonRoot))) ?
-                  (has(variables.anyObject.spec.securityContext) && !(has(variables.anyObject.spec.securityContext.runAsUser) || has(variables.anyObject.spec.securityContext.runAsNonRoot))) : false
+              variables.candidateContainers.filter(container, 
+                has(variables.params.runAsUser) && has(variables.params.runAsUser.rule) && (variables.params.runAsUser.rule == "MustRunAsNonRoot") && ((has(container.securityContext) && !(has(container.securityContext.runAsUser) && has(container.securityContext.runAsNonRoot))) ?
+                  (has(variables.anyObject.spec.securityContext) && !(has(variables.anyObject.spec.securityContext.runAsUser) && has(variables.anyObject.spec.securityContext.runAsNonRoot))) : false
                 ))
           - name: processedRunAsUserContainers
             expression: (variables.missingRequiredRunAsNonRootContainers + variables.missingRequiredRunAsUserContainers).map(container, container.name)
           - name: invalidRunAsUserContainers
             expression: |
-              variables.badContainers.filter(container, 
+              variables.candidateContainers.filter(container, 
                 !(container.name in variables.processedRunAsUserContainers) &&
                 has(variables.params.runAsUser) && has(variables.params.runAsUser.rule) ? 
                 (
@@ -194,8 +194,8 @@ spec:
                     (
                       variables.params.runAsUser.rule == "MustRunAs" ?
                       (
-                        has(container.securityContext) && has(container.securityContext.runAsUser) ? !variables.params.runAsUser.ranges.all(range, container.securityContext.runAsUser >= range.min && container.securityContext.runAsUser <= range.max) :
-                          variables.podRunAsUser == null || !variables.params.runAsUser.ranges.all(range, variables.podRunAsUser >= range.min && variables.podRunAsUser <= range.max)
+                        has(container.securityContext) && has(container.securityContext.runAsUser) ? !variables.params.runAsUser.ranges.exists(range, container.securityContext.runAsUser >= range.min && container.securityContext.runAsUser <= range.max) :
+                          variables.podRunAsUser == null || !variables.params.runAsUser.ranges.exists(range, variables.podRunAsUser >= range.min && variables.podRunAsUser <= range.max)
                       ) : false
                     )
                   )
@@ -208,14 +208,14 @@ spec:
               : null
           - name: missingRequiredRunAsGroupContainers
             expression: |
-              variables.badContainers.filter(container, 
+              variables.candidateContainers.filter(container, 
                 has(variables.params.runAsGroup) && has(variables.params.runAsGroup.rule) && (variables.params.runAsGroup.rule == "MustRunAs") &&
                 !((has(container.securityContext) && has(container.securityContext.runAsGroup)) || 
                   (variables.podRunAsGroup != null))
               )
           - name: invalidRunAsGroupContainers
             expression: |
-              variables.badContainers.filter(container, 
+              variables.candidateContainers.filter(container, 
                 !(variables.missingRequiredRunAsGroupContainers.exists(c, c.name == container.name)) &&
                 (
                   has(variables.params.runAsGroup) && has(variables.params.runAsGroup.rule) ? 
@@ -225,8 +225,8 @@ spec:
                       (variables.params.runAsGroup.rule == "MustRunAs" || variables.params.runAsGroup.rule == "MayRunAs") && 
                       (
                         has(container.securityContext) && has(container.securityContext.runAsGroup) ? 
-                          !variables.params.runAsGroup.ranges.all(range, container.securityContext.runAsGroup >= range.min && container.securityContext.runAsGroup <= range.max) : 
-                          variables.podRunAsGroup == null || !variables.params.runAsGroup.ranges.all(range, variables.podRunAsGroup >= range.min && variables.podRunAsGroup <= range.max)
+                          !variables.params.runAsGroup.ranges.exists(range, container.securityContext.runAsGroup >= range.min && container.securityContext.runAsGroup <= range.max) : 
+                          variables.podRunAsGroup == null || !variables.params.runAsGroup.ranges.exists(range, variables.podRunAsGroup >= range.min && variables.podRunAsGroup <= range.max)
                       )
                     )
                   )
@@ -240,14 +240,14 @@ spec:
               : null
           - name: missingRequiredFsGroupContainers
             expression: |
-              variables.badContainers.filter(container, 
+              variables.candidateContainers.filter(container, 
                 has(variables.params.fsGroup) && has(variables.params.fsGroup.rule) && (variables.params.fsGroup.rule == "MustRunAs") &&
                 !((has(container.securityContext) && has(container.securityContext.fsGroup)) || 
                   (variables.podRunAsFsGroup != null))
               )
           - name: invalidRunAsFsGroupContainers
             expression: |
-              variables.badContainers.filter(container, 
+              variables.candidateContainers.filter(container, 
                 !(variables.missingRequiredFsGroupContainers.exists(c, c.name == container.name)) &&
                 (
                   has(variables.params.fsGroup) && has(variables.params.fsGroup.rule) ? 
@@ -257,8 +257,8 @@ spec:
                       (variables.params.fsGroup.rule == "MustRunAs" || variables.params.fsGroup.rule == "MayRunAs") && 
                       (
                         has(container.securityContext) && has(container.securityContext.fsGroup) ? 
-                          !variables.params.fsGroup.ranges.all(range, container.securityContext.fsGroup >= range.min && container.securityContext.fsGroup <= range.max) : 
-                          variables.podRunAsFsGroup == null || !variables.params.fsGroup.ranges.all(range, variables.podRunAsFsGroup >= range.min && variables.podRunAsFsGroup <= range.max)
+                          !variables.params.fsGroup.ranges.exists(range, container.securityContext.fsGroup >= range.min && container.securityContext.fsGroup <= range.max) : 
+                          variables.podRunAsFsGroup == null || !variables.params.fsGroup.ranges.exists(range, variables.podRunAsFsGroup >= range.min && variables.podRunAsFsGroup <= range.max)
                       )
                     )
                   )
@@ -272,13 +272,13 @@ spec:
               : null
           - name: missingRequiredSupplementalGroupsContainers
             expression: |
-              variables.badContainers.filter(container, 
+              variables.candidateContainers.filter(container, 
                 has(variables.params.supplementalGroups) && has(variables.params.supplementalGroups.rule) && (variables.params.supplementalGroups.rule == "MustRunAs") &&
                 !((has(container.securityContext) && has(container.securityContext.supplementalGroups)) || 
                   (variables.podRunAsSupplementalGroups != null)))
           - name: invalidSupplimentalGroupsContainers
             expression: |
-              variables.badContainers.filter(container, 
+              variables.candidateContainers.filter(container, 
                 !(variables.missingRequiredSupplementalGroupsContainers.exists(c, c.name == container.name)) &&
                 (
                   has(variables.params.supplementalGroups) && has(variables.params.supplementalGroups.rule) ? 
@@ -288,8 +288,8 @@ spec:
                       (variables.params.supplementalGroups.rule == "MustRunAs" || variables.params.supplementalGroups.rule == "MayRunAs") && 
                       (
                         has(container.securityContext) && has(container.securityContext.supplementalGroups) ? 
-                          !variables.params.supplementalGroups.ranges.all(range, container.securityContext.supplementalGroups.all(gp, gp>= range.min && gp <= range.max)) : 
-                          variables.podRunAsSupplementalGroups == null || !variables.params.supplementalGroups.ranges.all(range, variables.podRunAsSupplementalGroups.all(gp, gp >= range.min && gp <= range.max))
+                          !variables.params.supplementalGroups.ranges.exists(range, container.securityContext.supplementalGroups.all(gp, gp>= range.min && gp <= range.max)) : 
+                          variables.podRunAsSupplementalGroups == null || !variables.params.supplementalGroups.ranges.exists(range, variables.podRunAsSupplementalGroups.all(gp, gp >= range.min && gp <= range.max))
                       )
                     )
                   )

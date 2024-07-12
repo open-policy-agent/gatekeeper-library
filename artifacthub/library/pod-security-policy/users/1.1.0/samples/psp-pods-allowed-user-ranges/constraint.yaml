@@ -9,7 +9,7 @@ spec:
         kinds: ["Pod"]
   parameters:
     runAsUser:
-      rule: MustRunAsNonRoot # MustRunAsNonRoot # RunAsAny 
+      rule: MustRunAs # MustRunAsNonRoot # RunAsAny 
       ranges:
         - min: 100
           max: 200
