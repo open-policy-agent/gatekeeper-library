@@ -33,12 +33,19 @@ variables:
       has(variables.params.runAsUser) && has(variables.params.runAsUser.rule) && (variables.params.runAsUser.rule == "MustRunAs") &&
       !((has(container.securityContext) && has(container.securityContext.runAsUser)) || 
         (variables.podRunAsUser != null)))
+- name: missingRunAsNonRootGlobal
+  expression: |
+    !has(variables.anyObject.securityContext) || ((!has(variables.anyObject.securityContext.runAsNonRoot) || !variables.anyObject.securityContext.runAsNonRoot) && (!has(variables.anyObject.securityContext.runAsUser) || variables.anyObject.securityContext.runAsUser == 0))
 - name: missingRequiredRunAsNonRootContainers
   expression: |
     variables.candidateContainers.filter(container, 
-      has(variables.params.runAsUser) && has(variables.params.runAsUser.rule) && (variables.params.runAsUser.rule == "MustRunAsNonRoot") && ((has(container.securityContext) && !(has(container.securityContext.runAsUser) && has(container.securityContext.runAsNonRoot))) ?
-        (has(variables.anyObject.spec.securityContext) && !(has(variables.anyObject.spec.securityContext.runAsUser) && has(variables.anyObject.spec.securityContext.runAsNonRoot))) : false
-      ))
+      has(variables.params.runAsUser) && has(variables.params.runAsUser.rule) && (variables.params.runAsUser.rule == "MustRunAsNonRoot") ?
+      (
+        has(container.securityContext) ? (
+          (!has(container.securityContext.runAsNonRoot) || !container.securityContext.runAsNonRoot) && (!has(container.securityContext.runAsUser) || container.securityContext.runAsUser == 0) && variables.missingRunAsNonRootGlobal
+        ) : variables.missingRunAsNonRootGlobal
+      ) : false
+    )
 - name: processedRunAsUserContainers
   expression: (variables.missingRequiredRunAsNonRootContainers + variables.missingRequiredRunAsUserContainers).map(container, container.name)
 - name: invalidRunAsUserContainers
