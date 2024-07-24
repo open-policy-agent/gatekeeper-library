@@ -1,0 +1,32 @@
+apiVersion: admission.k8s.io/v1
+kind: AdmissionReview
+request:
+  dryRun: true
+  kind:
+    group: networking.k8s.io
+    kind: NetworkPolicy
+    version: v1
+  namespace: default
+  object:
+    apiVersion: v1
+    kind: NetworkPolicy
+    metadata:
+      name: custom-policy
+      namespace: default
+    spec:
+      podSelector: {}
+      policyTypes: []
+  operation: CREATE
+  resource:
+    group: networking.k8s.io
+    resource: NetworkPolicy
+    version: v1
+  requestKind:
+    group: ""
+    version: v1
+  uid: unittest
+  userInfo:
+    groups:
+    - developers
+    username: john_doe
+    uid: unittest
