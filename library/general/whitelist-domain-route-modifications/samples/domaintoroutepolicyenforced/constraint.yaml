@@ -1,0 +1,19 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: DenyRoutePerDomainPolicy
+metadata:
+  name: denyrouterperdomainpolicy
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups:
+          - route.openshift.io
+        kinds:
+          - Route
+  parameters:
+    example.com:
+      allowedGroups: ["example.com"]
+      allowedUsers: ["admin"]
+    somedomain.com:
+      allowedGroups: ["somedomain.com"]
+      allowedUsers: ["admin"]
