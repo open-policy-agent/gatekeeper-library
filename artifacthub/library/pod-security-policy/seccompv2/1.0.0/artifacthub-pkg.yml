@@ -3,7 +3,7 @@ name: k8spspseccompv2
 displayName: Seccomp V2
 createdAt: "2024-06-13T18:28:19Z"
 description: Controls the seccomp profile used by containers. Corresponds to the `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccompv2
-digest: cdb49c78b969dd2f13187a6aa35e279f903d63f10976ce8f44111b3aea5823f7
+digest: ef39b5aa35e9f71a60708fa2d234749c7e3c0ac882b8964ae0006c9498f87a73
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/seccompv2
 keywords:

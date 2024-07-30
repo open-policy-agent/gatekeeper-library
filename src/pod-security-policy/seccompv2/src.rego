@@ -30,11 +30,11 @@ input_wildcard_allowed_files {
     input.parameters.allowedLocalhostFiles[_] == "*"
 }
 
-allowed_profile(profile, file, allowed) {
+allowed_profile(_, _, _) {
     input_wildcard_allowed_profiles
 }
 
-allowed_profile(profile, _, allowed) {
+allowed_profile(profile, _, _) {
     profile == "Localhost"
     input_wildcard_allowed_files
 }
