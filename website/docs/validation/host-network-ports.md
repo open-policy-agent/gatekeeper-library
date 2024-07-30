@@ -6,7 +6,7 @@ title: Host Networking Ports
 # Host Networking Ports
 
 ## Description
-Controls usage of host network namespace by pod containers. Specific ports must be specified. Corresponds to the `hostNetwork` and `hostPorts` fields in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
+Controls usage of host network namespace by pod containers. HostNetwork verification happens without exception for exemptImages. Specific ports must be specified. Corresponds to the `hostNetwork` and `hostPorts` fields in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
 
 ## Template
 ```yaml
@@ -16,9 +16,9 @@ metadata:
   name: k8spsphostnetworkingports
   annotations:
     metadata.gatekeeper.sh/title: "Host Networking Ports"
-    metadata.gatekeeper.sh/version: 1.1.0
+    metadata.gatekeeper.sh/version: 1.1.1
     description: >-
-      Controls usage of host network namespace by pod containers. Specific
+      Controls usage of host network namespace by pod containers. HostNetwork verification happens without exception for exemptImages. Specific
       ports must be specified. Corresponds to the `hostNetwork` and
       `hostPorts` fields in a PodSecurityPolicy. For more information, see
       https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
@@ -32,7 +32,7 @@ spec:
         openAPIV3Schema:
           type: object
           description: >-
-            Controls usage of host network namespace by pod containers. Specific
+            Controls usage of host network namespace by pod containers. HostNetwork verification happens without exception for exemptImages. Specific
             ports must be specified. Corresponds to the `hostNetwork` and
             `hostPorts` fields in a PodSecurityPolicy. For more information, see
             https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
@@ -86,14 +86,17 @@ spec:
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
                 !(container.image in variables.exemptImages) &&
                 (
-                  (!has(variables.params.hostNetwork) || !variables.params.hostNetwork ? (has(variables.anyObject.spec.hostNetwork) && variables.anyObject.spec.hostNetwork) : false) ||
                   (container.ports.all(port, has(port.hostPort) && has(variables.params.min) && port.hostPort < variables.params.min)) ||
                   (container.ports.all(port, has(port.hostPort) && has(variables.params.max) && port.hostPort > variables.params.max))
                 )
               )
           validations:
           - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badContainers) == 0'
-            messageExpression: '"The specified hostNetwork and hostPort are not allowed, pod: " + variables.anyObject.metadata.name + ". Allowed values: " + variables.params' 
+            messageExpression: '"The specified hostNetwork and hostPort are not allowed, pod: " + variables.anyObject.metadata.name + ". Allowed values: " + variables.params'
+          - expression: |
+              (has(request.operation) && request.operation == "UPDATE") || 
+              (!has(variables.params.hostNetwork) || !variables.params.hostNetwork ? (has(variables.anyObject.spec.hostNetwork) && !variables.anyObject.spec.hostNetwork) : true)
+            messageExpression: '"The specified hostNetwork and hostPort are not allowed, pod: " + variables.anyObject.metadata.name + ". Allowed values: " + variables.params'
       - engine: Rego
         source:
           rego: |
@@ -194,7 +197,6 @@ spec:
     hostNetwork: true
     min: 80
     max: 9000
-
 ```
 
 Usage
@@ -309,6 +311,8 @@ spec:
         kinds: ["Pod"]
   parameters:
     hostNetwork: false
+    exemptImages:
+    - "nginx"
 ```
 
 Usage
