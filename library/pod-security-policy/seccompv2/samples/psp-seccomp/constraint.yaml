@@ -9,4 +9,7 @@ spec:
         kinds: ["Pod"]
   parameters:
     allowedProfiles:
-    - docker/default
+    - RuntimeDefault
+    - Localhost
+    allowedLocalhostFiles:
+    - "*"

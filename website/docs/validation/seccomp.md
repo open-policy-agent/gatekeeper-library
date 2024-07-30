@@ -166,7 +166,7 @@ spec:
               })
           - name: podLocalHostProfile
             expression: |
-              has(variables.anyObject.spec.securityContext) && has(variables.anyObject.spec.securityContext.seccompProfile) && has(variables.anyObject.spec.securityContext.seccompProfile.localhostProfile) ? variables.anyObject.spec.securityContext.seccompProfile.localhostProfile : ""
+              variables.hasPodSeccomp && has(variables.anyObject.spec.securityContext.seccompProfile.localhostProfile) ? variables.anyObject.spec.securityContext.seccompProfile.localhostProfile : ""
           - name: canonicalPodSecurityContextProfile
             expression: |
               has(variables.hasPodSeccomp) && has(variables.anyObject.spec.securityContext.seccompProfile.type) ? 
