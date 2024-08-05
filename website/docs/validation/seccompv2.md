@@ -1,20 +1,32 @@
+---
+id: seccompv2
+title: Seccomp V2
+---
+
+# Seccomp V2
+
+## Description
+Controls the seccomp profile used by containers. Corresponds to the `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccompv2
+
+## Template
+```yaml
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
-  name: k8spspseccomp
+  name: k8spspseccompv2
   annotations:
-    metadata.gatekeeper.sh/title: "Seccomp"
-    metadata.gatekeeper.sh/version: 1.1.0
+    metadata.gatekeeper.sh/title: "Seccomp V2"
+    metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Controls the seccomp profile used by containers. Corresponds to the
       `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on
       a PodSecurityPolicy. For more information, see
-      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccomp
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccompv2
 spec:
   crd:
     spec:
       names:
-        kind: K8sPSPSeccomp
+        kind: K8sPSPSeccompV2
       validation:
         # Schema for the `parameters` field
         openAPIV3Schema:
@@ -23,7 +35,7 @@ spec:
             Controls the seccomp profile used by containers. Corresponds to the
             `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on
             a PodSecurityPolicy. For more information, see
-            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccomp
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccompv2
           properties:
             exemptImages:
               description: >-
@@ -101,66 +113,24 @@ spec:
           - name: inputAllowedProfiles
             expression: |
               !has(variables.params.allowedProfiles) ? [] : variables.params.allowedProfiles
-          - name: allowedLocalhostFiles
-            expression: |
-              has(variables.params.allowedLocalhostFiles) ? variables.params.allowedLocalhostFiles : []
-          - name: allowedProfilesTranslation
-            expression: |
-              (variables.inputAllowedProfiles.filter(profile,
-              profile != "Localhost").map(profile, profile == "Unconfined" ? "unconfined" : profile)) + 
-              (variables.inputAllowedProfiles.exists(profile, profile == "RuntimeDefault") ? ["runtime/default", "docker/default"] : [])
-          - name: allowSecurityContextLocalhost
-            expression: |
-              variables.inputAllowedProfiles.exists(profile, profile == "Localhost")
           - name: derivedAllowedLocalhostFiles
             expression: |
-              variables.allowSecurityContextLocalhost ? variables.params.allowedLocalhostFiles.map(file, "localhost/" + file) : []
-          - name: localhostWildcardAllowed
-            expression: |
-              variables.inputAllowedProfiles.exists(profile, profile == "localhost/*") || variables.derivedAllowedLocalhostFiles.exists(profile, profile == "localhost/*")
+              variables.inputAllowedProfiles.exists(profile, profile == "Localhost") ? variables.params.allowedLocalhostFiles.map(file, "Localhost/" + file) : []
           - name: allowedProfiles
             expression: |
-              (variables.allowedProfilesTranslation + variables.derivedAllowedLocalhostFiles).filter(entry, entry != "localhost/*")
+              variables.inputAllowedProfiles + variables.derivedAllowedLocalhostFiles
+          - name: allowAllLocalhostFiles
+            expression: |
+              variables.allowedProfiles.exists(profile, profile == "Localhost/*")
           - name: hasPodSeccomp
             expression: |
               has(variables.anyObject.spec.securityContext) && has(variables.anyObject.spec.securityContext.seccompProfile)
-          - name: hasPodAnnotations
-            expression: |
-              has(variables.anyObject.metadata.annotations) && ("seccomp.security.alpha.kubernetes.io/pod" in variables.anyObject.metadata.annotations)
-          - name: podAnnotationsProfiles
-            expression: |
-              variables.unverifiedContainers.filter(container, 
-                !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
-                !(has(variables.anyObject.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations)) && 
-                !variables.hasPodSeccomp && 
-                variables.hasPodAnnotations 
-              ).map(container, {
-                "container" : container.name,
-                "profile" : variables.anyObject.metadata.annotations["seccomp.security.alpha.kubernetes.io/pod"],
-                "file" : dyn(""),
-                "location" : dyn("annotation seccomp.security.alpha.kubernetes.io/pod"),
-              })
-          - name: containerAnnotationsProfiles
-            expression: |
-              variables.unverifiedContainers.filter(container, 
-                !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
-                !variables.hasPodSeccomp && 
-                has(variables.anyObject.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations)
-              ).map(container, {
-                "container" : container.name,
-                "profile" : variables.anyObject.metadata.annotations["container.seccomp.security.alpha.kubernetes.io/" + container.name],
-                "file" : dyn(""),
-                "location" : dyn("annotation container.seccomp.security.alpha.kubernetes.io/" + container.name),
-              })
           - name: podLocalHostProfile
             expression: |
               variables.hasPodSeccomp && has(variables.anyObject.spec.securityContext.seccompProfile.localhostProfile) ? variables.anyObject.spec.securityContext.seccompProfile.localhostProfile : ""
-          - name: canonicalPodSecurityContextProfile
+          - name: podSecurityContextProfile
             expression: |
-              has(variables.hasPodSeccomp) && has(variables.anyObject.spec.securityContext.seccompProfile.type) ? 
-                (variables.anyObject.spec.securityContext.seccompProfile.type == "RuntimeDefault" ? (
-                  variables.allowedProfiles.exists(profile, profile == "runtime/default") ? "runtime/default" : variables.allowedProfiles.exists(profile, profile == "docker/default") ? "docker/default" : "runtime/default") : 
-                variables.anyObject.spec.securityContext.seccompProfile.type == "Unconfined" ? "unconfined" : variables.anyObject.spec.securityContext.seccompProfile.type == "Localhost" ? "localhost/" + variables.anyObject.spec.securityContext.seccompProfile.localhostProfile : "")
+              has(variables.hasPodSeccomp) && has(variables.anyObject.spec.securityContext.seccompProfile.type) ? variables.anyObject.spec.securityContext.seccompProfile.type
                 : ""
           - name: podSecurityContextProfiles
             expression: |
@@ -169,7 +139,7 @@ spec:
                 variables.hasPodSeccomp
               ).map(container, {
                 "container" : container.name,
-                "profile" : dyn(variables.canonicalPodSecurityContextProfile),
+                "profile" : dyn(variables.podSecurityContextProfile),
                 "file" : variables.podLocalHostProfile,
                 "location" : dyn("pod securityContext"),
               })
@@ -179,10 +149,7 @@ spec:
                 has(container.securityContext) && has(container.securityContext.seccompProfile)
               ).map(container, {
                 "container" : container.name,
-                "profile" : dyn(has(container.securityContext.seccompProfile.type) ? (container.securityContext.seccompProfile.type == "RuntimeDefault" ? (
-                  variables.allowedProfiles.exists(profile, profile == "runtime/default") ? "runtime/default" : variables.allowedProfiles.exists(profile, profile == "docker/default") ? "docker/default" : "runtime/default") : 
-                container.securityContext.seccompProfile.type == "Unconfined" ? "unconfined" : container.securityContext.seccompProfile.type == "Loclhost" ? "localhost/" + container.securityContext.seccompProfile.localhostProfile : "")
-                : ""),
+                "profile" : dyn(container.securityContext.seccompProfile.type),
                 "file" : has(container.securityContext.seccompProfile.localhostProfile) ? container.securityContext.seccompProfile.localhostProfile : dyn(""),
                 "location" : dyn("container securityContext"),
               })
@@ -190,9 +157,7 @@ spec:
             expression: |
               variables.unverifiedContainers.filter(container, 
                 !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
-                !(has(variables.anyObject.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations)) && 
-                !variables.hasPodSeccomp && 
-                !variables.hasPodAnnotations 
+                !variables.hasPodSeccomp
               ).map(container, {
                 "container" : container.name,
                 "profile" : dyn("not configured"),
@@ -201,19 +166,19 @@ spec:
               })
           - name: allContainerProfiles
             expression: |
-              variables.podAnnotationsProfiles + variables.containerAnnotationsProfiles + variables.podSecurityContextProfiles + variables.containerSecurityContextProfiles + variables.containerProfilesMissing
+              variables.podSecurityContextProfiles + variables.containerSecurityContextProfiles + variables.containerProfilesMissing
           - name: badContainerProfilesWithoutFiles
             expression: |
               variables.allContainerProfiles.filter(badContainerProfile, 
-                  !badContainerProfile.profile.startsWith("localhost/") &&
+                  badContainerProfile.profile != "Localhost" &&
                   !(badContainerProfile.profile in variables.allowedProfiles)
               ).map(badProfile, "Seccomp profile '" + badProfile.profile + "' is not allowed for container '" + badProfile.container + "'. Found at: " + badProfile.location + ". Allowed profiles: " + variables.allowedProfiles.join(", "))
           - name: badContainerProfilesWithFiles
             expression: |
               variables.allContainerProfiles.filter(badContainerProfile, 
-                badContainerProfile.profile.startsWith("localhost/") &&
-                !variables.localhostWildcardAllowed &&
-                !(badContainerProfile.profile in variables.allowedProfiles)
+                badContainerProfile.profile == "Localhost" &&
+                !variables.allowAllLocalhostFiles &&
+                !((badContainerProfile.profile + "/" + badContainerProfile.file) in variables.allowedProfiles)
               ).map(badProfile, "Seccomp profile '" + badProfile.profile + "' With file '" + badProfile.file + "' is not allowed for container '" + badProfile.container + "'. Found at: " + badProfile.location + ". Allowed profiles: " + variables.allowedProfiles.join(", "))
           validations:
           - expression: 'size(variables.badContainerProfilesWithoutFiles) == 0'
@@ -228,10 +193,6 @@ spec:
             package k8spspseccomp
 
             import data.lib.exempt_container.is_exempt
-
-            container_annotation_key_prefix = "container.seccomp.security.alpha.kubernetes.io/"
-
-            pod_annotation_key = "seccomp.security.alpha.kubernetes.io/pod"
 
             violation[{"msg": msg}] {
                 not input_wildcard_allowed_profiles
@@ -261,26 +222,25 @@ spec:
                 input.parameters.allowedLocalhostFiles[_] == "*"
             }
 
-            input_wildcard_allowed_files {
-                "localhost/*" == input.parameters.allowedProfiles[_]
+            allowed_profile(_, _, _) {
+                input_wildcard_allowed_profiles
+            }
+
+            allowed_profile(profile, _, _) {
+                profile == "Localhost"
+                input_wildcard_allowed_files
             }
 
             # Simple allowed Profiles
             allowed_profile(profile, _, allowed) {
-                not startswith(profile, "localhost/")
+                profile != "Localhost"
                 profile == allowed[_]
-            }
-
-            # annotation localhost with wildcard
-            allowed_profile(profile, _, allowed) {
-                "localhost/*" == allowed[_]
-                startswith(profile, "localhost/")
             }
 
             # annotation localhost without wildcard
-            allowed_profile(profile, _, allowed) {
-                startswith(profile, "localhost/")
-                profile == allowed[_]
+            allowed_profile(profile, file, allowed) {
+                profile == "Localhost"
+                allowed[_] == sprintf("Localhost/%s", [file])
             }
 
             # The profiles explicitly in the list
@@ -288,59 +248,33 @@ spec:
                 allowed := input.parameters.allowedProfiles[_]
             }
 
-            # Seccomp Localhost to annotation translation
             get_allowed_profiles[allowed] {
                 profile := input.parameters.allowedProfiles[_]
-                not contains(profile, "/")
+                profile == "Localhost"
                 file := object.get(input.parameters, "allowedLocalhostFiles", [])[_]
-                allowed := canonicalize_seccomp_profile({"type": profile, "localhostProfile": file}, "")[_]
-            }
-
-            # Container profile as defined in pod annotation
-            get_profile(container) = {"profile": profile, "file": "", "location": location} {
-                not has_securitycontext_container(container)
-                not has_annotation(get_container_annotation_key(container.name))
-                not has_securitycontext_pod
-                profile := input.review.object.metadata.annotations[pod_annotation_key]
-                location := sprintf("annotation %v", [pod_annotation_key])
-            }
-
-            # Container profile as defined in container annotation
-            get_profile(container) = {"profile": profile, "file": "", "location": location} {
-                not has_securitycontext_container(container)
-                not has_securitycontext_pod
-                container_annotation := get_container_annotation_key(container.name)
-                has_annotation(container_annotation)
-                profile := input.review.object.metadata.annotations[container_annotation]
-                location := sprintf("annotation %v", [container_annotation])
-            }
-
-            # Container profile as defined in pods securityContext
-            get_profile(container) = {"profile": profile, "file": file, "location": location} {
-                not has_securitycontext_container(container)
-                profile := canonicalize_seccomp_profile(input.review.object.spec.securityContext.seccompProfile, canonicalize_runtime_default_profile)[_]
-                file := object.get(input.review.object.spec.securityContext.seccompProfile, "localhostProfile", "")
-                location := "pod securityContext"
+                allowed := sprintf("Localhost/%s", [file])
             }
 
             # Container profile as defined in containers securityContext
             get_profile(container) = {"profile": profile, "file": file, "location": location} {
                 has_securitycontext_container(container)
-                profile := canonicalize_seccomp_profile(container.securityContext.seccompProfile, canonicalize_runtime_default_profile)[_]
+                profile := container.securityContext.seccompProfile.type
                 file := object.get(container.securityContext.seccompProfile, "localhostProfile", "")
                 location := "container securityContext"
+            }
+
+            # Container profile as defined in pods securityContext
+            get_profile(container) = {"profile": profile, "file": file, "location": location} {
+                not has_securitycontext_container(container)
+                profile := input.review.object.spec.securityContext.seccompProfile.type
+                file := object.get(input.review.object.spec.securityContext.seccompProfile, "localhostProfile", "")
+                location := "pod securityContext"
             }
 
             # Container profile missing
             get_profile(container) = {"profile": "not configured", "file": "", "location": "no explicit profile found"} {
                 not has_securitycontext_container(container)
                 not has_securitycontext_pod
-                not has_annotation(get_container_annotation_key(container.name))
-                not has_annotation(pod_annotation_key)
-            }
-
-            has_annotation(annotation) {
-                input.review.object.metadata.annotations[annotation]
             }
 
             has_securitycontext_pod {
@@ -349,10 +283,6 @@ spec:
 
             has_securitycontext_container(container) {
                 container.securityContext.seccompProfile
-            }
-
-            get_container_annotation_key(name) = annotation {
-                annotation := concat("", [container_annotation_key_prefix, name])
             }
 
             input_containers[container.name] = container {
@@ -366,32 +296,6 @@ spec:
             input_containers[container.name] = container {
                 container := input.review.object.spec.ephemeralContainers[_]
             }
-
-            canonicalize_runtime_default_profile() = out {
-                "runtime/default" == input.parameters.allowedProfiles[_]
-                out := "runtime/default"
-            } else = out {
-                "docker/default" == input.parameters.allowedProfiles[_]
-                out := "docker/default"
-            } else = out {
-                out := "runtime/default"
-            }
-
-            canonicalize_seccomp_profile(profile, def) = out {
-                profile.type == "RuntimeDefault"
-                def == "" 
-                out := ["runtime/default", "docker/default"]
-            } else = out {
-                profile.type == "RuntimeDefault"
-                def != ""
-                out := [def]
-            } else = out {
-                profile.type == "Localhost"
-                out := [sprintf("localhost/%s", [profile.localhostProfile])]
-            } else = out {
-                profile.type == "Unconfined"
-                out := ["unconfined"]
-            } 
           libs:
             - |
               package lib.exempt_container
@@ -413,3 +317,180 @@ spec:
                   prefix := trim_suffix(exemption, "*")
                   startswith(img, prefix)
               }
+
+```
+
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/template.yaml
+```
+## Examples
+<details>
+<summary>default-seccomp-required</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPSeccompV2
+metadata:
+  name: psp-seccomp
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    allowedProfiles:
+    - RuntimeDefault
+    - Localhost
+    allowedLocalhostFiles:
+    - "*"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-disallowed-global</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-disallowed2
+  labels:
+    app: nginx-seccomp
+spec:
+  securityContext:
+    seccompProfile:
+      type: Unconfined
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/example_disallowed2.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-container</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-disallowed
+  labels:
+    app: nginx-seccomp
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      seccompProfile:
+        type: Unconfined
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/example_disallowed.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-container</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-allowed
+  labels:
+    app: nginx-seccomp
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-container</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-allowed
+  labels:
+    app: nginx-seccomp
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      seccompProfile:
+        type: Localhost
+        localhostProfile: profile.json
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/example_allowed_localhost.yaml
+```
+
+</details>
+<details>
+<summary>disallowed-ephemeral</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-disallowed
+  labels:
+    app: nginx-seccomp
+spec:
+  ephemeralContainers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/disallowed_ephemeral.yaml
+```
+
+</details>
+
+
+</details>

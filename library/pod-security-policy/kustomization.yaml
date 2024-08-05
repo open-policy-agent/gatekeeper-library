@@ -17,3 +17,4 @@ resources:
 - selinux
 - users
 - volumes
+- seccompv2
