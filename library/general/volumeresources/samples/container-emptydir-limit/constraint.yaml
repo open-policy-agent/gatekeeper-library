@@ -1,0 +1,12 @@
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sVolumeRequests
+metadata:
+  name: container-emptydir-limit
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    volumesizelimit: 1Gi

@@ -30,3 +30,4 @@ resources:
 - uniqueserviceselector
 - verifydeprecatedapi
 - storageclass
+- volumeresources
