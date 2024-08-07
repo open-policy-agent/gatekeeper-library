@@ -15,3 +15,9 @@ spec:
       securityContext:
         runAsUser: 250
         runAsGroup: 250
+  initContainers:
+    - name: nginx
+      image: nginx
+      securityContext:
+        runAsUser: 250
+        runAsGroup: 250
