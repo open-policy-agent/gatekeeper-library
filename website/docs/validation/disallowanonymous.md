@@ -16,7 +16,7 @@ metadata:
   name: k8sdisallowanonymous
   annotations:
     metadata.gatekeeper.sh/title: "Disallow Anonymous Access"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: Disallows associating ClusterRole and Role resources to the system:anonymous user and system:unauthenticated group.
 spec:
   crd:
@@ -42,7 +42,7 @@ spec:
         package k8sdisallowanonymous
 
         violation[{"msg": msg}] {
-          not is_allowed(input.review.object.roleRef, input.parameters.allowedRoles)
+          not is_allowed(input.review.object.roleRef, object.get(input, ["parameters", "allowedRoles"], []))
           review(input.review.object.subjects[_])
           msg := sprintf("Unauthenticated user reference is not allowed in %v %v ", [input.review.object.kind, input.review.object.metadata.name])
         }

@@ -1,7 +1,7 @@
 package k8sdisallowanonymous
 
 violation[{"msg": msg}] {
-  not is_allowed(input.review.object.roleRef, input.parameters.allowedRoles)
+  not is_allowed(input.review.object.roleRef, object.get(input, ["parameters", "allowedRoles"], []))
   review(input.review.object.subjects[_])
   msg := sprintf("Unauthenticated user reference is not allowed in %v %v ", [input.review.object.kind, input.review.object.metadata.name])
 }

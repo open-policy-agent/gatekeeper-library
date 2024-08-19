@@ -24,6 +24,12 @@ test_anonymous_user_clusterrolebinding {
     count(results) == 1
 }
 
+test_anonymous_user_clusterrolebinding_no_param {
+    inp := {"review": clusterrolebinding([{"name": "system:anonymous", "kind": "User"}], "role-2")}
+    results := violation with input as inp
+    count(results) == 1
+}
+
 test_allowed_role_anonymous_user_clusterrolebinding {
     inp := {"review": clusterrolebinding([{"name": "system:anonymous", "kind": "User"}], "role-2"), "parameters": {"allowedRoles": ["role-2"]}}
     results := violation with input as inp
@@ -56,6 +62,12 @@ test_allowed_multiple_role_multiple_subjects_anonymous_user_clusterrolebinding {
 
 test_unauthenticated_group_clusterrolebinding {
     inp := {"review": clusterrolebinding([{"name": "system:unauthenticated", "kind": "Group"}], "role-2"), "parameters": {"allowedRoles": ["role-1"]}}
+    results := violation with input as inp
+    count(results) == 1
+}
+
+test_unauthenticated_group_clusterrolebinding_no_param {
+    inp := {"review": clusterrolebinding([{"name": "system:unauthenticated", "kind": "Group"}], "role-2")}
     results := violation with input as inp
     count(results) == 1
 }
@@ -132,6 +144,12 @@ test_anonymous_user_rolebinding {
     count(results) == 1
 }
 
+test_anonymous_user_rolebinding_no_param {
+    inp := {"review": rolebinding([{"name": "system:anonymous", "kind": "User"}], "role-2")}
+    results := violation with input as inp
+    count(results) == 1
+}
+
 test_allowed_role_anonymous_user_rolebinding {
     inp := {"review": rolebinding([{"name": "system:anonymous", "kind": "User"}], "role-2"), "parameters": {"allowedRoles": ["role-2"]}}
     results := violation with input as inp
@@ -160,6 +178,12 @@ test_allowed_multiple_role_multiple_subjects_anonymous_user_rolebinding {
     inp := {"review": rolebinding([{"name": "system:anonymous", "kind": "User"}, {"name": "system:authenticated", "kind": "Group"}], "role-2"), "parameters": {"allowedRoles": ["role-1", "role-2"]}}
     results := violation with input as inp
     count(results) == 0
+}
+
+test_unauthenticated_group_rolebinding_no_param {
+    inp := {"review": rolebinding([{"name": "system:unauthenticated", "kind": "Group"}], "role-2")}
+    results := violation with input as inp
+    count(results) == 1
 }
 
 test_unauthenticated_group_rolebinding {
