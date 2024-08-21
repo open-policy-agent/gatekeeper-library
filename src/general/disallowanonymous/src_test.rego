@@ -6,12 +6,6 @@ test_blank_subject_clusterrolebinding {
     count(results) == 0
 }
 
-test_authenticated_group_clusterrolebinding {
-    inp := {"review": clusterrolebinding([{"name": "system:authenticated", "kind": "Group"}], "role-2"), "parameters": {"allowedRoles": ["role-1"]}}
-    results := violation with input as inp
-    count(results) == 0
-}
-
 test_non_anonymous_user_clusterrolebinding {
     inp := {"review": clusterrolebinding([{"name": "user-1", "kind": "User"}], "role-2"), "parameters": {"allowedRoles": ["role-1"]}}
     results := violation with input as inp
@@ -105,7 +99,7 @@ test_allowed_multiple_role_multiple_subjects_unauthenticated_group_clusterrolebi
 test_multiple_subjects_mix_clusterrolebinding {
     inp := {"review": clusterrolebinding([{"name": "system:unauthenticated", "kind": "Group"}, {"name": "system:anonymous", "kind": "User"}], "role-2"), "parameters": {"allowedRoles": ["role-1"]}}
     results := violation with input as inp
-    count(results) == 1
+    count(results) == 2
 }
 
 test_allowed_role_multiple_subjects_mix_clusterrolebinding {
@@ -117,7 +111,7 @@ test_allowed_role_multiple_subjects_mix_clusterrolebinding {
 test_multiple_role_multiple_subjects_mix_clusterrolebinding {
     inp := {"review": clusterrolebinding([{"name": "system:unauthenticated", "kind": "Group"}, {"name": "system:anonymous", "kind": "User"}], "role-2"), "parameters": {"allowedRoles": ["role-1", "role-3"]}}
     results := violation with input as inp
-    count(results) == 1
+    count(results) == 2
 }
 
 test_allowed_multiple_role_multiple_subjects_mix_clusterrolebinding {
@@ -225,7 +219,7 @@ test_allowed_multiple_role_multiple_subjects_unauthenticated_group_rolebinding {
 test_multiple_subjects_mix_rolebinding {
     inp := {"review": rolebinding([{"name": "system:unauthenticated", "kind": "Group"}, {"name": "system:anonymous", "kind": "User"}], "role-2"), "parameters": {"allowedRoles": ["role-1"]}}
     results := violation with input as inp
-    count(results) == 1
+    count(results) == 2
 }
 
 test_allowed_role_multiple_subjects_mix_rolebinding {
@@ -237,11 +231,31 @@ test_allowed_role_multiple_subjects_mix_rolebinding {
 test_multiple_role_multiple_subjects_mix_rolebinding {
     inp := {"review": rolebinding([{"name": "system:unauthenticated", "kind": "Group"}, {"name": "system:anonymous", "kind": "User"}], "role-2"), "parameters": {"allowedRoles": ["role-1", "role-3"]}}
     results := violation with input as inp
-    count(results) == 1
+    count(results) == 2
 }
 
 test_allowed_multiple_role_multiple_subjects_mix_rolebinding {
     inp := {"review": rolebinding([{"name": "system:unauthenticated", "kind": "Group"}, {"name": "system:anonymous", "kind": "User"}], "role-2"), "parameters": {"allowedRoles": ["role-1", "role-2"]}}
+    results := violation with input as inp
+    count(results) == 0
+}
+
+authenticated_rolebinding := rolebinding([{"name": "system:authenticated", "kind": "Group"}], "role-2")
+
+test_authenticated_with_disallow_authenticated_true {
+    inp := {"review": authenticated_rolebinding, "parameters": { "allowedRoles": [], "disallowAuthenticated": true }}
+    results := violation with input as inp
+    count(results) == 1
+}
+
+test_authenticated_with_disallow_authenticated_false {
+    inp := {"review": authenticated_rolebinding, "parameters": { "allowedRoles": [], "disallowAuthenticated": false }}
+    results := violation with input as inp
+    count(results) == 0
+}
+
+test_authenticated_with_disallow_authenticated_undefined {
+    inp := {"review": authenticated_rolebinding, "parameters": { "allowedRoles": [] }}
     results := violation with input as inp
     count(results) == 0
 }

@@ -10,9 +10,3 @@ subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group
   name: system:authenticated
-- apiGroup: rbac.authorization.k8s.io
-  kind: Group
-  name: system:unauthenticated
-- apiGroup: rbac.authorization.k8s.io
-  kind: Group
-  name: system:anonymous
