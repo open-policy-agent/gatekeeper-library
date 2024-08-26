@@ -173,7 +173,7 @@ spec:
       - apiGroups: [""]
         kinds: ["Pod"]
   parameters:
-    exemptImages: ["nonexistant/*"]
+    exemptImages: ["nonexistent/*"]
 
 ```
 
