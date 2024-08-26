@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: does-not-have-pizza
+  labels:
+    taco: is-great
+spec:
+  containers:
+    - name: nginx
+      image: nginx
