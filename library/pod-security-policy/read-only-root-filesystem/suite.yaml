@@ -25,3 +25,23 @@ tests:
     object: samples/psp-readonlyrootfilesystem/update.yaml
     assertions:
     - violations: no
+- name: full-wildcard
+  template: template.yaml
+  constraint: samples/wildcard_support/full_wildcard_constraint.yaml
+  cases:
+  - name: allow-normally-disallowed
+    object: samples/psp-readonlyrootfilesystem/example_disallowed.yaml
+    assertions:
+    - violations: no
+- name: wildcard-suffix
+  template: template.yaml
+  constraint: samples/wildcard_support/prefix_matching_constraint.yaml
+  cases:
+  - name: image-with-exempt-prefix-readOnlyRootFilesystem-not-required
+    object: samples/wildcard_support/example_safe_image_prefix.yaml
+    assertions:
+    - violations: no
+  - name: image-with-different-prefix-must-set-readOnlyRootFilesystem
+    object: samples/wildcard_support/example_unsafe_image_prefix.yaml
+    assertions:
+    - violations: yes
