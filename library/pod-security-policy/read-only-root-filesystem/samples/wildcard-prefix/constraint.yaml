@@ -9,4 +9,4 @@ spec:
         kinds: ["Pod"]
   parameters:
     exemptImages:
-    - "specialprogram"
+      - "safe-images.com/*"
