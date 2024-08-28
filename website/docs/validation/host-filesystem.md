@@ -82,8 +82,6 @@ spec:
           validations:
           - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badHostPaths) == 0'
             messageExpression: 'variables.badHostPaths.join("\n")'
-
-              
       - engine: Rego
         source:
           rego: |
