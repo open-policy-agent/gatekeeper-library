@@ -16,7 +16,7 @@ metadata:
   name: k8spspprocmount
   annotations:
     metadata.gatekeeper.sh/title: "Proc Mount"
-    metadata.gatekeeper.sh/version: 1.1.0
+    metadata.gatekeeper.sh/version: 1.1.1
     description: >-
       Controls the allowed `procMount` types for the container. Corresponds to
       the `allowedProcMountTypes` field in a PodSecurityPolicy. For more
@@ -79,9 +79,14 @@ spec:
                 variables.params.exemptImages.filter(image, !image.endsWith("*"))
           - name: exemptImages
             expression: |
-              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(
+                container,
                 container.image in variables.exemptImageExplicit ||
-                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption)))
+                  variables.exemptImagePrefixes.exists(
+                    exemption,
+                    string(container.image).startsWith(exemption)
+                  )
+              ).map(container, container.image)
           - name: allowedProcMount
             expression: |
               !has(variables.params) ? "default" : 
@@ -216,6 +221,8 @@ spec:
         kinds: ["Pod"]
   parameters:
     procMount: Default
+    exemptImages:
+    - "safeimages.com/*"
 
 ```
 
@@ -305,6 +312,33 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/proc-mount/samples/psp-proc-mount/disallowed_ephemeral.yaml
+```
+
+</details>
+<details>
+<summary>image-exempt-prefix-match</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-proc-mount-exempt-image
+  labels:
+    app: nginx-proc-mount
+spec:
+  hostUsers: false
+  containers:
+  - name: nginx
+    image: safeimages.com/nginx
+    securityContext:
+      procMount: Unmasked #Default
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/proc-mount/samples/psp-proc-mount/example_allowed_exempt_image.yaml
 ```
 
 </details>
