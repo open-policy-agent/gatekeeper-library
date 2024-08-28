@@ -1,7 +1,7 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sPSPHostNetworkingPorts
 metadata:
-  name: psp-host-network
+  name: psp-host-network-ports
 spec:
   match:
     kinds:
@@ -9,5 +9,5 @@ spec:
         kinds: ["Pod"]
   parameters:
     hostNetwork: false
-    exemptImages:
-    - "nginx"
+    min: 80
+    max: 9000
