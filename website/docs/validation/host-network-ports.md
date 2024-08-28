@@ -16,7 +16,7 @@ metadata:
   name: k8spsphostnetworkingports
   annotations:
     metadata.gatekeeper.sh/title: "Host Networking Ports"
-    metadata.gatekeeper.sh/version: 1.1.1
+    metadata.gatekeeper.sh/version: 1.1.2
     description: >-
       Controls usage of host network namespace by pod containers. HostNetwork verification happens without exception for exemptImages. Specific
       ports must be specified. Corresponds to the `hostNetwork` and
@@ -84,7 +84,7 @@ spec:
           - name: badContainers
             expression: |
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
-                !(container.image in variables.exemptImages) &&
+                !(container.image in variables.exemptImages) && has(container.ports) &&
                 (
                   (container.ports.all(port, has(port.hostPort) && has(variables.params.min) && port.hostPort < variables.params.min)) ||
                   (container.ports.all(port, has(port.hostPort) && has(variables.params.max) && port.hostPort > variables.params.max))
@@ -288,6 +288,31 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/disallowed_ephemeral.yaml
+```
+
+</details>
+<details>
+<summary>no-ports-specified</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-host-networking-ports-disallowed
+  labels:
+    app: nginx-host-networking-ports
+spec:
+  hostNetwork: true
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/example_allowed_no_ports.yaml
 ```
 
 </details>
