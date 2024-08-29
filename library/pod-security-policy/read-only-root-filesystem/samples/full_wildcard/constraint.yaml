@@ -1,11 +1,12 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sPSPAllowPrivilegeEscalationContainer
+kind: K8sPSPReadOnlyRootFilesystem
 metadata:
-  name: psp-allow-privilege-escalation-container
+  name: psp-readonlyrootfilesystem
 spec:
   match:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
   parameters:
-    exemptImages: ["safeimages.com/*"]
+    exemptImages:
+      - "*"
