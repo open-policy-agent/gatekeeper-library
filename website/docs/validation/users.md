@@ -853,7 +853,7 @@ spec:
         runAsUser: 250
         runAsGroup: 250
   initContainers:
-    - name: nginx
+    - name: init-nginx
       image: nginx
       securityContext:
         runAsUser: 250
