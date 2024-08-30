@@ -5,7 +5,6 @@ metadata:
   labels:
     app: nginx-host-networking-ports
 spec:
-  hostNetwork: false
   containers:
   - name: nginx
     image: nginx

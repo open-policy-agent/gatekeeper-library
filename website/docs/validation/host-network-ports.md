@@ -16,7 +16,7 @@ metadata:
   name: k8spsphostnetworkingports
   annotations:
     metadata.gatekeeper.sh/title: "Host Networking Ports"
-    metadata.gatekeeper.sh/version: 1.1.2
+    metadata.gatekeeper.sh/version: 1.1.3
     description: >-
       Controls usage of host network namespace by pod containers. HostNetwork verification happens without exception for exemptImages. Specific
       ports must be specified. Corresponds to the `hostNetwork` and
@@ -90,13 +90,19 @@ spec:
                   (container.ports.all(port, has(port.hostPort) && has(variables.params.max) && port.hostPort > variables.params.max))
                 )
               )
+          - name: isUpdate
+            expression: has(request.operation) && request.operation == "UPDATE"
+          - name: hostNetworkAllowed
+            expression: has(variables.params.hostNetwork) && variables.params.hostNetwork
+          - name: hostNetworkEnabled
+            expression: has(variables.anyObject.spec.hostNetwork) && variables.anyObject.spec.hostNetwork
+          - name: hostNetworkViolation
+            expression: variables.hostNetworkEnabled && !variables.hostNetworkAllowed
           validations:
-          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badContainers) == 0'
-            messageExpression: '"The specified hostNetwork and hostPort are not allowed, pod: " + variables.anyObject.metadata.name + ". Allowed values: " + variables.params'
-          - expression: |
-              (has(request.operation) && request.operation == "UPDATE") || 
-              (!has(variables.params.hostNetwork) || !variables.params.hostNetwork ? (has(variables.anyObject.spec.hostNetwork) && !variables.anyObject.spec.hostNetwork) : true)
-            messageExpression: '"The specified hostNetwork and hostPort are not allowed, pod: " + variables.anyObject.metadata.name + ". Allowed values: " + variables.params'
+          - expression: 'variables.isUpdate || size(variables.badContainers) == 0'
+            messageExpression: '"The specified hostNetwork and hostPort are not allowed, pod: " + variables.anyObject.metadata.name'
+          - expression: variables.isUpdate || !variables.hostNetworkViolation
+            messageExpression: '"The specified hostNetwork and hostPort are not allowed, pod: " + variables.anyObject.metadata.name'
       - engine: Rego
         source:
           rego: |
@@ -178,7 +184,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>use-of-host-networking-ports-blocked</summary>
+<summary>port-range-with-host-network-allowed</summary>
 
 <details>
 <summary>constraint</summary>
@@ -208,7 +214,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 <details>
-<summary>example-disallowed</summary>
+<summary>out-of-range</summary>
 
 ```yaml
 apiVersion: v1
@@ -231,7 +237,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/example_disallowed.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/port_range_block_host_network/example_disallowed_out_of_range_host_network_true.yaml
 ```
 
 </details>
@@ -246,7 +252,6 @@ metadata:
   labels:
     app: nginx-host-networking-ports
 spec:
-  hostNetwork: false
   containers:
   - name: nginx
     image: nginx
@@ -259,12 +264,12 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/example_allowed.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/example_allowed_in_range.yaml
 ```
 
 </details>
 <details>
-<summary>disallowed-ephemeral</summary>
+<summary>out-of-range-ephemeral</summary>
 
 ```yaml
 apiVersion: v1
@@ -319,7 +324,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 
 
 </details><details>
-<summary>use-of-host-network-blocked</summary>
+<summary>host-network-forbidden</summary>
 
 <details>
 <summary>constraint</summary>
@@ -336,20 +341,98 @@ spec:
         kinds: ["Pod"]
   parameters:
     hostNetwork: false
-    exemptImages:
-    - "nginx"
+
 ```
 
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/constraint_block_host_network.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/block_host_network/constraint.yaml
 ```
 
 </details>
 
 <details>
-<summary>example-disallowed</summary>
+<summary>hostnetwork-true</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-host-network-true
+spec:
+  hostNetwork: true
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/example_allowed_no_ports_host_network_true.yaml
+```
+
+</details>
+<details>
+<summary>hostnetwork-false</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-host-network-false
+spec:
+  hostNetwork: false
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/example_allowed_no_ports_host_network_false.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>port-range-with-host-network-forbidden</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostNetworkingPorts
+metadata:
+  name: psp-host-network-ports
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    hostNetwork: false
+    min: 80
+    max: 9000
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/port_range_block_host_network/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>out-of-range-and-host-network-true</summary>
 
 ```yaml
 apiVersion: v1
@@ -372,12 +455,12 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/example_disallowed.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/port_range_block_host_network/example_disallowed_out_of_range_host_network_true.yaml
 ```
 
 </details>
 <details>
-<summary>example-allowed</summary>
+<summary>in-range-host-network-false</summary>
 
 ```yaml
 apiVersion: v1
@@ -387,7 +470,6 @@ metadata:
   labels:
     app: nginx-host-networking-ports
 spec:
-  hostNetwork: false
   containers:
   - name: nginx
     image: nginx
@@ -400,7 +482,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/example_allowed.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/example_allowed_in_range.yaml
 ```
 
 </details>
