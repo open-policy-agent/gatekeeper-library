@@ -16,7 +16,7 @@ metadata:
   name: k8spspreadonlyrootfilesystem
   annotations:
     metadata.gatekeeper.sh/title: "Read Only Root Filesystem"
-    metadata.gatekeeper.sh/version: 1.1.0
+    metadata.gatekeeper.sh/version: 1.1.1
     description: >-
       Requires the use of a read-only root file system by pod containers.
       Corresponds to the `readOnlyRootFilesystem` field in a
@@ -71,7 +71,7 @@ spec:
             expression: |
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
                 container.image in variables.exemptImageExplicit ||
-                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption)))
+                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))).map(container, container.image)
           - name: badContainers
             expression: |
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
@@ -174,6 +174,9 @@ spec:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
+  parameters:
+    exemptImages:
+    - "specialprogram"
 
 ```
 
@@ -260,6 +263,174 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/read-only-root-filesystem/samples/psp-readonlyrootfilesystem/disallowed_ephemeral.yaml
+```
+
+</details>
+<details>
+<summary>exact-exemption</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-readonlyrootfilesystem-disallowed
+  labels:
+    app: nginx-readonlyrootfilesystem
+spec:
+  containers:
+  - name: specialprogram
+    image: specialprogram
+    securityContext:
+      readOnlyRootFilesystem: false
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/read-only-root-filesystem/samples/psp-readonlyrootfilesystem/example_allowed_exempted.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>full-wildcard</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPReadOnlyRootFilesystem
+metadata:
+  name: psp-readonlyrootfilesystem
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    exemptImages:
+      - "*"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/read-only-root-filesystem/samples/full_wildcard/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>allow-normally-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-readonlyrootfilesystem-disallowed
+  labels:
+    app: nginx-readonlyrootfilesystem
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      readOnlyRootFilesystem: false
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/read-only-root-filesystem/samples/psp-readonlyrootfilesystem/example_disallowed.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>wildcard-prefix</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPReadOnlyRootFilesystem
+metadata:
+  name: psp-readonlyrootfilesystem
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    exemptImages:
+      - "safe-images.com/*"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/read-only-root-filesystem/samples/wildcard-prefix/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>image-with-exempt-prefix-readOnlyRootFilesystem-not-required</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-readonlyrootfilesystem-allowed
+  labels:
+    app: nginx-readonlyrootfilesystem
+spec:
+  containers:
+  - name: nginx
+    image: "safe-images.com/nginx"
+    securityContext:
+      readOnlyRootFilesystem: false
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/read-only-root-filesystem/samples/wildcard-prefix/example_allowed_safe_prefix.yaml
+```
+
+</details>
+<details>
+<summary>image-with-different-prefix-must-set-readOnlyRootFilesystem</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-readonlyrootfilesystem-allowed
+  labels:
+    app: nginx-readonlyrootfilesystem
+spec:
+  containers:
+  - name: nginx
+    image: "unsafe-images.com/nginx"
+    securityContext:
+      readOnlyRootFilesystem: false
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/read-only-root-filesystem/samples/wildcard-prefix/example_disallowed_unsafe_prefix.yaml
 ```
 
 </details>

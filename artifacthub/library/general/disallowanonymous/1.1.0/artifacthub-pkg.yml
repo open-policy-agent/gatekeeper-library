@@ -1,0 +1,22 @@
+version: 1.1.0
+name: k8sdisallowanonymous
+displayName: Disallow Anonymous Access
+createdAt: "2024-08-21T21:13:49Z"
+description: Disallows associating ClusterRole and Role resources to the system:anonymous user and system:unauthenticated group.
+digest: 8de75985d7841ab683cf095d1b86934a3d3278b20816c0bb2a10680d25ddd740
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/disallowanonymous
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Disallow Anonymous Access
+    Disallows associating ClusterRole and Role resources to the system:anonymous user and system:unauthenticated group.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/disallowanonymous/1.1.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

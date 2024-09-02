@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-host-network-false
+spec:
+  hostNetwork: false
+  containers:
+  - name: nginx
+    image: nginx
