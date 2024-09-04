@@ -16,7 +16,7 @@ metadata:
   name: k8spsphostnetworkingports
   annotations:
     metadata.gatekeeper.sh/title: "Host Networking Ports"
-    metadata.gatekeeper.sh/version: 1.1.3
+    metadata.gatekeeper.sh/version: 1.1.4
     description: >-
       Controls usage of host network namespace by pod containers. HostNetwork verification happens without exception for exemptImages. Specific
       ports must be specified. Corresponds to the `hostNetwork` and
@@ -80,7 +80,8 @@ spec:
             expression: |
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
                 container.image in variables.exemptImageExplicit ||
-                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption)))
+                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))
+              ).map(container, container.image)
           - name: badContainers
             expression: |
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
@@ -203,6 +204,9 @@ spec:
     hostNetwork: true
     min: 80
     max: 9000
+    exemptImages:
+    - "safeimages.com/*"
+
 ```
 
 Usage
@@ -321,6 +325,34 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 
 </details>
+<details>
+<summary>port-violation-exempted</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-host-networking-ports-exempted
+  labels:
+    app: nginx-host-networking-ports
+spec:
+  hostNetwork: true
+  containers:
+  - name: nginx
+    image: safeimages.com/nginx
+    ports:
+    - containerPort: 9001
+      hostPort: 9001
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/example_allowed_out_of_range_exempted.yaml
+```
+
+</details>
 
 
 </details><details>
@@ -420,6 +452,8 @@ spec:
     hostNetwork: false
     min: 80
     max: 9000
+    exemptImages:
+    - "safeimages.com/*"
 
 ```
 
@@ -456,6 +490,34 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/port_range_block_host_network/example_disallowed_out_of_range_host_network_true.yaml
+```
+
+</details>
+<details>
+<summary>exempted-image-still-violates-on-hostnetwork</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-host-networking-hn-ok-bad-port
+  labels:
+    app: nginx-host-networking-ports
+spec:
+  hostNetwork: true
+  containers:
+  - name: nginx
+    image: safeimages.com/nginx
+    ports:
+    - containerPort: 9001
+      hostPort: 9001
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/port_range_block_host_network/example_disallowed_exempted_container_host_network_enabled.yaml
 ```
 
 </details>
