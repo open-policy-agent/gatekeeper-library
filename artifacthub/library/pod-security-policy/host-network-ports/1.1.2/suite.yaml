@@ -1,0 +1,50 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: host-network-ports
+tests:
+- name: use-of-host-networking-ports-blocked
+  template: template.yaml
+  constraint: samples/psp-host-network-ports/constraint.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/psp-host-network-ports/example_disallowed.yaml
+    assertions:
+    - violations: yes
+  - name: example-allowed
+    object: samples/psp-host-network-ports/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: disallowed-ephemeral
+    object: samples/psp-host-network-ports/disallowed_ephemeral.yaml
+    assertions:
+    - violations: yes
+  - name: update
+    object: samples/psp-host-network-ports/update.yaml
+    assertions:
+    - violations: no
+  - name: no-ports-specified
+    object: samples/psp-host-network-ports/example_allowed_no_ports.yaml
+    assertions:
+    - violations: no
+- name: use-of-host-network-blocked
+  template: template.yaml
+  constraint: samples/psp-host-network-ports/constraint_block_host_network.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/psp-host-network-ports/example_disallowed.yaml
+    assertions:
+    - violations: yes
+  - name: example-allowed
+    object: samples/psp-host-network-ports/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: disallowed-ephemeral
+    object: samples/psp-host-network-ports/disallowed_ephemeral.yaml
+    assertions:
+    - violations: yes
+  - name: update
+    object: samples/psp-host-network-ports/update.yaml
+    assertions:
+    - violations: no
+
