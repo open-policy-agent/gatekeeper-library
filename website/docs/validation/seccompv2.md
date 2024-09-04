@@ -6,7 +6,7 @@ title: Seccomp V2
 # Seccomp V2
 
 ## Description
-Controls the seccomp profile used by containers. Corresponds to the `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccompv2
+Controls the seccomp profile used by containers. Corresponds to the `securityContext.seccompProfile` field.
 
 ## Template
 ```yaml
@@ -19,9 +19,7 @@ metadata:
     metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Controls the seccomp profile used by containers. Corresponds to the
-      `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on
-      a PodSecurityPolicy. For more information, see
-      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccompv2
+      `securityContext.seccompProfile` field.
 spec:
   crd:
     spec:
@@ -33,9 +31,7 @@ spec:
           type: object
           description: >-
             Controls the seccomp profile used by containers. Corresponds to the
-            `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on
-            a PodSecurityPolicy. For more information, see
-            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccompv2
+            `securityContext.seccompProfile` field.
           properties:
             exemptImages:
               description: >-
