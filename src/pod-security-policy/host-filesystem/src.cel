@@ -12,7 +12,7 @@ variables:
     !has(variables.params.allowedHostPaths) ? [] : variables.params.allowedHostPaths
 - name: volumes
   expression: |
-    variables.anyObject.spec.volumes.filter(volume, has(volume.hostPath))
+    !has(variables.anyObject.spec.volumes) ? [] : variables.anyObject.spec.volumes.filter(volume, has(volume.hostPath))
 - name: badHostPaths
   expression: |
     variables.volumes.filter(volume, 
