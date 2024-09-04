@@ -16,7 +16,7 @@ metadata:
   name: k8spsphostfilesystem
   annotations:
     metadata.gatekeeper.sh/title: "Host Filesystem"
-    metadata.gatekeeper.sh/version: 1.1.0
+    metadata.gatekeeper.sh/version: 1.1.1
     description: >-
       Controls usage of the host filesystem. Corresponds to the
       `allowedHostPaths` field in a PodSecurityPolicy. For more information,
@@ -68,7 +68,7 @@ spec:
               !has(variables.params.allowedHostPaths) ? [] : variables.params.allowedHostPaths
           - name: volumes
             expression: |
-              variables.anyObject.spec.volumes.filter(volume, has(volume.hostPath))
+              !has(variables.anyObject.spec.volumes) ? [] : variables.anyObject.spec.volumes.filter(volume, has(volume.hostPath))
           - name: badHostPaths
             expression: |
               variables.volumes.filter(volume, 
@@ -317,6 +317,87 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-filesystem/samples/psp-host-filesystem/disallowed_ephemeral.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>no-host-paths</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: no-host-paths
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-filesystem/samples/no-host-paths/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>previously-allowed-path-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-host-filesystem
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      volumeMounts:
+        - mountPath: /cache
+          name: cache-volume
+          readOnly: true
+  volumes:
+    - name: cache-volume
+      hostPath:
+        path: /foo/bar
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-filesystem/samples/psp-host-filesystem/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>no-volumes-is-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-no-volumes
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-filesystem/samples/no-host-paths/example_allowed_no_volumes.yaml
 ```
 
 </details>
