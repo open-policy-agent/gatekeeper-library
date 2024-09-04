@@ -16,7 +16,7 @@ metadata:
   name: k8spspallowprivilegeescalationcontainer
   annotations:
     metadata.gatekeeper.sh/title: "Allow Privilege Escalation in Container"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Controls restricting escalation to root privileges. Corresponds to the
       `allowPrivilegeEscalation` field in a PodSecurityPolicy. For more
@@ -48,68 +48,106 @@ spec:
                 type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8spspallowprivilegeescalationcontainer
+      code:
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: containers
+            expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+          - name: initContainers
+            expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+          - name: ephemeralContainers
+            expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+          - name: exemptImagePrefixes
+            expression: |
+              !has(variables.params.exemptImages) ? [] :
+                variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+          - name: exemptImageExplicit
+            expression: |
+              !has(variables.params.exemptImages) ? [] : 
+                variables.params.exemptImages.filter(image, !image.endsWith("*"))
+          - name: exemptImages
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                container.image in variables.exemptImageExplicit ||
+                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))
+              ).map(container, container.image)
+          - name: badContainers
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                !(container.image in variables.exemptImages) && (
+                  !has(container.securityContext) ||
+                  !has(container.securityContext.allowPrivilegeEscalation) ||
+                  container.securityContext.allowPrivilegeEscalation != false
+                )
+              )
+          validations:
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badContainers) == 0'
+            messageExpression: '"Privilege escalation container is not allowed: " + variables.badContainers.map(c, c.image).join(", ")'
+      - engine: Rego
+        source:
+          rego: |
+            package k8spspallowprivilegeescalationcontainer
 
-        import data.lib.exclude_update.is_update
-        import data.lib.exempt_container.is_exempt
+            import data.lib.exclude_update.is_update
+            import data.lib.exempt_container.is_exempt
 
-        violation[{"msg": msg, "details": {}}] {
-            # spec.containers.securityContext.allowPrivilegeEscalation field is immutable.
-            not is_update(input.review)
+            violation[{"msg": msg, "details": {}}] {
+                # spec.containers.securityContext.allowPrivilegeEscalation field is immutable.
+                not is_update(input.review)
 
-            c := input_containers[_]
-            not is_exempt(c)
-            input_allow_privilege_escalation(c)
-            msg := sprintf("Privilege escalation container is not allowed: %v", [c.name])
-        }
+                c := input_containers[_]
+                not is_exempt(c)
+                input_allow_privilege_escalation(c)
+                msg := sprintf("Privilege escalation container is not allowed: %v", [c.name])
+            }
 
-        input_allow_privilege_escalation(c) {
-            not has_field(c, "securityContext")
-        }
-        input_allow_privilege_escalation(c) {
-            not c.securityContext.allowPrivilegeEscalation == false
-        }
-        input_containers[c] {
-            c := input.review.object.spec.containers[_]
-        }
-        input_containers[c] {
-            c := input.review.object.spec.initContainers[_]
-        }
-        input_containers[c] {
-            c := input.review.object.spec.ephemeralContainers[_]
-        }
-        # has_field returns whether an object has a field
-        has_field(object, field) = true {
-            object[field]
-        }
-      libs:
-        - |
-          package lib.exclude_update
+            input_allow_privilege_escalation(c) {
+                not has_field(c, "securityContext")
+            }
+            input_allow_privilege_escalation(c) {
+                not c.securityContext.allowPrivilegeEscalation == false
+            }
+            input_containers[c] {
+                c := input.review.object.spec.containers[_]
+            }
+            input_containers[c] {
+                c := input.review.object.spec.initContainers[_]
+            }
+            input_containers[c] {
+                c := input.review.object.spec.ephemeralContainers[_]
+            }
+            # has_field returns whether an object has a field
+            has_field(object, field) = true {
+                object[field]
+            }
+          libs:
+          - |
+            package lib.exclude_update
 
-          is_update(review) {
-              review.operation == "UPDATE"
-          }
-        - |
-          package lib.exempt_container
+            is_update(review) {
+                review.operation == "UPDATE"
+            }
+          - |
+            package lib.exempt_container
 
-          is_exempt(container) {
-              exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
-              img := container.image
-              exemption := exempt_images[_]
-              _matches_exemption(img, exemption)
-          }
+            is_exempt(container) {
+                exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+                img := container.image
+                exemption := exempt_images[_]
+                _matches_exemption(img, exemption)
+            }
 
-          _matches_exemption(img, exemption) {
-              not endswith(exemption, "*")
-              exemption == img
-          }
+            _matches_exemption(img, exemption) {
+                not endswith(exemption, "*")
+                exemption == img
+            }
 
-          _matches_exemption(img, exemption) {
-              endswith(exemption, "*")
-              prefix := trim_suffix(exemption, "*")
-              startswith(img, prefix)
-          }
+            _matches_exemption(img, exemption) {
+                endswith(exemption, "*")
+                prefix := trim_suffix(exemption, "*")
+                startswith(img, prefix)
+            }
 
 ```
 
@@ -134,6 +172,8 @@ spec:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
+  parameters:
+    exemptImages: ["safeimages.com/*"]
 
 ```
 
@@ -220,6 +260,32 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/allow-privilege-escalation/samples/psp-allow-privilege-escalation-container/disallowed_ephemeral.yaml
+```
+
+</details>
+<details>
+<summary>exempted-path</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-privilege-escalation-disallowed
+  labels:
+    app: nginx-privilege-escalation
+spec:
+  containers:
+  - name: nginx
+    image: "safeimages.com/nginx"
+    securityContext:
+      allowPrivilegeEscalation: true
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/allow-privilege-escalation/samples/psp-allow-privilege-escalation-container/example_allowed_exempt.yaml
 ```
 
 </details>
