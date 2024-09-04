@@ -23,3 +23,7 @@ tests:
         object: samples/psp-allow-privilege-escalation-container/update.yaml
         assertions:
           - violations: no
+      - name: exempted-path
+        object: samples/psp-allow-privilege-escalation-container/example_allowed_exempt.yaml
+        assertions:
+          - violations: no

@@ -15,9 +15,14 @@ variables:
       variables.params.exemptImages.filter(image, !image.endsWith("*"))
 - name: exemptImages
   expression: |
-    (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+    (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(
+      container,
       container.image in variables.exemptImageExplicit ||
-      variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption)))
+        variables.exemptImagePrefixes.exists(
+          exemption,
+          string(container.image).startsWith(exemption)
+        )
+    ).map(container, container.image)
 - name: allowedProcMount
   expression: |
     !has(variables.params) ? "default" : 
