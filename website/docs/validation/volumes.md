@@ -209,6 +209,31 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 
 </details>
+<details>
+<summary>example-allowed-without-volume</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-without-volume-allowed
+  labels:
+    app: nginx-without-volume-types
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+  - name: nginx2
+    image: nginx
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/volumes/samples/psp-volume-types/example_allowed_no_volume.yaml
+```
+
+</details>
 
 
 </details>

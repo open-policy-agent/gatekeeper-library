@@ -314,6 +314,30 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 
 </details>
 <details>
+<summary>example-allowed-wihtout-selinux-opts</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+    name: nginx-selinux-allowed-without-selinux-opts
+    labels:
+        app: nginx-selinux
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/selinux/samples/psp-selinux-v2/example_allowed_without_selinux_opts.yaml
+```
+
+</details>
+<details>
 <summary>disallowed-ephemeral</summary>
 
 ```yaml
