@@ -1,7 +1,7 @@
 version: 1.0.0
 name: k8spspseccompv2
 displayName: Seccomp V2
-createdAt: "2024-06-13T18:28:19Z"
+createdAt: "2024-09-05T01:36:31Z"
 description: Controls the seccomp profile used by containers. Corresponds to the `securityContext.seccompProfile` field.
 digest: 82f2c64bae8f6984ac24a71793134a385ec0761a2c44be43d16f25283bac4d9b
 license: Apache-2.0
