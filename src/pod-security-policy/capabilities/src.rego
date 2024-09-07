@@ -21,8 +21,6 @@ violation[{"msg": msg}] {
   msg := sprintf("container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
 }
 
-
-
 violation[{"msg": msg}] {
   not is_update(input.review)
   container := input.review.object.spec.initContainers[_]
@@ -39,8 +37,6 @@ violation[{"msg": msg}] {
   msg := sprintf("init container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
 }
 
-
-
 violation[{"msg": msg}] {
   not is_update(input.review)
   container := input.review.object.spec.ephemeralContainers[_]
@@ -56,7 +52,6 @@ violation[{"msg": msg}] {
   missing_drop_capabilities(container)
   msg := sprintf("ephemeral container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
 }
-
 
 has_disallowed_capabilities(container) {
   allowed := {c | c := lower(input.parameters.allowedCapabilities[_])}
