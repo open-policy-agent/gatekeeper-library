@@ -16,7 +16,7 @@ metadata:
   name: k8spspcapabilities
   annotations:
     metadata.gatekeeper.sh/title: "Capabilities"
-    metadata.gatekeeper.sh/version: 1.1.0
+    metadata.gatekeeper.sh/version: 1.1.1
     description: >-
       Controls Linux capabilities on containers. Corresponds to the
       `allowedCapabilities` and `requiredDropCapabilities` fields in a
@@ -147,8 +147,6 @@ spec:
               msg := sprintf("container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
             }
 
-
-
             violation[{"msg": msg}] {
               not is_update(input.review)
               container := input.review.object.spec.initContainers[_]
@@ -165,8 +163,6 @@ spec:
               msg := sprintf("init container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
             }
 
-
-
             violation[{"msg": msg}] {
               not is_update(input.review)
               container := input.review.object.spec.ephemeralContainers[_]
@@ -182,7 +178,6 @@ spec:
               missing_drop_capabilities(container)
               msg := sprintf("ephemeral container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
             }
-
 
             has_disallowed_capabilities(container) {
               allowed := {c | c := lower(input.parameters.allowedCapabilities[_])}
