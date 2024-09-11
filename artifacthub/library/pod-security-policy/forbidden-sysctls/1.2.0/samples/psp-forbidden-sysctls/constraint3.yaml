@@ -12,4 +12,4 @@ spec:
     # - "*" # * may be used to forbid all sysctls
     - kernel.*
     allowedSysctls:
-    - "net.*" # allows all sysctls. allowedSysctls is optional.
+    - "net.*"
