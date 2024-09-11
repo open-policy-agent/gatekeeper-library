@@ -1,4 +1,6 @@
 variables:
+- name: isUpdate
+  expression: has(request.operation) && request.operation == "UPDATE"
 - name: sysctls
   expression: '!has(variables.anyObject.spec.securityContext) ? [] : !has(variables.anyObject.spec.securityContext.sysctls) ? [] : variables.anyObject.spec.securityContext.sysctls'
 - name: allowedSysctlPrefixes
@@ -15,16 +17,17 @@ variables:
   expression: |
     !has(variables.params.forbiddenSysctls) ? [] : 
       variables.params.forbiddenSysctls.filter(sysctl, !sysctl.endsWith("*"))
-- name: allAllowed
-  expression: '!has(variables.params.allowedSysctls) ? true : false'
+- name: allowedSysctlsString
+  expression: |
+    !has(variables.params.allowedSysctls) ? "unspecified" : size(variables.params.allowedSysctls) == 0 ? "empty" : variables.params.allowedSysctls.join(", ")
 - name: violatingSysctls
   expression: |
     (variables.sysctls.filter(sysctl,
       (sysctl.name in variables.forbiddenSysctlExplicit ||
       variables.forbiddenSysctlPrefixes.exists(fsp, string(sysctl.name).startsWith(fsp))) ||
-      (!variables.allAllowed &&
+      (has(variables.params.allowedSysctls) &&
       !(sysctl.name in variables.allowedSysctlExplicit) &&
       !variables.allowedSysctlPrefixes.exists(asp, string(sysctl.name).startsWith(asp)))))
 validations:
-- expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.violatingSysctls) == 0'
-  messageExpression: '"The sysctl is not allowed for pod: " + variables.anyObject.metadata.name + ", forbidden: " + variables.forbiddenSysctls.map(c, c).join(", ") + ", allowed: " + variables.allowedSysctls.map(c, c).join(", ")'
+- expression: 'variables.isUpdate || size(variables.violatingSysctls) == 0'
+  messageExpression: '"The sysctl is not allowed for pod: " + variables.anyObject.metadata.name + ", forbidden: " + variables.params.forbiddenSysctls.join(", ") + ", allowed: " + variables.allowedSysctlsString'

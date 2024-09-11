@@ -11,5 +11,4 @@ spec:
     forbiddenSysctls:
     # - "*" # * may be used to forbid all sysctls
     - kernel.*
-    allowedSysctls:
-    - "net.*"
+    # unspecified allowedSysctls will not place any restrictions
