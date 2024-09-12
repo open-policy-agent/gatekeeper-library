@@ -3,7 +3,7 @@ name: k8spspfsgroup
 displayName: FS Group
 createdAt: "2024-07-08T22:14:40Z"
 description: Controls allocating an FSGroup that owns the Pod's volumes. Corresponds to the `fsGroup` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
-digest: a9a225993a5a5cb56c9fc4ee947b7756fde6025498a7e9dd66fb67718b59d24a
+digest: b0c1dada1dd06b897676e480a7a1439cc339cd9d1703dc0dbb4329e0b89ba4bd
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/fsgroup
 keywords:

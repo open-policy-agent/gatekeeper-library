@@ -60,14 +60,22 @@ spec:
       - engine: K8sNativeValidation
         source:
           variables:
+          - name: isUpdate
+            expression: has(request.operation) && request.operation == "UPDATE"
           - name: fsGroup
             expression: '!has(variables.anyObject.spec.securityContext) ? "" : !has(variables.anyObject.spec.securityContext.fsGroup) ? "" : variables.anyObject.spec.securityContext.fsGroup'
+          - name: ruleString
+            expression: |
+              !has(variables.params.rule) ? "unspecified" : string(variables.params.rule)
+          - name: rangesString
+            expression: |
+              !has(variables.params.ranges) ? "unspecified" : size(variables.params.ranges) == 0 ? "empty" : variables.params.ranges.map(r, string(r)).join(", ")
           - name: input_fsGroup_allowed
             expression: |
-              !has(variables.params.rule) ? true : variables.params.rule == "RunAsAny" ? true : variables.params.rule == "MayRunAs" && variables.fsGroup == "" ? true : (variables.params.rule == "MayRunAs" || variables.params.rule == "MustRunAs") && has(variables.params.ranges) && size(variables.params.ranges) > 0 ? variables.params.ranges.all(range, range.min <= variables.fsGroup && range.max >= variables.fsGroup) : false
+              !has(variables.params.rule) ? true : variables.params.rule == "RunAsAny" ? true : variables.params.rule == "MayRunAs" && variables.fsGroup == "" ? true : (variables.params.rule == "MayRunAs" || variables.params.rule == "MustRunAs") && has(variables.params.ranges) && size(variables.params.ranges) > 0 ? variables.params.ranges.exists(range, range.min <= variables.fsGroup && range.max >= variables.fsGroup) : false
           validations:
-          - expression: '(has(request.operation) && request.operation == "UPDATE") || variables.input_fsGroup_allowed'
-            messageExpression: '"The provided pod spec fsGroup is not allowed, pod: " + variables.anyObject.metadata.name + ". Allowed fsGroup: " + variables.params.rule'
+          - expression: 'variables.isUpdate || variables.input_fsGroup_allowed'
+            messageExpression: '"The provided pod spec fsGroup is not allowed, pod: " + variables.anyObject.metadata.name + ". Allowed fsGroup rule: " + variables.ruleString + ", allowed fsGroup ranges: " + variables.rangesString'
       - engine: Rego
         source:
           rego: |
@@ -207,7 +215,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 apiVersion: v1
 kind: Pod
 metadata:
-  name: fsgroup-disallowed
+  name: fsgroup-allowed
 spec:
   securityContext:
     fsGroup: 500 # directory will have group ID 500
@@ -234,7 +242,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 
 
 </details><details>
-<summary>fsgroup2</summary>
+<summary>fsgroup-no-rules</summary>
 
 <details>
 <summary>constraint</summary>
@@ -265,7 +273,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 <details>
-<summary>example-disallowed</summary>
+<summary>example-allowed</summary>
 
 ```yaml
 apiVersion: v1
@@ -302,7 +310,101 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 apiVersion: v1
 kind: Pod
 metadata:
+  name: fsgroup-allowed
+spec:
+  securityContext:
+    fsGroup: 500 # directory will have group ID 500
+  volumes:
+    - name: fsgroup-demo-vol
+      emptyDir: {}
+  containers:
+    - name: fsgroup-demo
+      image: busybox
+      command: ["sh", "-c", "sleep 1h"]
+      volumeMounts:
+        - name: fsgroup-demo-vol
+          mountPath: /data/demo
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/fsgroup/samples/psp-fsgroup/example_allowed.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>fsgroup-empty-ranges</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPFSGroup
+metadata:
+  name: psp-fsgroup
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    rule: "MustRunAs" #"MayRunAs", "RunAsAny"
+    ranges: [] # empty ranges should result in violation
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/fsgroup/samples/psp-fsgroup/constraint3.yaml
+```
+
+</details>
+
+<details>
+<summary>example-disallowed-2000</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
   name: fsgroup-disallowed
+spec:
+  securityContext:
+    fsGroup: 2000                           # directory will have group ID 2000
+  volumes:
+  - name: fsgroup-demo-vol
+    emptyDir: {}
+  containers:
+  - name: fsgroup-demo
+    image: busybox
+    command: [ "sh", "-c", "sleep 1h" ]
+    volumeMounts:
+    - name: fsgroup-demo-vol
+      mountPath: /data/demo
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/fsgroup/samples/psp-fsgroup/example_disallowed.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-500</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fsgroup-allowed
 spec:
   securityContext:
     fsGroup: 500 # directory will have group ID 500
