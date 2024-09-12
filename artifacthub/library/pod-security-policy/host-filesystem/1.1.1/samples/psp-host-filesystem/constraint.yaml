@@ -1,12 +1,13 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sPSPAppArmor
+kind: K8sPSPHostFilesystem
 metadata:
-  name: psp-apparmor
+  name: psp-host-filesystem
 spec:
   match:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
   parameters:
-    allowedProfiles:
-    - localhost/custom
+    allowedHostPaths:
+    - readOnly: true
+      pathPrefix: "/foo"
