@@ -173,7 +173,7 @@ spec:
       - apiGroups: [""]
         kinds: ["Pod"]
   parameters:
-    exemptImages: ["nonexistent/*"]
+    exemptImages: ["safeimages.com/*"]
 
 ```
 
@@ -260,6 +260,32 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/allow-privilege-escalation/samples/psp-allow-privilege-escalation-container/disallowed_ephemeral.yaml
+```
+
+</details>
+<details>
+<summary>exempted-path</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-privilege-escalation-disallowed
+  labels:
+    app: nginx-privilege-escalation
+spec:
+  containers:
+  - name: nginx
+    image: "safeimages.com/nginx"
+    securityContext:
+      allowPrivilegeEscalation: true
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/allow-privilege-escalation/samples/psp-allow-privilege-escalation-container/example_allowed_exempt.yaml
 ```
 
 </details>

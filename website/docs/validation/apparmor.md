@@ -16,7 +16,7 @@ metadata:
   name: k8spspapparmor
   annotations:
     metadata.gatekeeper.sh/title: "App Armor"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Configures an allow-list of AppArmor profiles for use by containers.
       This corresponds to specific annotations applied to a PodSecurityPolicy.
@@ -54,61 +54,180 @@ spec:
                 type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8spspapparmor
+      code:
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: containers
+            expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+          - name: initContainers
+            expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+          - name: ephemeralContainers
+            expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+          - name: podAppArmor
+            expression: 'has(variables.anyObject.spec.securityContext) && has(variables.anyObject.spec.securityContext.appArmorProfile) ? variables.anyObject.spec.securityContext.appArmorProfile : null'
+          - name: canonicalPodAppArmor
+            expression: |
+              variables.podAppArmor == null ? "runtime/default" : 
+                variables.podAppArmor.type == "RuntimeDefault" ? "runtime/default" :
+                  variables.podAppArmor.type == "Unconfined" ? "unconfined" : 
+                    variables.podAppArmor.type == "Localhost" ? "localhost/" + variables.podAppArmor.localhostProfile : ""
+          # break this mapping up by container type (regular/init/ephemeral) to avoid problems with name collisions,
+          # which may be a problem when running shift-left (no K8s API server to enforce uniqueness of container names)
+          - name: appArmorByContainer
+            expression: |
+              variables.containers.map(container, [container.name,
+                has(container.securityContext) && has(container.securityContext.appArmorProfile) ?
+                  (container.securityContext.appArmorProfile.type == "RuntimeDefault" ? "runtime/default" :
+                    container.securityContext.appArmorProfile.type == "Unconfined" ? "unconfined" : 
+                      container.securityContext.appArmorProfile.type == "Localhost" ? "localhost/" + container.securityContext.appArmorProfile.localhostProfile : "") :
+                  has(variables.anyObject.metadata.annotations) && ("container.apparmor.security.beta.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations ?
+                    variables.anyObject.metadata.annotations["container.apparmor.security.beta.kubernetes.io/" + container.name] :
+                      variables.canonicalPodAppArmor
+              ])
+          - name: appArmorByInitContainer
+            expression: |
+              variables.initContainers.map(container, [container.name,
+                has(container.securityContext) && has(container.securityContext.appArmorProfile) ?
+                  (container.securityContext.appArmorProfile.type == "RuntimeDefault" ? "runtime/default" :
+                    container.securityContext.appArmorProfile.type == "Unconfined" ? "unconfined" : 
+                      container.securityContext.appArmorProfile.type == "Localhost" ? "localhost/" + container.securityContext.appArmorProfile.localhostProfile : "") :
+                  has(variables.anyObject.metadata.annotations) && ("container.apparmor.security.beta.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations ?
+                    variables.anyObject.metadata.annotations["container.apparmor.security.beta.kubernetes.io/" + container.name] :
+                      variables.canonicalPodAppArmor
+              ])
+          - name: appArmorByEphemeralContainer
+            expression: |
+              variables.ephemeralContainers.map(container, [container.name,
+                has(container.securityContext) && has(container.securityContext.appArmorProfile) ?
+                  (container.securityContext.appArmorProfile.type == "RuntimeDefault" ? "runtime/default" :
+                    container.securityContext.appArmorProfile.type == "Unconfined" ? "unconfined" : 
+                      container.securityContext.appArmorProfile.type == "Localhost" ? "localhost/" + container.securityContext.appArmorProfile.localhostProfile : "") :
+                  has(variables.anyObject.metadata.annotations) && ("container.apparmor.security.beta.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations ?
+                    variables.anyObject.metadata.annotations["container.apparmor.security.beta.kubernetes.io/" + container.name] :
+                      variables.canonicalPodAppArmor
+              ])
+          - name: exemptImagePrefixes
+            expression: |
+              !has(variables.params.exemptImages) ? [] :
+                variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+          - name: exemptImageExplicit
+            expression: |
+              !has(variables.params.exemptImages) ? [] : 
+                variables.params.exemptImages.filter(image, !image.endsWith("*"))
+          - name: exemptImages
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                container.image in variables.exemptImageExplicit ||
+                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))
+              ).map(container, container.image)
+          validations:
+          - expression: |
+              variables.containers.all(container,
+                (container.image in variables.exemptImages) ||
+                variables.appArmorByContainer.exists(pair, pair[0] == container.name && pair[1] in variables.params.allowedProfiles)
+              )
+            messageExpression: '"AppArmor profile is not allowed. Allowed Profiles: " + variables.params.allowedProfiles.join(", ")'
+          - expression: |
+              variables.initContainers.all(container,
+                (container.image in variables.exemptImages) ||
+                variables.appArmorByInitContainer.exists(pair, pair[0] == container.name && pair[1] in variables.params.allowedProfiles)
+              )
+            messageExpression: '"AppArmor profile is not allowed. Allowed Profiles: " + variables.params.allowedProfiles.join(", ")'
+          - expression: |
+              variables.ephemeralContainers.all(container,
+                (container.image in variables.exemptImages) ||
+                variables.appArmorByEphemeralContainer.exists(pair, pair[0] == container.name && pair[1] in variables.params.allowedProfiles)
+              )
+            messageExpression: '"AppArmor profile is not allowed. Allowed Profiles: " + variables.params.allowedProfiles.join(", ")'
+      - engine: Rego
+        source:
+          rego: |
+            package k8spspapparmor
 
-        import data.lib.exempt_container.is_exempt
+            import data.lib.exempt_container.is_exempt
 
-        violation[{"msg": msg, "details": {}}] {
-            metadata := input.review.object.metadata
-            container := input_containers[_]
-            not is_exempt(container)
-            not input_apparmor_allowed(container, metadata)
-            msg := sprintf("AppArmor profile is not allowed, pod: %v, container: %v. Allowed profiles: %v", [input.review.object.metadata.name, container.name, input.parameters.allowedProfiles])
-        }
+            violation[{"msg": msg, "details": {}}] {
+                container := input_containers[_]
+                not is_exempt(container)
+                not input_apparmor_allowed(input.review.object, container)
+                msg := sprintf("AppArmor profile is not allowed, pod: %v, container: %v. Allowed profiles: %v", [input.review.object.metadata.name, container.name, input.parameters.allowedProfiles])
+            }
 
-        input_apparmor_allowed(container, metadata) {
-            get_annotation_for(container, metadata) == input.parameters.allowedProfiles[_]
-        }
+            input_apparmor_allowed(pod, container) {
+                get_apparmor_profile(pod, container) == input.parameters.allowedProfiles[_]
+            }
 
-        input_containers[c] {
-            c := input.review.object.spec.containers[_]
-        }
-        input_containers[c] {
-            c := input.review.object.spec.initContainers[_]
-        }
-        input_containers[c] {
-            c := input.review.object.spec.ephemeralContainers[_]
-        }
+            input_containers[c] {
+                c := input.review.object.spec.containers[_]
+            }
+            input_containers[c] {
+                c := input.review.object.spec.initContainers[_]
+            }
+            input_containers[c] {
+                c := input.review.object.spec.ephemeralContainers[_]
+            }
 
-        get_annotation_for(container, metadata) = out {
-            out = metadata.annotations[sprintf("container.apparmor.security.beta.kubernetes.io/%v", [container.name])]
-        }
-        get_annotation_for(container, metadata) = out {
-            not metadata.annotations[sprintf("container.apparmor.security.beta.kubernetes.io/%v", [container.name])]
-            out = "runtime/default"
-        }
-      libs:
-        - |
-          package lib.exempt_container
+            get_apparmor_profile(_, container) = out {
+                profile := object.get(container, ["securityContext", "appArmorProfile"], null)
+                profile != null
+                out := canonicalize_apparmor_profile(profile)
+            }
 
-          is_exempt(container) {
-              exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
-              img := container.image
-              exemption := exempt_images[_]
-              _matches_exemption(img, exemption)
-          }
+            get_apparmor_profile(pod, container) = out {
+                profile := object.get(container, ["securityContext", "appArmorProfile"], null)
+                profile == null
+                out := pod.metadata.annotations[sprintf("container.apparmor.security.beta.kubernetes.io/%v", [container.name])]
+            }
 
-          _matches_exemption(img, exemption) {
-              not endswith(exemption, "*")
-              exemption == img
-          }
+            get_apparmor_profile(pod, container) = out {
+                profile := object.get(container, ["securityContext", "appArmorProfile"], null)
+                profile == null
+                not pod.metadata.annotations[sprintf("container.apparmor.security.beta.kubernetes.io/%v", [container.name])]
+                out := canonicalize_apparmor_profile(object.get(pod, ["spec", "securityContext", "appArmorProfile"], null))
+            }
 
-          _matches_exemption(img, exemption) {
-              endswith(exemption, "*")
-              prefix := trim_suffix(exemption, "*")
-              startswith(img, prefix)
-          }
+            canonicalize_apparmor_profile(profile) = out {
+                profile.type == "RuntimeDefault"
+                out := "runtime/default"
+            }
+
+            canonicalize_apparmor_profile(profile) = out {
+                profile.type == "Unconfined"
+                out := "unconfined"
+            }
+
+            canonicalize_apparmor_profile(profile) = out {
+                profile.type = "Localhost"
+                out := sprintf("localhost/%s", [profile.localhostProfile])
+            }
+
+            canonicalize_apparmor_profile(profile) = out {
+                profile == null
+                out := "runtime/default"
+            }
+          libs:
+          - |
+            package lib.exempt_container
+
+            is_exempt(container) {
+                exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+                img := container.image
+                exemption := exempt_images[_]
+                _matches_exemption(img, exemption)
+            }
+
+            _matches_exemption(img, exemption) {
+                not endswith(exemption, "*")
+                exemption == img
+            }
+
+            _matches_exemption(img, exemption) {
+                endswith(exemption, "*")
+                prefix := trim_suffix(exemption, "*")
+                startswith(img, prefix)
+            }
+
 
 ```
 
@@ -135,7 +254,7 @@ spec:
         kinds: ["Pod"]
   parameters:
     allowedProfiles:
-    - runtime/default
+    - localhost/custom
 
 ```
 
@@ -157,7 +276,7 @@ metadata:
   name: nginx-apparmor-allowed
   annotations:
     # apparmor.security.beta.kubernetes.io/pod: unconfined # runtime/default
-    container.apparmor.security.beta.kubernetes.io/nginx: runtime/default
+    container.apparmor.security.beta.kubernetes.io/nginx: localhost/custom
   labels:
     app: nginx-apparmor
 spec:
@@ -171,6 +290,93 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/apparmor/samples/psp-apparmor/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-container</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-apparmor-allowed
+  labels:
+    app: nginx-apparmor
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      appArmorProfile:
+        type: "Localhost"
+        localhostProfile: "custom"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/apparmor/samples/psp-apparmor/example_allowed_container.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-pod</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-apparmor-allowed
+  labels:
+    app: nginx-apparmor
+spec:
+  securityContext:
+    appArmorProfile:
+      type: "Localhost"
+      localhostProfile: "custom"
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/apparmor/samples/psp-apparmor/example_allowed_pod.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-override</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-apparmor-allowed
+  labels:
+    app: nginx-apparmor
+spec:
+  securityContext:
+    appArmorProfile:
+      type: "Unconfined"
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      appArmorProfile:
+        type: "Localhost"
+        localhostProfile: "custom"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/apparmor/samples/psp-apparmor/example_allowed_override.yaml
 ```
 
 </details>
@@ -198,6 +404,61 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/apparmor/samples/psp-apparmor/example_disallowed.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-override</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-apparmor-allowed
+  labels:
+    app: nginx-apparmor
+spec:
+  securityContext:
+    appArmorProfile:
+      type: "Localhost"
+      localhostProfile: "custom"
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      appArmorProfile:
+        type: "Unconfined"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/apparmor/samples/psp-apparmor/example_disallowed_override.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-no-profile</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-apparmor-disallowed
+  labels:
+    app: nginx-apparmor
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/apparmor/samples/psp-apparmor/example_disallowed_no_profile.yaml
 ```
 
 </details>
