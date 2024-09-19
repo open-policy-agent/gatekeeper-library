@@ -16,7 +16,7 @@ metadata:
   name: k8spspprivilegedcontainer
   annotations:
     metadata.gatekeeper.sh/title: "Privileged Container"
-    metadata.gatekeeper.sh/version: 1.1.1
+    metadata.gatekeeper.sh/version: 1.1.2
     description: >-
       Controls the ability of any container to enable privileged mode.
       Corresponds to the `privileged` field in a PodSecurityPolicy. For more
@@ -76,13 +76,13 @@ spec:
             expression: |
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
                 !(container.image in variables.exemptImages) &&
-                (has(container.securityContext) && has(container.securityContext.privileged) && container.securityContext.privileged == true)
-              ).map(container, "Privileged container is not allowed: " + container.name +", securityContext: " + container.securityContext)
+                (has(container.securityContext) && has(container.securityContext.privileged) && container.securityContext.privileged)
+              ).map(container, "Privileged container is not allowed: " + container.name +", securityContext.privileged: true")
           - name: isUpdate
             expression: has(request.operation) && request.operation == "UPDATE"
           validations:
           - expression: variables.isUpdate || size(variables.badContainers) == 0
-            messageExpression: 'variables.badContainers.join("\n")' 
+            messageExpression: 'variables.badContainers.join(", ")' 
       - engine: Rego
         source:
           rego: |
@@ -191,6 +191,11 @@ metadata:
 spec:
   containers:
   - name: nginx
+    image: nginx
+    securityContext:
+      privileged: true
+  initContainers:
+  - name: nginx-init
     image: nginx
     securityContext:
       privileged: true
