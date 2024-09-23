@@ -42,25 +42,30 @@ allowed_profile(profile, _, _) {
 # Simple allowed Profiles
 allowed_profile(profile, _, allowed) {
     profile != "Localhost"
-    profile == allowed[_]
+    temp = allowed[_]
+    profile == temp.type
 }
 
 # annotation localhost without wildcard
 allowed_profile(profile, file, allowed) {
     profile == "Localhost"
-    allowed[_] == sprintf("Localhost/%s", [file])
+    temp = allowed[_]
+    temp.type == "Localhost"
+    file == temp.localHostProfile
 }
 
 # The profiles explicitly in the list
 get_allowed_profiles[allowed] {
-    allowed := input.parameters.allowedProfiles[_]
+    profile := input.parameters.allowedProfiles[_]
+    profile != "Localhost"
+    allowed := {"type": profile}
 }
 
 get_allowed_profiles[allowed] {
     profile := input.parameters.allowedProfiles[_]
     profile == "Localhost"
-    file := object.get(input.parameters, "allowedLocalhostFiles", [])[_]
-    allowed := sprintf("Localhost/%s", [file])
+    file := object.get(input.parameters, "allowedLocalhostFiles", [""])[_]
+    allowed := {"type": "Localhost", "localHostProfile": file}
 }
 
 # Container profile as defined in containers securityContext

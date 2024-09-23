@@ -196,25 +196,25 @@ test_input_seccomp_pod_initcontainer_mixed_not_allowed {
 test_translation_seccomp_allowed_context_localhost_wildcard_file {
     inp := {"parameters": input_parameters_localhost_wildcard_both}
     output := get_allowed_profiles with input as inp
-    output == {"Localhost", "Localhost/*"}
+    output == {{"type": "Localhost", "localHostProfile": "*"}}
 }
 
 test_translation_seccomp_allowed_context_localhost_no_file {
     inp := {"parameters": input_parameters_sc_localhost_no_file}
     output := get_allowed_profiles with input as inp
-    output == {"Localhost"}
+    output == {{"localHostProfile": "", "type": "Localhost"}}
 }
 
 test_translation_seccomp_allowed_context_localhost_with_file {
     inp := {"parameters": input_parameters_sc_localhost_with_file}
     output := get_allowed_profiles with input as inp
-    output == {"Localhost", "Localhost/profile.json"}
+    output == {{"type": "Localhost", "localHostProfile": "profile.json"}}
 }
 
 test_translation_seccomp_allowed_context_mixed {
     inp := {"parameters": input_parameters_in_list}
     output := get_allowed_profiles with input as inp
-    output == {"Localhost", "Localhost/profile.json", "RuntimeDefault"}
+    output == {{"type": "Localhost", "localHostProfile": "profile.json"}, {"type": "RuntimeDefault"}}
 }
 
 # Create Review Object

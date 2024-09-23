@@ -36,10 +36,7 @@ spec:
               description: >-
                 An array of allowed profile values for seccomp on Pods/Containers.
 
-                Can use the annotation naming scheme: `runtime/default`, `docker/default`, `unconfined` and/or
-                `localhost/some-profile.json`. The item `localhost/*` will allow any localhost based profile.
-
-                Can also use the securityContext naming scheme: `RuntimeDefault`, `Unconfined`
+                Can use the securityContext naming scheme: `RuntimeDefault`, `Unconfined`
                 and/or `Localhost`. For securityContext `Localhost`, use the parameter `allowedLocalhostProfiles`
                 to list the allowed profile JSON files.
 

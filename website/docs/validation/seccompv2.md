@@ -48,10 +48,7 @@ spec:
               description: >-
                 An array of allowed profile values for seccomp on Pods/Containers.
 
-                Can use the annotation naming scheme: `runtime/default`, `docker/default`, `unconfined` and/or
-                `localhost/some-profile.json`. The item `localhost/*` will allow any localhost based profile.
-
-                Can also use the securityContext naming scheme: `RuntimeDefault`, `Unconfined`
+                Can use the securityContext naming scheme: `RuntimeDefault`, `Unconfined`
                 and/or `Localhost`. For securityContext `Localhost`, use the parameter `allowedLocalhostProfiles`
                 to list the allowed profile JSON files.
 
@@ -106,25 +103,22 @@ spec:
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
                 !variables.allowAllProfiles &&
                 !(container.image in variables.exemptImages))
+          - name: inputNonLocalHostProfiles
+            expression: |
+              variables.params.allowedProfiles.filter(profile, profile != "Localhost").map(profile, {"type": profile})
+          - name: inputLocalHostProfiles
+            expression: |
+              variables.params.allowedProfiles.exists(profile, profile == "Localhost") ? variables.params.allowedLocalhostFiles.map(file, {"type": "Localhost", "localHostProfile": string(file)}) : []
           - name: inputAllowedProfiles
             expression: |
-              !has(variables.params.allowedProfiles) ? [] : variables.params.allowedProfiles
-          - name: derivedAllowedLocalhostFiles
-            expression: |
-              variables.inputAllowedProfiles.exists(profile, profile == "Localhost") ? variables.params.allowedLocalhostFiles.map(file, "Localhost/" + file) : []
-          - name: allowedProfiles
-            expression: |
-              variables.inputAllowedProfiles + variables.derivedAllowedLocalhostFiles
-          - name: allowAllLocalhostFiles
-            expression: |
-              variables.allowedProfiles.exists(profile, profile == "Localhost/*")
+              variables.inputNonLocalHostProfiles + variables.inputLocalHostProfiles
           - name: hasPodSeccomp
             expression: |
               has(variables.anyObject.spec.securityContext) && has(variables.anyObject.spec.securityContext.seccompProfile)
           - name: podLocalHostProfile
             expression: |
               variables.hasPodSeccomp && has(variables.anyObject.spec.securityContext.seccompProfile.localhostProfile) ? variables.anyObject.spec.securityContext.seccompProfile.localhostProfile : ""
-          - name: podSecurityContextProfile
+          - name: podSecurityContextProfileType
             expression: |
               has(variables.hasPodSeccomp) && has(variables.anyObject.spec.securityContext.seccompProfile.type) ? variables.anyObject.spec.securityContext.seccompProfile.type
                 : ""
@@ -135,7 +129,7 @@ spec:
                 variables.hasPodSeccomp
               ).map(container, {
                 "container" : container.name,
-                "profile" : dyn(variables.podSecurityContextProfile),
+                "profile" : dyn(variables.podSecurityContextProfileType),
                 "file" : variables.podLocalHostProfile,
                 "location" : dyn("pod securityContext"),
               })
@@ -165,24 +159,23 @@ spec:
               variables.podSecurityContextProfiles + variables.containerSecurityContextProfiles + variables.containerProfilesMissing
           - name: badContainerProfilesWithoutFiles
             expression: |
-              variables.allContainerProfiles.filter(badContainerProfile, 
-                  badContainerProfile.profile != "Localhost" &&
-                  !(badContainerProfile.profile in variables.allowedProfiles)
-              ).map(badProfile, "Seccomp profile '" + badProfile.profile + "' is not allowed for container '" + badProfile.container + "'. Found at: " + badProfile.location + ". Allowed profiles: " + variables.allowedProfiles.join(", "))
+              variables.allContainerProfiles.filter(container, 
+                  container.profile != "Localhost" &&
+                  !variables.inputAllowedProfiles.exists(profile, profile.type == container.profile)
+              ).map(badProfile, "Seccomp profile '" + badProfile.profile + "' is not allowed for container '" + badProfile.container + "'. Found at: " + badProfile.location + ". Allowed profiles: " + variables.inputAllowedProfiles.map(profile, "{\"type\": \"" + profile.type + "\"" + (has(profile.localHostProfile) ? ", \"localHostProfile\": \"" + profile.localHostProfile + "\"}" : "}")).join(", "))
           - name: badContainerProfilesWithFiles
             expression: |
-              variables.allContainerProfiles.filter(badContainerProfile, 
-                badContainerProfile.profile == "Localhost" &&
-                !variables.allowAllLocalhostFiles &&
-                !((badContainerProfile.profile + "/" + badContainerProfile.file) in variables.allowedProfiles)
-              ).map(badProfile, "Seccomp profile '" + badProfile.profile + "' With file '" + badProfile.file + "' is not allowed for container '" + badProfile.container + "'. Found at: " + badProfile.location + ". Allowed profiles: " + variables.allowedProfiles.join(", "))
+              variables.allContainerProfiles.filter(container, 
+                container.profile == "Localhost" &&
+                !variables.inputAllowedProfiles.exists(profile, profile.type == "Localhost" && (has(profile.localHostProfile) && (profile.localHostProfile == container.file || profile.localHostProfile == "*")))
+              ).map(badProfile, "Seccomp profile '" + badProfile.profile + "' With file '" + badProfile.file + "' is not allowed for container '" + badProfile.container + "'. Found at: " + badProfile.location + ". Allowed profiles: " + variables.inputAllowedProfiles.map(profile, "{\"type\": \"" + profile.type + "\"" + (has(profile.localHostProfile) ? ", \"localHostProfile\": \"" + profile.localHostProfile + "\"}" : "}")).join(", "))
           validations:
           - expression: 'size(variables.badContainerProfilesWithoutFiles) == 0'
             messageExpression: |
-              variables.badContainerProfilesWithoutFiles.join("\n")
+              variables.badContainerProfilesWithoutFiles.join(", ")
           - expression: 'size(variables.badContainerProfilesWithFiles) == 0'
             messageExpression: |
-              variables.badContainerProfilesWithFiles.join("\n")
+              variables.badContainerProfilesWithFiles.join(", ")
       - engine: Rego
         source:
           rego: |
@@ -230,25 +223,30 @@ spec:
             # Simple allowed Profiles
             allowed_profile(profile, _, allowed) {
                 profile != "Localhost"
-                profile == allowed[_]
+                temp = allowed[_]
+                profile == temp.type
             }
 
             # annotation localhost without wildcard
             allowed_profile(profile, file, allowed) {
                 profile == "Localhost"
-                allowed[_] == sprintf("Localhost/%s", [file])
+                temp = allowed[_]
+                temp.type == "Localhost"
+                file == temp.localHostProfile
             }
 
             # The profiles explicitly in the list
             get_allowed_profiles[allowed] {
-                allowed := input.parameters.allowedProfiles[_]
+                profile := input.parameters.allowedProfiles[_]
+                profile != "Localhost"
+                allowed := {"type": profile}
             }
 
             get_allowed_profiles[allowed] {
                 profile := input.parameters.allowedProfiles[_]
                 profile == "Localhost"
-                file := object.get(input.parameters, "allowedLocalhostFiles", [])[_]
-                allowed := sprintf("Localhost/%s", [file])
+                file := object.get(input.parameters, "allowedLocalhostFiles", [""])[_]
+                allowed := {"type": "Localhost", "localHostProfile": file}
             }
 
             # Container profile as defined in containers securityContext
