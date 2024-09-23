@@ -42,16 +42,16 @@ allowed_profile(profile, _, _) {
 # Simple allowed Profiles
 allowed_profile(profile, _, allowed) {
     profile != "Localhost"
-    temp = allowed[_]
-    profile == temp.type
+    allow_profile = allowed[_]
+    profile == allow_profile.type
 }
 
 # annotation localhost without wildcard
 allowed_profile(profile, file, allowed) {
     profile == "Localhost"
-    temp = allowed[_]
-    temp.type == "Localhost"
-    file == temp.localHostProfile
+    allow_profile = allowed[_]
+    allow_profile.type == "Localhost"
+    file == allow_profile.localHostProfile
 }
 
 # The profiles explicitly in the list
