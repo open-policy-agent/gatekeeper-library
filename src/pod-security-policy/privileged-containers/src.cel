@@ -23,10 +23,10 @@ variables:
   expression: |
     (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
       !(container.image in variables.exemptImages) &&
-      (has(container.securityContext) && has(container.securityContext.privileged) && container.securityContext.privileged == true)
-    ).map(container, "Privileged container is not allowed: " + container.name +", securityContext: " + container.securityContext)
+      (has(container.securityContext) && has(container.securityContext.privileged) && container.securityContext.privileged)
+    ).map(container, "Privileged container is not allowed: " + container.name +", securityContext.privileged: true")
 - name: isUpdate
   expression: has(request.operation) && request.operation == "UPDATE"
 validations:
 - expression: variables.isUpdate || size(variables.badContainers) == 0
-  messageExpression: 'variables.badContainers.join("\n")' 
+  messageExpression: 'variables.badContainers.join(", ")' 
