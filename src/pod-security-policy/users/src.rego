@@ -93,7 +93,6 @@ get_field_value(field, container, _) := get_seccontext_field(field, container)
 # If no container level exists, use pod level
 get_field_value(field, container, review) = out {
   not has_seccontext_field(field, container)
-  review.kind.kind == "Pod"
   pod_value := get_seccontext_field(field, review.object.spec)
   out := pod_value
 }
