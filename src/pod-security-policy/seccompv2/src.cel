@@ -1,0 +1,101 @@
+variables:
+- name: containers
+  expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+- name: initContainers
+  expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+- name: ephemeralContainers
+  expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+- name: allowAllProfiles
+  expression: |
+    has(variables.params.allowedProfiles) && variables.params.allowedProfiles.exists(profile, profile == "*")
+- name: exemptImagePrefixes
+  expression: |
+    !has(variables.params.exemptImages) ? [] :
+      variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+- name: exemptImageExplicit
+  expression: |
+    !has(variables.params.exemptImages) ? [] : 
+      variables.params.exemptImages.filter(image, !image.endsWith("*"))
+- name: exemptImages
+  expression: |
+    (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+      container.image in variables.exemptImageExplicit ||
+      variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))).map(container, container.image)
+- name: unverifiedContainers
+  expression: |
+    (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+      !variables.allowAllProfiles &&
+      !(container.image in variables.exemptImages))
+- name: inputNonLocalHostProfiles
+  expression: |
+    variables.params.allowedProfiles.filter(profile, profile != "Localhost").map(profile, {"type": profile})
+- name: inputLocalHostProfiles
+  expression: |
+    variables.params.allowedProfiles.exists(profile, profile == "Localhost") ? variables.params.allowedLocalhostFiles.map(file, {"type": "Localhost", "localHostProfile": string(file)}) : []
+- name: inputAllowedProfiles
+  expression: |
+    variables.inputNonLocalHostProfiles + variables.inputLocalHostProfiles
+- name: hasPodSeccomp
+  expression: |
+    has(variables.anyObject.spec.securityContext) && has(variables.anyObject.spec.securityContext.seccompProfile)
+- name: podLocalHostProfile
+  expression: |
+    variables.hasPodSeccomp && has(variables.anyObject.spec.securityContext.seccompProfile.localhostProfile) ? variables.anyObject.spec.securityContext.seccompProfile.localhostProfile : ""
+- name: podSecurityContextProfileType
+  expression: |
+    has(variables.hasPodSeccomp) && has(variables.anyObject.spec.securityContext.seccompProfile.type) ? variables.anyObject.spec.securityContext.seccompProfile.type
+      : ""
+- name: podSecurityContextProfiles
+  expression: |
+    variables.unverifiedContainers.filter(container, 
+      !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
+      variables.hasPodSeccomp
+    ).map(container, {
+      "container" : container.name,
+      "profile" : dyn(variables.podSecurityContextProfileType),
+      "file" : variables.podLocalHostProfile,
+      "location" : dyn("pod securityContext"),
+    })
+- name: containerSecurityContextProfiles
+  expression: |
+    variables.unverifiedContainers.filter(container, 
+      has(container.securityContext) && has(container.securityContext.seccompProfile)
+    ).map(container, {
+      "container" : container.name,
+      "profile" : dyn(container.securityContext.seccompProfile.type),
+      "file" : has(container.securityContext.seccompProfile.localhostProfile) ? container.securityContext.seccompProfile.localhostProfile : dyn(""),
+      "location" : dyn("container securityContext"),
+    })
+- name: containerProfilesMissing
+  expression: |
+    variables.unverifiedContainers.filter(container, 
+      !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
+      !variables.hasPodSeccomp
+    ).map(container, {
+      "container" : container.name,
+      "profile" : dyn("not configured"),
+      "file" : dyn(""),
+      "location" : dyn("no explicit profile found"),
+    })
+- name: allContainerProfiles
+  expression: |
+    variables.podSecurityContextProfiles + variables.containerSecurityContextProfiles + variables.containerProfilesMissing
+- name: badContainerProfilesWithoutFiles
+  expression: |
+    variables.allContainerProfiles.filter(container, 
+        container.profile != "Localhost" &&
+        !variables.inputAllowedProfiles.exists(profile, profile.type == container.profile)
+    ).map(badProfile, "Seccomp profile '" + badProfile.profile + "' is not allowed for container '" + badProfile.container + "'. Found at: " + badProfile.location + ". Allowed profiles: " + variables.inputAllowedProfiles.map(profile, "{\"type\": \"" + profile.type + "\"" + (has(profile.localHostProfile) ? ", \"localHostProfile\": \"" + profile.localHostProfile + "\"}" : "}")).join(", "))
+- name: badContainerProfilesWithFiles
+  expression: |
+    variables.allContainerProfiles.filter(container, 
+      container.profile == "Localhost" &&
+      !variables.inputAllowedProfiles.exists(profile, profile.type == "Localhost" && (has(profile.localHostProfile) && (profile.localHostProfile == container.file || profile.localHostProfile == "*")))
+    ).map(badProfile, "Seccomp profile '" + badProfile.profile + "' With file '" + badProfile.file + "' is not allowed for container '" + badProfile.container + "'. Found at: " + badProfile.location + ". Allowed profiles: " + variables.inputAllowedProfiles.map(profile, "{\"type\": \"" + profile.type + "\"" + (has(profile.localHostProfile) ? ", \"localHostProfile\": \"" + profile.localHostProfile + "\"}" : "}")).join(", "))
+validations:
+- expression: 'size(variables.badContainerProfilesWithoutFiles) == 0'
+  messageExpression: |
+    variables.badContainerProfilesWithoutFiles.join(", ")
+- expression: 'size(variables.badContainerProfilesWithFiles) == 0'
+  messageExpression: |
+    variables.badContainerProfilesWithFiles.join(", ")

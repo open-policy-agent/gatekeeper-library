@@ -68,6 +68,7 @@ module.exports = {
             'validation/proc-mount',
             'validation/read-only-root-filesystem',
             'validation/seccomp',
+            'validation/seccompv2',
             'validation/selinux',
             'validation/users',
             'validation/volumes',
