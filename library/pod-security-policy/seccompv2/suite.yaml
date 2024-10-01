@@ -25,6 +25,10 @@ tests:
     object: samples/psp-seccomp/example_allowed_localhost.yaml
     assertions:
     - violations: no
+  - name: example-allowed-container-exempt-image
+    object: samples/psp-seccomp/example_allowed_exempt_image.yaml
+    assertions:
+    - violations: no
   - name: disallowed-ephemeral
     object: samples/psp-seccomp/disallowed_ephemeral.yaml
     assertions:

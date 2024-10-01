@@ -104,7 +104,7 @@ spec:
             expression: |
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
                 container.image in variables.exemptImageExplicit ||
-                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption)))
+                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))).map(container, container.image)
           - name: unverifiedContainers
             expression: |
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
@@ -193,7 +193,7 @@ spec:
                 "container" : container.name,
                 "profile" : dyn(has(container.securityContext.seccompProfile.type) ? (container.securityContext.seccompProfile.type == "RuntimeDefault" ? (
                   variables.allowedProfiles.exists(profile, profile == "runtime/default") ? "runtime/default" : variables.allowedProfiles.exists(profile, profile == "docker/default") ? "docker/default" : "runtime/default") : 
-                container.securityContext.seccompProfile.type == "Unconfined" ? "unconfined" : container.securityContext.seccompProfile.type == "Loclhost" ? "localhost/" + container.securityContext.seccompProfile.localhostProfile : "")
+                container.securityContext.seccompProfile.type == "Unconfined" ? "unconfined" : container.securityContext.seccompProfile.type == "Localhost" ? "localhost/" + container.securityContext.seccompProfile.localhostProfile : "")
                 : ""),
                 "file" : has(container.securityContext.seccompProfile.localhostProfile) ? container.securityContext.seccompProfile.localhostProfile : dyn(""),
                 "location" : dyn("container securityContext"),
@@ -214,26 +214,15 @@ spec:
           - name: allContainerProfiles
             expression: |
               variables.podAnnotationsProfiles + variables.containerAnnotationsProfiles + variables.podSecurityContextProfiles + variables.containerSecurityContextProfiles + variables.containerProfilesMissing
-          - name: badContainerProfilesWithoutFiles
+          - name: badContainerProfiles
             expression: |
-              variables.allContainerProfiles.filter(badContainerProfile, 
-                  !badContainerProfile.profile.startsWith("localhost/") &&
+              variables.allContainerProfiles.filter(badContainerProfile,
                   !(badContainerProfile.profile in variables.allowedProfiles)
               ).map(badProfile, "Seccomp profile '" + badProfile.profile + "' is not allowed for container '" + badProfile.container + "'. Found at: " + badProfile.location + ". Allowed profiles: " + variables.allowedProfiles.join(", "))
-          - name: badContainerProfilesWithFiles
-            expression: |
-              variables.allContainerProfiles.filter(badContainerProfile, 
-                badContainerProfile.profile.startsWith("localhost/") &&
-                !variables.localhostWildcardAllowed &&
-                !(badContainerProfile.profile in variables.allowedProfiles)
-              ).map(badProfile, "Seccomp profile '" + badProfile.profile + "' With file '" + badProfile.file + "' is not allowed for container '" + badProfile.container + "'. Found at: " + badProfile.location + ". Allowed profiles: " + variables.allowedProfiles.join(", "))
           validations:
-          - expression: 'size(variables.badContainerProfilesWithoutFiles) == 0'
+          - expression: 'size(variables.badContainerProfiles) == 0'
             messageExpression: |
-              variables.badContainerProfilesWithoutFiles.join("\n")
-          - expression: 'size(variables.badContainerProfilesWithFiles) == 0'
-            messageExpression: |
-              variables.badContainerProfilesWithFiles.join("\n")
+              variables.badContainerProfiles.join(", ")
       - engine: Rego
         source:
           rego: |
@@ -256,13 +245,7 @@ spec:
             }
 
             get_message(profile, _, name, location, allowed_profiles) = message {
-                profile != "Localhost"
                 message := sprintf("Seccomp profile '%v' is not allowed for container '%v'. Found at: %v. Allowed profiles: %v", [profile, name, location, allowed_profiles])
-            }
-
-            get_message(profile, file, name, location, allowed_profiles) = message {
-                profile == "Localhost"
-                message := sprintf("Seccomp profile '%v' with file '%v' is not allowed for container '%v'. Found at: %v. Allowed profiles: %v", [profile, file, name, location, allowed_profiles])
             }
 
             input_wildcard_allowed_profiles {
@@ -450,9 +433,11 @@ spec:
       - apiGroups: [""]
         kinds: ["Pod"]
   parameters:
+    exemptImages:
+    - nginx-exempt
     allowedProfiles:
     - runtime/default
-
+    - localhost/profile.json
 ```
 
 Usage
@@ -590,6 +575,89 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/disallowed_ephemeral.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-container-exempt-image</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-disallowed
+  labels:
+    app: nginx-seccomp
+spec:
+  containers:
+  - name: nginx
+    image: nginx-exempt
+    securityContext:
+      seccompProfile:
+        type: Unconfined
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/example_allowed_exempt_image.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-container-localhost-profile</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-allowed-localhost
+  labels:
+    app: nginx-seccomp
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      seccompProfile:
+        type: Localhost
+        localhostProfile: profile.json
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/example_allowed_localhost.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-container-localhost-profile</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-disallowed-localhost
+  labels:
+    app: nginx-seccomp
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      seccompProfile:
+        type: Localhost
+        localhostProfile: profile.log
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccomp/samples/psp-seccomp/example_disallowed_localhost.yaml
 ```
 
 </details>

@@ -17,13 +17,7 @@ violation[{"msg": msg}] {
 }
 
 get_message(profile, _, name, location, allowed_profiles) = message {
-    profile != "Localhost"
     message := sprintf("Seccomp profile '%v' is not allowed for container '%v'. Found at: %v. Allowed profiles: %v", [profile, name, location, allowed_profiles])
-}
-
-get_message(profile, file, name, location, allowed_profiles) = message {
-    profile == "Localhost"
-    message := sprintf("Seccomp profile '%v' with file '%v' is not allowed for container '%v'. Found at: %v. Allowed profiles: %v", [profile, file, name, location, allowed_profiles])
 }
 
 input_wildcard_allowed_profiles {

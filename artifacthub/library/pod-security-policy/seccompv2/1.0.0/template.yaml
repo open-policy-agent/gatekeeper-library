@@ -37,7 +37,7 @@ spec:
                 An array of allowed profile values for seccomp on Pods/Containers.
 
                 Can use the securityContext naming scheme: `RuntimeDefault`, `Unconfined`
-                and/or `Localhost`. For securityContext `Localhost`, use the parameter `allowedLocalhostProfiles`
+                and/or `Localhost`. For securityContext `Localhost`, use the parameter `allowedLocalhostFiles`
                 to list the allowed profile JSON files.
 
                 The policy code will translate between the two schemes so it is not necessary to use both.
@@ -85,7 +85,7 @@ spec:
             expression: |
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
                 container.image in variables.exemptImageExplicit ||
-                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption)))
+                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))).map(container, container.image)
           - name: unverifiedContainers
             expression: |
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,

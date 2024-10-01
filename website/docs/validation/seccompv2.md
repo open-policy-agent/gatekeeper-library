@@ -49,7 +49,7 @@ spec:
                 An array of allowed profile values for seccomp on Pods/Containers.
 
                 Can use the securityContext naming scheme: `RuntimeDefault`, `Unconfined`
-                and/or `Localhost`. For securityContext `Localhost`, use the parameter `allowedLocalhostProfiles`
+                and/or `Localhost`. For securityContext `Localhost`, use the parameter `allowedLocalhostFiles`
                 to list the allowed profile JSON files.
 
                 The policy code will translate between the two schemes so it is not necessary to use both.
@@ -97,7 +97,7 @@ spec:
             expression: |
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
                 container.image in variables.exemptImageExplicit ||
-                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption)))
+                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))).map(container, container.image)
           - name: unverifiedContainers
             expression: |
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
@@ -336,6 +336,8 @@ spec:
       - apiGroups: [""]
         kinds: ["Pod"]
   parameters:
+    exemptImages:
+    - nginx-exempt 
     allowedProfiles:
     - RuntimeDefault
     - Localhost
@@ -440,7 +442,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx-seccomp-allowed
+  name: nginx-seccomp-allowed-localhost
   labels:
     app: nginx-seccomp
 spec:
@@ -458,6 +460,33 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/example_allowed_localhost.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-container-exempt-image</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-disallowed
+  labels:
+    app: nginx-seccomp
+spec:
+  containers:
+  - name: nginx
+    image: nginx-exempt
+    securityContext:
+      seccompProfile:
+        type: Unconfined
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/example_allowed_exempt_image.yaml
 ```
 
 </details>

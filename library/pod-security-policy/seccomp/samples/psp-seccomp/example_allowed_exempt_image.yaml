@@ -1,14 +1,13 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx-seccomp-allowed-localhost
+  name: nginx-seccomp-disallowed
   labels:
     app: nginx-seccomp
 spec:
   containers:
   - name: nginx
-    image: nginx
+    image: nginx-exempt
     securityContext:
       seccompProfile:
-        type: Localhost
-        localhostProfile: profile.json
+        type: Unconfined

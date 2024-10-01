@@ -3,7 +3,7 @@ name: k8spspseccompv2
 displayName: Seccomp V2
 createdAt: "2024-09-05T01:36:31Z"
 description: Controls the seccomp profile used by containers. Corresponds to the `securityContext.seccompProfile` field.
-digest: fcc97db4d44833d76224adc365e78fe3d51202670b24009974d2cbc928e104a1
+digest: 766b53fdddcb3f87c1f8c0cfbe99def3d0e8a600b5f5b6b0d8e13e6e03e1f8d1
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/seccompv2
 keywords:

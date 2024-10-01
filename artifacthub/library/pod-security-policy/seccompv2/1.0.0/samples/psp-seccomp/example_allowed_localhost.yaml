@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx-seccomp-allowed
+  name: nginx-seccomp-allowed-localhost
   labels:
     app: nginx-seccomp
 spec:
