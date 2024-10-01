@@ -5,13 +5,8 @@ metadata:
   labels:
     app: nginx-privileged
 spec:
-  containers:
+  ephemeralContainers:
   - name: nginx
-    image: nginx
-    securityContext:
-      privileged: true
-  initContainers:
-  - name: nginx-init
     image: nginx
     securityContext:
       privileged: true
