@@ -19,6 +19,10 @@ tests:
     object: samples/psp-pods-allowed-user-ranges/disallowed_ephemeral.yaml
     assertions:
     - violations: yes
+  - name: example-allowed-exempt-image
+    object: samples/psp-pods-allowed-user-ranges/example_allowed_exempt_image.yaml
+    assertions:
+    - violations: no
   - name: update
     object: samples/psp-pods-allowed-user-ranges/update.yaml
     assertions:
