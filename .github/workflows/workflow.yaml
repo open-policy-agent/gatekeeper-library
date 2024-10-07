@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     name: "Test scripts"
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
       - name: Unit test
         run: |
           make unit-test
@@ -30,7 +30,7 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
       - name: Generate templates and docs
         run: |
           make generate generate-website-docs generate-artifacthub-artifacts
@@ -53,7 +53,7 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
       - run: |
           binary=$([[ "$OSTYPE" == "darwin"* ]] && echo "opa_darwin_amd64" || echo "opa_linux_amd64")
           sudo curl -L -o /usr/local/bin/opa https://github.com/open-policy-agent/opa/releases/download/${{ matrix.opa }}/$binary
@@ -77,7 +77,7 @@ jobs:
 
       - name: Check out code into the Go module directory
         if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }}
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
 
       - name: Bootstrap integration test
         if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }}
@@ -99,7 +99,7 @@ jobs:
           kubectl logs -n gatekeeper-system -l control-plane=audit-controller --tail=-1 > logs-audit.json
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
+        uses: actions/upload-artifact@604373da6381bf24206979c74d06a550515601b9 # v4.4.1
         if: ${{ always() }}
         with:
           name: logs-int-test-${{ matrix.gatekeeper }}-${{ matrix.engine }}
@@ -114,7 +114,7 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
       - name: Run script
         run: |
           make require-suites
@@ -127,7 +127,7 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
       - name: Run script
         run: |
           make require-sync
@@ -145,7 +145,7 @@ jobs:
         with:
           egress-policy: audit
 
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
         if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }}
 
       - run: |
