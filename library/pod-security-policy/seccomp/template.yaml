@@ -120,7 +120,7 @@ spec:
               variables.inputAllowedProfiles.exists(profile, profile == "localhost/*") || variables.derivedAllowedLocalhostFiles.exists(profile, profile == "localhost/*")
           - name: allowedProfiles
             expression: |
-              (variables.allowedProfilesTranslation + variables.derivedAllowedLocalhostFiles).filter(entry, entry != "localhost/*")
+              (variables.allowedProfilesTranslation + variables.derivedAllowedLocalhostFiles)
           - name: hasPodSeccomp
             expression: |
               has(variables.anyObject.spec.securityContext) && has(variables.anyObject.spec.securityContext.seccompProfile)
@@ -160,7 +160,7 @@ spec:
               has(variables.hasPodSeccomp) && has(variables.anyObject.spec.securityContext.seccompProfile.type) ? 
                 (variables.anyObject.spec.securityContext.seccompProfile.type == "RuntimeDefault" ? (
                   variables.allowedProfiles.exists(profile, profile == "runtime/default") ? "runtime/default" : variables.allowedProfiles.exists(profile, profile == "docker/default") ? "docker/default" : "runtime/default") : 
-                variables.anyObject.spec.securityContext.seccompProfile.type == "Unconfined" ? "unconfined" : variables.anyObject.spec.securityContext.seccompProfile.type == "Localhost" ? "localhost/" + variables.anyObject.spec.securityContext.seccompProfile.localhostProfile : "")
+                variables.anyObject.spec.securityContext.seccompProfile.type == "Unconfined" ? "unconfined" : variables.anyObject.spec.securityContext.seccompProfile.type == "Localhost" ? "localhost/" + variables.podLocalHostProfile : "")
                 : ""
           - name: podSecurityContextProfiles
             expression: |
@@ -205,7 +205,7 @@ spec:
           - name: badContainerProfiles
             expression: |
               variables.allContainerProfiles.filter(badContainerProfile,
-                  !(badContainerProfile.profile in variables.allowedProfiles)
+                  !((badContainerProfile.profile in variables.allowedProfiles) || (badContainerProfile.profile.startsWith("localhost/") && variables.localhostWildcardAllowed))
               ).map(badProfile, "Seccomp profile '" + badProfile.profile + "' is not allowed for container '" + badProfile.container + "'. Found at: " + badProfile.location + ". Allowed profiles: " + variables.allowedProfiles.join(", "))
           validations:
           - expression: 'size(variables.badContainerProfiles) == 0'
