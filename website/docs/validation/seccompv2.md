@@ -6,7 +6,7 @@ title: Seccomp V2
 # Seccomp V2
 
 ## Description
-Controls the seccomp profile used by containers. Corresponds to the `securityContext.seccompProfile` field.
+Controls the seccomp profile used by containers. Corresponds to the `securityContext.seccompProfile` field. Security contexts from the annotation is not considered as Kubernetes no longer reads security contexts from the annotation.
 
 ## Template
 ```yaml
@@ -19,7 +19,7 @@ metadata:
     metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Controls the seccomp profile used by containers. Corresponds to the
-      `securityContext.seccompProfile` field.
+      `securityContext.seccompProfile` field. Security contexts from the annotation is not considered as Kubernetes no longer reads security contexts from the annotation.
 spec:
   crd:
     spec:
@@ -31,7 +31,7 @@ spec:
           type: object
           description: >-
             Controls the seccomp profile used by containers. Corresponds to the
-            `securityContext.seccompProfile` field.
+            `securityContext.seccompProfile` field. Security contexts from the annotation is not considered as Kubernetes no longer reads security contexts from the annotation.
           properties:
             exemptImages:
               description: >-
