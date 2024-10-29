@@ -1,15 +1,13 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sPSPSeccomp
+kind: K8sPSPPrivilegedContainer
 metadata:
-  name: psp-seccomp
+  name: psp-privileged-container
 spec:
   match:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
+    excludedNamespaces: ["kube-system"]
   parameters:
     exemptImages:
-    - nginx-exempt
-    allowedProfiles:
-    - runtime/default
-    - localhost/profile.json
+    - "safeimages.com/*"

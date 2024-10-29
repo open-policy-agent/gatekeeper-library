@@ -1,0 +1,22 @@
+version: 1.0.0
+name: k8spspseccompv2
+displayName: Seccomp V2
+createdAt: "2024-09-05T01:36:31Z"
+description: Controls the seccomp profile used by containers. Corresponds to the `securityContext.seccompProfile` field.
+digest: c6dbfe96ca7a4be156bee4bf42aef07a1424127fd9dc7d222b4e934c1919811f
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/seccompv2
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Seccomp V2
+    Controls the seccomp profile used by containers. Corresponds to the `securityContext.seccompProfile` field.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/pod-security-policy/seccompv2/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library
