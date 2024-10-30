@@ -1,3 +1,6 @@
+matchConditions:
+- name: "apply-to-pod"
+  expression: 'variables.anyObject.kind == "Pod"'
 variables:
 - name: containers
   expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
