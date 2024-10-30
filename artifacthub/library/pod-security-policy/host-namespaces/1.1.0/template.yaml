@@ -30,9 +30,15 @@ spec:
       - engine: K8sNativeValidation
         source:
           variables:
+          - name: sharingHostIPC
+            expression: |
+              has(variables.anyObject.spec.hostIPC) ? variables.anyObject.spec.hostIPC : false
+          - name: sharingHostPID
+            expression: |
+              has(variables.anyObject.spec.hostPID) ? variables.anyObject.spec.hostPID : false
           - name: sharingNamespace
             expression: |
-              has(variables.anyObject.spec.hostPID) || has(variables.anyObject.spec.hostIPC) ? variables.anyObject.spec.hostPID || variables.anyObject.spec.hostIPC : false
+              variables.sharingHostIPC || variables.sharingHostPID
           validations:
           - expression: '(has(request.operation) && request.operation == "UPDATE") || !variables.sharingNamespace'
             messageExpression: '"Sharing the host namespace is not allowed: " + variables.anyObject.metadata.namespace'
