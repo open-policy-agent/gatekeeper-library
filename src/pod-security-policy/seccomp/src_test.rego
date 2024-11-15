@@ -417,7 +417,7 @@ test_input_both_seccomp_pod_context_container_annotation_multiple_mixed {
 test_translation_seccomp_allowed_annotation_all {
     inp := {"parameters": input_parameters_annotation}
     output := get_allowed_profiles with input as inp
-    output == allowed_full_translated
+    output == allowed_full_translated_annotation_style
 }
 
 test_translation_seccomp_allowed_context_all {
@@ -644,4 +644,12 @@ allowed_full_translated = {
     "Localhost", "localhost/profile1.json", "localhost/profile2.json",
     "RuntimeDefault", "docker/default", "runtime/default",
     "Unconfined", "unconfined",
+}
+
+allowed_full_translated_annotation_style = {
+    "runtime/default",
+    "docker/default",
+    "localhost/profile1.json",
+    "localhost/profile2.json",
+    "unconfined",
 }
