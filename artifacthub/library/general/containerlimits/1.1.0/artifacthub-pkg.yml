@@ -5,7 +5,7 @@ createdAt: "2024-12-05T08:42:14Z"
 description: |-
     Requires containers to have memory and CPU limits set and constrains limits to be within the specified maximum values.
     https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
-digest: 4e4c84cd3532a7a0a30b3a823fb6a5f572d8b63f847f5fa5c98e8697353cb5d4
+digest: 80cdb57a413ec205ca940639fb78b7cb4b400fb820557654909578d0ddd0b5ef
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/containerlimits
 keywords:
