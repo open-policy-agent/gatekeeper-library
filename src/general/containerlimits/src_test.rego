@@ -60,7 +60,7 @@ test_no_parse_cpu_skip {
 test_no_parse_ram {
     inp := {"review": review([ctr("a", "1asdf", "2")]), "parameters": {"memory": "2", "cpu": "4"}}
     results := violation with input as inp
-    count(results) == 0
+    count(results) == 1
 }
 test_1_bad_cpu {
     inp := {"review": review([ctr("a", "1", "2"), ctr("b", "1", "8")]), "parameters": {"memory": "2", "cpu": "4"}}
