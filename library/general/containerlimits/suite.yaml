@@ -15,3 +15,15 @@ tests:
     object: samples/container-must-have-limits/example_disallowed.yaml
     assertions:
     - violations: yes
+- name: container-limits-ignore-cpu
+  template: template.yaml
+  constraint: samples/container-ignore-cpu-limits/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/container-ignore-cpu-limits/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/container-ignore-cpu-limits/example_disallowed.yaml
+    assertions:
+    - violations: yes

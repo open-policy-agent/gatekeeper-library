@@ -4,7 +4,7 @@ metadata:
   name: k8scontainerlimits
   annotations:
     metadata.gatekeeper.sh/title: "Container Limits"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Requires containers to have memory and CPU limits set and constrains
       limits to be within the specified maximum values.
@@ -31,7 +31,7 @@ spec:
               items:
                 type: string
             cpu:
-              description: "The maximum allowed cpu limit on a Pod, exclusive."
+              description: "The maximum allowed cpu limit on a Pod, exclusive. Set to -1 to disable."
               type: string
             memory:
               description: "The maximum allowed memory limit on a Pod, exclusive."
@@ -207,6 +207,7 @@ spec:
         }
 
         general_violation[{"msg": msg, "field": field}] {
+          input.parameters.cpu != "-1"
           container := input.review.object.spec[field][_]
           not is_exempt(container)
           missing(container.resources.limits, "cpu")
@@ -226,6 +227,7 @@ spec:
           cpu_orig := container.resources.limits.cpu
           cpu := canonify_cpu(cpu_orig)
           max_cpu_orig := input.parameters.cpu
+          max_cpu_orig != "-1"
           max_cpu := canonify_cpu(max_cpu_orig)
           cpu > max_cpu
           msg := sprintf("container <%v> cpu limit <%v> is higher than the maximum allowed of <%v>", [container.name, cpu_orig, max_cpu_orig])

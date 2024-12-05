@@ -166,6 +166,7 @@ general_violation[{"msg": msg, "field": field}] {
 }
 
 general_violation[{"msg": msg, "field": field}] {
+  input.parameters.cpu != "-1"
   container := input.review.object.spec[field][_]
   not is_exempt(container)
   missing(container.resources.limits, "cpu")
@@ -185,6 +186,7 @@ general_violation[{"msg": msg, "field": field}] {
   cpu_orig := container.resources.limits.cpu
   cpu := canonify_cpu(cpu_orig)
   max_cpu_orig := input.parameters.cpu
+  max_cpu_orig != "-1"
   max_cpu := canonify_cpu(max_cpu_orig)
   cpu > max_cpu
   msg := sprintf("container <%v> cpu limit <%v> is higher than the maximum allowed of <%v>", [container.name, cpu_orig, max_cpu_orig])
