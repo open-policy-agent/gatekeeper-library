@@ -8,6 +8,8 @@ spec:
       - apiGroups: [""]
         kinds: ["Pod"]
   parameters:
+    exemptImages:
+    - nginx-exempt
     allowedProfiles:
     - runtime/default
-    - docker/default
+    - localhost/profile.json

@@ -1,13 +1,15 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sPSPHostNetworkingPorts
+kind: K8sPSPSeccomp
 metadata:
-  name: psp-host-network
+  name: psp-seccomp
 spec:
   match:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
   parameters:
-    hostNetwork: false
     exemptImages:
-    - "nginx"
+    - nginx-exempt
+    allowedProfiles:
+    - runtime/default
+    - localhost/profile.json

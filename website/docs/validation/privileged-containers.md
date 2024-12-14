@@ -16,7 +16,7 @@ metadata:
   name: k8spspprivilegedcontainer
   annotations:
     metadata.gatekeeper.sh/title: "Privileged Container"
-    metadata.gatekeeper.sh/version: 1.1.0
+    metadata.gatekeeper.sh/version: 1.1.2
     description: >-
       Controls the ability of any container to enable privileged mode.
       Corresponds to the `privileged` field in a PodSecurityPolicy. For more
@@ -70,16 +70,19 @@ spec:
             expression: |
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
                 container.image in variables.exemptImageExplicit ||
-                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption)))
+                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))
+              ).map(container, container.image)
           - name: badContainers
             expression: |
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
                 !(container.image in variables.exemptImages) &&
-                (has(container.securityContext) && has(container.securityContext.privileged) && container.securityContext.privileged == true)
-              ).map(container, "Privileged container is not allowed: " + container.name +", securityContext: " + container.securityContext)
+                (has(container.securityContext) && has(container.securityContext.privileged) && container.securityContext.privileged)
+              ).map(container, "Privileged container is not allowed: " + container.name +", securityContext.privileged: true")
+          - name: isUpdate
+            expression: has(request.operation) && request.operation == "UPDATE"
           validations:
-          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badContainers) == 0'
-            messageExpression: 'variables.badContainers.join("\n")' 
+          - expression: variables.isUpdate || size(variables.badContainers) == 0
+            messageExpression: 'variables.badContainers.join(", ")' 
       - engine: Rego
         source:
           rego: |
@@ -161,6 +164,9 @@ spec:
       - apiGroups: [""]
         kinds: ["Pod"]
     excludedNamespaces: ["kube-system"]
+  parameters:
+    exemptImages:
+    - "safeimages.com/*"
 
 ```
 
@@ -185,6 +191,11 @@ metadata:
 spec:
   containers:
   - name: nginx
+    image: nginx
+    securityContext:
+      privileged: true
+  initContainers:
+  - name: nginx-init
     image: nginx
     securityContext:
       privileged: true
@@ -247,6 +258,32 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/privileged-containers/samples/psp-privileged-container/disallowed_ephemeral.yaml
+```
+
+</details>
+<details>
+<summary>exempted-image</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-privileged-allowed-exempt
+  labels:
+    app: nginx-privileged
+spec:
+  containers:
+  - name: nginx
+    image: safeimages.com/nginx
+    securityContext:
+      privileged: true
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/privileged-containers/samples/psp-privileged-container/example_allowed_exempt.yaml
 ```
 
 </details>
