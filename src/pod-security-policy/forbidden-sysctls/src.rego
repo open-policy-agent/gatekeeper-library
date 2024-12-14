@@ -17,7 +17,8 @@ violation[{"msg": msg, "details": {}}] {
     not is_update(input.review)
     sysctl := input.review.object.spec.securityContext.sysctls[_].name
     not allowed_sysctl(sysctl)
-    msg := sprintf("The sysctl %v is not explicitly allowed, pod: %v. Allowed sysctls: %v", [sysctl, input.review.object.metadata.name, input.parameters.allowedSysctls])
+    allowmsg := allowed_sysctl_string()
+    msg := sprintf("The sysctl %v is not explicitly allowed, pod: %v. Allowed sysctls: %v", [sysctl, input.review.object.metadata.name, allowmsg])
 }
 
 # * may be used to forbid all sysctls
@@ -48,4 +49,15 @@ allowed_sysctl(sysctl) {
     allowed := input.parameters.allowedSysctls[_]
     endswith(allowed, "*")
     startswith(sysctl, trim_suffix(allowed, "*"))
+}
+
+allowed_sysctl(_) {
+    not input.parameters.allowedSysctls
+}
+allowed_sysctl_string() = out {
+    not input.parameters.allowedSysctls
+    out = "unspecified"
+}
+allowed_sysctl_string() = out {
+    out = input.parameters.allowedSysctls
 }
