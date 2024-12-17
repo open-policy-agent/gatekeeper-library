@@ -1,0 +1,22 @@
+version: 1.0.0
+name: k8sallowedreposv2
+displayName: Allowed Images
+createdAt: "2024-12-17T13:21:26Z"
+description: 'This policy enforces that container images must begin with a string from a specified list. The updated version, K8sAllowedReposv2, introduces support for exact match and glob-like syntax to enhance security: 1. Exact Match: By default, if the * character is not specified, the policy strictly checks for an exact match of the full registry, repository, and/or the image name. 2. Glob-like Syntax: Adding * at the end of a prefix allows prefix-based matching (e.g., registry.example.com/project/*). Only the * wildcard at the end of a string is supported. 3. Security Note: To avoid bypasses scenarios, ensure prefixes include a trailing / where appropriate (e.g., registry.example.com/project/*).'
+digest: f0cc8c9d1d326a9a23ae7a5c6e8a9c0b909e9fd1fab95fb5822519514e07a717
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/allowedreposv2
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Allowed Images
+    This policy enforces that container images must begin with a string from a specified list. The updated version, K8sAllowedReposv2, introduces support for exact match and glob-like syntax to enhance security: 1. Exact Match: By default, if the * character is not specified, the policy strictly checks for an exact match of the full registry, repository, and/or the image name. 2. Glob-like Syntax: Adding * at the end of a prefix allows prefix-based matching (e.g., registry.example.com/project/*). Only the * wildcard at the end of a string is supported. 3. Security Note: To avoid bypasses scenarios, ensure prefixes include a trailing / where appropriate (e.g., registry.example.com/project/*).
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/allowedreposv2/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

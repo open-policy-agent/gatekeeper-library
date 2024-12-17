@@ -3,7 +3,7 @@ name: k8sallowedrepos
 displayName: Allowed Repositories
 createdAt: "2023-10-30T20:59:57Z"
 description: Requires container images to begin with a string from the specified list.
-digest: eaff16a982c2d3029b280b3d4061d82b55215ac648efaafa341e25c7c77b635f
+digest: 1ee1bb4b4fb6128bdcd6bd84c81d1d1e02b4b9c0f9bd3eb85f9fd30e82742dd1
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/allowedrepos
 keywords:
