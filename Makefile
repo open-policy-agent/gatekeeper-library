@@ -1,11 +1,11 @@
 docker := docker #You can build with podman by doing: make docker=podman
 KIND_VERSION ?= 0.23.0
 # note: k8s version pinned since KIND image availability lags k8s releases
-KUBERNETES_VERSION ?= 1.30.0
+KUBERNETES_VERSION ?= 1.32.0
 KUSTOMIZE_VERSION ?= 4.5.5
-GATEKEEPER_VERSION ?= 3.16.3
+GATEKEEPER_VERSION ?= 3.18.1
 BATS_VERSION ?= 1.8.2
-GATOR_VERSION ?= 3.17.0
+GATOR_VERSION ?= 3.18.1
 GOMPLATE_VERSION ?= 3.11.6
 POLICY_ENGINE ?= rego
 
@@ -36,9 +36,9 @@ deploy:
 ifeq ($(POLICY_ENGINE), rego)
 	helm install -n gatekeeper-system gatekeeper gatekeeper/gatekeeper --create-namespace --version $(GATEKEEPER_VERSION) --set enableK8sNativeValidation=false
 else ifeq ($(POLICY_ENGINE), cel)
-ifneq ($(GATEKEEPER_VERSION), 3.15.1)
 	helm install -n gatekeeper-system gatekeeper gatekeeper/gatekeeper --create-namespace --version $(GATEKEEPER_VERSION) --set enableK8sNativeValidation=true
-endif
+else ifeq ($(POLICY_ENGINE), vap)
+	helm install -n gatekeeper-system gatekeeper gatekeeper/gatekeeper --create-namespace --version $(GATEKEEPER_VERSION) --set enableK8sNativeValidation=true --set defaultCreateVAPForTemplates=true --set defaultCreateVAPBindingForConstraints=true
 endif
 
 uninstall:
