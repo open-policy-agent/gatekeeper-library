@@ -85,9 +85,15 @@ setup() {
     if [ -d "$policy" ]; then
       local policy_group=$(basename "$(dirname "$policy")")
       local template_name=$(basename "$policy")
+      vapb_exists=false
+      deny_substr="denied the request"
       echo "running integration test against policy group: $policy_group, constraint template: $template_name"
       # apply template
       wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl apply -k $policy"
+      if [ "$POLICY_ENGINE" == "vap" ] && grep -q "engine: K8sNativeValidation" "$policy"/template.yaml; then
+        wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl get ValidatingAdmissionPolicy gatekeeper-$template_name"
+        vapb_exists=true
+      fi
       local kind=$(yq e .metadata.name "$policy"/template.yaml)
       for sample in "$policy"/samples/*; do
         echo "testing sample constraint: $(basename "$sample")"
@@ -95,6 +101,11 @@ setup() {
         wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl apply -f ${sample}/constraint.yaml"
         local name=$(yq e .metadata.name "$sample"/constraint.yaml)
         wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "constraint_enforced $kind $name"
+
+        if [ vapb_exists == true ]; then
+          wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl get ValidatingAdmissionPolicyBinding gatekeeper-$name"
+          deny_substr="ValidatingAdmissionPolicy"
+        fi
 
         for inventory in "$sample"/example_inventory*.yaml; do
           if [[ -e "$inventory" ]]; then
@@ -123,7 +134,7 @@ setup() {
             echo "Applying ${disallowed} with contents:"
             cat ${disallowed}
             run kubectl apply -f "$disallowed"
-            assert_match_either 'denied the request' 'no matches for kind' "${output}"
+            assert_match_either "$deny_substr" 'no matches for kind' "${output}"
             assert_failure
             # delete resource
             run kubectl delete --ignore-not-found -f "$disallowed"
