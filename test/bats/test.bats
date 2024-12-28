@@ -85,16 +85,15 @@ setup() {
     if [ -d "$policy" ]; then
       local policy_group=$(basename "$(dirname "$policy")")
       local template_name=$(basename "$policy")
-      vapb_exists=false
       deny_substr="denied the request"
       echo "running integration test against policy group: $policy_group, constraint template: $template_name"
       # apply template
       wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl apply -k $policy"
-      if [ "$POLICY_ENGINE" == "vap" ] && grep -q "engine: K8sNativeValidation" "$policy"/template.yaml; then
-        wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl get ValidatingAdmissionPolicy gatekeeper-$template_name"
-        vapb_exists=true
-      fi
       local kind=$(yq e .metadata.name "$policy"/template.yaml)
+      if [ "$POLICY_ENGINE" == "vap" ] && grep -q "engine: K8sNativeValidation" "$policy"/template.yaml; then
+        wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl get ValidatingAdmissionPolicy gatekeeper-$kind"
+        deny_substr="ValidatingAdmissionPolicy"
+      fi
       for sample in "$policy"/samples/*; do
         echo "testing sample constraint: $(basename "$sample")"
         # apply constraint
@@ -102,9 +101,8 @@ setup() {
         local name=$(yq e .metadata.name "$sample"/constraint.yaml)
         wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "constraint_enforced $kind $name"
 
-        if [ vapb_exists == true ]; then
+        if [ "$POLICY_ENGINE" == "vap" ] && grep -q "engine: K8sNativeValidation" "$policy"/template.yaml; then
           wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl get ValidatingAdmissionPolicyBinding gatekeeper-$name"
-          deny_substr="ValidatingAdmissionPolicy"
         fi
 
         for inventory in "$sample"/example_inventory*.yaml; do
