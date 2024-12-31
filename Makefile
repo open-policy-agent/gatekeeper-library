@@ -5,7 +5,7 @@ KUBERNETES_VERSION ?= 1.30.0
 KUSTOMIZE_VERSION ?= 4.5.5
 GATEKEEPER_VERSION ?= 3.16.3
 BATS_VERSION ?= 1.8.2
-GATOR_VERSION ?= 3.16.3
+GATOR_VERSION ?= 3.17.0
 GOMPLATE_VERSION ?= 3.11.6
 POLICY_ENGINE ?= rego
 
@@ -50,17 +50,17 @@ test-integration:
 .PHONY: verify-gator
 verify-gator:
 ifeq ($(POLICY_ENGINE), rego)
-	gator verify ./... --experimental-enable-k8s-native-validation=false
+	gator verify ./... --enable-k8s-native-validation=false
 else ifeq ($(POLICY_ENGINE), cel)
-	gator verify ./... --experimental-enable-k8s-native-validation=true
+	gator verify ./... --enable-k8s-native-validation=true
 endif
 
 .PHONY: verify-gator-dockerized
 verify-gator-dockerized: __build-gator
 ifeq ($(POLICY_ENGINE), rego)
-	$(docker) run -i -v $(shell pwd):/gatekeeper-library gator-container verify ./... --experimental-enable-k8s-native-validation=false
+	$(docker) run -i -v $(shell pwd):/gatekeeper-library gator-container verify ./... --enable-k8s-native-validation=false
 else ifeq ($(POLICY_ENGINE), cel)
-	$(docker) run -i -v $(shell pwd):/gatekeeper-library gator-container verify ./... --experimental-enable-k8s-native-validation=true
+	$(docker) run -i -v $(shell pwd):/gatekeeper-library gator-container verify ./... --enable-k8s-native-validation=true
 endif
 
 .PHONY: build-gator
