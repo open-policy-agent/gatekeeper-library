@@ -6,7 +6,7 @@ title: Allowed Repositories
 # Allowed Repositories
 
 ## Description
-Requires container images to begin with a string from the specified list.
+Requires container images to begin with a string from the specified list. To prevent bypasses, ensure a '/' is added when specifying DockerHub repositories or custom registries. If exact matches or glob-like syntax are preferred, use the k8sallowedreposv2 policy.
 
 ## Template
 ```yaml
@@ -19,6 +19,8 @@ metadata:
     metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Requires container images to begin with a string from the specified list.
+      To prevent bypasses, ensure a '/' is added when specifying DockerHub repositories or custom registries.
+      If exact matches or glob-like syntax are preferred, use the k8sallowedreposv2 policy.
 spec:
   crd:
     spec:
