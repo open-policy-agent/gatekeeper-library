@@ -2,7 +2,7 @@
 
 load helpers
 
-TESTS_DIR=/mount/d/go/src/github.com/open-policy-agent/gatekeeper-library/library
+TESTS_DIR=library
 BATS_TESTS_DIR=test/bats
 WAIT_TIME=300
 SLEEP_TIME=5
