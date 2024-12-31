@@ -2,7 +2,7 @@
 
 load helpers
 
-TESTS_DIR=library
+TESTS_DIR=/mount/d/go/src/github.com/open-policy-agent/gatekeeper-library/library
 BATS_TESTS_DIR=test/bats
 WAIT_TIME=300
 SLEEP_TIME=5
@@ -89,16 +89,17 @@ setup() {
       echo "running integration test against policy group: $policy_group, constraint template: $template_name"
       # apply template
       wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl apply -k $policy"
-      local kind=$(yq e .metadata.name "$policy"/template.yaml)
+      local kind=$(cat "$policy"/template.yaml | yq e .metadata.name)
       if [ "$POLICY_ENGINE" == "vap" ] && grep -q "engine: K8sNativeValidation" "$policy"/template.yaml; then
         wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl get ValidatingAdmissionPolicy gatekeeper-$kind"
+        sleep 30
         deny_substr="ValidatingAdmissionPolicy"
       fi
       for sample in "$policy"/samples/*; do
         echo "testing sample constraint: $(basename "$sample")"
         # apply constraint
         wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl apply -f ${sample}/constraint.yaml"
-        local name=$(yq e .metadata.name "$sample"/constraint.yaml)
+        local name=$(cat "$sample"/constraint.yaml | yq e .metadata.name)
         wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "constraint_enforced $kind $name"
 
         if [ "$POLICY_ENGINE" == "vap" ] && grep -q "engine: K8sNativeValidation" "$policy"/template.yaml; then
