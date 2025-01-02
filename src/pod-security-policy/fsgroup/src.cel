@@ -1,0 +1,17 @@
+variables:
+- name: isUpdate
+  expression: has(request.operation) && request.operation == "UPDATE"
+- name: fsGroup
+  expression: '!has(variables.anyObject.spec.securityContext) ? "" : !has(variables.anyObject.spec.securityContext.fsGroup) ? "" : variables.anyObject.spec.securityContext.fsGroup'
+- name: ruleString
+  expression: |
+    !has(variables.params.rule) ? "unspecified" : string(variables.params.rule)
+- name: rangesString
+  expression: |
+    !has(variables.params.ranges) ? "unspecified" : size(variables.params.ranges) == 0 ? "empty" : variables.params.ranges.map(r, string(r)).join(", ")
+- name: input_fsGroup_allowed
+  expression: |
+    !has(variables.params.rule) ? true : variables.params.rule == "RunAsAny" ? true : variables.params.rule == "MayRunAs" && variables.fsGroup == "" ? true : (variables.params.rule == "MayRunAs" || variables.params.rule == "MustRunAs") && has(variables.params.ranges) && size(variables.params.ranges) > 0 ? variables.params.ranges.exists(range, range.min <= variables.fsGroup && range.max >= variables.fsGroup) : false
+validations:
+- expression: 'variables.isUpdate || variables.input_fsGroup_allowed'
+  messageExpression: '"The provided pod spec fsGroup is not allowed, pod: " + variables.anyObject.metadata.name + ". Allowed fsGroup rule: " + variables.ruleString + ", allowed fsGroup ranges: " + variables.rangesString'
