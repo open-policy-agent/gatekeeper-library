@@ -35,12 +35,12 @@ integration-bootstrap:
 deploy:
 	helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts
 # If the policy engine is rego, enableK8sNativeValidation should be set to false because K8sNativeValidation engine holds more priority than Rego engine. Otherwise Rego engine will not get evaluated for CT containing K8sNativeValidation engine. 
-ifeq ($(POLICY_ENGINE), rego)
-	helm install -n gatekeeper-system gatekeeper gatekeeper/gatekeeper --create-namespace --version $(GATEKEEPER_VERSION) --set enableK8sNativeValidation=false
+ifeq ($(ENABLE_VAP), true)
+	helm install -n gatekeeper-system gatekeeper gatekeeper/gatekeeper --create-namespace --version $(GATEKEEPER_VERSION) --set enableK8sNativeValidation=true --set defaultCreateVAPForTemplates=true --set defaultCreateVAPBindingForConstraints=true
 else ifeq ($(POLICY_ENGINE), cel)
 	helm install -n gatekeeper-system gatekeeper gatekeeper/gatekeeper --create-namespace --version $(GATEKEEPER_VERSION) --set enableK8sNativeValidation=true
-else ifeq ($(ENABLE_VAP), true)
-	helm install -n gatekeeper-system gatekeeper gatekeeper/gatekeeper --create-namespace --version $(GATEKEEPER_VERSION) --set enableK8sNativeValidation=true --set defaultCreateVAPForTemplates=true --set defaultCreateVAPBindingForConstraints=true
+else ifeq ($(POLICY_ENGINE), rego)
+	helm install -n gatekeeper-system gatekeeper gatekeeper/gatekeeper --create-namespace --version $(GATEKEEPER_VERSION) --set enableK8sNativeValidation=false
 endif
 
 uninstall:
