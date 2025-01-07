@@ -103,7 +103,7 @@ setup() {
         wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "constraint_enforced $kind $name"
 
         if [ "$ENABLE_VAP" == "true" ] && grep -q "engine: K8sNativeValidation" "$policy"/template.yaml; then
-          wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl get ValidatingAdmissionPolicyBinding gatekeeper-$name"
+          wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl get ValidatingAdmissionPolicyBinding gatekeeper-$name -o yaml"
         fi
 
         for inventory in "$sample"/example_inventory*.yaml; do
