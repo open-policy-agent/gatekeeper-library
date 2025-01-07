@@ -91,7 +91,7 @@ setup() {
       wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl apply -k $policy"
       local kind=$(cat "$policy"/template.yaml | yq e .metadata.name)
       if [ "$ENABLE_VAP" == "true" ] && grep -q "engine: K8sNativeValidation" "$policy"/template.yaml; then
-        wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl get ValidatingAdmissionPolicy gatekeeper-$kind"
+        wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl get ValidatingAdmissionPolicy gatekeeper-$kind -o yaml"
         sleep 30
         deny_substr="ValidatingAdmissionPolicy"
       fi
