@@ -65,22 +65,19 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        gatekeeper: [ "3.15.1", "3.16.3" ]
+        gatekeeper: [ "3.17.1", "3.18.1" ]
         engine: [ "cel", "rego" ]
     name: "Integration test on Gatekeeper ${{ matrix.gatekeeper }} for ${{ matrix.engine }} policies"
     steps:
       - name: Harden Runner
-        if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }} # remove this condition once 3.17 is out
         uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
         with:
           egress-policy: audit
 
       - name: Check out code into the Go module directory
-        if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }}
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Bootstrap integration test
-        if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }}
         run: |
           mkdir -p $GITHUB_WORKSPACE/bin
           echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
@@ -88,18 +85,16 @@ jobs:
           make deploy GATEKEEPER_VERSION=${{ matrix.gatekeeper }} POLICY_ENGINE=${{ matrix.engine }}
 
       - name: Run integration test
-        if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }}
         run: |
           make test-integration
 
       - name: Save logs
-        if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }}
         run: |
           kubectl logs -n gatekeeper-system -l control-plane=controller-manager --tail=-1 > logs-controller.json
           kubectl logs -n gatekeeper-system -l control-plane=audit-controller --tail=-1 > logs-audit.json
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
         if: ${{ always() }}
         with:
           name: logs-int-test-${{ matrix.gatekeeper }}-${{ matrix.engine }}
@@ -136,18 +131,15 @@ jobs:
     strategy:
       matrix:
         engine: [ "cel", "rego" ]
-        gatekeeper: [ "3.15.1", "3.16.3" ]
+        gatekeeper: [ "3.17.1", "3.18.1" ]
     name: "Verify assertions in suite.yaml files for ${{ matrix.engine }} policies"
     steps:
       - name: Harden Runner
-        if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }} # remove this condition once 3.17 is out
         uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
         with:
           egress-policy: audit
 
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-        if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }}
 
       - run: |
           make verify-gator-dockerized POLICY_ENGINE=${{ matrix.engine }} GATOR_VERSION=${{ matrix.gatekeeper }}
-        if: ${{ !(matrix.gatekeeper == '3.15.1' && matrix.engine == 'cel') }}
