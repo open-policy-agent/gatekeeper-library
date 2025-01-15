@@ -11,7 +11,7 @@ spec:
           cpu: "100m"
           memory: "30Mi"
     - name: image-2-basic-image-allow
-      image: ubuntu
+      image: ubuntu:20.14
       resources:
         limits:
           cpu: "200m"

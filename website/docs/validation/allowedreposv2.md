@@ -104,7 +104,7 @@ spec:
       - "openpolicyagent/*"
       - "myregistry.azurecr.io/*"
       - "mydockerhub/*"
-      - "ubuntu"
+      - "ubuntu:20.14"
       - "123456789123.dkr.ecr.eu-west-1.amazonaws.com/postgres"
 
 ```
@@ -158,17 +158,11 @@ metadata:
 spec:
   containers:
     - name: image
-      image: ubuntu
+      image: ubuntu:20.14
       resources:
         limits:
           cpu: "100m"
           memory: "30Mi"
-    - name: image-with-version
-      image: ubuntu:20.04
-      resources:
-        limits:
-          cpu: "200m"
-          memory: "50Mi"
 
 ```
 
@@ -376,7 +370,7 @@ spec:
           cpu: "100m"
           memory: "30Mi"
     - name: image-2-basic-image-allow
-      image: ubuntu
+      image: ubuntu:20.14
       resources:
         limits:
           cpu: "200m"
