@@ -5,14 +5,8 @@ metadata:
 spec:
   containers:
     - name: image
-      image: ubuntu
+      image: ubuntu:20.14
       resources:
         limits:
           cpu: "100m"
           memory: "30Mi"
-    - name: image-with-version
-      image: ubuntu:20.04
-      resources:
-        limits:
-          cpu: "200m"
-          memory: "50Mi"

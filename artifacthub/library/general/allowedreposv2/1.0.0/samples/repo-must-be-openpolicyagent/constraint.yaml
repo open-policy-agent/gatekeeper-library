@@ -14,5 +14,5 @@ spec:
       - "openpolicyagent/*"
       - "myregistry.azurecr.io/*"
       - "mydockerhub/*"
-      - "ubuntu"
+      - "ubuntu:20.14"
       - "123456789123.dkr.ecr.eu-west-1.amazonaws.com/postgres"
