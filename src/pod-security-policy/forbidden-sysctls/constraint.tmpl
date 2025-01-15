@@ -4,7 +4,7 @@ metadata:
   name: k8spspforbiddensysctls
   annotations:
     metadata.gatekeeper.sh/title: "Forbidden Sysctls"
-    metadata.gatekeeper.sh/version: 1.1.3
+    metadata.gatekeeper.sh/version: 1.2.0
     description: >-
       Controls the `sysctl` profile used by containers. Corresponds to the
       `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy.
@@ -39,8 +39,14 @@ spec:
                 type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
-      rego: |
-{{ file.Read "src/pod-security-policy/forbidden-sysctls/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
-      libs:
-        - |
-{{ file.Read "src/pod-security-policy/forbidden-sysctls/lib_exclude_update.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+      code:
+      - engine: K8sNativeValidation
+        source:
+{{ file.Read "src/pod-security-policy/forbidden-sysctls/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+      - engine: Rego
+        source:
+          rego: |
+{{ file.Read "src/pod-security-policy/forbidden-sysctls/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}
+          libs:
+            - |
+{{ file.Read "src/pod-security-policy/forbidden-sysctls/lib_exclude_update.rego" | strings.Indent 14 | strings.TrimSuffix "\n" }}
