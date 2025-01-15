@@ -10,7 +10,7 @@ spec:
         limits:
           cpu: "100m"
           memory: "30Mi"
-    - name: image_with_version
+    - name: image-with-version
       image: ubuntu:20.04
       resources:
         limits:
