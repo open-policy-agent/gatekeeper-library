@@ -17,7 +17,7 @@ metadata:
   name: k8scontainerlimits
   annotations:
     metadata.gatekeeper.sh/title: "Container Limits"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Requires containers to have memory and CPU limits set and constrains
       limits to be within the specified maximum values.
@@ -44,7 +44,7 @@ spec:
               items:
                 type: string
             cpu:
-              description: "The maximum allowed cpu limit on a Pod, exclusive."
+              description: "The maximum allowed cpu limit on a Pod, exclusive. Set to -1 to disable."
               type: string
             memory:
               description: "The maximum allowed memory limit on a Pod, exclusive."
@@ -190,6 +190,7 @@ spec:
         # Ephemeral containers not checked as it is not possible to set field.
 
         general_violation[{"msg": msg, "field": field}] {
+          input.parameters.cpu != "-1"
           container := input.review.object.spec[field][_]
           not is_exempt(container)
           cpu_orig := container.resources.limits.cpu
@@ -220,6 +221,7 @@ spec:
         }
 
         general_violation[{"msg": msg, "field": field}] {
+          input.parameters.cpu != "-1"
           container := input.review.object.spec[field][_]
           not is_exempt(container)
           missing(container.resources.limits, "cpu")
@@ -239,6 +241,7 @@ spec:
           cpu_orig := container.resources.limits.cpu
           cpu := canonify_cpu(cpu_orig)
           max_cpu_orig := input.parameters.cpu
+          max_cpu_orig != "-1"
           max_cpu := canonify_cpu(max_cpu_orig)
           cpu > max_cpu
           msg := sprintf("container <%v> cpu limit <%v> is higher than the maximum allowed of <%v>", [container.name, cpu_orig, max_cpu_orig])
@@ -373,6 +376,95 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerlimits/samples/container-must-have-limits/example_disallowed.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>container-limits-ignore-cpu</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sContainerLimits
+metadata:
+  name: container-must-have-limits
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    cpu: "-1"
+    memory: "1Gi"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerlimits/samples/container-ignore-cpu-limits/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-allowed
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      resources:
+        limits:
+          memory: "1Gi"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerlimits/samples/container-ignore-cpu-limits/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-disallowed
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      resources:
+        limits:
+          memory: "2Gi"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/containerlimits/samples/container-ignore-cpu-limits/example_disallowed.yaml
 ```
 
 </details>
