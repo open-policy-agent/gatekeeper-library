@@ -48,6 +48,7 @@ module.exports = {
             'validation/uniqueingresshost',
             'validation/uniqueserviceselector',
             'validation/verifydeprecatedapi',
+            'validation/volumeresources',
           ],
         },
         {
