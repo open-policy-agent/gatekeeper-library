@@ -34,7 +34,7 @@ variables:
       !(container.image in variables.exemptImages) &&
       !(
         (variables.allowedProcMount == "unmasked") ||
-        (variables.allowedProcMount == "default" && has(container.securityContext) && has(container.securityContext.procMount) && container.securityContext.procMount.lowerAscii() == "default")
+        (variables.allowedProcMount == "default" && (!has(container.securityContext) || !has(container.securityContext.procMount) || container.securityContext.procMount == null || container.securityContext.procMount.lowerAscii() == "default"))
       )
     ).map(container, "ProcMount type is not allowed, container: " + container.name +". Allowed procMount types: " + variables.allowedProcMount)
 validations:
