@@ -19,6 +19,7 @@ module.exports = {
           collapsed: true,
           items: [
             'validation/allowedrepos',
+            'validation/allowedreposv2',
             'validation/automount-serviceaccount-token',
             'validation/block-endpoint-edit-default-role',
             'validation/block-loadbalancer-services',
@@ -68,6 +69,7 @@ module.exports = {
             'validation/proc-mount',
             'validation/read-only-root-filesystem',
             'validation/seccomp',
+            'validation/seccompv2',
             'validation/selinux',
             'validation/users',
             'validation/volumes',
