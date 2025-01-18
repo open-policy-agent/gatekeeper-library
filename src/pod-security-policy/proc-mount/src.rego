@@ -24,15 +24,15 @@ input_proc_mount_type_allowed(allowedProcMount, _) {
 
 input_containers[c] {
     c := input.review.object.spec.containers[_]
-    c.securityContext.procMount
+    c.securityContext.procMount != null
 }
 input_containers[c] {
     c := input.review.object.spec.initContainers[_]
-    c.securityContext.procMount
+    c.securityContext.procMount != null
 }
 input_containers[c] {
     c := input.review.object.spec.ephemeralContainers[_]
-    c.securityContext.procMount
+    c.securityContext.procMount != null
 }
 
 get_allowed_proc_mount(arg) = out {

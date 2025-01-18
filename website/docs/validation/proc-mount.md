@@ -16,7 +16,7 @@ metadata:
   name: k8spspprocmount
   annotations:
     metadata.gatekeeper.sh/title: "Proc Mount"
-    metadata.gatekeeper.sh/version: 1.1.1
+    metadata.gatekeeper.sh/version: 1.1.2
     description: >-
       Controls the allowed `procMount` types for the container. Corresponds to
       the `allowedProcMountTypes` field in a PodSecurityPolicy. For more
@@ -98,7 +98,7 @@ spec:
                 !(container.image in variables.exemptImages) &&
                 !(
                   (variables.allowedProcMount == "unmasked") ||
-                  (variables.allowedProcMount == "default" && has(container.securityContext) && has(container.securityContext.procMount) && container.securityContext.procMount.lowerAscii() == "default")
+                  (variables.allowedProcMount == "default" && (!has(container.securityContext) || !has(container.securityContext.procMount) || container.securityContext.procMount == null || container.securityContext.procMount.lowerAscii() == "default"))
                 )
               ).map(container, "ProcMount type is not allowed, container: " + container.name +". Allowed procMount types: " + variables.allowedProcMount)
           validations:
@@ -133,15 +133,15 @@ spec:
 
             input_containers[c] {
                 c := input.review.object.spec.containers[_]
-                c.securityContext.procMount
+                c.securityContext.procMount != null
             }
             input_containers[c] {
                 c := input.review.object.spec.initContainers[_]
-                c.securityContext.procMount
+                c.securityContext.procMount != null
             }
             input_containers[c] {
                 c := input.review.object.spec.ephemeralContainers[_]
-                c.securityContext.procMount
+                c.securityContext.procMount != null
             }
 
             get_allowed_proc_mount(arg) = out {
@@ -285,6 +285,38 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/proc-mount/samples/psp-proc-mount/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-missing</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-proc-mount-disallowed
+  labels:
+    app: nginx-proc-mount
+spec:
+  hostUsers: false
+  containers:
+  - name: no-proc-mount-value
+    image: nginx
+    securityContext:
+      procMount: null
+  - name: no-proc-mount
+    image: nginx
+    securityContext: {}
+  - name: no-context
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/proc-mount/samples/psp-proc-mount/example_allowed_missing.yaml
 ```
 
 </details>
