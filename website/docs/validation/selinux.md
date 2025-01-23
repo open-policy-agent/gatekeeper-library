@@ -77,7 +77,7 @@ spec:
               has(variables.anyObject.spec.securityContext) && has(variables.anyObject.spec.securityContext.seLinuxOptions) ? 
                 (has(variables.params.allowedSELinuxOptions) ? 
                 (
-                  variables.params.allowedSELinuxOptions.all(opts,
+                  size(variables.params.allowedSELinuxOptions) > 0 && variables.params.allowedSELinuxOptions.all(opts,
                     (has(opts.level) ? has(variables.anyObject.spec.securityContext.seLinuxOptions.level) && (variables.anyObject.spec.securityContext.seLinuxOptions.level == opts.level) : !has(variables.anyObject.spec.securityContext.seLinuxOptions.level)) &&
                     (has(opts.role) ? has(variables.anyObject.spec.securityContext.seLinuxOptions.role) && (variables.anyObject.spec.securityContext.seLinuxOptions.role == opts.role) : !has(variables.anyObject.spec.securityContext.seLinuxOptions.role)) &&
                     (has(opts.type) ? has(variables.anyObject.spec.securityContext.seLinuxOptions.type) && (variables.anyObject.spec.securityContext.seLinuxOptions.type == opts.type) : !has(variables.anyObject.spec.securityContext.seLinuxOptions.type)) &&
@@ -110,7 +110,7 @@ spec:
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(c, !(c.image in variables.exemptImages) && (has(c.securityContext.seLinuxOptions) ? (
                 has(variables.params.allowedSELinuxOptions) ? 
                 (
-                  !variables.params.allowedSELinuxOptions.all(opts,
+                  size(variables.params.allowedSELinuxOptions) == 0 || !variables.params.allowedSELinuxOptions.all(opts,
                     (has(opts.level) ? has(c.securityContext.seLinuxOptions.level) && (c.securityContext.seLinuxOptions.level == opts.level) : !has(c.securityContext.seLinuxOptions.level)) &&
                     (has(opts.role) ? has(c.securityContext.seLinuxOptions.role) && (c.securityContext.seLinuxOptions.role == opts.role) : !has(c.securityContext.seLinuxOptions.role)) &&
                     (has(opts.type) ? has(c.securityContext.seLinuxOptions.type) && (c.securityContext.seLinuxOptions.type == opts.type) : !has(c.securityContext.seLinuxOptions.type)) &&
@@ -249,6 +249,150 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/selinux/samples/psp-selinux-v2/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+    name: nginx-selinux-disallowed
+    labels:
+        app: nginx-selinux
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      seLinuxOptions:
+        level: s1:c234,c567
+        user: sysadm_u
+        role: sysadm_r
+        type: svirt_lxc_net_t
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/selinux/samples/psp-selinux-v2/example_disallowed.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+    name: nginx-selinux-allowed
+    labels:
+        app: nginx-selinux
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      seLinuxOptions:
+        level: s0:c123,c456
+        role: object_r
+        type: svirt_sandbox_file_t
+        user: system_u
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/selinux/samples/psp-selinux-v2/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-wihtout-selinux-opts</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+    name: nginx-selinux-allowed-without-selinux-opts
+    labels:
+        app: nginx-selinux
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/selinux/samples/psp-selinux-v2/example_allowed_without_selinux_opts.yaml
+```
+
+</details>
+<details>
+<summary>disallowed-ephemeral</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+    name: nginx-selinux-disallowed
+    labels:
+        app: nginx-selinux
+spec:
+  ephemeralContainers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      seLinuxOptions:
+        level: s1:c234,c567
+        user: sysadm_u
+        role: sysadm_r
+        type: svirt_lxc_net_t
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/selinux/samples/psp-selinux-v2/disallowed_ephemeral.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>deny-all-selinux-options</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPSELinuxV2
+metadata:
+  name: psp-selinux-v2
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    allowedSELinuxOptions: []
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/selinux/samples/psp-selinux-v2/constraint2.yaml
 ```
 
 </details>

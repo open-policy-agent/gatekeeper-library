@@ -27,3 +27,27 @@ tests:
     object: samples/psp-selinux-v2/update.yaml
     assertions:
     - violations: no
+- name: deny-all-selinux-options
+  template: template.yaml
+  constraint: samples/psp-selinux-v2/constraint2.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/psp-selinux-v2/example_disallowed.yaml
+    assertions:
+    - violations: yes
+  - name: example-allowed
+    object: samples/psp-selinux-v2/example_allowed.yaml
+    assertions:
+    - violations: yes
+  - name: example-allowed-wihtout-selinux-opts
+    object: samples/psp-selinux-v2/example_allowed_without_selinux_opts.yaml
+    assertions:
+    - violations: no
+  - name: disallowed-ephemeral
+    object: samples/psp-selinux-v2/disallowed_ephemeral.yaml
+    assertions:
+    - violations: yes
+  - name: update
+    object: samples/psp-selinux-v2/update.yaml
+    assertions:
+    - violations: no
