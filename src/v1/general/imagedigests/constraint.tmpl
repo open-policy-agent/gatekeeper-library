@@ -1,0 +1,41 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8simagedigests
+  annotations:
+    metadata.gatekeeper.sh/title: "Image Digests"
+    metadata.gatekeeper.sh/version: 1.0.1
+    description: >-
+      Requires container images to contain a digest.
+
+      https://kubernetes.io/docs/concepts/containers/images/
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sImageDigests
+      validation:
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Requires container images to contain a digest.
+
+            https://kubernetes.io/docs/concepts/containers/images/
+          properties:
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ file.Read "src/general/imagedigests/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
+      libs:
+        - |
+{{ file.Read "src/general/imagedigests/lib_exempt_container.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}

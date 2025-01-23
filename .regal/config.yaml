@@ -1,0 +1,42 @@
+rules:
+  custom:
+    prefer-value-in-head:
+      level: error
+      only-scalars: true
+  idiomatic:
+    directory-package-mismatch:
+      level: ignore
+    no-defined-entrypoint:
+      level: ignore
+  imports:
+    prefer-package-imports:
+      level: ignore
+  style:
+    avoid-get-and-list-prefix:
+      level: ignore
+    external-reference:
+      level: ignore
+    file-length:
+      ignore:
+        files:
+          - "*_test.rego"
+    line-length:
+      ignore:
+        files:
+          - "*_test.rego"
+      non-breakable-word-threshold: 80
+    prefer-snake-case:
+      ignore:
+        files:
+          - "*_test.rego"
+  testing:
+    print-or-trace-call:
+      level: ignore
+    test-outside-test-package:
+      level: ignore
+
+ignore:
+  files:
+    - src/general
+    - src/pod-security-policy
+    - src/rego

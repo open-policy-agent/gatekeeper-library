@@ -1,0 +1,62 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8spspprocmount
+  annotations:
+    metadata.gatekeeper.sh/title: "Proc Mount"
+    metadata.gatekeeper.sh/version: 1.1.2
+    description: >-
+      Controls the allowed `procMount` types for the container. Corresponds to
+      the `allowedProcMountTypes` field in a PodSecurityPolicy. For more
+      information, see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#allowedprocmounttypes
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPProcMount
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Controls the allowed `procMount` types for the container. Corresponds to
+            the `allowedProcMountTypes` field in a PodSecurityPolicy. For more
+            information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#allowedprocmounttypes
+          properties:
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
+              type: array
+              items:
+                type: string
+            procMount:
+              type: string
+              description: >-
+                Defines the strategy for the security exposure of certain paths
+                in `/proc` by the container runtime. Setting to `Default` uses
+                the runtime defaults, where `Unmasked` bypasses the default
+                behavior.
+              enum:
+                - Default
+                - Unmasked
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+{{ file.Read "src/pod-security-policy/proc-mount/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+      - engine: Rego
+        source:
+          rego: |
+{{ file.Read "src/pod-security-policy/proc-mount/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}
+          libs:
+            - |
+{{ file.Read "src/pod-security-policy/proc-mount/lib_exclude_update.rego" | strings.Indent 14 | strings.TrimSuffix "\n" }}
+            - |
+{{ file.Read "src/pod-security-policy/proc-mount/lib_exempt_container.rego" | strings.Indent 14 | strings.TrimSuffix "\n" }}

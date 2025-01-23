@@ -1,0 +1,36 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdisallowanonymous
+  annotations:
+    metadata.gatekeeper.sh/title: "Disallow Anonymous Access"
+    metadata.gatekeeper.sh/version: 1.1.0
+    description: Disallows associating ClusterRole and Role resources to the system:anonymous user and system:unauthenticated group.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDisallowAnonymous
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          properties:
+            allowedRoles:
+              description: >-
+                The list of ClusterRoles and Roles that may be associated
+                with the `system:unauthenticated` group and `system:anonymous`
+                user.
+              type: array
+              items:
+                type: string
+            disallowAuthenticated:
+              description: >-
+                A boolean indicating whether `system:authenticated` should also
+                be disallowed by this policy.
+              type: boolean
+              default: false
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ file.Read "src/general/disallowanonymous/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}

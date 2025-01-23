@@ -1,0 +1,52 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8spspforbiddensysctls
+  annotations:
+    metadata.gatekeeper.sh/title: "Forbidden Sysctls"
+    metadata.gatekeeper.sh/version: 1.2.0
+    description: >-
+      Controls the `sysctl` profile used by containers. Corresponds to the
+      `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy.
+      When specified, any sysctl not in the `allowedSysctls` parameter is considered to be forbidden.
+      The `forbiddenSysctls` parameter takes precedence over the `allowedSysctls` parameter.
+      For more information, see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPForbiddenSysctls
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Controls the `sysctl` profile used by containers. Corresponds to the
+            `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy.
+            When specified, any sysctl not in the `allowedSysctls` parameter is considered to be forbidden.
+            The `forbiddenSysctls` parameter takes precedence over the `allowedSysctls` parameter.
+            For more information, see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
+          properties:
+            allowedSysctls:
+              type: array
+              description: "An allow-list of sysctls. `*` allows all sysctls not listed in the `forbiddenSysctls` parameter."
+              items:
+                type: string
+            forbiddenSysctls:
+              type: array
+              description: "A disallow-list of sysctls. `*` forbids all sysctls."
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+{{ file.Read "src/pod-security-policy/forbidden-sysctls/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+      - engine: Rego
+        source:
+          rego: |
+{{ file.Read "src/pod-security-policy/forbidden-sysctls/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}
+          libs:
+            - |
+{{ file.Read "src/pod-security-policy/forbidden-sysctls/lib_exclude_update.rego" | strings.Indent 14 | strings.TrimSuffix "\n" }}

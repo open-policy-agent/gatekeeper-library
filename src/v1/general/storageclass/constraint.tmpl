@@ -1,0 +1,42 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sstorageclass
+  annotations:
+    metadata.gatekeeper.sh/title: "Storage Class"
+    metadata.gatekeeper.sh/version: 1.1.2
+    metadata.gatekeeper.sh/requires-sync-data: |
+      "[
+        [
+          {
+            "groups":["storage.k8s.io"],
+            "versions": ["v1"],
+            "kinds": ["StorageClass"]
+          }
+        ]
+      ]"
+    description: >-
+      Requires storage classes to be specified when used. Only Gatekeeper 3.9+ and non-ephemeral containers are supported.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sStorageClass
+      validation:
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Requires storage classes to be specified when used.
+          properties:
+            includeStorageClassesInMessage:
+              type: boolean
+              default: true
+            allowedStorageClasses:
+              type: array
+              description: "An optional allow-list of storage classes.  If specified, any storage class not in the `allowedStorageClasses` parameter is disallowed."
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ file.Read "src/general/storageclass/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}

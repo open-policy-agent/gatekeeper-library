@@ -1,0 +1,80 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8spspseccomp
+  annotations:
+    metadata.gatekeeper.sh/title: "Seccomp"
+    metadata.gatekeeper.sh/version: 1.1.0
+    description: >-
+      Controls the seccomp profile used by containers. Corresponds to the
+      `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on
+      a PodSecurityPolicy. For more information, see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccomp
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPSeccomp
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Controls the seccomp profile used by containers. Corresponds to the
+            `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on
+            a PodSecurityPolicy. For more information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccomp
+          properties:
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
+              type: array
+              items:
+                type: string
+            allowedProfiles:
+              type: array
+              description: >-
+                An array of allowed profile values for seccomp on Pods/Containers.
+
+                Can use the annotation naming scheme: `runtime/default`, `docker/default`, `unconfined` and/or
+                `localhost/some-profile.json`. The item `localhost/*` will allow any localhost based profile.
+
+                Can also use the securityContext naming scheme: `RuntimeDefault`, `Unconfined`
+                and/or `Localhost`. For securityContext `Localhost`, use the parameter `allowedLocalhostProfiles`
+                to list the allowed profile JSON files.
+
+                The policy code will translate between the two schemes so it is not necessary to use both.
+
+                Putting a `*` in this array allows all Profiles to be used.
+
+                This field is required since with an empty list this policy will block all workloads.
+              items:
+                type: string
+            allowedLocalhostFiles:
+              type: array
+              description: >-
+                When using securityContext naming scheme for seccomp and including `Localhost` this array holds
+                the allowed profile JSON files.
+
+                Putting a `*` in this array will allows all JSON files to be used.
+
+                This field is required to allow `Localhost` in securityContext as with an empty list it will block.
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code: 
+      - engine: K8sNativeValidation
+        source:
+{{ file.Read "src/pod-security-policy/seccomp/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+      - engine: Rego
+        source:
+          rego: |
+{{ file.Read "src/pod-security-policy/seccomp/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}
+          libs:
+            - |
+{{ file.Read "src/pod-security-policy/seccomp/lib_exempt_container.rego" | strings.Indent 14 | strings.TrimSuffix "\n" }}

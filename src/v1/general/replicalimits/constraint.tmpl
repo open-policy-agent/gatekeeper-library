@@ -1,0 +1,37 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sreplicalimits
+  annotations:
+    metadata.gatekeeper.sh/title: "Replica Limits"
+    metadata.gatekeeper.sh/version: 1.0.2
+    description: >-
+      Requires that objects with the field `spec.replicas` (Deployments,
+      ReplicaSets, etc.) specify a number of replicas within defined ranges.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sReplicaLimits
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          properties:
+            ranges:
+              type: array
+              description: Allowed ranges for numbers of replicas.  Values are inclusive.
+              items:
+                type: object
+                description: A range of allowed replicas.  Values are inclusive.
+                properties:
+                  min_replicas:
+                    description: The minimum number of replicas allowed, inclusive.
+                    type: integer
+                  max_replicas:
+                    description: The maximum number of replicas allowed, inclusive.
+                    type: integer
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ file.Read "src/general/replicalimits/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}

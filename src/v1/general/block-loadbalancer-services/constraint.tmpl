@@ -1,0 +1,20 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sblockloadbalancer
+  annotations:
+    metadata.gatekeeper.sh/title: "Block Services with type LoadBalancer"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      Disallows all Services with type LoadBalancer.
+
+      https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sBlockLoadBalancer
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ file.Read "src/general/block-loadbalancer-services/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}

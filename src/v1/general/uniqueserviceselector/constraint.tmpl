@@ -1,0 +1,33 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8suniqueserviceselector
+  annotations:
+    metadata.gatekeeper.sh/title: "Unique Service Selector"
+    metadata.gatekeeper.sh/version: 1.0.2
+    metadata.gatekeeper.sh/requires-sync-data: |
+      "[
+        [
+          {
+            "groups":[""],
+            "versions": ["v1"],
+            "kinds": ["Service"]
+          }
+        ]
+      ]"
+    description: >-
+      Requires Services to have unique selectors within a namespace.
+      Selectors are considered the same if they have identical keys and values.
+      Selectors may share a key/value pair so long as there is at least one
+      distinct key/value pair between them.
+
+      https://kubernetes.io/docs/concepts/services-networking/service/#defining-a-service
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sUniqueServiceSelector
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ file.Read "src/general/uniqueserviceselector/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}

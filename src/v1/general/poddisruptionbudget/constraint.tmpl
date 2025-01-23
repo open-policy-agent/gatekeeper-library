@@ -1,0 +1,33 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8spoddisruptionbudget
+  annotations:
+    metadata.gatekeeper.sh/title: "Pod Disruption Budget"
+    metadata.gatekeeper.sh/version: 1.0.4
+    metadata.gatekeeper.sh/requires-sync-data: |
+      "[
+        [
+          {
+            "groups":["policy"],
+            "versions": ["v1"],
+            "kinds": ["PodDisruptionBudget"]
+          }
+        ]
+      ]"
+    description: >-
+      Disallow the following scenarios when deploying PodDisruptionBudgets or resources that implement the replica subresource (e.g. Deployment, ReplicationController, ReplicaSet, StatefulSet):
+      1. Deployment of PodDisruptionBudgets with .spec.maxUnavailable == 0
+      2. Deployment of PodDisruptionBudgets with .spec.minAvailable == .spec.replicas of the resource with replica subresource
+      This will prevent PodDisruptionBudgets from blocking voluntary disruptions such as node draining.
+
+      https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPodDisruptionBudget
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ file.Read "src/general/poddisruptionbudget/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
