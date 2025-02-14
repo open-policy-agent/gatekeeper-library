@@ -41,7 +41,7 @@ spec:
               variables.sharingHostIPC || variables.sharingHostPID
           validations:
           - expression: '(has(request.operation) && request.operation == "UPDATE") || !variables.sharingNamespace'
-            messageExpression: '"Sharing the host namespace is not allowed: " + variables.anyObject.metadata.namespace'
+            messageExpression: '"Sharing the host namespace is not allowed: " + variables.anyObject.metadata.name'
       - engine: Rego
         source:
           rego: |
