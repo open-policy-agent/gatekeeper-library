@@ -16,7 +16,7 @@ metadata:
   name: k8spsphostnamespace
   annotations:
     metadata.gatekeeper.sh/title: "Host Namespace"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Disallows sharing of host PID and IPC namespaces by pod containers.
       Corresponds to the `hostPID` and `hostIPC` fields in a PodSecurityPolicy.
@@ -38,32 +38,50 @@ spec:
             https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
   targets:
     - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8spsphostnamespace
+      code:
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: sharingHostIPC
+            expression: |
+              has(variables.anyObject.spec.hostIPC) ? variables.anyObject.spec.hostIPC : false
+          - name: sharingHostPID
+            expression: |
+              has(variables.anyObject.spec.hostPID) ? variables.anyObject.spec.hostPID : false
+          - name: sharingNamespace
+            expression: |
+              variables.sharingHostIPC || variables.sharingHostPID
+          validations:
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || !variables.sharingNamespace'
+            messageExpression: '"Sharing the host namespace is not allowed: " + variables.anyObject.metadata.name'
+      - engine: Rego
+        source:
+          rego: |
+            package k8spsphostnamespace
 
-        import data.lib.exclude_update.is_update
+            import data.lib.exclude_update.is_update
 
-        violation[{"msg": msg, "details": {}}] {
-            # spec.hostPID and spec.hostIPC fields are immutable.
-            not is_update(input.review)
+            violation[{"msg": msg, "details": {}}] {
+                # spec.hostPID and spec.hostIPC fields are immutable.
+                not is_update(input.review)
 
-            input_share_hostnamespace(input.review.object)
-            msg := sprintf("Sharing the host namespace is not allowed: %v", [input.review.object.metadata.name])
-        }
+                input_share_hostnamespace(input.review.object)
+                msg := sprintf("Sharing the host namespace is not allowed: %v", [input.review.object.metadata.name])
+            }
 
-        input_share_hostnamespace(o) {
-            o.spec.hostPID
-        }
-        input_share_hostnamespace(o) {
-            o.spec.hostIPC
-        }
-      libs:
-        - |
-          package lib.exclude_update
+            input_share_hostnamespace(o) {
+                o.spec.hostPID
+            }
+            input_share_hostnamespace(o) {
+                o.spec.hostIPC
+            }
+          libs:
+            - |
+              package lib.exclude_update
 
-          is_update(review) {
-              review.operation == "UPDATE"
-          }
+              is_update(review) {
+                  review.operation == "UPDATE"
+              }
 
 ```
 
