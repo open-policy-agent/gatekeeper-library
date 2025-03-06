@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: example-namespace-updated-with-quota
+  labels:
+    environment: "production"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: updated-quota
+  namespace: example-namespace-updated-with-quota
+spec:
+  hard:
+    pods: "20"

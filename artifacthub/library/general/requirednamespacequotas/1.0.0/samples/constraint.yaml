@@ -1,0 +1,12 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredNamespaceQuota
+metadata:
+  name: enforce-namespace-quota
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Namespace"]
+  enforcementAction: "warn"
+  parameters:
+    message: "Every namespace must have a ResourceQuota!"

@@ -43,6 +43,7 @@ module.exports = {
             'validation/replicalimits',
             'validation/requiredannotations',
             'validation/requiredlabels',
+            'validation/requirednamespacequotas',
             'validation/requiredprobes',
             'validation/storageclass',
             'validation/uniqueingresshost',
