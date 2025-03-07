@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: example-namespace
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: example-quota
+  namespace: example-namespace
+spec:
+  hard:
+    pods: "10"
