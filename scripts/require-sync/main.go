@@ -108,7 +108,6 @@ func checkTemplates(libraryPath string) error {
 
 		syncPath := filepath.Join(filepath.Dir(path), "sync.yaml")
 		_, err = fs.Stat(system, syncPath)
-
 		if err != nil {
 			if os.IsNotExist(err) {
 				return fmt.Errorf("`sync.yaml` not found in dir '%s'", filepath.Dir(absolutePath))
