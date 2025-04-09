@@ -85,16 +85,26 @@ setup() {
     if [ -d "$policy" ]; then
       local policy_group=$(basename "$(dirname "$policy")")
       local template_name=$(basename "$policy")
+      deny_substr="denied the request"
       echo "running integration test against policy group: $policy_group, constraint template: $template_name"
       # apply template
       wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl apply -k $policy"
-      local kind=$(yq e .metadata.name "$policy"/template.yaml)
+      local kind=$(cat "$policy"/template.yaml | yq e .metadata.name)
+      if [ "$ENABLE_VAP" == "true" ] && grep -q "engine: K8sNativeValidation" "$policy"/template.yaml; then
+        wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl get ValidatingAdmissionPolicy gatekeeper-$kind -o yaml"
+        sleep 30
+        deny_substr="ValidatingAdmissionPolicy"
+      fi
       for sample in "$policy"/samples/*; do
         echo "testing sample constraint: $(basename "$sample")"
         # apply constraint
         wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl apply -f ${sample}/constraint.yaml"
-        local name=$(yq e .metadata.name "$sample"/constraint.yaml)
+        local name=$(cat "$sample"/constraint.yaml | yq e .metadata.name)
         wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "constraint_enforced $kind $name"
+
+        if [ "$ENABLE_VAP" == "true" ] && grep -q "engine: K8sNativeValidation" "$policy"/template.yaml; then
+          wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl get ValidatingAdmissionPolicyBinding gatekeeper-$name -o yaml"
+        fi
 
         for inventory in "$sample"/example_inventory*.yaml; do
           if [[ -e "$inventory" ]]; then
@@ -123,7 +133,7 @@ setup() {
             echo "Applying ${disallowed} with contents:"
             cat ${disallowed}
             run kubectl apply -f "$disallowed"
-            assert_match_either 'denied the request' 'no matches for kind' "${output}"
+            assert_match_either "$deny_substr" 'no matches for kind' "${output}"
             assert_failure
             # delete resource
             run kubectl delete --ignore-not-found -f "$disallowed"

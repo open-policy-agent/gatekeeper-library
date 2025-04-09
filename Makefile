@@ -3,11 +3,12 @@ KIND_VERSION ?= 0.23.0
 # note: k8s version pinned since KIND image availability lags k8s releases
 KUBERNETES_VERSION ?= 1.30.0
 KUSTOMIZE_VERSION ?= 4.5.5
-GATEKEEPER_VERSION ?= 3.16.3
+GATEKEEPER_VERSION ?= 3.18.1
 BATS_VERSION ?= 1.8.2
-GATOR_VERSION ?= 3.17.0
+GATOR_VERSION ?= 3.18.1
 GOMPLATE_VERSION ?= 3.11.6
 POLICY_ENGINE ?= rego
+ENABLE_VAP ?= false
 
 REPO_ROOT := $(shell git rev-parse --show-toplevel)
 WEBSITE_SCRIPT_DIR := $(REPO_ROOT)/scripts/website
@@ -33,12 +34,13 @@ integration-bootstrap:
 
 deploy:
 	helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts
-ifeq ($(POLICY_ENGINE), rego)
-	helm install -n gatekeeper-system gatekeeper gatekeeper/gatekeeper --create-namespace --version $(GATEKEEPER_VERSION) --set enableK8sNativeValidation=false
+# If the policy engine is rego, enableK8sNativeValidation should be set to false because K8sNativeValidation engine holds more priority than Rego engine. Otherwise Rego engine will not get evaluated for CT containing K8sNativeValidation engine. 
+ifeq ($(ENABLE_VAP), true)
+	helm install -n gatekeeper-system gatekeeper gatekeeper/gatekeeper --create-namespace --version $(GATEKEEPER_VERSION) --set enableK8sNativeValidation=true --set defaultCreateVAPForTemplates=true --set defaultCreateVAPBindingForConstraints=true
 else ifeq ($(POLICY_ENGINE), cel)
-ifneq ($(GATEKEEPER_VERSION), 3.15.1)
 	helm install -n gatekeeper-system gatekeeper gatekeeper/gatekeeper --create-namespace --version $(GATEKEEPER_VERSION) --set enableK8sNativeValidation=true
-endif
+else ifeq ($(POLICY_ENGINE), rego)
+	helm install -n gatekeeper-system gatekeeper gatekeeper/gatekeeper --create-namespace --version $(GATEKEEPER_VERSION) --set enableK8sNativeValidation=false
 endif
 
 uninstall:
