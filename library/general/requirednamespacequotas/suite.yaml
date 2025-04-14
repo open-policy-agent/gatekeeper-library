@@ -1,0 +1,25 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: requirednamespacequota
+tests:
+- name: required-namespace-quota
+  template: template.yaml
+  constraint: samples/constraint.yaml
+  cases:
+  - name: allowed
+    object: samples/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: disallowed
+    object: samples/example_disallowed.yaml
+    assertions:
+    - violations: yes
+  - name: update_allowed
+    object: samples/example_update_allowed.yaml
+    assertions:
+    - violations: no
+  - name: update_disallowed
+    object: samples/example_update_disallowed.yaml
+    assertions:
+    - violations: yes
