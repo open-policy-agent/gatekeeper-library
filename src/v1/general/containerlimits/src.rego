@@ -1,0 +1,194 @@
+package k8scontainerlimits
+
+import rego.v1
+
+import data.lib.exempt_container.is_exempt
+
+missing(obj, field) if {
+	not obj[field]
+}
+
+missing(obj, field) if {
+	obj[field] == ""
+}
+
+canonify_cpu(orig) := new if {
+	is_number(orig)
+	new := orig * 1000
+}
+
+canonify_cpu(orig) := new if {
+	not is_number(orig)
+	endswith(orig, "m")
+	new := to_number(replace(orig, "m", ""))
+}
+
+canonify_cpu(orig) := new if {
+	not is_number(orig)
+	not endswith(orig, "m")
+	regex.match(`^[0-9]+(\\.[0-9]+)?$`, orig)
+	new := to_number(orig) * 1000
+}
+
+# 10 ** 21
+mem_multiple("E") := 1000000000000000000000
+
+# 10 ** 18
+mem_multiple("P") := 1000000000000000000
+
+# 10 ** 15
+mem_multiple("T") := 1000000000000000
+
+# 10 ** 12
+mem_multiple("G") := 1000000000000
+
+# 10 ** 9
+mem_multiple("M") := 1000000000
+
+# 10 ** 6
+mem_multiple("k") := 1000000
+
+# 10 ** 3
+mem_multiple("") := 1000
+
+# Kubernetes accepts millibyte precision when it probably shouldn't.
+# https://github.com/kubernetes/kubernetes/issues/28741
+# 10 ** 0
+mem_multiple("m") := 1
+
+# 1000 * 2 ** 10
+mem_multiple("Ki") := 1024000
+
+# 1000 * 2 ** 20
+mem_multiple("Mi") := 1048576000
+
+# 1000 * 2 ** 30
+mem_multiple("Gi") := 1073741824000
+
+# 1000 * 2 ** 40
+mem_multiple("Ti") := 1099511627776000
+
+# 1000 * 2 ** 50
+mem_multiple("Pi") := 1125899906842624000
+
+# 1000 * 2 ** 60
+mem_multiple("Ei") := 1152921504606846976000
+
+get_suffix(mem) := "" if not is_string(mem)
+
+get_suffix(mem) := suffix if {
+	is_string(mem)
+	count(mem) > 0
+	suffix := substring(mem, count(mem) - 1, -1)
+	mem_multiple(suffix)
+}
+
+get_suffix(mem) := suffix if {
+	is_string(mem)
+	count(mem) > 1
+	suffix := substring(mem, count(mem) - 2, -1)
+	mem_multiple(suffix)
+}
+
+get_suffix(mem) := "" if {
+	is_string(mem)
+	count(mem) > 1
+	not mem_multiple(substring(mem, count(mem) - 1, -1))
+	not mem_multiple(substring(mem, count(mem) - 2, -1))
+}
+
+get_suffix(mem) := "" if {
+	is_string(mem)
+	count(mem) == 1
+	not mem_multiple(mem)
+}
+
+get_suffix("") := ""
+
+canonify_mem(orig) := orig * 1000 if is_number(orig)
+
+canonify_mem(orig) := to_number(raw) * mem_multiple(suffix) if {
+	not is_number(orig)
+	suffix := get_suffix(orig)
+	raw := replace(orig, suffix, "")
+	regex.match(`^[0-9]+(\.[0-9]+)?$`, raw)
+}
+
+violation contains {"msg": msg} if {
+	general_violation[{"msg": msg, "field": "containers"}]
+}
+
+violation contains {"msg": msg} if {
+	general_violation[{"msg": msg, "field": "initContainers"}]
+}
+
+# Ephemeral containers not checked as it is not possible to set field.
+
+general_violation contains {"msg": msg, "field": field} if {
+	input.parameters.cpu != "-1"
+	some [field, container] in non_exempt_containers
+	cpu_orig := container.resources.limits.cpu
+	not canonify_cpu(cpu_orig)
+	msg := sprintf("container <%v> cpu limit <%v> could not be parsed", [container.name, cpu_orig])
+}
+
+general_violation contains {"msg": msg, "field": field} if {
+	some [field, container] in non_exempt_containers
+	mem_orig := container.resources.limits.memory
+	not canonify_mem(mem_orig)
+	msg := sprintf("container <%v> memory limit <%v> could not be parsed", [container.name, mem_orig])
+}
+
+general_violation contains {"msg": msg, "field": field} if {
+	some [field, container] in non_exempt_containers
+	not container.resources
+	msg := sprintf("container <%v> has no resource limits", [container.name])
+}
+
+general_violation contains {"msg": msg, "field": field} if {
+	some [field, container] in non_exempt_containers
+	not container.resources.limits
+	msg := sprintf("container <%v> has no resource limits", [container.name])
+}
+
+general_violation contains {"msg": msg, "field": field} if {
+	input.parameters.cpu != "-1"
+	some [field, container] in non_exempt_containers
+	missing(container.resources.limits, "cpu")
+	msg := sprintf("container <%v> has no cpu limit", [container.name])
+}
+
+general_violation contains {"msg": msg, "field": field} if {
+	some [field, container] in non_exempt_containers
+	missing(container.resources.limits, "memory")
+	msg := sprintf("container <%v> has no memory limit", [container.name])
+}
+
+general_violation contains {"msg": msg, "field": field} if {
+	input.parameters.cpu != "-1"
+	some [field, container] in non_exempt_containers
+	cpu := canonify_cpu(container.resources.limits.cpu)
+	max_cpu := canonify_cpu(input.parameters.cpu)
+	cpu > max_cpu
+	msg := sprintf(
+		"container <%v> cpu limit <%v> is higher than the maximum allowed of <%v>",
+		[container.name, container.resources.limits.cpu, input.parameters.cpu],
+	)
+}
+
+general_violation contains {"msg": msg, "field": field} if {
+	some [field, container] in non_exempt_containers
+	mem := canonify_mem(container.resources.limits.memory)
+	max_mem := canonify_mem(input.parameters.memory)
+	mem > max_mem
+	msg := sprintf(
+		"container <%v> memory limit <%v> is higher than the maximum allowed of <%v>",
+		[container.name, container.resources.limits.memory, input.parameters.memory],
+	)
+}
+
+non_exempt_containers contains [field, container] if {
+	some field, containers in input.review.object.spec
+	some container in containers
+	not is_exempt(container)
+}
