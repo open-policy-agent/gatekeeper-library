@@ -1,0 +1,18 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sblockwildcardingress
+  annotations:
+    metadata.gatekeeper.sh/title: "Block Wildcard Ingress"
+    metadata.gatekeeper.sh/version: 1.0.1
+    description: >-
+      Users should not be able to create Ingresses with a blank or wildcard (*) hostname since that would enable them to intercept traffic for other services in the cluster, even if they don't have access to those services.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sBlockWildcardIngress
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ file.Read "src/general/block-wildcard-ingress/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
