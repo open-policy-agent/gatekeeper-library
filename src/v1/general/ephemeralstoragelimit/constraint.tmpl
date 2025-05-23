@@ -1,0 +1,44 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8scontainerephemeralstoragelimit
+  annotations:
+    metadata.gatekeeper.sh/title: "Container ephemeral storage limit"
+    metadata.gatekeeper.sh/version: 1.0.2
+    description: >-
+      Requires containers to have an ephemeral storage limit set and constrains
+      the limit to be within the specified maximum values.
+
+      https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sContainerEphemeralStorageLimit
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          properties:
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
+              type: array
+              items:
+                type: string
+            ephemeral-storage:
+              description: "The maximum allowed ephemeral storage limit on a Pod, exclusive."
+              type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ file.Read "src/general/ephemeralstoragelimit/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
+      libs:
+        - |
+{{ file.Read "src/general/ephemeralstoragelimit/lib_exclude_update.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+        - |
+{{ file.Read "src/general/ephemeralstoragelimit/lib_exempt_container.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}
