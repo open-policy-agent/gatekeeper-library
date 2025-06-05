@@ -1,0 +1,52 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8spsphostfilesystem
+  annotations:
+    metadata.gatekeeper.sh/title: "Host Filesystem"
+    metadata.gatekeeper.sh/version: 1.1.1
+    description: >-
+      Controls usage of the host filesystem. Corresponds to the
+      `allowedHostPaths` field in a PodSecurityPolicy. For more information,
+      see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPHostFilesystem
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Controls usage of the host filesystem. Corresponds to the
+            `allowedHostPaths` field in a PodSecurityPolicy. For more information,
+            see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
+          properties:
+            allowedHostPaths:
+              type: array
+              description: "An array of hostpath objects, representing paths and read/write configuration."
+              items:
+                type: object
+                properties:
+                  pathPrefix:
+                    type: string
+                    description: "The path prefix that the host volume must match."
+                  readOnly:
+                    type: boolean
+                    description: "when set to true, any container volumeMounts matching the pathPrefix must include `readOnly: true`."
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source: 
+{{ file.Read "src/pod-security-policy/host-filesystem/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+      - engine: Rego
+        source:
+          rego: |
+{{ file.Read "src/pod-security-policy/host-filesystem/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}
+          libs:
+            - |
+{{ file.Read "src/pod-security-policy/host-filesystem/lib_exclude_update.rego" | strings.Indent 14 | strings.TrimSuffix "\n" }}
