@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-disallowed-2
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:latest
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
