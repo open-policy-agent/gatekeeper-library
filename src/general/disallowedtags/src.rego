@@ -13,7 +13,8 @@ violation[{"msg": msg}] {
 violation[{"msg": msg}] {
     container := input_containers[_]
     not is_exempt(container)
-    not contains(container.image, ":")
+    parts := split(container.image, "/")
+    not contains(parts[count(parts) - 1], ":")
     msg := sprintf("container <%v> didn't specify an image tag <%v>", [container.name, container.image])
 }
 
