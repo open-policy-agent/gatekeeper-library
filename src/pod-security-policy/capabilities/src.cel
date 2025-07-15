@@ -39,7 +39,7 @@ variables:
     variables.allContainers.map(container, !(container.image in variables.exemptImages) &&
       size(variables.requiredDropCapabilities) > 0 && (
         !has(container.securityContext) || !has(container.securityContext.capabilities) || !has(container.securityContext.capabilities.drop) || (
-          !("all" in container.securityContext.capabilities.drop) &&
+          !(container.securityContext.capabilities.drop.exists(capability, capability.lowerAscii() == "all")) &&
           variables.requiredDropCapabilities.exists(capability, !(capability in container.securityContext.capabilities.drop))
         )
       ),
