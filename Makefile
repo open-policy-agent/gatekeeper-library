@@ -1,11 +1,11 @@
 docker := docker #You can build with podman by doing: make docker=podman
-KIND_VERSION ?= 0.23.0
+KIND_VERSION ?= 0.29.0
 # note: k8s version pinned since KIND image availability lags k8s releases
-KUBERNETES_VERSION ?= 1.30.0
-KUSTOMIZE_VERSION ?= 4.5.5
-GATEKEEPER_VERSION ?= 3.16.3
-BATS_VERSION ?= 1.8.2
-GATOR_VERSION ?= 3.17.0
+KUBERNETES_VERSION ?= 1.33.0
+KUSTOMIZE_VERSION ?= 5.7.1
+GATEKEEPER_VERSION ?= 3.20.0
+BATS_VERSION ?= 1.12.0
+GATOR_VERSION ?= 3.20.0
 GOMPLATE_VERSION ?= 3.11.6
 POLICY_ENGINE ?= rego
 
