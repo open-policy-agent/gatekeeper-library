@@ -1,7 +1,7 @@
 docker := docker #You can build with podman by doing: make docker=podman
 KIND_VERSION ?= 0.29.0
 # note: k8s version pinned since KIND image availability lags k8s releases
-KUBERNETES_VERSION ?= 1.33.0
+KUBERNETES_VERSION ?= 1.33.2
 KUSTOMIZE_VERSION ?= 5.7.1
 GATEKEEPER_VERSION ?= 3.20.0
 BATS_VERSION ?= 1.12.0

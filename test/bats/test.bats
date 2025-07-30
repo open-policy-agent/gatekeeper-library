@@ -113,9 +113,9 @@ setup() {
               run kubectl apply -f "$allowed"
               assert_match 'created' "$output"
               assert_success
+              # delete resource
+              kubectl delete --ignore-not-found -f "$allowed"
             fi
-            # delete resource
-            kubectl delete --ignore-not-found -f "$allowed"
           fi
         done
 
@@ -128,9 +128,9 @@ setup() {
               run kubectl apply -f "$disallowed"
               assert_match_either 'denied the request' 'no matches for kind' "${output}"
               assert_failure
+              # delete resource
+              run kubectl delete --ignore-not-found -f "$disallowed"
             fi
-            # delete resource
-            run kubectl delete --ignore-not-found -f "$disallowed"
           fi
         done
 
