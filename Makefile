@@ -1,11 +1,11 @@
 docker := docker #You can build with podman by doing: make docker=podman
-KIND_VERSION ?= 0.23.0
+KIND_VERSION ?= 0.29.0
 # note: k8s version pinned since KIND image availability lags k8s releases
-KUBERNETES_VERSION ?= 1.30.0
-KUSTOMIZE_VERSION ?= 4.5.5
-GATEKEEPER_VERSION ?= 3.16.3
-BATS_VERSION ?= 1.8.2
-GATOR_VERSION ?= 3.17.0
+KUBERNETES_VERSION ?= 1.33.2
+KUSTOMIZE_VERSION ?= 5.7.1
+GATEKEEPER_VERSION ?= 3.20.0
+BATS_VERSION ?= 1.12.0
+GATOR_VERSION ?= 3.20.0
 GOMPLATE_VERSION ?= 3.11.6
 POLICY_ENGINE ?= rego
 
@@ -19,7 +19,7 @@ integration-bootstrap:
 	# Download and install kind
 	curl -L https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-amd64 --output ${GITHUB_WORKSPACE}/bin/kind && chmod +x ${GITHUB_WORKSPACE}/bin/kind
 	# Download and install kubectl
-	curl -L https://storage.googleapis.com/kubernetes-release/release/v${KUBERNETES_VERSION}/bin/linux/amd64/kubectl -o ${GITHUB_WORKSPACE}/bin/kubectl && chmod +x ${GITHUB_WORKSPACE}/bin/kubectl
+	curl -L https://dl.k8s.io/release/v${KUBERNETES_VERSION}/bin/linux/amd64/kubectl -o ${GITHUB_WORKSPACE}/bin/kubectl && chmod +x ${GITHUB_WORKSPACE}/bin/kubectl
 	# Download and install kustomize
 	curl -L https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz -o kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz && tar -zxvf kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz && chmod +x kustomize && mv kustomize ${GITHUB_WORKSPACE}/bin/kustomize
 	# Download and install bats

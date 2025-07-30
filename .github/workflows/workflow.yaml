@@ -65,7 +65,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        gatekeeper: [ "3.18.2", "3.19.0" ]
+        gatekeeper: [ "3.19.3", "3.20.0" ]
         engine: [ "cel", "rego" ]
     name: "Integration test on Gatekeeper ${{ matrix.gatekeeper }} for ${{ matrix.engine }} policies"
     steps:
@@ -131,7 +131,7 @@ jobs:
     strategy:
       matrix:
         engine: [ "cel", "rego" ]
-        gatekeeper: [ "3.18.2", "3.19.0" ]
+        gatekeeper: [ "3.19.3", "3.20.0" ]
     name: "Verify assertions in suite.yaml files for ${{ matrix.engine }} policies"
     steps:
       - name: Harden Runner
