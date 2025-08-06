@@ -155,7 +155,7 @@ input_container_denied_empty_with_port = [
 {
     "name": "nginx",
     "image": "nginx:443/nginx",
-}]
+}] 
 
 input_container_denied_latest = [
 {
