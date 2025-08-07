@@ -277,7 +277,7 @@ make verify-gator-dockerized POLICY_ENGINE=cel   # Tests CEL implementations
 
 ## Key Configuration Files
 
-- **Makefile**: All build targets, version configurations, tool versions, **POLICY_ENGINE variable for rego/cel testing**
+- **Makefile**: All build targets, version configurations, tool versions, **POLICY_ENGINE variable (valid values: 'rego', 'cel') for rego/cel testing**
 - **.golangci.yaml**: Go linting rules for scripts (Go 1.20, strict rules)
 - **go.work**: Go workspace for scripts (artifacthub, validate, require-sync, website)
 - **test/kind_config.yaml**: Kubernetes cluster config for integration tests
