@@ -1,0 +1,60 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8shorizontalpodautoscaler
+  annotations:
+    metadata.gatekeeper.sh/title: "Horizontal Pod Autoscaler"
+    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/requires-sync-data: |
+      "[
+        [
+          {
+            "groups":["apps"],
+            "versions": ["v1"],
+            "kinds": ["Deployment"]
+          },
+          {
+            "groups":["apps"],
+            "versions": ["v1"],
+            "kinds": ["StatefulSet"]
+          }
+        ]
+      ]"
+    description: >-
+      Disallow the following scenarios when deploying `HorizontalPodAutoscalers`
+      1. Deployment of HorizontalPodAutoscalers with `.spec.minReplicas` or `.spec.maxReplicas` outside the ranges defined in the constraint
+      2. Deployment of HorizontalPodAutoscalers where the difference between `.spec.minReplicas` and `.spec.maxReplicas` is less than the configured `minimumReplicaSpread`
+      3. Deployment of HorizontalPodAutoscalers that do not reference a valid `scaleTargetRef` (e.g. Deployment, ReplicationController, ReplicaSet, StatefulSet).
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sHorizontalPodAutoscaler
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          properties:
+            enforceScaleTargetRef:
+              description: If set to true it validates the HPA scaleTargetRef exists
+              type: boolean
+            minimumReplicaSpread:
+              description: If configured it enforces the minReplicas and maxReplicas in an HPA must have a spread of at least this many replicas
+              type: integer
+            ranges:
+              type: array
+              description: Allowed ranges for numbers of replicas.  Values are inclusive.
+              items:
+                type: object
+                description: A range of allowed replicas.  Values are inclusive.
+                properties:
+                  min_replicas:
+                    description: The minimum number of replicas allowed, inclusive.
+                    type: integer
+                  max_replicas:
+                    description: The maximum number of replicas allowed, inclusive.
+                    type: integer
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ file.Read "src/general/horizontalpodautoscaler/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
