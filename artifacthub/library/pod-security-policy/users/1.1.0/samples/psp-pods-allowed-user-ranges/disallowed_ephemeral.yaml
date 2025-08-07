@@ -9,14 +9,8 @@ spec:
     supplementalGroups:
       - 250
     fsGroup: 250
-  containers:
+  ephemeralContainers:
     - name: nginx
-      image: nginx
-      securityContext:
-        runAsUser: 250
-        runAsGroup: 250
-  initContainers:
-    - name: init-nginx
       image: nginx
       securityContext:
         runAsUser: 250
