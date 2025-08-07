@@ -19,6 +19,10 @@ tests:
     object: samples/container-image-must-not-have-latest-tag/example_no_tag.yaml
     assertions:
     - violations: yes
+  - name: no-tag-with-port
+    object: samples/container-image-must-not-have-latest-tag/example_no_tag_w_port.yaml
+    assertions:
+    - violations: yes
   - name: single-disallowed-tag
     object: samples/container-image-must-not-have-latest-tag/example_disallowed_tag.yaml
     assertions:

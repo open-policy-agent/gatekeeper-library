@@ -232,6 +232,31 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 
 </details>
 <details>
+<summary>no-tag-with-port</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-disallowed-4
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent:443/opa
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/disallowedtags/samples/container-image-must-not-have-latest-tag/example_no_tag_w_port.yaml
+```
+
+</details>
+<details>
 <summary>single-disallowed-tag</summary>
 
 ```yaml
