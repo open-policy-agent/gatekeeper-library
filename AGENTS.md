@@ -98,56 +98,56 @@ make verify-gator-dockerized POLICY_ENGINE=cel
 
 ### Repository Layout
 ```
-├── src/                                   # Source templates and Rego/CEL policies (EDIT HERE)
-│   ├── general/                           # General validation policies  
-│   │   ├── httpsonly/                     # Example: HTTPS-only ingress policy (Rego only)
-│   │   │   ├── constraint.tmpl            # Gomplate template → generates library/.../template.yaml
-│   │   │   ├── src.rego                   # Rego policy logic
-│   │   │   └── src_test.rego             # OPA unit tests
-│   │   ├── requiredlabels/                # Example: Required labels policy (Rego + CEL)
-│   │   │   ├── constraint.tmpl            # Dual-engine template (both Rego and CEL)
-│   │   │   ├── src.rego                   # Rego policy logic
-│   │   │   ├── src.cel                    # CEL policy logic (K8sNativeValidation engine)
-│   │   │   └── src_test.rego             # OPA unit tests (CEL tested via gator)
-│   │   └── [policy-name]/                # Pattern for all policies
-│   ├── pod-security-policy/               # Pod Security Policy equivalent validations (mostly Rego + CEL)
-│   └── rego/                             # Shared Rego utilities
-├── library/                              # Generated Kubernetes manifests (DO NOT EDIT)
-│   ├── general/                          # Generated validation templates
-│   │   ├── httpsonly/                    # Generated from src/general/httpsonly/
-│   │   │   ├── template.yaml             # Generated ConstraintTemplate (AUTO-GENERATED)
-│   │   │   ├── kustomization.yaml        # Kustomize config (MANUALLY MAINTAINED)
-│   │   │   ├── suite.yaml               # Gator test cases (MANUALLY MAINTAINED)  
-│   │   │   ├── sync.yaml                # Optional: OPA data sync config
-│   │   │   └── samples/                  # Example constraints and test resources
-│   │   │       └── [constraint-name]/    # Sample constraint + test resources
-│   │   └── [policy-name]/               # Pattern for all generated policies
-│   └── pod-security-policy/             # Generated PSP-equivalent templates
-├── mutation/                             # Mutation policy examples (manually maintained)
-│   └── pod-security-policy/             # Example mutation policies
-├── scripts/                              # Go tooling and automation
-│   ├── generate.sh                       # Main template generation script
-│   ├── require-suites.sh                 # Validates suite.yaml files exist
-│   ├── artifacthub/                      # Go: ArtifactHub package generation
-│   ├── validate/                         # Go: Repository structure validation
-│   ├── require-sync/                     # Go: Sync requirements validation
-│   └── website/                          # Go: Website documentation generation
-├── build/                                # Docker build contexts
-│   ├── gomplate/Dockerfile               # Container for template generation
-│   └── gator/Dockerfile                  # Container for policy testing
-├── test/                                 # Integration test configurations
-│   ├── kind_config.yaml                  # Kind cluster configuration
-│   └── bats/                            # BATS integration tests
-├── .github/workflows/                    # CI/CD pipelines
-│   ├── workflow.yaml                     # Main CI pipeline (tests on rego/cel + multiple gatekeeper versions)
-│   ├── website.yaml                      # Website deployment
-│   └── scripts.yaml                     # Script validation
-├── artifacthub/                          # Generated ArtifactHub packages
-├── website/                              # Generated documentation website
-├── go.work                               # Go workspace for scripts
-├── .golangci.yaml                        # Go linting configuration  
-├── Makefile                              # Main build commands
-└── test.sh                               # OPA unit test runner
+├── src/                                     # Source templates and Rego/CEL policies (EDIT HERE)
+│   ├── general/                             # General validation policies  
+│   │   ├── httpsonly/                       # Example: HTTPS-only ingress policy (Rego only)
+│   │   │   ├── constraint.tmpl              # Gomplate template → generates library/.../template.yaml
+│   │   │   ├── src.rego                     # Rego policy logic
+│   │   │   └── src_test.rego                # OPA unit tests
+│   │   ├── requiredlabels/                  # Example: Required labels policy (Rego + CEL)
+│   │   │   ├── constraint.tmpl              # Dual-engine template (both Rego and CEL)
+│   │   │   ├── src.rego                     # Rego policy logic
+│   │   │   ├── src.cel                      # CEL policy logic (K8sNativeValidation engine)
+│   │   │   └── src_test.rego                # OPA unit tests (CEL tested via gator)
+│   │   └── [policy-name]/                   # Pattern for all policies
+│   ├── pod-security-policy/                 # Pod Security Policy equivalent validations (mostly Rego + CEL)
+│   └── rego/                                # Shared Rego utilities
+├── library/                                 # Generated Kubernetes manifests (DO NOT EDIT)
+│   ├── general/                             # Generated validation templates
+│   │   ├── httpsonly/                       # Generated from src/general/httpsonly/
+│   │   │   ├── template.yaml                # Generated ConstraintTemplate (AUTO-GENERATED)
+│   │   │   ├── kustomization.yaml           # Kustomize config (MANUALLY MAINTAINED)
+│   │   │   ├── suite.yaml                   # Gator test cases (MANUALLY MAINTAINED)  
+│   │   │   ├── sync.yaml                    # Optional: OPA data sync config
+│   │   │   └── samples/                     # Example constraints and test resources
+│   │   │       └── [constraint-name]/       # Sample constraint + test resources
+│   │   └── [policy-name]/                   # Pattern for all generated policies
+│   └── pod-security-policy/                 # Generated PSP-equivalent templates
+├── mutation/                                # Mutation policy examples (manually maintained)
+│   └── pod-security-policy/                 # Example mutation policies
+├── scripts/                                 # Go tooling and automation
+│   ├── generate.sh                          # Main template generation script
+│   ├── require-suites.sh                    # Validates suite.yaml files exist
+│   ├── artifacthub/                         # Go: ArtifactHub package generation
+│   ├── validate/                            # Go: Repository structure validation
+│   ├── require-sync/                        # Go: Sync requirements validation
+│   └── website/                             # Go: Website documentation generation
+├── build/                                   # Docker build contexts
+│   ├── gomplate/Dockerfile                  # Container for template generation
+│   └── gator/Dockerfile                     # Container for policy testing
+├── test/                                    # Integration test configurations
+│   ├── kind_config.yaml                     # Kind cluster configuration
+│   └── bats/                                # BATS integration tests
+├── .github/workflows/                       # CI/CD pipelines
+│   ├── workflow.yaml                        # Main CI pipeline (tests on rego/cel + multiple gatekeeper versions)
+│   ├── website.yaml                         # Website deployment
+│   └── scripts.yaml                         # Script validation
+├── artifacthub/                             # Generated ArtifactHub packages
+├── website/                                 # Generated documentation website
+├── go.work                                  # Go workspace for scripts
+├── .golangci.yaml                           # Go linting configuration  
+├── Makefile                                 # Main build commands
+└── test.sh                                  # OPA unit test runner
 ```
 
 ## Policy Development Workflow
