@@ -1,0 +1,62 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8spspcapabilities
+  annotations:
+    metadata.gatekeeper.sh/title: "Capabilities"
+    metadata.gatekeeper.sh/version: 1.1.1
+    description: >-
+      Controls Linux capabilities on containers. Corresponds to the
+      `allowedCapabilities` and `requiredDropCapabilities` fields in a
+      PodSecurityPolicy. For more information, see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#capabilities
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPCapabilities
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Controls Linux capabilities on containers. Corresponds to the
+            `allowedCapabilities` and `requiredDropCapabilities` fields in a
+            PodSecurityPolicy. For more information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#capabilities
+          properties:
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
+              type: array
+              items:
+                type: string
+            allowedCapabilities:
+              type: array
+              description: "A list of Linux capabilities that can be added to a container."
+              items:
+                type: string
+            requiredDropCapabilities:
+              type: array
+              description: "A list of Linux capabilities that are required to be dropped from a container."
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+{{ file.Read "src/pod-security-policy/capabilities/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+      - engine: Rego
+        source:
+          rego: |
+{{ file.Read "src/pod-security-policy/capabilities/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}
+          libs:
+          - |
+{{ file.Read "src/pod-security-policy/capabilities/lib_exclude_update.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}
+          - |
+{{ file.Read "src/pod-security-policy/capabilities/lib_exempt_container.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}
