@@ -1,0 +1,25 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: capabilities
+tests:
+  - name: capabilities
+    template: template.yaml
+    constraint: samples/capabilities-demo/constraint.yaml
+    cases:
+      - name: example-disallowed
+        object: samples/capabilities-demo/example_disallowed.yaml
+        assertions:
+          - violations: yes
+      - name: example-allowed
+        object: samples/capabilities-demo/example_allowed.yaml
+        assertions:
+          - violations: no
+      - name: disallowed-ephemeral
+        object: samples/capabilities-demo/disallowed_ephemeral.yaml
+        assertions:
+          - violations: yes
+      - name: update
+        object: samples/capabilities-demo/update.yaml
+        assertions:
+          - violations: no
