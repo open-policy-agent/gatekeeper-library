@@ -1,0 +1,39 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8spspvolumetypes
+  annotations:
+    metadata.gatekeeper.sh/title: "Volume Types"
+    metadata.gatekeeper.sh/version: 1.0.2
+    description: >-
+      Restricts mountable volume types to those specified by the user.
+      Corresponds to the `volumes` field in a PodSecurityPolicy. For more
+      information, see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPVolumeTypes
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Restricts mountable volume types to those specified by the user.
+            Corresponds to the `volumes` field in a PodSecurityPolicy. For more
+            information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
+          properties:
+            volumes:
+              description: "`volumes` is an array of volume types. All volume types can be enabled using `*`."
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ file.Read "src/pod-security-policy/volumes/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
+      libs:
+        - |
+{{ file.Read "src/pod-security-policy/volumes/lib_exclude_update.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}
