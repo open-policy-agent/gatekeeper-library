@@ -1,0 +1,11 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: inventory-mongo-pdb-allowed-3
+  namespace: default
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: mongo
+      example: non-matching-deployment-3
