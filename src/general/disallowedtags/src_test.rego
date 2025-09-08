@@ -15,6 +15,11 @@ test_input_denied_container_emtpy {
     results := violation with input as inp
     count(results) == 1
 }
+test_input_denied_container_empty_with_port {
+    inp := { "review": input_review(input_container_denied_empty_with_port), "parameters": {"tags": ["latest", "testing"]}}
+    results := violation with input as inp
+    count(results) == 1
+}
 test_input_denied_container_latest {
     inp := { "review": input_review(input_container_denied_latest), "parameters": {"tags": ["latest", "testing"]}}
     results := violation with input as inp
@@ -145,6 +150,12 @@ input_container_denied_empty = [
     "name": "nginx",
     "image": "nginx",
 }]
+
+input_container_denied_empty_with_port = [
+{
+    "name": "nginx",
+    "image": "nginx:443/nginx",
+}] 
 
 input_container_denied_latest = [
 {
