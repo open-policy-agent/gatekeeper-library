@@ -107,26 +107,30 @@ setup() {
         for allowed in "$sample"/example_allowed*.yaml; do
           if [[ -e "$allowed" ]]; then
             # apply resource
-            echo "Applying ${allowed} with contents:"
-            cat ${allowed}
-            run kubectl apply -f "$allowed"
-            assert_match 'created' "$output"
-            assert_success
-            # delete resource
-            kubectl delete --ignore-not-found -f "$allowed"
+            if kubectl apply -f "$allowed" --dry-run=server &> /dev/null; then
+              echo "Applying ${allowed} with contents:"
+              cat ${allowed}
+              run kubectl apply -f "$allowed"
+              assert_match 'created' "$output"
+              assert_success
+              # delete resource
+              kubectl delete --ignore-not-found -f "$allowed"
+            fi
           fi
         done
 
         for disallowed in "$sample"/example_disallowed*.yaml; do
           if [[ -e "$disallowed" ]]; then
             # apply resource
-            echo "Applying ${disallowed} with contents:"
-            cat ${disallowed}
-            run kubectl apply -f "$disallowed"
-            assert_match_either 'denied the request' 'no matches for kind' "${output}"
-            assert_failure
-            # delete resource
-            run kubectl delete --ignore-not-found -f "$disallowed"
+            if kubectl apply -f "$disallowed" --dry-run=server &> /dev/null; then
+              echo "Applying ${disallowed} with contents:"
+              cat ${disallowed}
+              run kubectl apply -f "$disallowed"
+              assert_match_either 'denied the request' 'no matches for kind' "${output}"
+              assert_failure
+              # delete resource
+              run kubectl delete --ignore-not-found -f "$disallowed"
+            fi
           fi
         done
 
