@@ -294,6 +294,7 @@ spec:
         limits:
           cpu: "100m"
           memory: "30Mi"
+
 ```
 
 Usage
