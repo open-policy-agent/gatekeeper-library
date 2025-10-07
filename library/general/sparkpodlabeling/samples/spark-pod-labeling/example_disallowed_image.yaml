@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: spark-pod-disallowed-image
+  labels:
+    spark-job-id: "job-123"
+    spark-role: "driver"
+    app: "spark-app"
+spec:
+  serviceAccountName: "spark-driver-sa"
+  containers:
+    - name: spark-driver
+      image: "nginx:latest"  # Not allowed for Spark pods

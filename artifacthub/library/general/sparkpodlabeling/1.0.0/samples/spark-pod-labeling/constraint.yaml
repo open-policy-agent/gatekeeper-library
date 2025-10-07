@@ -1,0 +1,20 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: SparkPodLabeling
+metadata:
+  name: spark-pod-labeling
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    allowedServiceAccounts:
+      - "spark-driver-sa"
+      - "spark-executor-sa"
+    requiredLabels:
+      - "spark-job-id"
+      - "spark-role"
+      - "app"
+    allowedImagePatterns:
+      - "spark/"
+      - "apache/spark"

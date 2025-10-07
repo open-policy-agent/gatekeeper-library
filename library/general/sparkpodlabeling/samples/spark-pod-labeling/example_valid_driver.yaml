@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: spark-driver-pod
+  labels:
+    spark-job-id: "job-123"
+    spark-role: "driver"
+    app: "spark-app"
+spec:
+  serviceAccountName: "spark-driver-sa"
+  containers:
+    - name: spark-driver
+      image: "spark/spark:3.4.0"
+      command: ["spark-submit"]
+      args: ["--class", "MySparkApp", "myapp.jar"]

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: regular-pod
+  labels:
+    app: "nginx"
+spec:
+  serviceAccountName: "regular-sa"  # Not a Spark service account
+  containers:
+    - name: nginx
+      image: "nginx:latest"

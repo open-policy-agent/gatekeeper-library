@@ -1,0 +1,79 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: sparkpodlabeling
+tests:
+- name: spark-pod-labeling
+  template: template.yaml
+  constraint: samples/spark-pod-labeling/constraint.yaml
+  cases:
+  - name: valid-spark-driver
+    object: samples/spark-pod-labeling/example_valid_driver.yaml
+    assertions:
+    - violations: no
+  - name: valid-spark-executor
+    object: samples/spark-pod-labeling/example_valid_executor.yaml
+    assertions:
+    - violations: no
+  - name: missing-required-label
+    object: samples/spark-pod-labeling/example_missing_label.yaml
+    assertions:
+    - violations: yes
+      message: "Spark pod missing required label: app"
+  - name: empty-spark-job-id
+    object: samples/spark-pod-labeling/example_empty_job_id.yaml
+    assertions:
+    - violations: yes
+      message: "spark-job-id label cannot be empty"
+  - name: missing-spark-role
+    object: samples/spark-pod-labeling/example_missing_role.yaml
+    assertions:
+    - violations: yes
+      message: "spark-role label is required (driver or executor)"
+  - name: invalid-spark-role
+    object: samples/spark-pod-labeling/example_invalid_role.yaml
+    assertions:
+    - violations: yes
+      message: "Invalid spark-role: invalid-role. Must be 'driver' or 'executor'"
+  - name: disallowed-image
+    object: samples/spark-pod-labeling/example_disallowed_image.yaml
+    assertions:
+    - violations: yes
+      message: "Image not allowed for Spark pods: nginx:latest"
+  - name: privileged-container
+    object: samples/spark-pod-labeling/example_privileged_container.yaml
+    assertions:
+    - violations: yes
+      message: "Privileged containers not allowed for Spark pods"
+  - name: host-path-volume
+    object: samples/spark-pod-labeling/example_host_path_volume.yaml
+    assertions:
+    - violations: yes
+      message: "Host path volumes not allowed for Spark pods"
+  - name: wrong-service-account
+    object: samples/spark-pod-labeling/example_wrong_service_account.yaml
+    assertions:
+    - violations: yes
+      message: "SECURITY: Pod service account 'wrong-sa' must match allowed service accounts"
+  - name: executor-wrong-service-account
+    object: samples/spark-pod-labeling/example_executor_wrong_sa.yaml
+    assertions:
+    - violations: yes
+      message: "SECURITY: Executor pod must use allowed service account. Found: wrong-sa"
+  - name: non-spark-service-account
+    object: samples/spark-pod-labeling/example_non_spark_sa.yaml
+    assertions:
+    - violations: no
+  - name: multiple-violations
+    object: samples/spark-pod-labeling/example_multiple_violations.yaml
+    assertions:
+    - violations: yes
+      message: "Spark pod missing required label: app"
+    - violations: yes
+      message: "spark-job-id label cannot be empty"
+    - violations: yes
+      message: "Invalid spark-role: invalid-role. Must be 'driver' or 'executor'"
+    - violations: yes
+      message: "Image not allowed for Spark pods: nginx:latest"
+    - violations: yes
+      message: "Privileged containers not allowed for Spark pods"

@@ -44,6 +44,7 @@ module.exports = {
             'validation/requiredannotations',
             'validation/requiredlabels',
             'validation/requiredprobes',
+            'validation/sparkpodlabeling',
             'validation/storageclass',
             'validation/uniqueingresshost',
             'validation/uniqueserviceselector',

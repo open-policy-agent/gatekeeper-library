@@ -1,0 +1,22 @@
+version: 1.0.0
+name: sparkpodlabeling
+displayName: Spark Pod Labeling
+createdAt: "2025-10-07T20:33:19Z"
+description: Enforces security and labeling requirements for Spark pods created by Spark service accounts. Validates that Spark pods have required labels (spark-job-id, spark-role), use allowed service accounts, run only approved container images, and follow security best practices by prohibiting privileged containers and host path volumes.
+digest: 577fb7131b4f2c0a003c3a00fbcb76a0283cef8f315b28063c6f321f11b00ffc
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/sparkpodlabeling
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Spark Pod Labeling
+    Enforces security and labeling requirements for Spark pods created by Spark service accounts. Validates that Spark pods have required labels (spark-job-id, spark-role), use allowed service accounts, run only approved container images, and follow security best practices by prohibiting privileged containers and host path volumes.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/sparkpodlabeling/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

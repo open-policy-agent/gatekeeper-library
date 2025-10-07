@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: spark-executor-wrong-sa
+  labels:
+    spark-job-id: "job-123"
+    spark-role: "executor"
+    app: "spark-app"
+spec:
+  serviceAccountName: "wrong-sa"  # Not in allowed list
+  containers:
+    - name: spark-executor
+      image: "spark/spark:3.4.0"

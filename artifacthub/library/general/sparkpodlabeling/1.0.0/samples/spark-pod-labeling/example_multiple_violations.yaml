@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: spark-pod-multiple-violations
+  labels:
+    spark-job-id: ""  # Empty job ID
+    spark-role: "invalid-role"  # Invalid role
+    # Missing required "app" label
+spec:
+  serviceAccountName: "spark-driver-sa"
+  containers:
+    - name: spark-driver
+      image: "nginx:latest"  # Disallowed image
+      securityContext:
+        privileged: true  # Privileged container
+  volumes:
+    - name: host-vol
+      hostPath:
+        path: "/tmp"  # Host path volume
