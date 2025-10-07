@@ -1,0 +1,37 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: sparkpodlabeling
+  annotations:
+    metadata.gatekeeper.sh/title: "Spark Pod Labeling"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      Enforces security and labeling requirements for Spark pods created by Spark service accounts.
+      Validates that Spark pods have required labels (spark-job-id, spark-role), use allowed
+      service accounts, run only approved container images, and follow security best practices
+      by prohibiting privileged containers and host path volumes.
+spec:
+  crd:
+    spec:
+      names:
+        kind: SparkPodLabeling
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            allowedServiceAccounts:
+              type: array
+              items:
+                type: string
+            requiredLabels:
+              type: array
+              items:
+                type: string
+            allowedImagePatterns:
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ file.Read "src/general/sparkpodlabeling/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
