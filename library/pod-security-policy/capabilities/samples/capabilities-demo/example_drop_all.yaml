@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: opa-disallowed
+  name: opa-drop-all
   labels:
     owner: me.agilebank.demo
 spec:
@@ -14,7 +14,7 @@ spec:
         - "--addr=localhost:8080"
       securityContext:
         capabilities:
-          add: ["disallowedcapability"]
+          drop: ["ALL", "all"]
       resources:
         limits:
           cpu: "100m"
