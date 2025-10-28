@@ -301,10 +301,6 @@ gator verify ./... --enable-k8s-native-validation=true
 ```
 
 **When to add CEL alongside Rego:**
-- **Performance-critical policies** (CEL is faster)
-- **Simple validation logic** (CEL syntax is more straightforward)
-- **Kubernetes-native deployments** (CEL doesn't require OPA runtime)
-- **Future-proofing** (CEL is Kubernetes' strategic direction)
 - **ALWAYS for non-referential policies**: If the policy doesn't use `data.inventory` or external data sources, **always add CEL implementation alongside Rego**
 - **REQUIRED for new policies**: Unless the policy requires referential data (data.inventory) or external data integration, **CEL implementation is mandatory**
 
