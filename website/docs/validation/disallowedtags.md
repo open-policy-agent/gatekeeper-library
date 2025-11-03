@@ -17,7 +17,7 @@ metadata:
   name: k8sdisallowedtags
   annotations:
     metadata.gatekeeper.sh/title: "Disallow tags"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.0.2
     description: >-
       Requires container images to have an image tag different from the ones in
       the specified list.
@@ -65,7 +65,8 @@ spec:
         violation[{"msg": msg}] {
             container := input_containers[_]
             not is_exempt(container)
-            not contains(container.image, ":")
+            parts := split(container.image, "/")
+            not contains(parts[count(parts) - 1], ":")
             msg := sprintf("container <%v> didn't specify an image tag <%v>", [container.name, container.image])
         }
 
@@ -227,6 +228,32 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/disallowedtags/samples/container-image-must-not-have-latest-tag/example_no_tag.yaml
+```
+
+</details>
+<details>
+<summary>no-tag-with-port</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-disallowed-4
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent:443/opa
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/disallowedtags/samples/container-image-must-not-have-latest-tag/example_no_tag_w_port.yaml
 ```
 
 </details>
