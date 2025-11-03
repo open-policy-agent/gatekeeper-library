@@ -16,7 +16,7 @@ metadata:
   name: k8spspcapabilities
   annotations:
     metadata.gatekeeper.sh/title: "Capabilities"
-    metadata.gatekeeper.sh/version: 1.1.1
+    metadata.gatekeeper.sh/version: 1.1.2
     description: >-
       Controls Linux capabilities on containers. Corresponds to the
       `allowedCapabilities` and `requiredDropCapabilities` fields in a
@@ -103,7 +103,7 @@ spec:
               variables.allContainers.map(container, !(container.image in variables.exemptImages) &&
                 size(variables.requiredDropCapabilities) > 0 && (
                   !has(container.securityContext) || !has(container.securityContext.capabilities) || !has(container.securityContext.capabilities.drop) || (
-                    !("all" in container.securityContext.capabilities.drop) &&
+                    !(container.securityContext.capabilities.drop.exists(capability, capability.lowerAscii() == "all")) &&
                     variables.requiredDropCapabilities.exists(capability, !(capability in container.securityContext.capabilities.drop))
                   )
                 ),
@@ -294,6 +294,7 @@ spec:
         limits:
           cpu: "100m"
           memory: "30Mi"
+
 ```
 
 Usage
