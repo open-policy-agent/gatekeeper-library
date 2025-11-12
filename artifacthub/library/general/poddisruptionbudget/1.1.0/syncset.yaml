@@ -1,0 +1,21 @@
+apiVersion: syncset.gatekeeper.sh/v1alpha1
+kind: SyncSet
+metadata:
+  name: k8spoddisruptionbudget
+spec:
+  gvks:
+  - group: "policy"
+    version: "v1"
+    kind: "PodDisruptionBudget"
+  - group: "apps"
+    version: "v1"
+    kind: "Deployment"
+  - group: "apps"
+    version: "v1"
+    kind: "StatefulSet"
+  - group: ""
+    version: "v1"
+    kind: "ReplicationController"
+  - group: "autoscaling"
+    version: "v2"
+    kind: "HorizontalPodAutoscaler"

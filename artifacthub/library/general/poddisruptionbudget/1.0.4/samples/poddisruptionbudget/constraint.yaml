@@ -11,3 +11,5 @@ spec:
         kinds: ["PodDisruptionBudget"]
       - apiGroups: [""]
         kinds: ["ReplicationController"]
+      - apiGroups: ["autoscaling/v2"]
+        kinds: ["HorizontalPodAutoscaler"]
