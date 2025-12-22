@@ -16,7 +16,7 @@ metadata:
   name: k8spspflexvolumes
   annotations:
     metadata.gatekeeper.sh/title: "FlexVolumes"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Controls the allowlist of FlexVolume drivers. Corresponds to the
       `allowedFlexVolumes` field in PodSecurityPolicy. For more information,
@@ -48,40 +48,62 @@ spec:
                     type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8spspflexvolumes
+      code:
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: flexVolumes
+            expression: |
+              !has(variables.anyObject.spec.volumes) ? [] :
+                variables.anyObject.spec.volumes.filter(volume, has(volume.flexVolume))
+          - name: allowedFlexVolumeDrivers
+            expression: variables.params.allowedFlexVolumes.map(volume, volume.driver)
+          - name: badFlexVolumeNames
+            expression: |
+              variables.flexVolumes.map(volume,
+                !has(volume.flexVolume.driver) || !(volume.flexVolume.driver in variables.allowedFlexVolumeDrivers),
+                volume.name
+              )
+          validations:
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badFlexVolumeNames) == 0'
+            messageExpression: |
+              "FlexVolumes [" + variables.badFlexVolumeNames.join(", ") + "] not allowed, pod: " + variables.anyObject.metadata.name + ". Allowed drivers: [" + variables.allowedFlexVolumeDrivers.join(", ") + "]" 
+      - engine: Rego
+        source:
+          rego: |
+            package k8spspflexvolumes
 
-        import data.lib.exclude_update.is_update
+            import data.lib.exclude_update.is_update
 
-        violation[{"msg": msg, "details": {}}] {
-            # spec.volumes field is immutable.
-            not is_update(input.review)
+            violation[{"msg": msg, "details": {}}] {
+                # spec.volumes field is immutable.
+                not is_update(input.review)
 
-            volume := input_flexvolumes[_]
-            not input_flexvolumes_allowed(volume)
-            msg := sprintf("FlexVolume %v is not allowed, pod: %v. Allowed drivers: %v", [volume, input.review.object.metadata.name, input.parameters.allowedFlexVolumes])
-        }
+                volume := input_flexvolumes[_]
+                not input_flexvolumes_allowed(volume)
+                msg := sprintf("FlexVolume %v is not allowed, pod: %v. Allowed drivers: %v", [volume, input.review.object.metadata.name, input.parameters.allowedFlexVolumes])
+            }
 
-        input_flexvolumes_allowed(volume) {
-            input.parameters.allowedFlexVolumes[_].driver == volume.flexVolume.driver
-        }
+            input_flexvolumes_allowed(volume) {
+                input.parameters.allowedFlexVolumes[_].driver == volume.flexVolume.driver
+            }
 
-        input_flexvolumes[v] {
-            v := input.review.object.spec.volumes[_]
-            has_field(v, "flexVolume")
-        }
+            input_flexvolumes[v] {
+                v := input.review.object.spec.volumes[_]
+                has_field(v, "flexVolume")
+            }
 
-        # has_field returns whether an object has a field
-        has_field(object, field) = true {
-            object[field]
-        }
-      libs:
-        - |
-          package lib.exclude_update
+            # has_field returns whether an object has a field
+            has_field(object, field) = true {
+                object[field]
+            }
+          libs:
+          - |
+            package lib.exclude_update
 
-          is_update(review) {
-              review.operation == "UPDATE"
-          }
+            is_update(review) {
+                review.operation == "UPDATE"
+            }
 
 ```
 
