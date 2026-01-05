@@ -1,0 +1,44 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8snodeportnamespacerange
+  annotations:
+    metadata.gatekeeper.sh/title: "NodePort Namespace Range"
+    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/requires-sync-data: |
+      "[
+        [
+          {
+            "groups":[""],
+            "versions": ["v1"],
+            "kinds": ["Service"]
+          }
+        ]
+      ]"
+    description: >-
+      Restricts NodePort services to specific port ranges based on namespace patterns.
+      Each namespace pattern can define an allowed NodePort range.
+
+      https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sNodePortNamespaceRange
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            ranges:
+              type: object
+              additionalProperties:
+                type: object
+                properties:
+                  namespacePattern:
+                    type: string
+                  portRange:
+                    type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        {{ file.Read "src/general/enforce-nodeport-namespace-range/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
