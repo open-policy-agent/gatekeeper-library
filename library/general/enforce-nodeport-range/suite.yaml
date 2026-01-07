@@ -1,0 +1,17 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: enforce-nodeport-range
+tests:
+- name: enforce-nodeport-range
+  template: template.yaml
+  constraint: samples/enforce-nodeport-range/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/enforce-nodeport-range/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/enforce-nodeport-range/example_disallowed.yaml
+    assertions:
+    - violations: yes
