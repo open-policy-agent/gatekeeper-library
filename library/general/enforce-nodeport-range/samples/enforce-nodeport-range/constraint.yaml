@@ -1,7 +1,7 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sNodePortNamespaceRange
 metadata:
-  name: enforce-nodeport-namespace-range
+  name: enforce-nodeport-range
 spec:
   enforcementAction: deny
   match:

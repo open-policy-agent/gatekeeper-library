@@ -41,4 +41,4 @@ spec:
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
-        {{ file.Read "src/general/enforce-nodeport-namespace-range/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
+        {{ file.Read "src/general/enforce-nodeport-range/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
