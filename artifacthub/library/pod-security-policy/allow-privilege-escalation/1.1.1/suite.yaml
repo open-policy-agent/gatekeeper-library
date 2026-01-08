@@ -1,0 +1,29 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: allow-privilege-escalation
+tests:
+  - name: allow-privilege-escalation
+    template: template.yaml
+    constraint: samples/psp-allow-privilege-escalation-container/constraint.yaml
+    cases:
+      - name: example-allowed
+        object: samples/psp-allow-privilege-escalation-container/example_allowed.yaml
+        assertions:
+          - violations: no
+      - name: example-disallowed
+        object: samples/psp-allow-privilege-escalation-container/example_disallowed.yaml
+        assertions:
+          - violations: yes
+      - name: disallowed-ephemeral
+        object: samples/psp-allow-privilege-escalation-container/disallowed_ephemeral.yaml
+        assertions:
+          - violations: yes
+      - name: update
+        object: samples/psp-allow-privilege-escalation-container/update.yaml
+        assertions:
+          - violations: no
+      - name: exempted-path
+        object: samples/psp-allow-privilege-escalation-container/example_allowed_exempt.yaml
+        assertions:
+          - violations: no

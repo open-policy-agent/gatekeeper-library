@@ -1,0 +1,22 @@
+version: 1.0.1
+name: k8spspseccompv2
+displayName: Seccomp V2
+createdAt: "2026-01-08T18:35:12Z"
+description: Controls the seccomp profile used by containers. Corresponds to the `securityContext.seccompProfile` field. Security contexts from the annotation is not considered as Kubernetes no longer reads security contexts from the annotation.
+digest: 0c373e75e2bc9f10bf8480dc4a3c0ee79e731a574e0527e6818dcbe8cff29669
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/seccompv2
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Seccomp V2
+    Controls the seccomp profile used by containers. Corresponds to the `securityContext.seccompProfile` field. Security contexts from the annotation is not considered as Kubernetes no longer reads security contexts from the annotation.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/pod-security-policy/seccompv2/1.0.1/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library
