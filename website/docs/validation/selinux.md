@@ -5,6 +5,8 @@ title: SELinux V2
 
 # SELinux V2
 
+**Bundles:** `pod-security-baseline` `pod-security-restricted`
+
 ## Description
 Defines an allow-list of seLinuxOptions configurations for pod containers. Corresponds to a PodSecurityPolicy requiring SELinux configs. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#selinux
 
@@ -17,6 +19,7 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "SELinux V2"
     metadata.gatekeeper.sh/version: 1.0.3
+    metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Defines an allow-list of seLinuxOptions configurations for pod
       containers. Corresponds to a PodSecurityPolicy requiring SELinux configs.

@@ -5,6 +5,8 @@ title: Seccomp V2
 
 # Seccomp V2
 
+**Bundles:** `pod-security-baseline` `pod-security-restricted`
+
 ## Description
 Controls the seccomp profile used by containers. Corresponds to the `securityContext.seccompProfile` field. Security contexts from the annotation is not considered as Kubernetes no longer reads security contexts from the annotation.
 
@@ -17,6 +19,7 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "Seccomp V2"
     metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Controls the seccomp profile used by containers. Corresponds to the
       `securityContext.seccompProfile` field. Security contexts from the annotation is not considered as Kubernetes no longer reads security contexts from the annotation.

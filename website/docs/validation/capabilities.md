@@ -5,6 +5,8 @@ title: Capabilities
 
 # Capabilities
 
+**Bundles:** `pod-security-baseline` `pod-security-restricted`
+
 ## Description
 Controls Linux capabilities on containers. Corresponds to the `allowedCapabilities` and `requiredDropCapabilities` fields in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#capabilities
 
@@ -17,6 +19,7 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "Capabilities"
     metadata.gatekeeper.sh/version: 1.1.2
+    metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Controls Linux capabilities on containers. Corresponds to the
       `allowedCapabilities` and `requiredDropCapabilities` fields in a
