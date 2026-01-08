@@ -3,7 +3,7 @@ name: k8spspflexvolumes
 displayName: FlexVolumes
 createdAt: "2023-05-23T09:47:31Z"
 description: Controls the allowlist of FlexVolume drivers. Corresponds to the `allowedFlexVolumes` field in PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#flexvolume-drivers
-digest: 72545f834896499ee61b0918b4735e25bc851df1b16a8adcf35b0ca250ca79de
+digest: eabd9e0cdbd815ce0e83618b8c66e1d266d13d6cc6d559a72067e5035e27b5ec
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/flexvolume-drivers
 keywords:
