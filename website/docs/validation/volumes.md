@@ -5,6 +5,8 @@ title: Volume Types
 
 # Volume Types
 
+**Bundles:** `pod-security-restricted`
+
 ## Description
 Restricts mountable volume types to those specified by the user. Corresponds to the `volumes` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
 
@@ -17,6 +19,7 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "Volume Types"
     metadata.gatekeeper.sh/version: 1.0.2
+    metadata.gatekeeper.sh/bundle: "pod-security-restricted"
     description: >-
       Restricts mountable volume types to those specified by the user.
       Corresponds to the `volumes` field in a PodSecurityPolicy. For more

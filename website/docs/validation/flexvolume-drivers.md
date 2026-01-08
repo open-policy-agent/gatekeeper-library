@@ -5,6 +5,8 @@ title: FlexVolumes
 
 # FlexVolumes
 
+**Bundles:** `pod-security-restricted`
+
 ## Description
 Controls the allowlist of FlexVolume drivers. Corresponds to the `allowedFlexVolumes` field in PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#flexvolume-drivers
 
@@ -17,6 +19,7 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "FlexVolumes"
     metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/bundle: "pod-security-restricted"
     description: >-
       Controls the allowlist of FlexVolume drivers. Corresponds to the
       `allowedFlexVolumes` field in PodSecurityPolicy. For more information,

@@ -5,6 +5,8 @@ title: Host Namespace
 
 # Host Namespace
 
+**Bundles:** `pod-security-baseline` `pod-security-restricted`
+
 ## Description
 Disallows sharing of host PID and IPC namespaces by pod containers. Corresponds to the `hostPID` and `hostIPC` fields in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
 
@@ -17,6 +19,7 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "Host Namespace"
     metadata.gatekeeper.sh/version: 1.1.0
+    metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Disallows sharing of host PID and IPC namespaces by pod containers.
       Corresponds to the `hostPID` and `hostIPC` fields in a PodSecurityPolicy.
