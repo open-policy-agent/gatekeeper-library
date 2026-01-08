@@ -18,7 +18,7 @@ metadata:
   name: k8spspallowedusers
   annotations:
     metadata.gatekeeper.sh/title: "Allowed Users"
-    metadata.gatekeeper.sh/version: 1.0.2
+    metadata.gatekeeper.sh/version: 1.0.3
     metadata.gatekeeper.sh/bundle: "pod-security-restricted"
     description: >-
       Controls the user and group IDs of the container and some volumes.

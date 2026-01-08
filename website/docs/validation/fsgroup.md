@@ -18,7 +18,7 @@ metadata:
   name: k8spspfsgroup
   annotations:
     metadata.gatekeeper.sh/title: "FS Group"
-    metadata.gatekeeper.sh/version: 1.1.0
+    metadata.gatekeeper.sh/version: 1.1.1
     metadata.gatekeeper.sh/bundle: "pod-security-restricted"
     description: >-
       Controls allocating an FSGroup that owns the Pod's volumes. Corresponds

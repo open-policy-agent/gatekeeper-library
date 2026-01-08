@@ -1,0 +1,53 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: fsgroup
+tests:
+  - name: fsgroup
+    template: template.yaml
+    constraint: samples/psp-fsgroup/constraint.yaml
+    cases:
+      - name: example-disallowed
+        object: samples/psp-fsgroup/example_disallowed.yaml
+        assertions:
+          - violations: yes
+      - name: example-allowed
+        object: samples/psp-fsgroup/example_allowed.yaml
+        assertions:
+          - violations: no
+      - name: update
+        object: samples/psp-fsgroup/update.yaml
+        assertions:
+          - violations: no
+  - name: fsgroup-no-rules
+    template: template.yaml
+    constraint: samples/psp-fsgroup/constraint2.yaml
+    cases:
+      - name: example-allowed
+        object: samples/psp-fsgroup/example_disallowed.yaml
+        assertions:
+          - violations: no
+      - name: example-allowed
+        object: samples/psp-fsgroup/example_allowed.yaml
+        assertions:
+          - violations: no
+      - name: update
+        object: samples/psp-fsgroup/update.yaml
+        assertions:
+          - violations: no
+  - name: fsgroup-empty-ranges
+    template: template.yaml
+    constraint: samples/psp-fsgroup/constraint3.yaml
+    cases:
+      - name: example-disallowed-2000
+        object: samples/psp-fsgroup/example_disallowed.yaml
+        assertions:
+          - violations: yes
+      - name: example-disallowed-500
+        object: samples/psp-fsgroup/example_allowed.yaml
+        assertions:
+          - violations: yes
+      - name: update
+        object: samples/psp-fsgroup/update.yaml
+        assertions:
+          - violations: no

@@ -1,0 +1,37 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: host-filesystem
+tests:
+  - name: host-filesystem
+    template: template.yaml
+    constraint: samples/psp-host-filesystem/constraint.yaml
+    cases:
+      - name: example-disallowed
+        object: samples/psp-host-filesystem/example_disallowed.yaml
+        assertions:
+          - violations: yes
+      - name: example-allowed
+        object: samples/psp-host-filesystem/example_allowed.yaml
+        assertions:
+          - violations: no
+      - name: disallowed-ephemeral
+        object: samples/psp-host-filesystem/disallowed_ephemeral.yaml
+        assertions:
+          - violations: yes
+      - name: update
+        object: samples/psp-host-filesystem/update.yaml
+        assertions:
+          - violations: no
+  - name: no-host-paths
+    template: template.yaml
+    constraint: samples/no-host-paths/constraint.yaml
+    cases:
+    - name: previously-allowed-path-disallowed
+      object: samples/psp-host-filesystem/example_allowed.yaml
+      assertions:
+        - violations: yes
+    - name: no-volumes-is-allowed
+      object: samples/no-host-paths/example_allowed_no_volumes.yaml
+      assertions:
+        - violations: no

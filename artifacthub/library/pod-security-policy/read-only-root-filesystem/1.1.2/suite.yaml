@@ -1,0 +1,51 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: read-only-root-filesystem
+tests:
+- name: require-read-only-root-filesystem
+  template: template.yaml
+  constraint: samples/psp-readonlyrootfilesystem/constraint.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/psp-readonlyrootfilesystem/example_disallowed.yaml
+    assertions:
+    - violations: yes
+      message: "only read-only root filesystem container is allowed: nginx"
+  - name: example-allowed
+    object: samples/psp-readonlyrootfilesystem/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: disallowed-ephemeral
+    object: samples/psp-readonlyrootfilesystem/disallowed_ephemeral.yaml
+    assertions:
+    - violations: yes
+      message: "only read-only root filesystem container is allowed: nginx"
+  - name: update
+    object: samples/psp-readonlyrootfilesystem/update.yaml
+    assertions:
+    - violations: no
+  - name: exact-exemption
+    object: samples/psp-readonlyrootfilesystem/example_allowed_exempted.yaml
+    assertions:
+    - violations: no
+- name: full-wildcard
+  template: template.yaml
+  constraint: samples/full_wildcard/constraint.yaml
+  cases:
+  - name: allow-normally-disallowed
+    object: samples/psp-readonlyrootfilesystem/example_disallowed.yaml
+    assertions:
+    - violations: no
+- name: wildcard-prefix
+  template: template.yaml
+  constraint: samples/wildcard-prefix/constraint.yaml
+  cases:
+  - name: image-with-exempt-prefix-readOnlyRootFilesystem-not-required
+    object: samples/wildcard-prefix/example_allowed_safe_prefix.yaml
+    assertions:
+    - violations: no
+  - name: image-with-different-prefix-must-set-readOnlyRootFilesystem
+    object: samples/wildcard-prefix/example_disallowed_unsafe_prefix.yaml
+    assertions:
+    - violations: yes

@@ -1,0 +1,69 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: host-network-ports
+tests:
+- name: port-range-with-host-network-allowed
+  template: template.yaml
+  constraint: samples/psp-host-network-ports/constraint.yaml
+  cases:
+  - name: out-of-range
+    object: samples/port_range_block_host_network/example_disallowed_out_of_range_host_network_true.yaml
+    assertions:
+    - violations: yes
+  - name: example-allowed
+    object: samples/psp-host-network-ports/example_allowed_in_range.yaml
+    assertions:
+    - violations: no
+  - name: out-of-range-ephemeral
+    object: samples/psp-host-network-ports/disallowed_ephemeral.yaml
+    assertions:
+    - violations: yes
+  - name: update
+    object: samples/psp-host-network-ports/update.yaml
+    assertions:
+    - violations: no
+  - name: no-ports-specified
+    object: samples/psp-host-network-ports/example_allowed_no_ports.yaml
+    assertions:
+    - violations: no
+  - name: port-violation-exempted
+    object: samples/psp-host-network-ports/example_allowed_out_of_range_exempted.yaml
+    assertions:
+    - violations: no
+- name: host-network-forbidden
+  template: template.yaml
+  constraint: samples/block_host_network/constraint.yaml
+  cases:
+  - name: hostnetwork-true
+    object: samples/psp-host-network-ports/example_allowed_no_ports_host_network_true.yaml
+    assertions:
+    - violations: yes
+  - name: hostnetwork-false
+    object: samples/psp-host-network-ports/example_allowed_no_ports_host_network_false.yaml
+    assertions:
+    - violations: no
+- name: port-range-with-host-network-forbidden
+  template: template.yaml
+  constraint: samples/port_range_block_host_network/constraint.yaml
+  cases:
+  - name: out-of-range-and-host-network-true
+    object: samples/port_range_block_host_network/example_disallowed_out_of_range_host_network_true.yaml
+    assertions:
+    - violations: yes
+  - name: exempted-image-still-violates-on-hostnetwork
+    object: samples/port_range_block_host_network/example_disallowed_exempted_container_host_network_enabled.yaml
+    assertions:
+    - violations: yes
+  - name: in-range-host-network-false
+    object: samples/psp-host-network-ports/example_allowed_in_range.yaml
+    assertions:
+    - violations: no
+  - name: disallowed-ephemeral
+    object: samples/psp-host-network-ports/disallowed_ephemeral.yaml
+    assertions:
+    - violations: yes
+  - name: update
+    object: samples/psp-host-network-ports/update.yaml
+    assertions:
+    - violations: no
