@@ -5,6 +5,7 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "Allow Privilege Escalation in Container"
     metadata.gatekeeper.sh/version: 1.1.0
+    metadata.gatekeeper.sh/bundle: "pod-security-restricted"
     description: >-
       Controls restricting escalation to root privileges. Corresponds to the
       `allowPrivilegeEscalation` field in a PodSecurityPolicy. For more
