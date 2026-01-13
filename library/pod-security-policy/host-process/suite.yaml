@@ -1,0 +1,37 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: host-process
+tests:
+- name: host-process-disallowed
+  template: template.yaml
+  constraint: samples/psp-host-process/constraint.yaml
+  cases:
+  - name: example-disallowed-pod-level
+    object: samples/psp-host-process/example_disallowed_pod_level.yaml
+    assertions:
+    - violations: yes
+  - name: example-disallowed-container-level
+    object: samples/psp-host-process/example_disallowed_container_level.yaml
+    assertions:
+    - violations: yes
+  - name: example-allowed
+    object: samples/psp-host-process/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: disallowed-ephemeral
+    object: samples/psp-host-process/disallowed_ephemeral.yaml
+    assertions:
+    - violations: yes
+  - name: disallowed-init
+    object: samples/psp-host-process/disallowed_init.yaml
+    assertions:
+    - violations: yes
+  - name: update
+    object: samples/psp-host-process/update.yaml
+    assertions:
+    - violations: no
+  - name: exempted-image
+    object: samples/psp-host-process/example_allowed_exempt.yaml
+    assertions:
+    - violations: no

@@ -1,0 +1,49 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: host-probes-lifecycle
+tests:
+- name: host-probes-lifecycle-disallowed
+  template: template.yaml
+  constraint: samples/psp-host-probes-lifecycle/constraint.yaml
+  cases:
+  - name: example-allowed-no-probes
+    object: samples/psp-host-probes-lifecycle/example_allowed_no_probes.yaml
+    assertions:
+    - violations: no
+  - name: example-allowed-probe-no-host
+    object: samples/psp-host-probes-lifecycle/example_allowed_probe_no_host.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed-liveness-probe
+    object: samples/psp-host-probes-lifecycle/example_disallowed_liveness_probe.yaml
+    assertions:
+    - violations: yes
+  - name: example-disallowed-readiness-probe
+    object: samples/psp-host-probes-lifecycle/example_disallowed_readiness_probe.yaml
+    assertions:
+    - violations: yes
+  - name: example-disallowed-startup-probe
+    object: samples/psp-host-probes-lifecycle/example_disallowed_startup_probe.yaml
+    assertions:
+    - violations: yes
+  - name: example-disallowed-lifecycle-poststart
+    object: samples/psp-host-probes-lifecycle/example_disallowed_lifecycle_poststart.yaml
+    assertions:
+    - violations: yes
+  - name: example-disallowed-lifecycle-prestop
+    object: samples/psp-host-probes-lifecycle/example_disallowed_lifecycle_prestop.yaml
+    assertions:
+    - violations: yes
+  - name: example-disallowed-tcp-probe
+    object: samples/psp-host-probes-lifecycle/example_disallowed_tcp_probe.yaml
+    assertions:
+    - violations: yes
+  - name: update
+    object: samples/psp-host-probes-lifecycle/update.yaml
+    assertions:
+    - violations: no
+  - name: exempted-image
+    object: samples/psp-host-probes-lifecycle/example_allowed_exempt.yaml
+    assertions:
+    - violations: no
