@@ -270,3 +270,79 @@ input_containers_probe_with_host_exempt = [
         }
     }
 }]
+
+# Tests for initContainers
+test_input_init_container_probe_with_host_not_allowed {
+    inp := { "review": input_review_init_container_probe_with_host}
+    results := violation with input as inp
+    count(results) > 0
+}
+
+input_review_init_container_probe_with_host = {
+    "object": {
+        "metadata": {
+            "name": "nginx"
+        },
+        "spec": {
+            "containers": input_containers_one,
+            "initContainers": input_containers_probe_with_host
+        }
+    }
+}
+
+# Tests for ephemeralContainers
+test_input_ephemeral_container_probe_with_host_not_allowed {
+    inp := { "review": input_review_ephemeral_container_probe_with_host}
+    results := violation with input as inp
+    count(results) > 0
+}
+
+input_review_ephemeral_container_probe_with_host = {
+    "object": {
+        "metadata": {
+            "name": "nginx"
+        },
+        "spec": {
+            "containers": input_containers_one,
+            "ephemeralContainers": input_containers_probe_with_host
+        }
+    }
+}
+
+# Test for initContainers with lifecycle hook
+test_input_init_container_lifecycle_with_host_not_allowed {
+    inp := { "review": input_review_init_container_lifecycle_with_host}
+    results := violation with input as inp
+    count(results) > 0
+}
+
+input_review_init_container_lifecycle_with_host = {
+    "object": {
+        "metadata": {
+            "name": "nginx"
+        },
+        "spec": {
+            "containers": input_containers_one,
+            "initContainers": input_containers_lifecycle_with_host
+        }
+    }
+}
+
+# Test for ephemeralContainers with lifecycle hook
+test_input_ephemeral_container_lifecycle_with_host_not_allowed {
+    inp := { "review": input_review_ephemeral_container_lifecycle_with_host}
+    results := violation with input as inp
+    count(results) > 0
+}
+
+input_review_ephemeral_container_lifecycle_with_host = {
+    "object": {
+        "metadata": {
+            "name": "nginx"
+        },
+        "spec": {
+            "containers": input_containers_one,
+            "ephemeralContainers": input_containers_lifecycle_with_host
+        }
+    }
+}

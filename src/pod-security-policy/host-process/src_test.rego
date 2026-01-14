@@ -54,6 +54,13 @@ test_exempted_image {
     count(results) == 0
 }
 
+# Test that pod-level hostProcess violation is NOT bypassed by exempt container images
+test_pod_level_host_process_not_bypassed_by_exempt_container {
+    inp := { "review": input_review_pod_host_process_with_exempt_container, "parameters": {"exemptImages": ["safeimages.com/*"]}}
+    results := violation with input as inp
+    count(results) > 0
+}
+
 input_review = {
     "object": {
         "metadata": {
@@ -188,3 +195,23 @@ input_containers_many = [
     "name": "nginx1",
     "image": "nginx"
 }]
+
+# Pod-level hostProcess with exempt container image - should still violate
+input_review_pod_host_process_with_exempt_container = {
+    "object": {
+        "metadata": {
+            "name": "nginx"
+        },
+        "spec": {
+            "securityContext": {
+                "windowsOptions": {
+                    "hostProcess": true
+                }
+            },
+            "containers": [{
+                "name": "nginx",
+                "image": "safeimages.com/nginx"
+            }]
+        }
+    }
+}

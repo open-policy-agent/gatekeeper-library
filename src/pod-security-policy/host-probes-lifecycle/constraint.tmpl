@@ -7,7 +7,7 @@ metadata:
     metadata.gatekeeper.sh/version: 1.0.0
     description: >-
       Disallows specifying the host field in probes and lifecycle hooks.
-      The Restricted profile (v1.34+) requires that probes (livenessProbe,
+      The Baseline profile (v1.34+) requires that probes (livenessProbe,
       readinessProbe, startupProbe) and lifecycle hooks (postStart, preStop)
       must not specify a host field. This prevents containers from executing
       network requests to the host node.
@@ -23,7 +23,7 @@ spec:
           type: object
           description: >-
             Disallows specifying the host field in probes and lifecycle hooks.
-            The Restricted profile (v1.34+) requires that probes (livenessProbe,
+            The Baseline profile (v1.34+) requires that probes (livenessProbe,
             readinessProbe, startupProbe) and lifecycle hooks (postStart, preStop)
             must not specify a host field. This prevents containers from executing
             network requests to the host node.

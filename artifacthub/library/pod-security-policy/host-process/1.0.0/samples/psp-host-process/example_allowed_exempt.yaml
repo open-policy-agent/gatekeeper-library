@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-host-process-allowed-exempt
+  labels:
+    app: nginx-host-process
+spec:
+  containers:
+  - name: nginx
+    image: safeimages.com/nginx
+    securityContext:
+      windowsOptions:
+        hostProcess: true

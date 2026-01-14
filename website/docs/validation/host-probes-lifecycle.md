@@ -1,3 +1,15 @@
+---
+id: host-probes-lifecycle
+title: Host Probes and Lifecycle Hooks
+---
+
+# Host Probes and Lifecycle Hooks
+
+## Description
+Disallows specifying the host field in probes and lifecycle hooks. The Baseline profile (v1.34+) requires that probes (livenessProbe, readinessProbe, startupProbe) and lifecycle hooks (postStart, preStop) must not specify a host field. This prevents containers from executing network requests to the host node. For more information, see https://kubernetes.io/docs/concepts/security/pod-security-standards/
+
+## Template
+```yaml
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
@@ -205,3 +217,431 @@ spec:
                   prefix := trim_suffix(exemption, "*")
                   startswith(img, prefix)
               }
+
+```
+
+### Usage
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-probes-lifecycle/template.yaml
+```
+## Examples
+<details>
+<summary>host-probes-lifecycle-disallowed</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostProbesLifecycle
+metadata:
+  name: psp-host-probes-lifecycle
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    excludedNamespaces: ["kube-system"]
+  parameters:
+    exemptImages:
+    - "safeimages.com/*"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-probes-lifecycle/samples/psp-host-probes-lifecycle/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-allowed-no-probes</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-no-probes-allowed
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-probes-lifecycle/samples/psp-host-probes-lifecycle/example_allowed_no_probes.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-probe-no-host</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-probe-no-host-allowed
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 80
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-probes-lifecycle/samples/psp-host-probes-lifecycle/example_allowed_probe_no_host.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-liveness-probe</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-liveness-probe-host-disallowed
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 80
+        host: 127.0.0.1
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-probes-lifecycle/samples/psp-host-probes-lifecycle/example_disallowed_liveness_probe.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-readiness-probe</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-readiness-probe-host-disallowed
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 80
+        host: 127.0.0.1
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-probes-lifecycle/samples/psp-host-probes-lifecycle/example_disallowed_readiness_probe.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-startup-probe</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-startup-probe-host-disallowed
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    startupProbe:
+      httpGet:
+        path: /
+        port: 80
+        host: 127.0.0.1
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-probes-lifecycle/samples/psp-host-probes-lifecycle/example_disallowed_startup_probe.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-lifecycle-poststart</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-lifecycle-poststart-host-disallowed
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    lifecycle:
+      postStart:
+        httpGet:
+          path: /
+          port: 80
+          host: 127.0.0.1
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-probes-lifecycle/samples/psp-host-probes-lifecycle/example_disallowed_lifecycle_poststart.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-lifecycle-prestop</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-lifecycle-prestop-host-disallowed
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    lifecycle:
+      preStop:
+        httpGet:
+          path: /
+          port: 80
+          host: 127.0.0.1
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-probes-lifecycle/samples/psp-host-probes-lifecycle/example_disallowed_lifecycle_prestop.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-tcp-probe</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-tcp-probe-host-disallowed
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    livenessProbe:
+      tcpSocket:
+        port: 80
+        host: 127.0.0.1
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-probes-lifecycle/samples/psp-host-probes-lifecycle/example_disallowed_tcp_probe.yaml
+```
+
+</details>
+<details>
+<summary>disallowed-init-probe</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-init-probe-host-disallowed
+  labels:
+    app: nginx
+spec:
+  initContainers:
+  - name: init
+    image: nginx
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 80
+        host: 127.0.0.1
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-probes-lifecycle/samples/psp-host-probes-lifecycle/disallowed_init_probe.yaml
+```
+
+</details>
+<details>
+<summary>disallowed-ephemeral-probe</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-ephemeral-probe-host-disallowed
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+  ephemeralContainers:
+  - name: debug
+    image: nginx
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 80
+        host: 127.0.0.1
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-probes-lifecycle/samples/psp-host-probes-lifecycle/disallowed_ephemeral_probe.yaml
+```
+
+</details>
+<details>
+<summary>disallowed-init-lifecycle</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-init-lifecycle-host-disallowed
+  labels:
+    app: nginx
+spec:
+  initContainers:
+  - name: init
+    image: nginx
+    lifecycle:
+      postStart:
+        httpGet:
+          path: /
+          port: 80
+          host: 127.0.0.1
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-probes-lifecycle/samples/psp-host-probes-lifecycle/disallowed_init_lifecycle.yaml
+```
+
+</details>
+<details>
+<summary>disallowed-ephemeral-lifecycle</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-ephemeral-lifecycle-host-disallowed
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+  ephemeralContainers:
+  - name: debug
+    image: nginx
+    lifecycle:
+      postStart:
+        httpGet:
+          path: /
+          port: 80
+          host: 127.0.0.1
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-probes-lifecycle/samples/psp-host-probes-lifecycle/disallowed_ephemeral_lifecycle.yaml
+```
+
+</details>
+<details>
+<summary>exempted-image</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-probe-host-allowed-exempt
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: safeimages.com/nginx
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 80
+        host: 127.0.0.1
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-probes-lifecycle/samples/psp-host-probes-lifecycle/example_allowed_exempt.yaml
+```
+
+</details>
+
+
+</details>
