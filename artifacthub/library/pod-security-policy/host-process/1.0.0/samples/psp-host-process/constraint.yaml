@@ -7,7 +7,3 @@ spec:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
-    excludedNamespaces: ["kube-system"]
-  parameters:
-    exemptImages:
-    - "safeimages.com/*"

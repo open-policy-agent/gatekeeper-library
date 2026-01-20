@@ -59,7 +59,3 @@ tests:
     object: samples/psp-host-probes-lifecycle/update.yaml
     assertions:
     - violations: no
-  - name: exempted-image
-    object: samples/psp-host-probes-lifecycle/example_allowed_exempt.yaml
-    assertions:
-    - violations: no

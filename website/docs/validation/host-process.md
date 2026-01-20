@@ -189,10 +189,6 @@ spec:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
-    excludedNamespaces: ["kube-system"]
-  parameters:
-    exemptImages:
-    - "safeimages.com/*"
 
 ```
 
@@ -337,60 +333,6 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-process/samples/psp-host-process/disallowed_init.yaml
-```
-
-</details>
-<details>
-<summary>exempted-image</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-host-process-allowed-exempt
-  labels:
-    app: nginx-host-process
-spec:
-  containers:
-  - name: nginx
-    image: safeimages.com/nginx
-    securityContext:
-      windowsOptions:
-        hostProcess: true
-
-```
-
-Usage
-
-```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-process/samples/psp-host-process/example_allowed_exempt.yaml
-```
-
-</details>
-<details>
-<summary>disallowed-pod-level-exempt-container</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-host-process-pod-level-with-exempt-container
-  labels:
-    app: nginx-host-process
-spec:
-  securityContext:
-    windowsOptions:
-      hostProcess: true
-  containers:
-  - name: nginx
-    image: safeimages.com/nginx
-
-```
-
-Usage
-
-```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-process/samples/psp-host-process/example_disallowed_pod_level_exempt_container.yaml
 ```
 
 </details>

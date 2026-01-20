@@ -31,12 +31,3 @@ tests:
     object: samples/psp-host-process/update.yaml
     assertions:
     - violations: no
-  - name: exempted-image
-    object: samples/psp-host-process/example_allowed_exempt.yaml
-    assertions:
-    - violations: no
-  - name: disallowed-pod-level-exempt-container
-    object: samples/psp-host-process/example_disallowed_pod_level_exempt_container.yaml
-    assertions:
-    - violations: yes
-      message: "HostProcess is not allowed at pod level"

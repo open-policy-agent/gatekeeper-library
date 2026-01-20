@@ -241,10 +241,6 @@ spec:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
-    excludedNamespaces: ["kube-system"]
-  parameters:
-    exemptImages:
-    - "safeimages.com/*"
 
 ```
 
@@ -610,35 +606,6 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-probes-lifecycle/samples/psp-host-probes-lifecycle/disallowed_ephemeral_lifecycle.yaml
-```
-
-</details>
-<details>
-<summary>exempted-image</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx-probe-host-allowed-exempt
-  labels:
-    app: nginx
-spec:
-  containers:
-  - name: nginx
-    image: safeimages.com/nginx
-    livenessProbe:
-      httpGet:
-        path: /
-        port: 80
-        host: 127.0.0.1
-
-```
-
-Usage
-
-```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-probes-lifecycle/samples/psp-host-probes-lifecycle/example_allowed_exempt.yaml
 ```
 
 </details>
