@@ -4,7 +4,7 @@ metadata:
   name: k8spoddisruptionbudget
   annotations:
     metadata.gatekeeper.sh/title: "Pod Disruption Budget"
-    metadata.gatekeeper.sh/version: 1.0.4
+    metadata.gatekeeper.sh/version: 1.1.0
     metadata.gatekeeper.sh/requires-sync-data: |
       "[
         [
@@ -12,6 +12,64 @@ metadata:
             "groups":["policy"],
             "versions": ["v1"],
             "kinds": ["PodDisruptionBudget"]
+          },
+        ],
+        [
+          {
+            "groups":["policy"],
+            "versions": ["v1"],
+            "kinds": ["PodDisruptionBudget"]
+          },
+          {
+            "groups": ["apps"],
+            "versions": ["v1"],
+            "kinds": ["Deployment", "StatefulSet"]
+          }
+        ],
+        [
+          {
+            "groups":["policy"],
+            "versions": ["v1"],
+            "kinds": ["PodDisruptionBudget"]
+          },
+          {
+            "groups": [""],
+            "versions": ["v1"],
+            "kinds": ["ReplicationController"]
+          }
+        ],
+        [
+          {
+            "groups":["policy"],
+            "versions": ["v1"],
+            "kinds": ["PodDisruptionBudget"]
+          },
+          {
+            "groups": ["apps"],
+            "versions": ["v1"],
+            "kinds": ["Deployment", "StatefulSet"]
+          },
+          {
+            "groups": ["autoscaling"],
+            "versions": ["v2"],
+            "kinds": ["HorizontalPodAutoscaler"]
+          }
+        ].
+        [
+          {
+            "groups":["policy"],
+            "versions": ["v1"],
+            "kinds": ["PodDisruptionBudget"]
+          },
+          {
+            "groups": [""],
+            "versions": ["v1"],
+            "kinds": ["ReplicationController"]
+          },
+          {
+            "groups": ["autoscaling"],
+            "versions": ["v2"],
+            "kinds": ["HorizontalPodAutoscaler"]
           }
         ]
       ]"

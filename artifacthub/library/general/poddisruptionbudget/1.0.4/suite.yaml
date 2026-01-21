@@ -45,3 +45,45 @@ tests:
     - samples/poddisruptionbudget/example_inventory_disallowed.yaml
     assertions:
     - violations: yes
+  - name: hpa-allowed-min-available
+    object: samples/poddisruptionbudget/example_hpa_allowed1.yaml
+    inventory:
+    - samples/poddisruptionbudget/example_allowed_deployment_hpa.yaml
+    - samples/poddisruptionbudget/example_inventory_allowed1.yaml
+    assertions:
+    - violations: no
+  - name: hpa-allowed-min-available-inventory
+    object: samples/poddisruptionbudget/example_allowed_deployment_hpa.yaml
+    inventory:
+    - samples/poddisruptionbudget/example_hpa_allowed1.yaml
+    - samples/poddisruptionbudget/example_inventory_allowed1.yaml
+    assertions:
+    - violations: no
+  - name: hpa-allowed-max-unavailable
+    object: samples/poddisruptionbudget/example_hpa_allowed2.yaml
+    inventory:
+    - samples/poddisruptionbudget/example_allowed_deployment_hpa.yaml
+    - samples/poddisruptionbudget/example_inventory_allowed2.yaml
+    assertions:
+    - violations: no
+  - name: hpa-allowed-max-unavailable-inventory
+    object: samples/poddisruptionbudget/example_allowed_deployment_hpa.yaml
+    inventory:
+    - samples/poddisruptionbudget/example_hpa_allowed2.yaml
+    - samples/poddisruptionbudget/example_inventory_allowed2.yaml
+    assertions:
+    - violations: no
+  - name: hpa-disallowed-min-available
+    object: samples/poddisruptionbudget/example_hpa_disallowed.yaml
+    inventory:
+    - samples/poddisruptionbudget/example_disallowed_deployment.yaml
+    - samples/poddisruptionbudget/example_inventory_disallowed.yaml
+    assertions:
+    - violations: yes
+  - name: hpa-disallowed-min-available-inventory
+    object: samples/poddisruptionbudget/example_disallowed_deployment.yaml
+    inventory:
+    - samples/poddisruptionbudget/example_hpa_disallowed.yaml
+    - samples/poddisruptionbudget/example_inventory_disallowed.yaml
+    assertions:
+    - violations: yes
