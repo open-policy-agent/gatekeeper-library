@@ -31,3 +31,4 @@ resources:
 - verifydeprecatedapi
 - storageclass
 - allowedreposv2
+- enforce-nodeport-range
