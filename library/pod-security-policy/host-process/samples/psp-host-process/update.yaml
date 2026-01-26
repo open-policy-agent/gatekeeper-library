@@ -1,0 +1,18 @@
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx-host-process-disallowed
+      labels:
+        app: nginx-host-process
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        securityContext:
+          windowsOptions:
+            hostProcess: true

@@ -1,0 +1,54 @@
+variables:
+- name: containers
+  expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+- name: initContainers
+  expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+- name: ephemeralContainers
+  expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+- name: exemptImagePrefixes
+  expression: |
+    !has(variables.params.exemptImages) ? [] :
+      variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+- name: exemptImageExplicit
+  expression: |
+    !has(variables.params.exemptImages) ? [] : 
+      variables.params.exemptImages.filter(image, !image.endsWith("*"))
+- name: exemptImages
+  expression: |
+    (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+      container.image in variables.exemptImageExplicit ||
+      variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))
+    ).map(container, container.image)
+- name: allContainers
+  expression: 'variables.containers + variables.initContainers + variables.ephemeralContainers'
+- name: badProbeContainers
+  expression: |
+    variables.allContainers.filter(container,
+      !(container.image in variables.exemptImages) &&
+      (
+        (has(container.livenessProbe) && has(container.livenessProbe.httpGet) && has(container.livenessProbe.httpGet.host) && container.livenessProbe.httpGet.host != "") ||
+        (has(container.livenessProbe) && has(container.livenessProbe.tcpSocket) && has(container.livenessProbe.tcpSocket.host) && container.livenessProbe.tcpSocket.host != "") ||
+        (has(container.readinessProbe) && has(container.readinessProbe.httpGet) && has(container.readinessProbe.httpGet.host) && container.readinessProbe.httpGet.host != "") ||
+        (has(container.readinessProbe) && has(container.readinessProbe.tcpSocket) && has(container.readinessProbe.tcpSocket.host) && container.readinessProbe.tcpSocket.host != "") ||
+        (has(container.startupProbe) && has(container.startupProbe.httpGet) && has(container.startupProbe.httpGet.host) && container.startupProbe.httpGet.host != "") ||
+        (has(container.startupProbe) && has(container.startupProbe.tcpSocket) && has(container.startupProbe.tcpSocket.host) && container.startupProbe.tcpSocket.host != "")
+      )
+    ).map(container, "Container " + container.name + " has probe with host field set")
+- name: badLifecycleContainers
+  expression: |
+    variables.allContainers.filter(container,
+      !(container.image in variables.exemptImages) &&
+      (
+        (has(container.lifecycle) && has(container.lifecycle.postStart) && has(container.lifecycle.postStart.httpGet) && has(container.lifecycle.postStart.httpGet.host) && container.lifecycle.postStart.httpGet.host != "") ||
+        (has(container.lifecycle) && has(container.lifecycle.postStart) && has(container.lifecycle.postStart.tcpSocket) && has(container.lifecycle.postStart.tcpSocket.host) && container.lifecycle.postStart.tcpSocket.host != "") ||
+        (has(container.lifecycle) && has(container.lifecycle.preStop) && has(container.lifecycle.preStop.httpGet) && has(container.lifecycle.preStop.httpGet.host) && container.lifecycle.preStop.httpGet.host != "") ||
+        (has(container.lifecycle) && has(container.lifecycle.preStop) && has(container.lifecycle.preStop.tcpSocket) && has(container.lifecycle.preStop.tcpSocket.host) && container.lifecycle.preStop.tcpSocket.host != "")
+      )
+    ).map(container, "Container " + container.name + " has lifecycle hook with host field set")
+- name: isUpdate
+  expression: has(request.operation) && request.operation == "UPDATE"
+validations:
+- expression: variables.isUpdate || size(variables.badProbeContainers) == 0
+  messageExpression: 'variables.badProbeContainers.join(", ")'
+- expression: variables.isUpdate || size(variables.badLifecycleContainers) == 0
+  messageExpression: 'variables.badLifecycleContainers.join(", ")'
