@@ -3,7 +3,7 @@ name: k8spspcapabilities
 displayName: Capabilities
 createdAt: "2025-07-25T08:00:24Z"
 description: Controls Linux capabilities on containers. Corresponds to the `allowedCapabilities` and `requiredDropCapabilities` fields in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#capabilities
-digest: 862a61c24e3b515def0bdd6cee47e2f777f62d8187e92c8048de6ee891c1e331
+digest: 68a2bdfdb5f102de58221ff04f3d10068c2d75face265cf600256deb31547791
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/capabilities
 keywords:

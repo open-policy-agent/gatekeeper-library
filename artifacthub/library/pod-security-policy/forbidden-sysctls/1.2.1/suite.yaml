@@ -1,0 +1,85 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: forbidden-sysctls
+tests:
+  - name: forbidden-sysctls
+    template: template.yaml
+    constraint: samples/psp-forbidden-sysctls/constraint.yaml
+    cases:
+      - name: example-disallowed
+        object: samples/psp-forbidden-sysctls/example_disallowed.yaml
+        assertions:
+          - violations: yes
+      - name: example-allowed
+        object: samples/psp-forbidden-sysctls/example_allowed.yaml
+        assertions:
+          - violations: no
+      - name: update
+        object: samples/psp-forbidden-sysctls/update.yaml
+        assertions:
+          - violations: no
+  - name: forbidden-sysctls-wildcard
+    template: template.yaml
+    constraint: samples/psp-forbidden-sysctls/constraint2.yaml
+    cases:
+      - name: example-disallowed
+        object: samples/psp-forbidden-sysctls/example_disallowed.yaml
+        assertions:
+          - violations: yes
+      - name: example-disallowed
+        object: samples/psp-forbidden-sysctls/example_allowed.yaml
+        assertions:
+          - violations: yes
+      - name: update
+        object: samples/psp-forbidden-sysctls/update.yaml
+        assertions:
+          - violations: no
+  - name: forbidden-sysctls3
+    template: template.yaml
+    constraint: samples/psp-forbidden-sysctls/constraint3.yaml
+    cases:
+      - name: example-disallowed
+        object: samples/psp-forbidden-sysctls/example_disallowed.yaml
+        assertions:
+          - violations: yes
+      - name: example-allowed
+        object: samples/psp-forbidden-sysctls/example_allowed.yaml
+        assertions:
+          - violations: no
+      - name: update
+        object: samples/psp-forbidden-sysctls/update.yaml
+        assertions:
+          - violations: no
+  - name: forbidden-sysctls4-empty-allowedSysctls
+    template: template.yaml
+    constraint: samples/psp-forbidden-sysctls/constraint4.yaml
+    cases:
+      - name: example-disallowed
+        object: samples/psp-forbidden-sysctls/example_disallowed.yaml
+        assertions:
+          - violations: yes
+      - name: example-disallowed
+        object: samples/psp-forbidden-sysctls/example_allowed.yaml
+        assertions:
+          - violations: yes
+      - name: update
+        object: samples/psp-forbidden-sysctls/update.yaml
+        assertions:
+          - violations: no
+  - name: forbidden-sysctls5-unspecified-allowedSysctls
+    template: template.yaml
+    constraint: samples/psp-forbidden-sysctls/constraint5.yaml
+    cases:
+      - name: example-disallowed
+        object: samples/psp-forbidden-sysctls/example_disallowed.yaml
+        assertions:
+          - violations: yes
+      - name: example-allowed
+        object: samples/psp-forbidden-sysctls/example_allowed.yaml
+        assertions:
+          - violations: no
+      - name: update
+        object: samples/psp-forbidden-sysctls/update.yaml
+        assertions:
+          - violations: no

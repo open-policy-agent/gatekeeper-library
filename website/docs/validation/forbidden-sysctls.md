@@ -5,6 +5,8 @@ title: Forbidden Sysctls
 
 # Forbidden Sysctls
 
+**Bundles:** `pod-security-baseline` `pod-security-restricted`
+
 ## Description
 Controls the `sysctl` profile used by containers. Corresponds to the `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy. When specified, any sysctl not in the `allowedSysctls` parameter is considered to be forbidden. The `forbiddenSysctls` parameter takes precedence over the `allowedSysctls` parameter. For more information, see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
 
@@ -16,7 +18,8 @@ metadata:
   name: k8spspforbiddensysctls
   annotations:
     metadata.gatekeeper.sh/title: "Forbidden Sysctls"
-    metadata.gatekeeper.sh/version: 1.2.0
+    metadata.gatekeeper.sh/version: 1.2.1
+    metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Controls the `sysctl` profile used by containers. Corresponds to the
       `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy.

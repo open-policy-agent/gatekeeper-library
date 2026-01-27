@@ -3,7 +3,7 @@ name: k8spspapparmor
 displayName: App Armor
 createdAt: "2024-05-29T23:39:01Z"
 description: Configures an allow-list of AppArmor profiles for use by containers. This corresponds to specific annotations applied to a PodSecurityPolicy. For information on AppArmor, see https://kubernetes.io/docs/tutorials/clusters/apparmor/
-digest: d77b1285f65085153e6a6e6ac86dc32195591df467c3162abe8cc6c806cab69a
+digest: 2516903d8d9537fb5e4c0691d501ba6efe349453b325536a690f0171d9fd6a64
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/apparmor
 keywords:

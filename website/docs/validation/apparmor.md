@@ -5,6 +5,8 @@ title: App Armor
 
 # App Armor
 
+**Bundles:** `pod-security-baseline` `pod-security-restricted`
+
 ## Description
 Configures an allow-list of AppArmor profiles for use by containers. This corresponds to specific annotations applied to a PodSecurityPolicy. For information on AppArmor, see https://kubernetes.io/docs/tutorials/clusters/apparmor/
 
@@ -16,7 +18,8 @@ metadata:
   name: k8spspapparmor
   annotations:
     metadata.gatekeeper.sh/title: "App Armor"
-    metadata.gatekeeper.sh/version: 1.1.0
+    metadata.gatekeeper.sh/version: 1.1.1
+    metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Configures an allow-list of AppArmor profiles for use by containers.
       This corresponds to specific annotations applied to a PodSecurityPolicy.

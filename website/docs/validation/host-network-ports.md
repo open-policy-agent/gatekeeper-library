@@ -5,6 +5,8 @@ title: Host Networking Ports
 
 # Host Networking Ports
 
+**Bundles:** `pod-security-baseline` `pod-security-restricted`
+
 ## Description
 Controls usage of host network namespace by pod containers. HostNetwork verification happens without exception for exemptImages. Specific ports must be specified. Corresponds to the `hostNetwork` and `hostPorts` fields in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
 
@@ -16,7 +18,8 @@ metadata:
   name: k8spsphostnetworkingports
   annotations:
     metadata.gatekeeper.sh/title: "Host Networking Ports"
-    metadata.gatekeeper.sh/version: 1.1.4
+    metadata.gatekeeper.sh/version: 1.1.5
+    metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Controls usage of host network namespace by pod containers. HostNetwork verification happens without exception for exemptImages. Specific
       ports must be specified. Corresponds to the `hostNetwork` and
