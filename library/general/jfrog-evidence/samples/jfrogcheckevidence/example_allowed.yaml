@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: your-jfrog-testing-pod
+spec:
+  containers:
+  - name: testing
+    image: my-jfrog-registry.jfrog.io/docker-local/your-valid-testing-image:1.0.0
+    imagePullPolicy: Always
+  imagePullSecrets: 
+  - name: jfrog-secret
