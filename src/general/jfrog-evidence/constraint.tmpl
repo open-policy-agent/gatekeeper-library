@@ -1,7 +1,7 @@
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
-  name: jfrogcheckevidence
+  name: k8sjfrogcheckevidence
   annotations:
     metadata.gatekeeper.sh/title: "Check JFrog Evidence"
     metadata.gatekeeper.sh/version: 1.0.0
@@ -12,7 +12,7 @@ spec:
   crd:
     spec:
       names:
-        kind: jfrogcheckevidence
+        kind: K8sJfrogCheckEvidence
       validation:
         openAPIV3Schema:
           type: object
@@ -31,8 +31,5 @@ spec:
                 type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
-      code:
-      - engine: Rego
-        source: 
-          rego: |
+      rego: |
 {{ file.Read "src/general/jfrog-evidence/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
