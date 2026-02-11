@@ -5,6 +5,9 @@ metadata:
   labels:
     app: nginx-apparmor
 spec:
+  securityContext:
+    appArmorProfile:
+      type: "Unconfined"
   containers:
   - name: nginx
     image: nginx

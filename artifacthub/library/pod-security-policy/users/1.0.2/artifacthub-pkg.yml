@@ -3,7 +3,7 @@ name: k8spspallowedusers
 displayName: Allowed Users
 createdAt: "2023-10-30T21:00:02Z"
 description: Controls the user and group IDs of the container and some volumes. Corresponds to the `runAsUser`, `runAsGroup`, `supplementalGroups`, and `fsGroup` fields in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#users-and-groups
-digest: 760d9a5ae0141be570adb41c494aedd4b5316b8aa4da8db59ac39fe0bd976684
+digest: 485bfc85639175c748da7632863dd3c91ad7f4dbd2544d2579cb82732ee795ea
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/users
 keywords:

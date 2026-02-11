@@ -9,22 +9,10 @@ spec:
         kinds: ["Pod"]
   parameters:
     runAsUser:
-      rule: MustRunAs # MustRunAsNonRoot # RunAsAny 
-      ranges:
-        - min: 100
-          max: 200
+      rule: MustRunAsNonRoot
     runAsGroup:
-      rule: MustRunAs # MayRunAs # RunAsAny 
-      ranges:
-        - min: 100
-          max: 200
+      rule: RunAsAny
     supplementalGroups:
-      rule: MustRunAs # MayRunAs # RunAsAny 
-      ranges:
-        - min: 100
-          max: 200
+      rule: RunAsAny
     fsGroup:
-      rule: MustRunAs # MayRunAs # RunAsAny 
-      ranges:
-        - min: 100
-          max: 200
+      rule: RunAsAny

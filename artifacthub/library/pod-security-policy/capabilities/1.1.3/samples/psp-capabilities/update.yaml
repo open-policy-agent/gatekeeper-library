@@ -19,7 +19,7 @@ request:
             - "--addr=localhost:8080"
           securityContext:
             capabilities:
-              add: ["disallowedcapability"]
+              add: ["SYS_ADMIN"]
           resources:
             limits:
               cpu: "100m"

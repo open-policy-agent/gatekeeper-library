@@ -188,11 +188,17 @@ spec:
       - apiGroups: [""]
         kinds: ["Pod"]
   parameters:
-    forbiddenSysctls:
-    # - "*" # * may be used to forbid all sysctls
-    - kernel.*
     allowedSysctls:
-    - "*" # allows all sysctls. allowedSysctls is optional.
+    - kernel.shm_rmid_forced
+    - net.ipv4.ip_local_port_range
+    - net.ipv4.ip_unprivileged_port_start
+    - net.ipv4.tcp_syncookies
+    - net.ipv4.ping_group_range
+    - net.ipv4.ip_local_reserved_ports
+    - net.ipv4.tcp_keepalive_time
+    - net.ipv4.tcp_fin_timeout
+    - net.ipv4.tcp_keepalive_intvl
+    - net.ipv4.tcp_keepalive_probes
 
 ```
 
@@ -250,8 +256,8 @@ spec:
       image: nginx
   securityContext:
     sysctls:
-      - name: net.core.somaxconn
-        value: "1024"
+      - name: net.ipv4.ip_local_port_range
+        value: "1024 65535"
 
 ```
 
@@ -342,8 +348,8 @@ spec:
       image: nginx
   securityContext:
     sysctls:
-      - name: net.core.somaxconn
-        value: "1024"
+      - name: net.ipv4.ip_local_port_range
+        value: "1024 65535"
 
 ```
 
@@ -435,8 +441,8 @@ spec:
       image: nginx
   securityContext:
     sysctls:
-      - name: net.core.somaxconn
-        value: "1024"
+      - name: net.ipv4.ip_local_port_range
+        value: "1024 65535"
 
 ```
 
@@ -527,8 +533,8 @@ spec:
       image: nginx
   securityContext:
     sysctls:
-      - name: net.core.somaxconn
-        value: "1024"
+      - name: net.ipv4.ip_local_port_range
+        value: "1024 65535"
 
 ```
 
@@ -619,8 +625,8 @@ spec:
       image: nginx
   securityContext:
     sysctls:
-      - name: net.core.somaxconn
-        value: "1024"
+      - name: net.ipv4.ip_local_port_range
+        value: "1024 65535"
 
 ```
 

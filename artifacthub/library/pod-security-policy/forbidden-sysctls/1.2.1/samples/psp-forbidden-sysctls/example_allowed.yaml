@@ -10,5 +10,5 @@ spec:
       image: nginx
   securityContext:
     sysctls:
-      - name: net.core.somaxconn
-        value: "1024"
+      - name: net.ipv4.ip_local_port_range
+        value: "1024 65535"

@@ -10,5 +10,4 @@ spec:
     image: nginx
     securityContext:
       appArmorProfile:
-        type: "Localhost"
-        localhostProfile: "custom"
+        type: "RuntimeDefault"

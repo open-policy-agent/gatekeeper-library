@@ -5,8 +5,6 @@ title: Read Only Root Filesystem
 
 # Read Only Root Filesystem
 
-**Bundles:** `pod-security-restricted`
-
 ## Description
 Requires the use of a read-only root file system by pod containers. Corresponds to the `readOnlyRootFilesystem` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
 
@@ -18,8 +16,7 @@ metadata:
   name: k8spspreadonlyrootfilesystem
   annotations:
     metadata.gatekeeper.sh/title: "Read Only Root Filesystem"
-    metadata.gatekeeper.sh/version: 1.1.2
-    metadata.gatekeeper.sh/bundle: "pod-security-restricted"
+    metadata.gatekeeper.sh/version: 1.1.1
     description: >-
       Requires the use of a read-only root file system by pod containers.
       Corresponds to the `readOnlyRootFilesystem` field in a

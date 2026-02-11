@@ -3,8 +3,7 @@ kind: Pod
 metadata:
   name: nginx-apparmor-allowed
   annotations:
-    # apparmor.security.beta.kubernetes.io/pod: unconfined # runtime/default
-    container.apparmor.security.beta.kubernetes.io/nginx: localhost/custom
+    container.apparmor.security.beta.kubernetes.io/nginx: runtime/default
   labels:
     app: nginx-apparmor
 spec:

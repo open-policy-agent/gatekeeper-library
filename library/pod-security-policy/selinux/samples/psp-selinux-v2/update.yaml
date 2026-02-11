@@ -15,7 +15,6 @@ request:
         image: nginx
         securityContext:
           seLinuxOptions:
-            level: s1:c234,c567
+            type: svirt_lxc_net_t
             user: sysadm_u
             role: sysadm_r
-            type: svirt_lxc_net_t

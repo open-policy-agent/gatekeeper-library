@@ -3,7 +3,7 @@ name: k8spspprivilegedcontainer
 displayName: Privileged Container
 createdAt: "2024-09-19T20:41:16Z"
 description: Controls the ability of any container to enable privileged mode. Corresponds to the `privileged` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#privileged
-digest: 0eb01c026c2287229e329ca26970e8f8e7ad2ae110f7290446366ef5d0c8cbdf
+digest: c59b8fdc5827901a5d35fb33825275427b6cf27e38d5f2d975ac52fcc022deff
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/privileged-containers
 keywords:

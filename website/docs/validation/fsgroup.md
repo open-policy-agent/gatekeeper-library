@@ -5,8 +5,6 @@ title: FS Group
 
 # FS Group
 
-**Bundles:** `pod-security-restricted`
-
 ## Description
 Controls allocating an FSGroup that owns the Pod's volumes. Corresponds to the `fsGroup` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
 
@@ -18,8 +16,7 @@ metadata:
   name: k8spspfsgroup
   annotations:
     metadata.gatekeeper.sh/title: "FS Group"
-    metadata.gatekeeper.sh/version: 1.1.1
-    metadata.gatekeeper.sh/bundle: "pod-security-restricted"
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Controls allocating an FSGroup that owns the Pod's volumes. Corresponds
       to the `fsGroup` field in a PodSecurityPolicy. For more information, see

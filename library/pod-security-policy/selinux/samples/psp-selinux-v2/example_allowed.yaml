@@ -10,7 +10,4 @@ spec:
     image: nginx
     securityContext:
       seLinuxOptions:
-        level: s0:c123,c456
-        role: object_r
-        type: svirt_sandbox_file_t
-        user: system_u
+        type: container_t

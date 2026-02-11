@@ -257,7 +257,8 @@ spec:
         kinds: ["Pod"]
   parameters:
     allowedProfiles:
-    - localhost/custom
+    - runtime/default
+    - localhost/*
 
 ```
 
@@ -278,8 +279,7 @@ kind: Pod
 metadata:
   name: nginx-apparmor-allowed
   annotations:
-    # apparmor.security.beta.kubernetes.io/pod: unconfined # runtime/default
-    container.apparmor.security.beta.kubernetes.io/nginx: localhost/custom
+    container.apparmor.security.beta.kubernetes.io/nginx: runtime/default
   labels:
     app: nginx-apparmor
 spec:
@@ -312,8 +312,7 @@ spec:
     image: nginx
     securityContext:
       appArmorProfile:
-        type: "Localhost"
-        localhostProfile: "custom"
+        type: "RuntimeDefault"
 
 ```
 
@@ -337,8 +336,7 @@ metadata:
 spec:
   securityContext:
     appArmorProfile:
-      type: "Localhost"
-      localhostProfile: "custom"
+      type: "RuntimeDefault"
   containers:
   - name: nginx
     image: nginx
@@ -371,8 +369,7 @@ spec:
     image: nginx
     securityContext:
       appArmorProfile:
-        type: "Localhost"
-        localhostProfile: "custom"
+        type: "RuntimeDefault"
 
 ```
 
@@ -423,8 +420,7 @@ metadata:
 spec:
   securityContext:
     appArmorProfile:
-      type: "Localhost"
-      localhostProfile: "custom"
+      type: "RuntimeDefault"
   containers:
   - name: nginx
     image: nginx
@@ -452,6 +448,9 @@ metadata:
   labels:
     app: nginx-apparmor
 spec:
+  securityContext:
+    appArmorProfile:
+      type: "Unconfined"
   containers:
   - name: nginx
     image: nginx

@@ -6,12 +6,10 @@ metadata:
     app: nginx-users
 spec:
   securityContext:
-    supplementalGroups:
-      - 199
-    fsGroup: 199
+    runAsNonRoot: true
   containers:
     - name: nginx
       image: nginx
       securityContext:
-        runAsUser: 199
-        runAsGroup: 199
+        runAsUser: 1000
+        runAsGroup: 1000

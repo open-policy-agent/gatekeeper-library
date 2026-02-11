@@ -50,6 +50,14 @@ module.exports = {
                 },
               ],
             },
+            {
+              type: 'category',
+              label: 'Other',
+              collapsed: true,
+              items: [
+%OTHER_PSP_ITEMS%
+              ],
+            },
           ],
         },
       ]

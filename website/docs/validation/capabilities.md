@@ -250,24 +250,22 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sPSPCapabilities
 metadata:
-  name: capabilities-demo
+  name: psp-capabilities
 spec:
   match:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
-    namespaces:
-      - "default"
   parameters:
-    allowedCapabilities: ["something"]
-    requiredDropCapabilities: ["must_drop"]
+    allowedCapabilities: ["NET_BIND_SERVICE"]
+    requiredDropCapabilities: ["ALL"]
 
 ```
 
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/capabilities-demo/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities/constraint.yaml
 ```
 
 </details>
@@ -292,7 +290,7 @@ spec:
         - "--addr=localhost:8080"
       securityContext:
         capabilities:
-          add: ["disallowedcapability"]
+          add: ["SYS_ADMIN"]
       resources:
         limits:
           cpu: "100m"
@@ -303,7 +301,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/capabilities-demo/example_disallowed.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities/example_disallowed.yaml
 ```
 
 </details>
@@ -327,8 +325,8 @@ spec:
         - "--addr=localhost:8080"
       securityContext:
         capabilities:
-          add: ["something"]
-          drop: ["must_drop", "another_one"]
+          add: ["NET_BIND_SERVICE"]
+          drop: ["ALL"]
       resources:
         limits:
           cpu: "100m"
@@ -339,7 +337,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/capabilities-demo/example_allowed.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities/example_allowed.yaml
 ```
 
 </details>
@@ -363,7 +361,7 @@ spec:
         - "--addr=localhost:8080"
       securityContext:
         capabilities:
-          add: ["disallowedcapability"]
+          add: ["SYS_ADMIN"]
       resources:
         limits:
           cpu: "100m"
@@ -374,7 +372,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/capabilities-demo/disallowed_ephemeral.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities/disallowed_ephemeral.yaml
 ```
 
 </details>

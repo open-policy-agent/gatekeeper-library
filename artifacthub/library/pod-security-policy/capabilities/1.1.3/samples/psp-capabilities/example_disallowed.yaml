@@ -5,7 +5,7 @@ metadata:
   labels:
     owner: me.agilebank.demo
 spec:
-  ephemeralContainers:
+  containers:
     - name: opa
       image: openpolicyagent/opa:0.9.2
       args:
@@ -14,7 +14,7 @@ spec:
         - "--addr=localhost:8080"
       securityContext:
         capabilities:
-          add: ["disallowedcapability"]
+          add: ["SYS_ADMIN"]
       resources:
         limits:
           cpu: "100m"

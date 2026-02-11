@@ -5,13 +5,9 @@ metadata:
   labels:
     app: nginx-users
 spec:
-  securityContext:
-    supplementalGroups:
-      - 250
-    fsGroup: 250
   containers:
     - name: nginx
       image: nginx
       securityContext:
-        runAsUser: 250
-        runAsGroup: 250
+        runAsUser: 0
+        runAsGroup: 0

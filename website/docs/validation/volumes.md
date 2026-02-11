@@ -105,13 +105,13 @@ spec:
     volumes:
     # - "*" # * may be used to allow all volume types
     - configMap
+    - csi
+    - downwardAPI
     - emptyDir
+    - ephemeral
+    - persistentVolumeClaim
     - projected
     - secret
-    - downwardAPI
-    - persistentVolumeClaim
-    #- hostPath #required for allowedHostPaths
-    - flexVolume #required for allowedFlexVolumes
 
 ```
 

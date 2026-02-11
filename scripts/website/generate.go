@@ -363,6 +363,23 @@ func main() {
 	restrictedOnlyItems := filterItems(bundleItems["pod-security-restricted"], bundleItems["pod-security-baseline"])
 	restrictedItemsList := generateSidebarItems(restrictedOnlyItems, "validation/", "                    ")
 
+	// Collect all bundled PSP policies
+	allBundledPSP := make(map[string]bool)
+	for _, items := range bundleItems {
+		for _, item := range items {
+			allBundledPSP[item] = true
+		}
+	}
+
+	// Generate "Other" PSP items: policies in pod-security-policy category without any bundle annotation
+	var otherPSPItems []string
+	for _, item := range validationSidebarItems["pod-security-policy"] {
+		if !allBundledPSP[item] {
+			otherPSPItems = append(otherPSPItems, item)
+		}
+	}
+	otherPSPItemsList := generateSidebarItems(otherPSPItems, "validation/", "                ")
+
 	// Read from template file
 	sidebarTemplate, err := os.ReadFile(filepath.Join(rootDir, sidebarTemplatePath))
 	if err != nil {
@@ -375,6 +392,7 @@ func main() {
 		"%MUTATION_ITEMS%", mutationItemsList,
 		"%BASELINE_ITEMS%", baselineItemsList,
 		"%RESTRICTED_ITEMS%", restrictedItemsList,
+		"%OTHER_PSP_ITEMS%", otherPSPItemsList,
 	)
 	updatedSidebar := sidebarReplacer.Replace(string(sidebarTemplate))
 

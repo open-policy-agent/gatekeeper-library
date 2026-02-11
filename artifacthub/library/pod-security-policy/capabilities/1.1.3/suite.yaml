@@ -5,21 +5,21 @@ metadata:
 tests:
   - name: capabilities
     template: template.yaml
-    constraint: samples/capabilities-demo/constraint.yaml
+    constraint: samples/psp-capabilities/constraint.yaml
     cases:
       - name: example-disallowed
-        object: samples/capabilities-demo/example_disallowed.yaml
+        object: samples/psp-capabilities/example_disallowed.yaml
         assertions:
           - violations: yes
       - name: example-allowed
-        object: samples/capabilities-demo/example_allowed.yaml
+        object: samples/psp-capabilities/example_allowed.yaml
         assertions:
           - violations: no
       - name: disallowed-ephemeral
-        object: samples/capabilities-demo/disallowed_ephemeral.yaml
+        object: samples/psp-capabilities/disallowed_ephemeral.yaml
         assertions:
           - violations: yes
       - name: update
-        object: samples/capabilities-demo/update.yaml
+        object: samples/psp-capabilities/update.yaml
         assertions:
           - violations: no

@@ -328,25 +328,13 @@ spec:
         kinds: ["Pod"]
   parameters:
     runAsUser:
-      rule: MustRunAs # MustRunAsNonRoot # RunAsAny 
-      ranges:
-        - min: 100
-          max: 200
+      rule: MustRunAsNonRoot
     runAsGroup:
-      rule: MustRunAs # MayRunAs # RunAsAny 
-      ranges:
-        - min: 100
-          max: 200
+      rule: RunAsAny
     supplementalGroups:
-      rule: MustRunAs # MayRunAs # RunAsAny 
-      ranges:
-        - min: 100
-          max: 200
+      rule: RunAsAny
     fsGroup:
-      rule: MustRunAs # MayRunAs # RunAsAny 
-      ranges:
-        - min: 100
-          max: 200
+      rule: RunAsAny
 
 ```
 
@@ -369,16 +357,12 @@ metadata:
   labels:
     app: nginx-users
 spec:
-  securityContext:
-    supplementalGroups:
-      - 250
-    fsGroup: 250
   containers:
     - name: nginx
       image: nginx
       securityContext:
-        runAsUser: 250
-        runAsGroup: 250
+        runAsUser: 0
+        runAsGroup: 0
 
 ```
 
@@ -401,15 +385,13 @@ metadata:
     app: nginx-users
 spec:
   securityContext:
-    supplementalGroups:
-      - 199
-    fsGroup: 199
+    runAsNonRoot: true
   containers:
     - name: nginx
       image: nginx
       securityContext:
-        runAsUser: 199
-        runAsGroup: 199
+        runAsUser: 1000
+        runAsGroup: 1000
 
 ```
 
@@ -431,16 +413,12 @@ metadata:
   labels:
     app: nginx-users
 spec:
-  securityContext:
-    supplementalGroups:
-      - 250
-    fsGroup: 250
   ephemeralContainers:
     - name: nginx
       image: nginx
       securityContext:
-        runAsUser: 250
-        runAsGroup: 250
+        runAsUser: 0
+        runAsGroup: 0
 
 ```
 
