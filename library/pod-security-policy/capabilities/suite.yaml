@@ -3,23 +3,43 @@ apiVersion: test.gatekeeper.sh/v1alpha1
 metadata:
   name: capabilities
 tests:
-  - name: capabilities
+  - name: capabilities-baseline
     template: template.yaml
-    constraint: samples/psp-capabilities/constraint.yaml
+    constraint: samples/psp-capabilities-baseline/constraint.yaml
     cases:
       - name: example-disallowed
-        object: samples/psp-capabilities/example_disallowed.yaml
+        object: samples/psp-capabilities-baseline/example_disallowed.yaml
         assertions:
           - violations: yes
       - name: example-allowed
-        object: samples/psp-capabilities/example_allowed.yaml
+        object: samples/psp-capabilities-baseline/example_allowed.yaml
         assertions:
           - violations: no
       - name: disallowed-ephemeral
-        object: samples/psp-capabilities/disallowed_ephemeral.yaml
+        object: samples/psp-capabilities-baseline/disallowed_ephemeral.yaml
         assertions:
           - violations: yes
       - name: update
-        object: samples/psp-capabilities/update.yaml
+        object: samples/psp-capabilities-baseline/update.yaml
+        assertions:
+          - violations: no
+  - name: capabilities-restricted
+    template: template.yaml
+    constraint: samples/psp-capabilities-restricted/constraint.yaml
+    cases:
+      - name: example-disallowed
+        object: samples/psp-capabilities-restricted/example_disallowed.yaml
+        assertions:
+          - violations: yes
+      - name: example-allowed
+        object: samples/psp-capabilities-restricted/example_allowed.yaml
+        assertions:
+          - violations: no
+      - name: disallowed-ephemeral
+        object: samples/psp-capabilities-restricted/disallowed_ephemeral.yaml
+        assertions:
+          - violations: yes
+      - name: update
+        object: samples/psp-capabilities-restricted/update.yaml
         assertions:
           - violations: no

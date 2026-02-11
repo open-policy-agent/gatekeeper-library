@@ -241,7 +241,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>capabilities</summary>
+<summary>capabilities-baseline</summary>
 
 <details>
 <summary>constraint</summary>
@@ -250,22 +250,35 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sPSPCapabilities
 metadata:
-  name: psp-capabilities
+  name: psp-capabilities-baseline
 spec:
   match:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
   parameters:
-    allowedCapabilities: ["NET_BIND_SERVICE"]
-    requiredDropCapabilities: ["ALL"]
+    allowedCapabilities:
+    - AUDIT_WRITE
+    - CHOWN
+    - DAC_OVERRIDE
+    - FOWNER
+    - FSETID
+    - KILL
+    - MKNOD
+    - NET_BIND_SERVICE
+    - NET_RAW
+    - SETFCAP
+    - SETGID
+    - SETPCAP
+    - SETUID
+    - SYS_CHROOT
 
 ```
 
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities-baseline/constraint.yaml
 ```
 
 </details>
@@ -301,7 +314,144 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities/example_disallowed.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities-baseline/example_disallowed.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-allowed
+  labels:
+    owner: me.agilebank.demo
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      securityContext:
+        capabilities:
+          add: ["NET_BIND_SERVICE"]
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "30Mi"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities-baseline/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>disallowed-ephemeral</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-disallowed
+  labels:
+    owner: me.agilebank.demo
+spec:
+  ephemeralContainers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      securityContext:
+        capabilities:
+          add: ["SYS_ADMIN"]
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "30Mi"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities-baseline/disallowed_ephemeral.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>capabilities-restricted</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPCapabilities
+metadata:
+  name: psp-capabilities-restricted
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    allowedCapabilities: ["NET_BIND_SERVICE"]
+    requiredDropCapabilities: ["ALL"]
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities-restricted/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-disallowed
+  labels:
+    owner: me.agilebank.demo
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      securityContext:
+        capabilities:
+          add: ["SYS_ADMIN"]
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "30Mi"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities-restricted/example_disallowed.yaml
 ```
 
 </details>
@@ -337,7 +487,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities/example_allowed.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities-restricted/example_allowed.yaml
 ```
 
 </details>
@@ -372,7 +522,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities/disallowed_ephemeral.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities-restricted/disallowed_ephemeral.yaml
 ```
 
 </details>

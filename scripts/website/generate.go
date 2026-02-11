@@ -357,11 +357,10 @@ func main() {
 	mutationItemsList := generateSidebarItems(mutationSidebarItems["pod-security-policy"], "mutation-examples/", "        ")
 	
 	// Generate profile items for sidebar (policies organized by bundle)
+	// Policies appear in every profile they belong to, since baseline and restricted
+	// may require different constraint values (e.g. capabilities, seccomp).
 	baselineItemsList := generateSidebarItems(bundleItems["pod-security-baseline"], "validation/", "                    ")
-	
-	// Filter restricted items to only show policies not already in baseline (since profiles are cumulative)
-	restrictedOnlyItems := filterItems(bundleItems["pod-security-restricted"], bundleItems["pod-security-baseline"])
-	restrictedItemsList := generateSidebarItems(restrictedOnlyItems, "validation/", "                    ")
+	restrictedItemsList := generateSidebarItems(bundleItems["pod-security-restricted"], "validation/", "                    ")
 
 	// Collect all bundled PSP policies
 	allBundledPSP := make(map[string]bool)
@@ -417,22 +416,6 @@ func generateSidebarItems(items []string, prefix string, indent string) string {
 	}
 
 	return strings.Join(itemStrings, "\n")
-}
-
-// filterItems returns items from 'all' that are not present in 'exclude'.
-func filterItems(all []string, exclude []string) []string {
-	excludeSet := make(map[string]bool)
-	for _, item := range exclude {
-		excludeSet[item] = true
-	}
-
-	var filtered []string
-	for _, item := range all {
-		if !excludeSet[item] {
-			filtered = append(filtered, item)
-		}
-	}
-	return filtered
 }
 
 // TODO: Use shared pkg.
