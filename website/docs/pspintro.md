@@ -26,6 +26,8 @@ These policies prevent known privilege escalations and are recommended as the mi
 | Running of privileged containers                  | [privileged-containers](validation/privileged-containers)           |
 | Usage of host namespaces                          | [host-namespaces](validation/host-namespaces)                       |
 | Usage of host networking and ports                | [host-network-ports](validation/host-network-ports)                 |
+| Host field in probes and lifecycle hooks          | [host-probes-lifecycle](validation/host-probes-lifecycle)           |
+| HostProcess containers (Windows)                  | [host-process](validation/host-process)                             |
 | Usage of the host filesystem                      | [host-filesystem](validation/host-filesystem)                       |
 | Linux capabilities                                | [capabilities](validation/capabilities)                             |
 | The SELinux context of the container              | [selinux](validation/selinux)                                       |

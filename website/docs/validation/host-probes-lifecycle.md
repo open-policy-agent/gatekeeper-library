@@ -5,6 +5,8 @@ title: Host Probes and Lifecycle Hooks
 
 # Host Probes and Lifecycle Hooks
 
+**Bundles:** `pod-security-baseline` `pod-security-restricted`
+
 ## Description
 Disallows specifying the host field in probes and lifecycle hooks. The Baseline profile (v1.34+) requires that probes (livenessProbe, readinessProbe, startupProbe) and lifecycle hooks (postStart, preStop) must not specify a host field. This prevents containers from executing network requests to the host node. For more information, see https://kubernetes.io/docs/concepts/security/pod-security-standards/
 
@@ -17,6 +19,7 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "Host Probes and Lifecycle Hooks"
     metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Disallows specifying the host field in probes and lifecycle hooks.
       The Baseline profile (v1.34+) requires that probes (livenessProbe,

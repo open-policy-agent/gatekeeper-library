@@ -5,6 +5,8 @@ title: Host Process
 
 # Host Process
 
+**Bundles:** `pod-security-baseline` `pod-security-restricted`
+
 ## Description
 Disallows HostProcess containers for Windows pods. HostProcess containers enable privileged access on Windows nodes and must be disallowed in Baseline and Restricted policies. Corresponds to the windowsOptions.hostProcess field in a Pod's securityContext or container securityContext. For more information, see https://kubernetes.io/docs/concepts/security/pod-security-standards/
 
@@ -17,6 +19,7 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "Host Process"
     metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Disallows HostProcess containers for Windows pods.
       HostProcess containers enable privileged access on Windows nodes
