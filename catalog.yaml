@@ -1,7 +1,7 @@
 # Policy Catalog for Gatekeeper Library
 #
 # This file is auto-generated. Do not edit directly.
-# Generated at: 2026-02-12T23:12:47Z
+# Generated at: 2026-02-12T23:49:33Z
 #
 # To regenerate, run:
 #   gator policy generate-catalog --library-path=. --output=catalog.yaml
@@ -49,7 +49,7 @@ kind: PolicyCatalog
 metadata:
   name: gatekeeper-library
   repository: https://github.com/open-policy-agent/gatekeeper-library
-  updatedAt: "2026-02-12T23:12:47.11552325Z"
+  updatedAt: "2026-02-12T23:49:33.304069431Z"
   version: v1.0.0
 policies:
 - category: general
@@ -326,7 +326,7 @@ policies:
     For more information, see https://kubernetes.io/docs/concepts/security/pod-security-standards/
   name: k8spsphostprobeslifecycle
   templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/host-probes-lifecycle/template.yaml
-  version: v1.0.0
+  version: v1.0.1
 - bundleConstraints:
     pod-security-baseline: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/host-process/samples/psp-host-process/constraint.yaml
     pod-security-restricted: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/host-process/samples/psp-host-process/constraint.yaml
@@ -341,7 +341,7 @@ policies:
     https://kubernetes.io/docs/concepts/security/pod-security-standards/
   name: k8spsphostprocess
   templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/host-process/template.yaml
-  version: v1.0.0
+  version: v1.0.1
 - bundleConstraints:
     pod-security-baseline: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/privileged-containers/samples/psp-privileged-container/constraint.yaml
     pod-security-restricted: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/privileged-containers/samples/psp-privileged-container/constraint.yaml

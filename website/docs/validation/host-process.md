@@ -18,7 +18,7 @@ metadata:
   name: k8spsphostprocess
   annotations:
     metadata.gatekeeper.sh/title: "Host Process"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Disallows HostProcess containers for Windows pods.

@@ -18,7 +18,7 @@ metadata:
   name: k8spsphostprobeslifecycle
   annotations:
     metadata.gatekeeper.sh/title: "Host Probes and Lifecycle Hooks"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Disallows specifying the host field in probes and lifecycle hooks.
