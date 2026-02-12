@@ -19,10 +19,10 @@ const (
 	sourceURL = "https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/"
 
 	// directory entry point for parsing.
-	entryPoint           = "library"
-	mutationEntryPoint   = "mutation"
-	sidebarPath          = "website/sidebars.js"
-	sidebarTemplatePath  = "scripts/website/sidebars-template.js"
+	entryPoint          = "library"
+	mutationEntryPoint  = "mutation"
+	sidebarPath         = "website/sidebars.js"
+	sidebarTemplatePath = "scripts/website/sidebars-template.js"
 
 	// regex patterns.
 	pspReadmeLinkPattern = `\[([^\[\]]+)\]\(([^(]+)\)`
@@ -349,13 +349,13 @@ func main() {
 
 	// update sidebar from template
 	fmt.Println("Updating sidebar")
-	
+
 	// Generate General items
 	generalItemsList := generateSidebarItems(validationSidebarItems["general"], "validation/", "            ")
-	
+
 	// Generate Mutation items
 	mutationItemsList := generateSidebarItems(mutationSidebarItems["pod-security-policy"], "mutation-examples/", "        ")
-	
+
 	// Generate profile items for sidebar (policies organized by bundle)
 	// Policies appear in every profile they belong to, since baseline and restricted
 	// may require different constraint values (e.g. capabilities, seccomp).

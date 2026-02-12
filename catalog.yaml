@@ -1,7 +1,7 @@
 # Policy Catalog for Gatekeeper Library
 #
 # This file is auto-generated. Do not edit directly.
-# Generated at: 2026-02-12T01:33:15Z
+# Generated at: 2026-02-12T19:15:38Z
 #
 # To regenerate, run:
 #   gator policy generate-catalog --library-path=. --output=catalog.yaml
@@ -45,8 +45,8 @@ kind: PolicyCatalog
 metadata:
   name: gatekeeper-library
   repository: https://github.com/open-policy-agent/gatekeeper-library
-  updatedAt: "2026-02-12T01:33:15.546305451Z"
-  version: v1.0.0
+  updatedAt: "2026-02-12T19:15:38.733602106Z"
+  version: v2026.02.12-700bbcb56
 policies:
 - category: general
   description: Requires container images to begin with a string from the specified
@@ -294,7 +294,7 @@ policies:
   name: k8spsphostnamespace
   templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-namespaces/template.yaml
   version: v1.1.1
-- bundleConstraints:
+-  v:
     pod-security-baseline: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-network-ports/samples/block_host_network/constraint.yaml
     pod-security-restricted: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-network-ports/samples/block_host_network/constraint.yaml
   bundles:
@@ -308,6 +308,24 @@ policies:
   name: k8spsphostnetworkingports
   templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-network-ports/template.yaml
   version: v1.1.5
+- category: pod-security
+  description: Disallows specifying the host field in probes and lifecycle hooks.
+    The Baseline profile (v1.34+) requires that probes (livenessProbe, readinessProbe,
+    startupProbe) and lifecycle hooks (postStart, preStop) must not specify a host
+    field. This prevents containers from executing network requests to the host node.
+    For more information, see https://kubernetes.io/docs/concepts/security/pod-security-standards/
+  name: k8spsphostprobeslifecycle
+  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-probes-lifecycle/template.yaml
+  version: v1.0.0
+- category: pod-security
+  description: Disallows HostProcess containers for Windows pods. HostProcess containers
+    enable privileged access on Windows nodes and must be disallowed in Baseline and
+    Restricted policies. Corresponds to the windowsOptions.hostProcess field in a
+    Pod's securityContext or container securityContext. For more information, see
+    https://kubernetes.io/docs/concepts/security/pod-security-standards/
+  name: k8spsphostprocess
+  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-process/template.yaml
+  version: v1.0.0
 - bundleConstraints:
     pod-security-baseline: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/privileged-containers/samples/psp-privileged-container/constraint.yaml
     pod-security-restricted: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/privileged-containers/samples/psp-privileged-container/constraint.yaml
