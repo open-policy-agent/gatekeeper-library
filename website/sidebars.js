@@ -72,6 +72,7 @@ module.exports = {
                     'validation/host-filesystem',
                     'validation/host-namespaces',
                     'validation/host-network-ports',
+                    'validation/host-process',
                     'validation/privileged-containers',
                     'validation/proc-mount',
                     'validation/seccompv2',
@@ -90,6 +91,7 @@ module.exports = {
                     'validation/host-filesystem',
                     'validation/host-namespaces',
                     'validation/host-network-ports',
+                    'validation/host-process',
                     'validation/privileged-containers',
                     'validation/proc-mount',
                     'validation/seccompv2',
@@ -107,6 +109,7 @@ module.exports = {
               items: [
                 'validation/flexvolume-drivers',
                 'validation/fsgroup',
+                'validation/host-probes-lifecycle',
                 'validation/read-only-root-filesystem',
                 'validation/seccomp',
               ],
