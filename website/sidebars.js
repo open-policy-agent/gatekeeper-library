@@ -65,6 +65,8 @@ module.exports = {
             'validation/host-filesystem',
             'validation/host-namespaces',
             'validation/host-network-ports',
+            'validation/host-probes-lifecycle',
+            'validation/host-process',
             'validation/privileged-containers',
             'validation/proc-mount',
             'validation/read-only-root-filesystem',

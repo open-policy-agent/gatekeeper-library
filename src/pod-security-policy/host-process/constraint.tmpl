@@ -1,0 +1,57 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8spsphostprocess
+  annotations:
+    metadata.gatekeeper.sh/title: "Host Process"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      Disallows HostProcess containers for Windows pods.
+      HostProcess containers enable privileged access on Windows nodes
+      and must be disallowed in Baseline and Restricted policies.
+      Corresponds to the windowsOptions.hostProcess field in a Pod's
+      securityContext or container securityContext.
+      For more information, see
+      https://kubernetes.io/docs/concepts/security/pod-security-standards/
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPHostProcess
+      validation:
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Disallows HostProcess containers for Windows pods.
+            HostProcess containers enable privileged access on Windows nodes
+            and must be disallowed in Baseline and Restricted policies.
+            Corresponds to the windowsOptions.hostProcess field in a Pod's
+            securityContext or container securityContext.
+            For more information, see
+            https://kubernetes.io/docs/concepts/security/pod-security-standards/
+          properties:
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+{{ file.Read "src/pod-security-policy/host-process/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+      - engine: Rego
+        source:
+          rego: |
+{{ file.Read "src/pod-security-policy/host-process/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}
+          libs:
+            - |
+{{ file.Read "src/pod-security-policy/host-process/lib_exclude_update.rego" | strings.Indent 14 | strings.TrimSuffix "\n" }}
+            - |
+{{ file.Read "src/pod-security-policy/host-process/lib_exempt_container.rego" | strings.Indent 14 | strings.TrimSuffix "\n" }}
