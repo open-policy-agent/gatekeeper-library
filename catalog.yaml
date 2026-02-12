@@ -1,7 +1,7 @@
 # Policy Catalog for Gatekeeper Library
 #
 # This file is auto-generated. Do not edit directly.
-# Generated at: 2026-02-12T19:15:38Z
+# Generated at: 2026-02-12T20:16:33Z
 #
 # To regenerate, run:
 #   gator policy generate-catalog --library-path=. --output=catalog.yaml
@@ -45,8 +45,8 @@ kind: PolicyCatalog
 metadata:
   name: gatekeeper-library
   repository: https://github.com/open-policy-agent/gatekeeper-library
-  updatedAt: "2026-02-12T19:15:38.733602106Z"
-  version: v2026.02.12-700bbcb56
+  updatedAt: "2026-02-12T20:16:33.452778868Z"
+  version: v2026.02.12-local
 policies:
 - category: general
   description: Requires container images to begin with a string from the specified
@@ -294,7 +294,7 @@ policies:
   name: k8spsphostnamespace
   templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-namespaces/template.yaml
   version: v1.1.1
--  v:
+- bundleConstraints:
     pod-security-baseline: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-network-ports/samples/block_host_network/constraint.yaml
     pod-security-restricted: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-network-ports/samples/block_host_network/constraint.yaml
   bundles:

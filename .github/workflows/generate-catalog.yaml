@@ -83,10 +83,11 @@ jobs:
           gator policy update
           gator policy search ""
 
-          # Verify bundles are present
+          # Verify bundles are present in catalog
           echo ""
           echo "=== Bundles ==="
-          gator policy list --bundles
+          grep -n "^bundles:" catalog.yaml
+          grep -q "^bundles:" catalog.yaml
 
       - name: Upload catalog artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
