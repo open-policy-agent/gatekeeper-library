@@ -51,7 +51,7 @@ jobs:
       - name: Build gator
         run: |
           cd gatekeeper
-          go build -o ../bin/gator ./cmd/gator
+          GOWORK=off go build -o ../bin/gator ./cmd/gator
           cd ..
           echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
 

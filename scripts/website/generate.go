@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"slices"
+	"sort"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -408,7 +408,7 @@ func generateSidebarItems(items []string, prefix string, indent string) string {
 		return ""
 	}
 
-	slices.Sort(items)
+	sort.Strings(items)
 
 	var itemStrings []string
 	for _, item := range items {
