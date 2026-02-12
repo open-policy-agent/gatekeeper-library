@@ -16,7 +16,7 @@ metadata:
   name: k8spspvolumetypes
   annotations:
     metadata.gatekeeper.sh/title: "Volume Types"
-    metadata.gatekeeper.sh/version: 1.0.2
+    metadata.gatekeeper.sh/version: 1.1.0
     description: >-
       Restricts mountable volume types to those specified by the user.
       Corresponds to the `volumes` field in a PodSecurityPolicy. For more
@@ -44,36 +44,50 @@ spec:
                 type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8spspvolumetypes
+      code:
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: volumes
+            expression: 'has(variables.anyObject.spec.volumes) && has(request.operation) && request.operation != "UPDATE" ? variables.anyObject.spec.volumes : []'
+          - name: badVolumes
+            expression: |
+              variables.params.volumes.exists(entry, entry == "*") ? [] : variables.volumes.map(e, e.map(k, k != "name", k)).map(k, k[0]).filter(entry, !(entry in variables.params.volumes))
+          validations:
+          - expression: 'size(variables.badVolumes) == 0'
+            messageExpression: '"The volume type " + variables.badVolumes.join(", ") + " is not allowed, pod: " + variables.anyObject.metadata.name + ". Allowed volume types: " + variables.params.volumes.join(", ")'
+      - engine: Rego
+        source:
+          rego: |
+            package k8spspvolumetypes
 
-        import data.lib.exclude_update.is_update
+            import data.lib.exclude_update.is_update
 
-        violation[{"msg": msg, "details": {}}] {
-            # spec.volumes field is immutable.
-            not is_update(input.review)
+            violation[{"msg": msg, "details": {}}] {
+                # spec.volumes field is immutable.
+                not is_update(input.review)
 
-            volume_fields := {x | input.review.object.spec.volumes[_][x]; x != "name"}
-            field := volume_fields[_]
-            not input_volume_type_allowed(field)
-            msg := sprintf("The volume type %v is not allowed, pod: %v. Allowed volume types: %v", [field, input.review.object.metadata.name, input.parameters.volumes])
-        }
+                volume_fields := {x | input.review.object.spec.volumes[_][x]; x != "name"}
+                field := volume_fields[_]
+                not input_volume_type_allowed(field)
+                msg := sprintf("The volume type %v is not allowed, pod: %v. Allowed volume types: %v", [field, input.review.object.metadata.name, input.parameters.volumes])
+            }
 
-        # * may be used to allow all volume types
-        input_volume_type_allowed(_) {
-            input.parameters.volumes[_] == "*"
-        }
+            # * may be used to allow all volume types
+            input_volume_type_allowed(_) {
+                input.parameters.volumes[_] == "*"
+            }
 
-        input_volume_type_allowed(field) {
-            field == input.parameters.volumes[_]
-        }
-      libs:
-        - |
-          package lib.exclude_update
+            input_volume_type_allowed(field) {
+                field == input.parameters.volumes[_]
+            }
+          libs:
+            - |
+              package lib.exclude_update
 
-          is_update(review) {
-              review.operation == "UPDATE"
-          }
+              is_update(review) {
+                  review.operation == "UPDATE"
+              }
 
 ```
 
@@ -192,6 +206,31 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/volumes/samples/psp-volume-types/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-without-volume</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-without-volume-allowed
+  labels:
+    app: nginx-without-volume-types
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+  - name: nginx2
+    image: nginx
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/volumes/samples/psp-volume-types/example_allowed_no_volume.yaml
 ```
 
 </details>
