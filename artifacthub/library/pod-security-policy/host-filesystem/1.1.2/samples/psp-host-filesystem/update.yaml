@@ -1,0 +1,23 @@
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx-host-filesystem
+      labels:
+        app: nginx-host-filesystem-disallowed
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        volumeMounts:
+        - mountPath: /cache
+          name: cache-volume
+          readOnly: true
+      volumes:
+      - name: cache-volume
+        hostPath:
+          path: /tmp # directory location on host

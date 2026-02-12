@@ -5,6 +5,8 @@ title: Volume Types
 
 # Volume Types
 
+**Bundles:** `pod-security-restricted`
+
 ## Description
 Restricts mountable volume types to those specified by the user. Corresponds to the `volumes` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
 
@@ -16,7 +18,8 @@ metadata:
   name: k8spspvolumetypes
   annotations:
     metadata.gatekeeper.sh/title: "Volume Types"
-    metadata.gatekeeper.sh/version: 1.0.2
+    metadata.gatekeeper.sh/version: 1.0.3
+    metadata.gatekeeper.sh/bundle: "pod-security-restricted"
     description: >-
       Restricts mountable volume types to those specified by the user.
       Corresponds to the `volumes` field in a PodSecurityPolicy. For more
@@ -102,13 +105,13 @@ spec:
     volumes:
     # - "*" # * may be used to allow all volume types
     - configMap
+    - csi
+    - downwardAPI
     - emptyDir
+    - ephemeral
+    - persistentVolumeClaim
     - projected
     - secret
-    - downwardAPI
-    - persistentVolumeClaim
-    #- hostPath #required for allowedHostPaths
-    - flexVolume #required for allowedFlexVolumes
 
 ```
 

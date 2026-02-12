@@ -5,6 +5,8 @@ title: Proc Mount
 
 # Proc Mount
 
+**Bundles:** `pod-security-baseline` `pod-security-restricted`
+
 ## Description
 Controls the allowed `procMount` types for the container. Corresponds to the `allowedProcMountTypes` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#allowedprocmounttypes
 
@@ -16,7 +18,8 @@ metadata:
   name: k8spspprocmount
   annotations:
     metadata.gatekeeper.sh/title: "Proc Mount"
-    metadata.gatekeeper.sh/version: 1.1.2
+    metadata.gatekeeper.sh/version: 1.1.3
+    metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Controls the allowed `procMount` types for the container. Corresponds to
       the `allowedProcMountTypes` field in a PodSecurityPolicy. For more

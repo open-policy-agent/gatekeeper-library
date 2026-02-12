@@ -5,6 +5,8 @@ title: Allow Privilege Escalation in Container
 
 # Allow Privilege Escalation in Container
 
+**Bundles:** `pod-security-restricted`
+
 ## Description
 Controls restricting escalation to root privileges. Corresponds to the `allowPrivilegeEscalation` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#privilege-escalation
 
@@ -16,7 +18,8 @@ metadata:
   name: k8spspallowprivilegeescalationcontainer
   annotations:
     metadata.gatekeeper.sh/title: "Allow Privilege Escalation in Container"
-    metadata.gatekeeper.sh/version: 1.1.0
+    metadata.gatekeeper.sh/version: 1.1.1
+    metadata.gatekeeper.sh/bundle: "pod-security-restricted"
     description: >-
       Controls restricting escalation to root privileges. Corresponds to the
       `allowPrivilegeEscalation` field in a PodSecurityPolicy. For more

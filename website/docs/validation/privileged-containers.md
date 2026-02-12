@@ -5,6 +5,8 @@ title: Privileged Container
 
 # Privileged Container
 
+**Bundles:** `pod-security-baseline` `pod-security-restricted`
+
 ## Description
 Controls the ability of any container to enable privileged mode. Corresponds to the `privileged` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#privileged
 
@@ -16,7 +18,8 @@ metadata:
   name: k8spspprivilegedcontainer
   annotations:
     metadata.gatekeeper.sh/title: "Privileged Container"
-    metadata.gatekeeper.sh/version: 1.1.2
+    metadata.gatekeeper.sh/version: 1.1.3
+    metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Controls the ability of any container to enable privileged mode.
       Corresponds to the `privileged` field in a PodSecurityPolicy. For more

@@ -5,6 +5,8 @@ title: App Armor
 
 # App Armor
 
+**Bundles:** `pod-security-baseline` `pod-security-restricted`
+
 ## Description
 Configures an allow-list of AppArmor profiles for use by containers. This corresponds to specific annotations applied to a PodSecurityPolicy. For information on AppArmor, see https://kubernetes.io/docs/tutorials/clusters/apparmor/
 
@@ -16,7 +18,8 @@ metadata:
   name: k8spspapparmor
   annotations:
     metadata.gatekeeper.sh/title: "App Armor"
-    metadata.gatekeeper.sh/version: 1.1.0
+    metadata.gatekeeper.sh/version: 1.1.1
+    metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Configures an allow-list of AppArmor profiles for use by containers.
       This corresponds to specific annotations applied to a PodSecurityPolicy.
@@ -254,7 +257,8 @@ spec:
         kinds: ["Pod"]
   parameters:
     allowedProfiles:
-    - localhost/custom
+    - runtime/default
+    - localhost/*
 
 ```
 
@@ -275,8 +279,7 @@ kind: Pod
 metadata:
   name: nginx-apparmor-allowed
   annotations:
-    # apparmor.security.beta.kubernetes.io/pod: unconfined # runtime/default
-    container.apparmor.security.beta.kubernetes.io/nginx: localhost/custom
+    container.apparmor.security.beta.kubernetes.io/nginx: runtime/default
   labels:
     app: nginx-apparmor
 spec:
@@ -309,8 +312,7 @@ spec:
     image: nginx
     securityContext:
       appArmorProfile:
-        type: "Localhost"
-        localhostProfile: "custom"
+        type: "RuntimeDefault"
 
 ```
 
@@ -334,8 +336,7 @@ metadata:
 spec:
   securityContext:
     appArmorProfile:
-      type: "Localhost"
-      localhostProfile: "custom"
+      type: "RuntimeDefault"
   containers:
   - name: nginx
     image: nginx
@@ -368,8 +369,7 @@ spec:
     image: nginx
     securityContext:
       appArmorProfile:
-        type: "Localhost"
-        localhostProfile: "custom"
+        type: "RuntimeDefault"
 
 ```
 
@@ -420,8 +420,7 @@ metadata:
 spec:
   securityContext:
     appArmorProfile:
-      type: "Localhost"
-      localhostProfile: "custom"
+      type: "RuntimeDefault"
   containers:
   - name: nginx
     image: nginx
@@ -449,6 +448,9 @@ metadata:
   labels:
     app: nginx-apparmor
 spec:
+  securityContext:
+    appArmorProfile:
+      type: "Unconfined"
   containers:
   - name: nginx
     image: nginx

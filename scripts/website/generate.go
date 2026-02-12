@@ -7,10 +7,11 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 
 	"gopkg.in/yaml.v3"
-	"k8s.io/utils/strings/slices"
+	k8sslices "k8s.io/utils/strings/slices"
 )
 
 const (
@@ -18,15 +19,13 @@ const (
 	sourceURL = "https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/"
 
 	// directory entry point for parsing.
-	entryPoint         = "library"
-	mutationEntryPoint = "mutation"
-	sidebarPath        = "website/sidebars.js"
+	entryPoint          = "library"
+	mutationEntryPoint  = "mutation"
+	sidebarPath         = "website/sidebars.js"
+	sidebarTemplatePath = "scripts/website/sidebars-template.js"
 
 	// regex patterns.
 	pspReadmeLinkPattern = `\[([^\[\]]+)\]\(([^(]+)\)`
-	generalPattern       = `(\s*)(type:\s+'category',\s+label:\s+'General',\s+collapsed:\s+true,\s+items:\s*\[\s)(\s*)([^\]]*,)`
-	pspPattern           = `(\s*)(type:\s+'category',\s+label:\s+'Pod Security Policy',\s+collapsed:\s+true,\s+items:\s*\[\s)(\s*)([^\]]*,)`
-	mutationPattern      = `(\s*)(type:\s+'category',\s+label:\s+'Mutation',\s+collapsed:\s+true,\s+items:\s*\[\s)(\s*)([^\]]*,)`
 )
 
 // Skip including examples for the following Kinds.
@@ -78,6 +77,8 @@ func main() {
 	}
 
 	validationSidebarItems := make(map[string][]string)
+	// Track policies by bundle for bundle-based navigation
+	bundleItems := make(map[string][]string)
 	for _, entry := range dirEntry {
 		if entry.Type().IsDir() {
 			basePath, err := filepath.Abs(filepath.Join(libraryPath, entry.Name()))
@@ -125,6 +126,18 @@ func main() {
 						panic(err)
 					}
 
+					// Track bundle membership for this policy
+					bundleAnnotation := getConstraintTemplateBundleAnnotation(constraintTemplate)
+					if bundleAnnotation != "" {
+						bundles := strings.Split(bundleAnnotation, ",")
+						for _, b := range bundles {
+							b = strings.TrimSpace(b)
+							if b != "" {
+								bundleItems[b] = append(bundleItems[b], dir.Name())
+							}
+						}
+					}
+
 					allExamples := ""
 					for _, test := range suite.Tests {
 						constraintRawURL := sourceURL + filepath.Join(entryPoint, entry.Name(), dir.Name(), test.Constraint)
@@ -155,7 +168,7 @@ func main() {
 							if exampleKind, ok := exampleResource["kind"].(string); !ok {
 								fmt.Printf("error while parsing kind: %v", exampleRawURL)
 								panic(err)
-							} else if !slices.Contains(skipExampleKinds, exampleKind) {
+							} else if !k8sslices.Contains(skipExampleKinds, exampleKind) {
 								examples += fmt.Sprintf("<details>\n<summary>%s</summary>\n\n```yaml\n%s\n```\n\nUsage\n\n```shell\nkubectl apply -f %s\n```\n\n</details>\n", testCase.Name, exampleContent, exampleRawURL)
 							}
 						}
@@ -175,6 +188,7 @@ func main() {
 						"%EXAMPLES%", allExamples,
 						"%TITLE%", getConstraintTemplateTitle(constraintTemplate),
 						"%DESCRIPTION%", getConstraintTemplateDescription(constraintTemplate),
+						"%BUNDLE%", getConstraintTemplateBundle(constraintTemplate),
 						"%FILENAME%", dir.Name(),
 					)
 
@@ -333,61 +347,53 @@ func main() {
 		panic(err)
 	}
 
-	// update sidebar
+	// update sidebar from template
 	fmt.Println("Updating sidebar")
-	var generalItems []string
-	for _, item := range validationSidebarItems["general"] {
-		generalItems = append(
-			generalItems,
-			fmt.Sprintf(
-				"'validation/%s',",
-				item,
-			),
-		)
+
+	// Generate General items
+	generalItemsList := generateSidebarItems(validationSidebarItems["general"], "validation/", "            ")
+
+	// Generate Mutation items
+	mutationItemsList := generateSidebarItems(mutationSidebarItems["pod-security-policy"], "mutation-examples/", "        ")
+
+	// Generate profile items for sidebar (policies organized by bundle)
+	// Policies appear in every profile they belong to, since baseline and restricted
+	// may require different constraint values (e.g. capabilities, seccomp).
+	baselineItemsList := generateSidebarItems(bundleItems["pod-security-baseline"], "validation/", "                    ")
+	restrictedItemsList := generateSidebarItems(bundleItems["pod-security-restricted"], "validation/", "                    ")
+
+	// Collect all bundled PSP policies
+	allBundledPSP := make(map[string]bool)
+	for _, items := range bundleItems {
+		for _, item := range items {
+			allBundledPSP[item] = true
+		}
 	}
 
-	var podSecurityPolicyItems []string
-	podSecurityPolicyItems = append(podSecurityPolicyItems, "'pspintro',")
+	// Generate "Other" PSP items: policies in pod-security-policy category without any bundle annotation
+	var otherPSPItems []string
 	for _, item := range validationSidebarItems["pod-security-policy"] {
-		podSecurityPolicyItems = append(
-			podSecurityPolicyItems,
-			fmt.Sprintf(
-				"'validation/%s',",
-				item,
-			),
-		)
+		if !allBundledPSP[item] {
+			otherPSPItems = append(otherPSPItems, item)
+		}
 	}
+	otherPSPItemsList := generateSidebarItems(otherPSPItems, "validation/", "                ")
 
-	var mutationItems []string
-	for _, item := range mutationSidebarItems["pod-security-policy"] {
-		mutationItems = append(
-			mutationItems,
-			fmt.Sprintf(
-				"'mutation-examples/%s',",
-				item,
-			),
-		)
-	}
-
-	data, err := os.ReadFile(filepath.Join(rootDir, sidebarPath))
+	// Read from template file
+	sidebarTemplate, err := os.ReadFile(filepath.Join(rootDir, sidebarTemplatePath))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// find and replace the matching content
-	updatedSidebar := getRegexReplacedString(
-		getRegexReplacedString(
-			getRegexReplacedString(
-				string(data),
-				generalPattern,
-				generalItems,
-			),
-			pspPattern,
-			podSecurityPolicyItems,
-		),
-		mutationPattern,
-		mutationItems,
+	// Replace all placeholders in template
+	sidebarReplacer := strings.NewReplacer(
+		"%GENERAL_ITEMS%", generalItemsList,
+		"%MUTATION_ITEMS%", mutationItemsList,
+		"%BASELINE_ITEMS%", baselineItemsList,
+		"%RESTRICTED_ITEMS%", restrictedItemsList,
+		"%OTHER_PSP_ITEMS%", otherPSPItemsList,
 	)
+	updatedSidebar := sidebarReplacer.Replace(string(sidebarTemplate))
 
 	// write the updated content to the file
 	err = os.WriteFile(filepath.Join(rootDir, sidebarPath), []byte(updatedSidebar), 0o600)
@@ -396,29 +402,20 @@ func main() {
 	}
 }
 
-func getRegexReplacedString(content string, pattern string, replacement []string) string {
-	re := regexp.MustCompile(pattern)
-	matches := re.FindStringSubmatch(content)
-	if len(matches) < 5 {
-		panic("Error: could not find match in file content")
+// generateSidebarItems creates a list of sidebar items with proper indentation.
+func generateSidebarItems(items []string, prefix string, indent string) string {
+	if len(items) == 0 {
+		return ""
 	}
 
-	// add indentation to each item
-	for i, item := range replacement {
-		replacement[i] = fmt.Sprintf(
-			"%s%s",
-			matches[3],
-			item,
-		)
+	sort.Strings(items)
+
+	var itemStrings []string
+	for _, item := range items {
+		itemStrings = append(itemStrings, fmt.Sprintf("%s'%s%s',", indent, prefix, item))
 	}
 
-	updatedContent := fmt.Sprintf("%s%s%s",
-		matches[1],
-		matches[2],
-		strings.Join(replacement, "\n"),
-	)
-
-	return re.ReplaceAllString(content, updatedContent)
+	return strings.Join(itemStrings, "\n")
 }
 
 // TODO: Use shared pkg.
@@ -451,4 +448,40 @@ func getConstraintTemplateDescription(constraintTemplate map[string]interface{})
 	annotations := getConstraintTemplateAnnotations(constraintTemplate)
 
 	return fmt.Sprintf("%s", annotations["description"])
+}
+
+func getConstraintTemplateBundle(constraintTemplate map[string]interface{}) string {
+	annotations := getConstraintTemplateAnnotations(constraintTemplate)
+
+	bundle, ok := annotations["metadata.gatekeeper.sh/bundle"].(string)
+	if !ok || bundle == "" {
+		return ""
+	}
+
+	// Parse comma-separated bundles and create badges
+	bundles := strings.Split(bundle, ",")
+	var badges []string
+	for _, b := range bundles {
+		b = strings.TrimSpace(b)
+		if b != "" {
+			// Create a badge for each bundle
+			badges = append(badges, fmt.Sprintf("`%s`", b))
+		}
+	}
+
+	if len(badges) == 0 {
+		return ""
+	}
+
+	return fmt.Sprintf("\n**Bundles:** %s\n", strings.Join(badges, " "))
+}
+
+func getConstraintTemplateBundleAnnotation(constraintTemplate map[string]interface{}) string {
+	annotations := getConstraintTemplateAnnotations(constraintTemplate)
+
+	bundle, ok := annotations["metadata.gatekeeper.sh/bundle"].(string)
+	if !ok {
+		return ""
+	}
+	return bundle
 }

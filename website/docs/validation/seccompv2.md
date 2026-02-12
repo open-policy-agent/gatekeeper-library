@@ -5,6 +5,8 @@ title: Seccomp V2
 
 # Seccomp V2
 
+**Bundles:** `pod-security-baseline` `pod-security-restricted`
+
 ## Description
 Controls the seccomp profile used by containers. Corresponds to the `securityContext.seccompProfile` field. Security contexts from the annotation is not considered as Kubernetes no longer reads security contexts from the annotation.
 
@@ -16,7 +18,8 @@ metadata:
   name: k8spspseccompv2
   annotations:
     metadata.gatekeeper.sh/title: "Seccomp V2"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Controls the seccomp profile used by containers. Corresponds to the
       `securityContext.seccompProfile` field. Security contexts from the annotation is not considered as Kubernetes no longer reads security contexts from the annotation.
@@ -320,7 +323,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>default-seccomp-required</summary>
+<summary>seccomp-baseline</summary>
 
 <details>
 <summary>constraint</summary>
@@ -329,7 +332,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sPSPSeccompV2
 metadata:
-  name: psp-seccomp
+  name: psp-seccomp-baseline
 spec:
   match:
     kinds:
@@ -337,10 +340,11 @@ spec:
         kinds: ["Pod"]
   parameters:
     exemptImages:
-    - nginx-exempt 
+    - nginx-exempt
     allowedProfiles:
     - RuntimeDefault
     - Localhost
+    - not configured
     allowedLocalhostFiles:
     - "*"
 
@@ -349,7 +353,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp-baseline/constraint.yaml
 ```
 
 </details>
@@ -377,7 +381,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/example_disallowed2.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp-baseline/example_disallowed2.yaml
 ```
 
 </details>
@@ -404,7 +408,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/example_disallowed.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp-baseline/example_disallowed.yaml
 ```
 
 </details>
@@ -431,12 +435,12 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/example_allowed.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp-baseline/example_allowed.yaml
 ```
 
 </details>
 <details>
-<summary>example-allowed-container</summary>
+<summary>example-allowed-localhost</summary>
 
 ```yaml
 apiVersion: v1
@@ -459,12 +463,36 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/example_allowed_localhost.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp-baseline/example_allowed_localhost.yaml
 ```
 
 </details>
 <details>
-<summary>example-allowed-container-exempt-image</summary>
+<summary>example-allowed-no-profile</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-allowed-no-profile
+  labels:
+    app: nginx-seccomp
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp-baseline/example_allowed_no_profile.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-exempt-image</summary>
 
 ```yaml
 apiVersion: v1
@@ -486,12 +514,209 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/example_allowed_exempt_image.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp-baseline/example_allowed_exempt_image.yaml
 ```
 
 </details>
 <details>
-<summary>disallowed-ephemeral</summary>
+<summary>allowed-ephemeral-no-profile</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-allowed-ephemeral
+  labels:
+    app: nginx-seccomp
+spec:
+  ephemeralContainers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp-baseline/allowed_ephemeral.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>seccomp-restricted</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPSeccompV2
+metadata:
+  name: psp-seccomp-restricted
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    exemptImages:
+    - nginx-exempt 
+    allowedProfiles:
+    - RuntimeDefault
+    - Localhost
+    allowedLocalhostFiles:
+    - "*"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp-restricted/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-disallowed-global</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-disallowed2
+  labels:
+    app: nginx-seccomp
+spec:
+  securityContext:
+    seccompProfile:
+      type: Unconfined
+  containers:
+  - name: nginx
+    image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp-restricted/example_disallowed2.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-container</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-disallowed
+  labels:
+    app: nginx-seccomp
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      seccompProfile:
+        type: Unconfined
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp-restricted/example_disallowed.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-container</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-allowed
+  labels:
+    app: nginx-seccomp
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp-restricted/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-localhost</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-allowed-localhost
+  labels:
+    app: nginx-seccomp
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      seccompProfile:
+        type: Localhost
+        localhostProfile: profile.json
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp-restricted/example_allowed_localhost.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed-exempt-image</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-disallowed
+  labels:
+    app: nginx-seccomp
+spec:
+  containers:
+  - name: nginx
+    image: nginx-exempt
+    securityContext:
+      seccompProfile:
+        type: Unconfined
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp-restricted/example_allowed_exempt_image.yaml
+```
+
+</details>
+<details>
+<summary>disallowed-ephemeral-no-profile</summary>
 
 ```yaml
 apiVersion: v1
@@ -510,7 +735,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp/disallowed_ephemeral.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/seccompv2/samples/psp-seccomp-restricted/disallowed_ephemeral.yaml
 ```
 
 </details>

@@ -5,6 +5,8 @@ title: Forbidden Sysctls
 
 # Forbidden Sysctls
 
+**Bundles:** `pod-security-baseline` `pod-security-restricted`
+
 ## Description
 Controls the `sysctl` profile used by containers. Corresponds to the `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy. When specified, any sysctl not in the `allowedSysctls` parameter is considered to be forbidden. The `forbiddenSysctls` parameter takes precedence over the `allowedSysctls` parameter. For more information, see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
 
@@ -16,7 +18,8 @@ metadata:
   name: k8spspforbiddensysctls
   annotations:
     metadata.gatekeeper.sh/title: "Forbidden Sysctls"
-    metadata.gatekeeper.sh/version: 1.2.0
+    metadata.gatekeeper.sh/version: 1.2.1
+    metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Controls the `sysctl` profile used by containers. Corresponds to the
       `allowedUnsafeSysctls` and `forbiddenSysctls` fields in a PodSecurityPolicy.
@@ -185,11 +188,17 @@ spec:
       - apiGroups: [""]
         kinds: ["Pod"]
   parameters:
-    forbiddenSysctls:
-    # - "*" # * may be used to forbid all sysctls
-    - kernel.*
     allowedSysctls:
-    - "*" # allows all sysctls. allowedSysctls is optional.
+    - kernel.shm_rmid_forced
+    - net.ipv4.ip_local_port_range
+    - net.ipv4.ip_unprivileged_port_start
+    - net.ipv4.tcp_syncookies
+    - net.ipv4.ping_group_range
+    - net.ipv4.ip_local_reserved_ports
+    - net.ipv4.tcp_keepalive_time
+    - net.ipv4.tcp_fin_timeout
+    - net.ipv4.tcp_keepalive_intvl
+    - net.ipv4.tcp_keepalive_probes
 
 ```
 
@@ -247,8 +256,8 @@ spec:
       image: nginx
   securityContext:
     sysctls:
-      - name: net.core.somaxconn
-        value: "1024"
+      - name: net.ipv4.ip_local_port_range
+        value: "1024 65535"
 
 ```
 
@@ -339,8 +348,8 @@ spec:
       image: nginx
   securityContext:
     sysctls:
-      - name: net.core.somaxconn
-        value: "1024"
+      - name: net.ipv4.ip_local_port_range
+        value: "1024 65535"
 
 ```
 
@@ -432,8 +441,8 @@ spec:
       image: nginx
   securityContext:
     sysctls:
-      - name: net.core.somaxconn
-        value: "1024"
+      - name: net.ipv4.ip_local_port_range
+        value: "1024 65535"
 
 ```
 
@@ -524,8 +533,8 @@ spec:
       image: nginx
   securityContext:
     sysctls:
-      - name: net.core.somaxconn
-        value: "1024"
+      - name: net.ipv4.ip_local_port_range
+        value: "1024 65535"
 
 ```
 
@@ -616,8 +625,8 @@ spec:
       image: nginx
   securityContext:
     sysctls:
-      - name: net.core.somaxconn
-        value: "1024"
+      - name: net.ipv4.ip_local_port_range
+        value: "1024 65535"
 
 ```
 
