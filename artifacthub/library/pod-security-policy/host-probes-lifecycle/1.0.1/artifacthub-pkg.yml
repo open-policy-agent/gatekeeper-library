@@ -1,9 +1,9 @@
-version: 1.0.0
+version: 1.0.1
 name: k8spsphostprobeslifecycle
 displayName: Host Probes and Lifecycle Hooks
-createdAt: "2026-01-13T23:17:46Z"
+createdAt: "2026-02-12T23:45:37Z"
 description: Disallows specifying the host field in probes and lifecycle hooks. The Baseline profile (v1.34+) requires that probes (livenessProbe, readinessProbe, startupProbe) and lifecycle hooks (postStart, preStop) must not specify a host field. This prevents containers from executing network requests to the host node. For more information, see https://kubernetes.io/docs/concepts/security/pod-security-standards/
-digest: 214e494c7dcdd252e8338a81a98cba26937dbdafd66fa5b79a64e3b986b58281
+digest: 2ecdfecf68750b0d9878a46ca836723bec0d6e7c8c71c25784814bd5aad25997
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/host-probes-lifecycle
 keywords:
@@ -16,7 +16,7 @@ readme: |-
 install: |-
     ### Usage
     ```shell
-    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/pod-security-policy/host-probes-lifecycle/1.0.0/template.yaml
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/pod-security-policy/host-probes-lifecycle/1.0.1/template.yaml
     ```
 provider:
     name: Gatekeeper Library

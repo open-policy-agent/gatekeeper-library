@@ -1,7 +1,7 @@
 # Policy Catalog for Gatekeeper Library
 #
 # This file is auto-generated. Do not edit directly.
-# Generated at: 2026-02-12T20:16:33Z
+# Generated at: 2026-02-12T23:49:33Z
 #
 # To regenerate, run:
 #   gator policy generate-catalog --library-path=. --output=catalog.yaml
@@ -19,6 +19,8 @@ bundles:
   - k8spsphostfilesystem
   - k8spsphostnamespace
   - k8spsphostnetworkingports
+  - k8spsphostprobeslifecycle
+  - k8spsphostprocess
   - k8spspprivilegedcontainer
   - k8spspprocmount
   - k8spspseccompv2
@@ -36,6 +38,8 @@ bundles:
   - k8spsphostfilesystem
   - k8spsphostnamespace
   - k8spsphostnetworkingports
+  - k8spsphostprobeslifecycle
+  - k8spsphostprocess
   - k8spspprivilegedcontainer
   - k8spspprocmount
   - k8spspseccompv2
@@ -45,8 +49,8 @@ kind: PolicyCatalog
 metadata:
   name: gatekeeper-library
   repository: https://github.com/open-policy-agent/gatekeeper-library
-  updatedAt: "2026-02-12T20:16:33.452778868Z"
-  version: v2026.02.12-local
+  updatedAt: "2026-02-12T23:49:33.304069431Z"
+  version: v1.0.0
 policies:
 - category: general
   description: Requires container images to begin with a string from the specified
@@ -54,7 +58,7 @@ policies:
     or custom registries. If exact matches or glob-like syntax are preferred, use
     the k8sallowedreposv2 policy.
   name: k8sallowedrepos
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/allowedrepos/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/allowedrepos/template.yaml
   version: v1.0.2
 - category: general
   description: 'This policy enforces that container images must begin with a string
@@ -67,95 +71,95 @@ policies:
     avoid bypasses scenarios, ensure prefixes include a trailing / where appropriate
     (e.g., registry.example.com/project/*).'
   name: k8sallowedreposv2
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/allowedreposv2/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/allowedreposv2/template.yaml
   version: v1.0.0
 - category: general
   description: |-
     Many Kubernetes installations by default have a system:aggregate-to-edit ClusterRole which does not properly restrict access to editing Endpoints. This ConstraintTemplate forbids the system:aggregate-to-edit ClusterRole from granting permission to create/patch/update Endpoints.
     ClusterRole/system:aggregate-to-edit should not allow Endpoint edit permissions due to CVE-2021-25740, Endpoint & EndpointSlice permissions allow cross-Namespace forwarding, https://github.com/kubernetes/kubernetes/issues/103675
   name: k8sblockendpointeditdefaultrole
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/block-endpoint-edit-default-role/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/block-endpoint-edit-default-role/template.yaml
   version: v1.0.0
 - category: general
   description: |-
     Disallows all Services with type LoadBalancer.
     https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
   name: k8sblockloadbalancer
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/block-loadbalancer-services/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/block-loadbalancer-services/template.yaml
   version: v1.0.0
 - category: general
   description: |-
     Disallows all Services with type NodePort.
     https://kubernetes.io/docs/concepts/services-networking/service/#nodeport
   name: k8sblocknodeport
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/block-nodeport-services/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/block-nodeport-services/template.yaml
   version: v1.0.0
 - category: general
   description: Users should not be able to create Ingresses with a blank or wildcard
     (*) hostname since that would enable them to intercept traffic for other services
     in the cluster, even if they don't have access to those services.
   name: k8sblockwildcardingress
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/block-wildcard-ingress/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/block-wildcard-ingress/template.yaml
   version: v1.0.1
 - category: general
   description: |-
     Requires containers to have an ephemeral storage limit set and constrains the limit to be within the specified maximum values.
     https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
   name: k8scontainerephemeralstoragelimit
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/ephemeralstoragelimit/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/ephemeralstoragelimit/template.yaml
   version: v1.0.2
 - category: general
   description: |-
     Requires containers to have memory and CPU limits set and constrains limits to be within the specified maximum values.
     https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
   name: k8scontainerlimits
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/containerlimits/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/containerlimits/template.yaml
   version: v1.1.0
 - category: general
   description: |-
     Sets a maximum ratio for container resource limits to requests.
     https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
   name: k8scontainerratios
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/containerresourceratios/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/containerresourceratios/template.yaml
   version: v1.0.1
 - category: general
   description: |-
     Requires containers to have memory and CPU requests set and constrains requests to be within the specified maximum values.
     https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
   name: k8scontainerrequests
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/containerrequests/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/containerrequests/template.yaml
   version: v1.0.1
 - category: general
   description: Disallows associating ClusterRole and Role resources to the system:anonymous
     user and system:unauthenticated group.
   name: k8sdisallowanonymous
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/disallowanonymous/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/disallowanonymous/template.yaml
   version: v1.1.0
 - category: general
   description: Disallowed container repositories that begin with a string from the
     specified list.
   name: k8sdisallowedrepos
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/disallowedrepos/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/disallowedrepos/template.yaml
   version: v1.0.0
 - category: general
   description: |-
     Requires container images to have an image tag different from the ones in the specified list.
     https://kubernetes.io/docs/concepts/containers/images/#image-names
   name: k8sdisallowedtags
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/disallowedtags/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/disallowedtags/template.yaml
   version: v1.0.2
 - category: general
   description: Requires that objects have the fields `spec.tty` and `spec.stdin` set
     to false or unset.
   name: k8sdisallowinteractivetty
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/disallowinteractive/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/disallowinteractive/template.yaml
   version: v1.0.0
 - category: general
   description: |-
     Restricts Service externalIPs to an allowed list of IP addresses.
     https://kubernetes.io/docs/concepts/services-networking/service/#external-ips
   name: k8sexternalips
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/externalip/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/externalip/template.yaml
   version: v1.0.0
 - category: general
   description: Disallow the following scenarios when deploying `HorizontalPodAutoscalers`
@@ -166,31 +170,31 @@ policies:
     that do not reference a valid `scaleTargetRef` (e.g. Deployment, ReplicationController,
     ReplicaSet, StatefulSet).
   name: k8shorizontalpodautoscaler
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/horizontalpodautoscaler/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/horizontalpodautoscaler/template.yaml
   version: v1.0.1
 - category: general
   description: |-
     Requires Ingress resources to be HTTPS only.  Ingress resources must include the `kubernetes.io/ingress.allow-http` annotation, set to `false`. By default a valid TLS {} configuration is required, this can be made optional by setting the `tlsOptional` parameter to `true`.
     https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
   name: k8shttpsonly
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/httpsonly/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/httpsonly/template.yaml
   version: v1.0.2
 - category: general
   description: |-
     Requires container images to contain a digest.
     https://kubernetes.io/docs/concepts/containers/images/
   name: k8simagedigests
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/imagedigests/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/imagedigests/template.yaml
   version: v1.0.1
 - category: general
   description: |-
     Disallow the following scenarios when deploying PodDisruptionBudgets or resources that implement the replica subresource (e.g. Deployment, ReplicationController, ReplicaSet, StatefulSet): 1. Deployment of PodDisruptionBudgets with .spec.maxUnavailable == 0 2. Deployment of PodDisruptionBudgets with .spec.minAvailable == .spec.replicas of the resource with replica subresource This will prevent PodDisruptionBudgets from blocking voluntary disruptions such as node draining.
     https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
   name: k8spoddisruptionbudget
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/poddisruptionbudget/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/poddisruptionbudget/template.yaml
   version: v1.0.4
 - bundleConstraints:
-    pod-security-restricted: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/users/samples/psp-pods-allowed-user-ranges/constraint.yaml
+    pod-security-restricted: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/users/samples/psp-pods-allowed-user-ranges/constraint.yaml
   bundles:
   - pod-security-restricted
   category: pod-security
@@ -198,10 +202,10 @@ policies:
     Corresponds to the `runAsUser`, `runAsGroup`, `supplementalGroups`, and `fsGroup`
     fields in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#users-and-groups
   name: k8spspallowedusers
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/users/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/users/template.yaml
   version: v1.0.3
 - bundleConstraints:
-    pod-security-restricted: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/allow-privilege-escalation/samples/psp-allow-privilege-escalation-container/constraint.yaml
+    pod-security-restricted: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/allow-privilege-escalation/samples/psp-allow-privilege-escalation-container/constraint.yaml
   bundles:
   - pod-security-restricted
   category: pod-security
@@ -209,11 +213,11 @@ policies:
     the `allowPrivilegeEscalation` field in a PodSecurityPolicy. For more information,
     see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#privilege-escalation
   name: k8spspallowprivilegeescalationcontainer
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/allow-privilege-escalation/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/allow-privilege-escalation/template.yaml
   version: v1.1.1
 - bundleConstraints:
-    pod-security-baseline: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/apparmor/samples/psp-apparmor/constraint.yaml
-    pod-security-restricted: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/apparmor/samples/psp-apparmor/constraint.yaml
+    pod-security-baseline: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/apparmor/samples/psp-apparmor/constraint.yaml
+    pod-security-restricted: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/apparmor/samples/psp-apparmor/constraint.yaml
   bundles:
   - pod-security-baseline
   - pod-security-restricted
@@ -222,16 +226,16 @@ policies:
     This corresponds to specific annotations applied to a PodSecurityPolicy. For information
     on AppArmor, see https://kubernetes.io/docs/tutorials/clusters/apparmor/
   name: k8spspapparmor
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/apparmor/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/apparmor/template.yaml
   version: v1.1.1
 - category: general
   description: Controls the ability of any Pod to enable automountServiceAccountToken.
   name: k8spspautomountserviceaccounttokenpod
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/automount-serviceaccount-token/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/automount-serviceaccount-token/template.yaml
   version: v1.0.1
 - bundleConstraints:
-    pod-security-baseline: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/capabilities/samples/psp-capabilities-baseline/constraint.yaml
-    pod-security-restricted: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/capabilities/samples/psp-capabilities-restricted/constraint.yaml
+    pod-security-baseline: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/capabilities/samples/psp-capabilities-baseline/constraint.yaml
+    pod-security-restricted: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/capabilities/samples/psp-capabilities-restricted/constraint.yaml
   bundles:
   - pod-security-baseline
   - pod-security-restricted
@@ -240,17 +244,17 @@ policies:
     and `requiredDropCapabilities` fields in a PodSecurityPolicy. For more information,
     see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#capabilities
   name: k8spspcapabilities
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/capabilities/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/capabilities/template.yaml
   version: v1.1.3
 - category: pod-security
   description: Controls the allowlist of FlexVolume drivers. Corresponds to the `allowedFlexVolumes`
     field in PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#flexvolume-drivers
   name: k8spspflexvolumes
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/flexvolume-drivers/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/flexvolume-drivers/template.yaml
   version: v1.0.1
 - bundleConstraints:
-    pod-security-baseline: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/constraint.yaml
-    pod-security-restricted: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/constraint.yaml
+    pod-security-baseline: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/constraint.yaml
+    pod-security-restricted: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/forbidden-sysctls/samples/psp-forbidden-sysctls/constraint.yaml
   bundles:
   - pod-security-baseline
   - pod-security-restricted
@@ -261,17 +265,17 @@ policies:
     forbidden. The `forbiddenSysctls` parameter takes precedence over the `allowedSysctls`
     parameter. For more information, see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/
   name: k8spspforbiddensysctls
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/forbidden-sysctls/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/forbidden-sysctls/template.yaml
   version: v1.2.1
 - category: pod-security
   description: Controls allocating an FSGroup that owns the Pod's volumes. Corresponds
     to the `fsGroup` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
   name: k8spspfsgroup
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/fsgroup/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/fsgroup/template.yaml
   version: v1.1.0
 - bundleConstraints:
-    pod-security-baseline: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-filesystem/samples/no-host-paths/constraint.yaml
-    pod-security-restricted: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-filesystem/samples/no-host-paths/constraint.yaml
+    pod-security-baseline: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/host-filesystem/samples/no-host-paths/constraint.yaml
+    pod-security-restricted: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/host-filesystem/samples/no-host-paths/constraint.yaml
   bundles:
   - pod-security-baseline
   - pod-security-restricted
@@ -279,11 +283,11 @@ policies:
   description: Controls usage of the host filesystem. Corresponds to the `allowedHostPaths`
     field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
   name: k8spsphostfilesystem
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-filesystem/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/host-filesystem/template.yaml
   version: v1.1.2
 - bundleConstraints:
-    pod-security-baseline: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-namespaces/samples/psp-host-namespace/constraint.yaml
-    pod-security-restricted: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-namespaces/samples/psp-host-namespace/constraint.yaml
+    pod-security-baseline: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/host-namespaces/samples/psp-host-namespace/constraint.yaml
+    pod-security-restricted: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/host-namespaces/samples/psp-host-namespace/constraint.yaml
   bundles:
   - pod-security-baseline
   - pod-security-restricted
@@ -292,11 +296,11 @@ policies:
     Corresponds to the `hostPID` and `hostIPC` fields in a PodSecurityPolicy. For
     more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
   name: k8spsphostnamespace
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-namespaces/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/host-namespaces/template.yaml
   version: v1.1.1
 - bundleConstraints:
-    pod-security-baseline: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-network-ports/samples/block_host_network/constraint.yaml
-    pod-security-restricted: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-network-ports/samples/block_host_network/constraint.yaml
+    pod-security-baseline: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/host-network-ports/samples/block_host_network/constraint.yaml
+    pod-security-restricted: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/host-network-ports/samples/block_host_network/constraint.yaml
   bundles:
   - pod-security-baseline
   - pod-security-restricted
@@ -306,29 +310,41 @@ policies:
     specified. Corresponds to the `hostNetwork` and `hostPorts` fields in a PodSecurityPolicy.
     For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
   name: k8spsphostnetworkingports
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-network-ports/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/host-network-ports/template.yaml
   version: v1.1.5
-- category: pod-security
+- bundleConstraints:
+    pod-security-baseline: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/host-probes-lifecycle/samples/psp-host-probes-lifecycle/constraint.yaml
+    pod-security-restricted: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/host-probes-lifecycle/samples/psp-host-probes-lifecycle/constraint.yaml
+  bundles:
+  - pod-security-baseline
+  - pod-security-restricted
+  category: pod-security
   description: Disallows specifying the host field in probes and lifecycle hooks.
     The Baseline profile (v1.34+) requires that probes (livenessProbe, readinessProbe,
     startupProbe) and lifecycle hooks (postStart, preStop) must not specify a host
     field. This prevents containers from executing network requests to the host node.
     For more information, see https://kubernetes.io/docs/concepts/security/pod-security-standards/
   name: k8spsphostprobeslifecycle
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-probes-lifecycle/template.yaml
-  version: v1.0.0
-- category: pod-security
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/host-probes-lifecycle/template.yaml
+  version: v1.0.1
+- bundleConstraints:
+    pod-security-baseline: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/host-process/samples/psp-host-process/constraint.yaml
+    pod-security-restricted: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/host-process/samples/psp-host-process/constraint.yaml
+  bundles:
+  - pod-security-baseline
+  - pod-security-restricted
+  category: pod-security
   description: Disallows HostProcess containers for Windows pods. HostProcess containers
     enable privileged access on Windows nodes and must be disallowed in Baseline and
     Restricted policies. Corresponds to the windowsOptions.hostProcess field in a
     Pod's securityContext or container securityContext. For more information, see
     https://kubernetes.io/docs/concepts/security/pod-security-standards/
   name: k8spsphostprocess
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/host-process/template.yaml
-  version: v1.0.0
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/host-process/template.yaml
+  version: v1.0.1
 - bundleConstraints:
-    pod-security-baseline: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/privileged-containers/samples/psp-privileged-container/constraint.yaml
-    pod-security-restricted: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/privileged-containers/samples/psp-privileged-container/constraint.yaml
+    pod-security-baseline: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/privileged-containers/samples/psp-privileged-container/constraint.yaml
+    pod-security-restricted: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/privileged-containers/samples/psp-privileged-container/constraint.yaml
   bundles:
   - pod-security-baseline
   - pod-security-restricted
@@ -336,11 +352,11 @@ policies:
   description: Controls the ability of any container to enable privileged mode. Corresponds
     to the `privileged` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#privileged
   name: k8spspprivilegedcontainer
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/privileged-containers/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/privileged-containers/template.yaml
   version: v1.1.3
 - bundleConstraints:
-    pod-security-baseline: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/proc-mount/samples/psp-proc-mount/constraint.yaml
-    pod-security-restricted: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/proc-mount/samples/psp-proc-mount/constraint.yaml
+    pod-security-baseline: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/proc-mount/samples/psp-proc-mount/constraint.yaml
+    pod-security-restricted: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/proc-mount/samples/psp-proc-mount/constraint.yaml
   bundles:
   - pod-security-baseline
   - pod-security-restricted
@@ -349,25 +365,25 @@ policies:
     to the `allowedProcMountTypes` field in a PodSecurityPolicy. For more information,
     see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#allowedprocmounttypes
   name: k8spspprocmount
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/proc-mount/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/proc-mount/template.yaml
   version: v1.1.3
 - category: pod-security
   description: Requires the use of a read-only root file system by pod containers.
     Corresponds to the `readOnlyRootFilesystem` field in a PodSecurityPolicy. For
     more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
   name: k8spspreadonlyrootfilesystem
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/read-only-root-filesystem/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/read-only-root-filesystem/template.yaml
   version: v1.1.1
 - category: pod-security
   description: Controls the seccomp profile used by containers. Corresponds to the
     `seccomp.security.alpha.kubernetes.io/allowedProfileNames` annotation on a PodSecurityPolicy.
     For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#seccomp
   name: k8spspseccomp
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/seccomp/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/seccomp/template.yaml
   version: v1.1.0
 - bundleConstraints:
-    pod-security-baseline: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/seccompv2/samples/psp-seccomp-baseline/constraint.yaml
-    pod-security-restricted: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/seccompv2/samples/psp-seccomp-restricted/constraint.yaml
+    pod-security-baseline: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/seccompv2/samples/psp-seccomp-baseline/constraint.yaml
+    pod-security-restricted: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/seccompv2/samples/psp-seccomp-restricted/constraint.yaml
   bundles:
   - pod-security-baseline
   - pod-security-restricted
@@ -376,11 +392,11 @@ policies:
     `securityContext.seccompProfile` field. Security contexts from the annotation
     is not considered as Kubernetes no longer reads security contexts from the annotation.
   name: k8spspseccompv2
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/seccompv2/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/seccompv2/template.yaml
   version: v1.0.1
 - bundleConstraints:
-    pod-security-baseline: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/selinux/samples/psp-selinux-v2/constraint.yaml
-    pod-security-restricted: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/selinux/samples/psp-selinux-v2/constraint.yaml
+    pod-security-baseline: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/selinux/samples/psp-selinux-v2/constraint.yaml
+    pod-security-restricted: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/selinux/samples/psp-selinux-v2/constraint.yaml
   bundles:
   - pod-security-baseline
   - pod-security-restricted
@@ -389,78 +405,78 @@ policies:
     Corresponds to a PodSecurityPolicy requiring SELinux configs. For more information,
     see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#selinux
   name: k8spspselinuxv2
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/selinux/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/selinux/template.yaml
   version: v1.0.4
 - bundleConstraints:
-    pod-security-restricted: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/volumes/samples/psp-volume-types/constraint.yaml
+    pod-security-restricted: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/volumes/samples/psp-volume-types/constraint.yaml
   bundles:
   - pod-security-restricted
   category: pod-security
   description: Restricts mountable volume types to those specified by the user. Corresponds
     to the `volumes` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
   name: k8spspvolumetypes
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/pod-security-policy/volumes/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/pod-security-policy/volumes/template.yaml
   version: v1.0.3
 - category: general
   description: Requires that objects with the field `spec.replicas` (Deployments,
     ReplicaSets, etc.) specify a number of replicas within defined ranges.
   name: k8sreplicalimits
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/replicalimits/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/replicalimits/template.yaml
   version: v1.0.2
 - category: general
   description: Requires resources to contain specified annotations, with values matching
     provided regular expressions.
   name: k8srequiredannotations
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/requiredannotations/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/requiredannotations/template.yaml
   version: v1.0.1
 - category: general
   description: Requires resources to contain specified labels, with values matching
     provided regular expressions.
   name: k8srequiredlabels
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/requiredlabels/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/requiredlabels/template.yaml
   version: v1.1.2
 - category: general
   description: Requires Pods to have readiness and/or liveness probes.
   name: k8srequiredprobes
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/requiredprobes/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/requiredprobes/template.yaml
   version: v1.0.1
 - category: general
   description: |-
     Requires containers to have defined resources set.
     https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
   name: k8srequiredresources
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/containerresources/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/containerresources/template.yaml
   version: v1.0.1
 - category: general
   description: Requires storage classes to be specified when used. Only Gatekeeper
     3.9+ and non-ephemeral containers are supported.
   name: k8sstorageclass
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/storageclass/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/storageclass/template.yaml
   version: v1.1.2
 - category: general
   description: |-
     Requires all Ingress rule hosts to be unique.
     Does not handle hostname wildcards: https://kubernetes.io/docs/concepts/services-networking/ingress/
   name: k8suniqueingresshost
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/uniqueingresshost/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/uniqueingresshost/template.yaml
   version: v1.0.4
 - category: general
   description: |-
     Requires Services to have unique selectors within a namespace. Selectors are considered the same if they have identical keys and values. Selectors may share a key/value pair so long as there is at least one distinct key/value pair between them.
     https://kubernetes.io/docs/concepts/services-networking/service/#defining-a-service
   name: k8suniqueserviceselector
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/uniqueserviceselector/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/uniqueserviceselector/template.yaml
   version: v1.0.2
 - category: general
   description: Blocks updating the service account on resources that abstract over
     Pods. This policy is ignored in audit mode.
   name: noupdateserviceaccount
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/noupdateserviceaccount/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/noupdateserviceaccount/template.yaml
   version: v1.0.1
 - category: general
   description: Verifies deprecated Kubernetes APIs to ensure all the API versions
     are up to date. This template does not apply to audit as audit looks at the resources
     which are already present in the cluster with non-deprecated API versions.
   name: verifydeprecatedapi
-  templatePath: https://raw.githubusercontent.com/sozercan/gatekeeper-library/refs/heads/bundles/library/general/verifydeprecatedapi/template.yaml
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/verifydeprecatedapi/template.yaml
   version: v1.0.0
