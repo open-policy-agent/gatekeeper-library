@@ -1,0 +1,29 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: requiredgputoleration
+tests:
+- name: gpu-with-toleration
+  template: template.yaml
+  constraint: samples/gpu-with-toleration/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/gpu-with-toleration/example_allowed.yaml
+    assertions:
+    - violations: no
+- name: gpu-without-toleration
+  template: template.yaml
+  constraint: samples/gpu-without-toleration/constraint.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/gpu-without-toleration/example_disallowed.yaml
+    assertions:
+    - violations: yes
+- name: no-gpu
+  template: template.yaml
+  constraint: samples/no-gpu/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/no-gpu/example_allowed.yaml
+    assertions:
+    - violations: no

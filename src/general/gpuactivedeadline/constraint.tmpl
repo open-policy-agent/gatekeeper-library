@@ -1,0 +1,44 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sgpuactivedeadline
+  annotations:
+    metadata.gatekeeper.sh/title: "GPU Active Deadline Required"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to set
+      activeDeadlineSeconds. This prevents runaway training jobs from holding
+      GPU resources indefinitely.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sGpuActiveDeadline
+      validation:
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Requires GPU pods to set activeDeadlineSeconds.
+          properties:
+            maxActiveDeadlineSeconds:
+              description: >-
+                The maximum value allowed for activeDeadlineSeconds. Set to 0 to
+                only require the field is present without enforcing a maximum.
+              type: integer
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`.
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+{{ file.Read "src/general/gpuactivedeadline/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+      - engine: Rego
+        source:
+          rego: |
+{{ file.Read "src/general/gpuactivedeadline/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}

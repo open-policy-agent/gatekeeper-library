@@ -1,0 +1,39 @@
+variables:
+- name: containers
+  expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+- name: initContainers
+  expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+- name: ephemeralContainers
+  expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+- name: exemptImagePrefixes
+  expression: |
+    !has(variables.params.exemptImages) ? [] :
+      variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+- name: exemptImageExplicit
+  expression: |
+    !has(variables.params.exemptImages) ? [] :
+      variables.params.exemptImages.filter(image, !image.endsWith("*"))
+- name: exemptImages
+  expression: |
+    (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+      container.image in variables.exemptImageExplicit ||
+      variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))
+    ).map(container, container.image)
+- name: podRequestsGpu
+  expression: |
+    (variables.containers + variables.initContainers + variables.ephemeralContainers).exists(container,
+      !(container.image in variables.exemptImages) &&
+      has(container.resources) &&
+      has(container.resources.limits) &&
+      "nvidia.com/gpu" in container.resources.limits &&
+      quantity(string(container.resources.limits["nvidia.com/gpu"])).compareTo(quantity("0")) > 0
+    )
+- name: allowedRuntimeClassNames
+  expression: 'has(variables.params.allowedRuntimeClassNames) ? variables.params.allowedRuntimeClassNames : []'
+- name: hasAllowedRc
+  expression: |
+    !has(variables.anyObject.spec.runtimeClassName) ? false :
+      variables.anyObject.spec.runtimeClassName in variables.allowedRuntimeClassNames
+validations:
+- expression: '!variables.podRequestsGpu || size(variables.allowedRuntimeClassNames) == 0 || variables.hasAllowedRc'
+  messageExpression: '"Pod <" + variables.anyObject.metadata.name + "> requests GPU resources but does not specify an allowed runtimeClassName (allowed: " + variables.allowedRuntimeClassNames.join(", ") + ")"'

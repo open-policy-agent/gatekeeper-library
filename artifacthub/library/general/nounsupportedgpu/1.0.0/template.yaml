@@ -1,0 +1,125 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8snounsupportedgpu
+  annotations:
+    metadata.gatekeeper.sh/title: "No Unsupported GPU Requests"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      Containers which request NVIDIA GPU resources (nvidia.com/gpu) must set
+      the NVIDIA_VISIBLE_DEVICES environment variable, indicating the container
+      image is built to consume GPUs via the NVIDIA CUDA runtime. This prevents
+      GPU resource waste from containers that request GPUs but cannot use them.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sNoUnsupportedGpu
+      validation:
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Containers which request NVIDIA GPU resources (nvidia.com/gpu) must set
+            the NVIDIA_VISIBLE_DEVICES environment variable.
+          properties:
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: containers
+            expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+          - name: initContainers
+            expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+          - name: ephemeralContainers
+            expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+          - name: exemptImagePrefixes
+            expression: |
+              !has(variables.params.exemptImages) ? [] :
+                variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+          - name: exemptImageExplicit
+            expression: |
+              !has(variables.params.exemptImages) ? [] :
+                variables.params.exemptImages.filter(image, !image.endsWith("*"))
+          - name: exemptImages
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                container.image in variables.exemptImageExplicit ||
+                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))
+              ).map(container, container.image)
+          - name: badContainers
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                !(container.image in variables.exemptImages) &&
+                has(container.resources) &&
+                has(container.resources.limits) &&
+                "nvidia.com/gpu" in container.resources.limits &&
+                quantity(string(container.resources.limits["nvidia.com/gpu"])).compareTo(quantity("0")) > 0 &&
+                (!has(container.env) || !container.env.exists(e, e.name == "NVIDIA_VISIBLE_DEVICES"))
+              ).map(container, "Container <" + container.name + "> requests nvidia.com/gpu but does not set the NVIDIA_VISIBLE_DEVICES environment variable")
+          validations:
+          - expression: 'size(variables.badContainers) == 0'
+            messageExpression: 'variables.badContainers.join(", ")'
+      - engine: Rego
+        source:
+          rego: |
+            package k8snounsupportedgpu
+
+            violation[{"msg": msg}] {
+                container := input_containers[_]
+                not is_exempt(container)
+                has_gpu_request(container)
+                not has_nvidia_env(container)
+                msg := sprintf("Container <%v> requests nvidia.com/gpu but does not set the NVIDIA_VISIBLE_DEVICES environment variable", [container.name])
+            }
+
+            has_gpu_request(container) {
+                gpu := container.resources.limits["nvidia.com/gpu"]
+                to_number(gpu) > 0
+            }
+
+            has_nvidia_env(container) {
+                env := container.env[_]
+                env.name == "NVIDIA_VISIBLE_DEVICES"
+            }
+
+            input_containers[c] {
+                c := input.review.object.spec.containers[_]
+            }
+
+            input_containers[c] {
+                c := input.review.object.spec.initContainers[_]
+            }
+
+            input_containers[c] {
+                c := input.review.object.spec.ephemeralContainers[_]
+            }
+
+            is_exempt(container) {
+                exempt_images := object.get(input, ["parameters", "exemptImages"], [])
+                img := container.image
+                exemption := exempt_images[_]
+                _matches_exemption(img, exemption)
+            }
+
+            _matches_exemption(img, exemption) {
+                not endswith(exemption, "*")
+                exemption == img
+            }
+
+            _matches_exemption(img, exemption) {
+                endswith(exemption, "*")
+                prefix := trim_suffix(exemption, "*")
+                startswith(img, prefix)
+            }

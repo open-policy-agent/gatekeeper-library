@@ -45,6 +45,18 @@ bundles:
   - k8spspseccompv2
   - k8spspselinuxv2
   - k8spspvolumetypes
+- description: |-
+    Enforces governance policies for AI and GPU workloads. Prevents GPU resource waste,
+    ensures proper scheduling configuration, and enforces runtime safety for training
+    and inference containers.
+  name: ai-workload
+  policies:
+  - k8snounsupportedgpu
+  - k8sgpuresourcelimits
+  - k8srequiredgputoleration
+  - k8sgpuactivedeadline
+  - k8sgpusharedmemory
+  - k8srequiredgpuruntimeclass
 kind: PolicyCatalog
 metadata:
   name: gatekeeper-library
@@ -479,4 +491,39 @@ policies:
     which are already present in the cluster with non-deprecated API versions.
   name: verifydeprecatedapi
   templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/verifydeprecatedapi/template.yaml
+  version: v1.0.0
+- category: general
+  description: Enforces a maximum number of NVIDIA GPUs (nvidia.com/gpu) that a single
+    container may request. This prevents individual containers from hoarding GPU resources
+    on shared clusters, particularly for AI/ML training workloads.
+  name: k8sgpuresourcelimits
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/gpuresourcelimits/template.yaml
+  version: v1.0.0
+- category: general
+  description: Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to
+    include a toleration for the specified GPU node taint. This ensures GPU workloads
+    are properly configured to schedule on GPU nodes.
+  name: k8srequiredgputoleration
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/requiredgputoleration/template.yaml
+  version: v1.0.0
+- category: general
+  description: Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to
+    set activeDeadlineSeconds. This prevents runaway training jobs from holding GPU
+    resources indefinitely.
+  name: k8sgpuactivedeadline
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/gpuactivedeadline/template.yaml
+  version: v1.0.0
+- category: general
+  description: Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to
+    mount a memory-backed emptyDir volume at /dev/shm. PyTorch DataLoader, NCCL multi-GPU
+    communication, and most training frameworks require shared memory beyond the default 64MB.
+  name: k8sgpusharedmemory
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/gpusharedmemory/template.yaml
+  version: v1.0.0
+- category: general
+  description: Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to
+    specify a runtimeClassName from an allowed list. This ensures GPU workloads use
+    the proper container runtime (e.g., nvidia) rather than relying on default runtime hooks.
+  name: k8srequiredgpuruntimeclass
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/requiredgpuruntimeclass/template.yaml
   version: v1.0.0

@@ -1,0 +1,40 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sgpusharedmemory
+  annotations:
+    metadata.gatekeeper.sh/title: "GPU Shared Memory Required"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to mount a
+      memory-backed emptyDir volume at /dev/shm. PyTorch DataLoader, NCCL
+      multi-GPU communication, and most training frameworks require shared memory
+      beyond the default 64MB.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sGpuSharedMemory
+      validation:
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Requires GPU pods to mount a memory-backed volume at /dev/shm.
+          properties:
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`.
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+{{ file.Read "src/general/gpusharedmemory/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+      - engine: Rego
+        source:
+          rego: |
+{{ file.Read "src/general/gpusharedmemory/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}

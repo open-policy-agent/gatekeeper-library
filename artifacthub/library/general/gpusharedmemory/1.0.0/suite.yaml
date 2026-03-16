@@ -1,0 +1,29 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: gpusharedmemory
+tests:
+- name: gpu-with-shm
+  template: template.yaml
+  constraint: samples/gpu-with-shm/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/gpu-with-shm/example_allowed.yaml
+    assertions:
+    - violations: no
+- name: gpu-without-shm
+  template: template.yaml
+  constraint: samples/gpu-without-shm/constraint.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/gpu-without-shm/example_disallowed.yaml
+    assertions:
+    - violations: yes
+- name: no-gpu
+  template: template.yaml
+  constraint: samples/no-gpu/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/no-gpu/example_allowed.yaml
+    assertions:
+    - violations: no

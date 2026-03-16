@@ -1,0 +1,22 @@
+version: 1.0.0
+name: k8sgpusharedmemory
+displayName: GPU Shared Memory Required
+createdAt: "2026-03-17T00:04:28Z"
+description: Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to mount a memory-backed emptyDir volume at /dev/shm. PyTorch DataLoader, NCCL multi-GPU communication, and most training frameworks require shared memory beyond the default 64MB.
+digest: 628e3e0b08ad2b199d17af6d076f4dd9702beaf1d08da8cdcf83835fd2e15b0f
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/gpusharedmemory
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # GPU Shared Memory Required
+    Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to mount a memory-backed emptyDir volume at /dev/shm. PyTorch DataLoader, NCCL multi-GPU communication, and most training frameworks require shared memory beyond the default 64MB.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/gpusharedmemory/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

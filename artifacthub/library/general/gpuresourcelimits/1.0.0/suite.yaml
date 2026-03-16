@@ -1,0 +1,21 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: gpuresourcelimits
+tests:
+- name: gpu-within-limit
+  template: template.yaml
+  constraint: samples/gpu-within-limit/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/gpu-within-limit/example_allowed.yaml
+    assertions:
+    - violations: no
+- name: gpu-exceeds-limit
+  template: template.yaml
+  constraint: samples/gpu-exceeds-limit/constraint.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/gpu-exceeds-limit/example_disallowed.yaml
+    assertions:
+    - violations: yes

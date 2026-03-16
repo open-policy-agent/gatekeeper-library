@@ -1,0 +1,43 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sgpuresourcelimits
+  annotations:
+    metadata.gatekeeper.sh/title: "GPU Resource Limits"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      Enforces a maximum number of NVIDIA GPUs (nvidia.com/gpu) that a single
+      container may request. This prevents individual containers from hoarding
+      GPU resources on shared clusters, particularly for AI/ML training workloads.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sGpuResourceLimits
+      validation:
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Enforces a maximum number of NVIDIA GPUs per container.
+          properties:
+            maxGpuPerContainer:
+              description: >-
+                The maximum number of GPUs a single container may request.
+              type: integer
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+{{ file.Read "src/general/gpuresourcelimits/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+      - engine: Rego
+        source:
+          rego: |
+{{ file.Read "src/general/gpuresourcelimits/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}
