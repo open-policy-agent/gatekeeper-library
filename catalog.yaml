@@ -493,6 +493,14 @@ policies:
   templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/verifydeprecatedapi/template.yaml
   version: v1.0.0
 - category: general
+  description: Containers which request NVIDIA GPU resources (nvidia.com/gpu) must
+    set the NVIDIA_VISIBLE_DEVICES environment variable, indicating the container image
+    is built to consume GPUs via the NVIDIA CUDA runtime. This prevents GPU resource
+    waste from containers that request GPUs but cannot use them.
+  name: k8snounsupportedgpu
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/nounsupportedgpu/template.yaml
+  version: v1.0.0
+- category: general
   description: Enforces a maximum number of NVIDIA GPUs (nvidia.com/gpu) that a single
     container may request. This prevents individual containers from hoarding GPU resources
     on shared clusters, particularly for AI/ML training workloads.
