@@ -53,6 +53,8 @@ bundles:
   policies:
   - k8snounsupportedgpu
   - k8sgpuresourcelimits
+  - k8sgpuworkloadresources
+  - k8sgpunodetargeting
   - k8srequiredgputoleration
   - k8sgpuactivedeadline
   - k8sgpusharedmemory
@@ -506,6 +508,22 @@ policies:
     on shared clusters, particularly for AI/ML training workloads.
   name: k8sgpuresourcelimits
   templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/gpuresourcelimits/template.yaml
+  version: v1.0.0
+- category: general
+  description: Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to set
+    memory requests equal to limits for all non-exempt containers and to set a CPU
+    request. Containers that request GPUs must also set matching GPU requests and
+    limits. This keeps GPU workloads schedulable and predictable while still allowing
+    CPU burst above request.
+  name: k8sgpuworkloadresources
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/gpuworkloadresources/template.yaml
+  version: v1.0.0
+- category: general
+  description: Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to target
+    GPU-labeled nodes using required node affinity or nodeSelector. This helps ensure
+    GPU workloads only land on nodes that advertise GPU capacity.
+  name: k8sgpunodetargeting
+  templatePath: https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/refs/heads/master/library/general/gpunodetargeting/template.yaml
   version: v1.0.0
 - category: general
   description: Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to

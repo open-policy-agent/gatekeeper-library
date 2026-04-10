@@ -1,0 +1,54 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sgpunodetargeting
+  annotations:
+    metadata.gatekeeper.sh/title: "GPU Node Targeting"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to target
+      GPU-labeled nodes using required node affinity or nodeSelector. This helps
+      ensure GPU workloads only land on nodes that advertise GPU capacity.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sGpuNodeTargeting
+      validation:
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Requires GPU pods to target nodes with a configured GPU label key and optional values.
+          properties:
+            nodeLabelKey:
+              description: >-
+                The node label key that GPU workloads must target (for example, `nvidia.com/gpu.present`
+                or `nvidia.com/gpu.product`).
+              type: string
+            nodeLabelValues:
+              description: >-
+                Optional allowed values for the GPU node label. If omitted, the policy only requires the
+                label key to be present.
+              type: array
+              items:
+                type: string
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+{{ file.Read "src/general/gpunodetargeting/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+      - engine: Rego
+        source:
+          rego: |
+{{ file.Read "src/general/gpunodetargeting/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}

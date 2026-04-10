@@ -1,0 +1,37 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: gpuworkloadresources
+tests:
+- name: gpu-pod-compliant
+  template: template.yaml
+  constraint: samples/gpu-pod-compliant/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/gpu-pod-compliant/example_allowed.yaml
+    assertions:
+    - violations: no
+- name: gpu-pod-memory-mismatch
+  template: template.yaml
+  constraint: samples/gpu-pod-memory-mismatch/constraint.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/gpu-pod-memory-mismatch/example_disallowed.yaml
+    assertions:
+    - violations: yes
+- name: gpu-pod-cpu-request-missing
+  template: template.yaml
+  constraint: samples/gpu-pod-cpu-request-missing/constraint.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/gpu-pod-cpu-request-missing/example_disallowed.yaml
+    assertions:
+    - violations: yes
+- name: non-gpu-pod
+  template: template.yaml
+  constraint: samples/non-gpu-pod/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/non-gpu-pod/example_allowed.yaml
+    assertions:
+    - violations: no

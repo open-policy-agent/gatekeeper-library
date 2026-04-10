@@ -1,0 +1,70 @@
+variables:
+- name: containers
+  expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+- name: initContainers
+  expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+- name: ephemeralContainers
+  expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+- name: allContainers
+  expression: 'variables.containers + variables.initContainers + variables.ephemeralContainers'
+- name: exemptImagePrefixes
+  expression: |
+    !has(variables.params.exemptImages) ? [] :
+      variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+- name: exemptImageExplicit
+  expression: |
+    !has(variables.params.exemptImages) ? [] :
+      variables.params.exemptImages.filter(image, !image.endsWith("*"))
+- name: exemptImages
+  expression: |
+    variables.allContainers.filter(container,
+      container.image in variables.exemptImageExplicit ||
+      variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))
+    ).map(container, container.image)
+- name: podRequestsGpu
+  expression: |
+    variables.allContainers.exists(container,
+      !(container.image in variables.exemptImages) &&
+      has(container.resources) &&
+      (
+        (has(container.resources.limits) &&
+          "nvidia.com/gpu" in container.resources.limits &&
+          quantity(string(container.resources.limits["nvidia.com/gpu"])).compareTo(quantity("0")) > 0) ||
+        (has(container.resources.requests) &&
+          "nvidia.com/gpu" in container.resources.requests &&
+          quantity(string(container.resources.requests["nvidia.com/gpu"])).compareTo(quantity("0")) > 0)
+      )
+    )
+- name: nodeLabelKey
+  expression: 'has(variables.params.nodeLabelKey) ? variables.params.nodeLabelKey : ""'
+- name: nodeLabelValues
+  expression: 'has(variables.params.nodeLabelValues) ? variables.params.nodeLabelValues : []'
+- name: hasMatchingNodeSelector
+  expression: |
+    !has(variables.anyObject.spec.nodeSelector) || !(variables.nodeLabelKey in variables.anyObject.spec.nodeSelector) ? false :
+      size(variables.nodeLabelValues) == 0 || variables.anyObject.spec.nodeSelector[variables.nodeLabelKey] in variables.nodeLabelValues
+- name: hasMatchingNodeAffinity
+  expression: |
+    !has(variables.anyObject.spec.affinity) ||
+    !has(variables.anyObject.spec.affinity.nodeAffinity) ||
+    !has(variables.anyObject.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution) ||
+    !has(variables.anyObject.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms) ? false :
+      variables.anyObject.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms.exists(term,
+        has(term.matchExpressions) &&
+        term.matchExpressions.exists(expr,
+          expr.key == variables.nodeLabelKey &&
+          (
+            size(variables.nodeLabelValues) == 0 ?
+              expr.operator == "Exists" :
+              expr.operator == "In" &&
+              has(expr.values) &&
+              variables.nodeLabelValues.exists(value, expr.values.exists(exprValue, exprValue == value))
+          )
+        )
+      )
+validations:
+- expression: '!variables.podRequestsGpu || variables.nodeLabelKey == "" || variables.hasMatchingNodeSelector || variables.hasMatchingNodeAffinity'
+  messageExpression: |
+    size(variables.nodeLabelValues) == 0 ?
+      "Pod <" + variables.anyObject.metadata.name + "> requests GPU resources but does not target nodes with label key <" + variables.nodeLabelKey + "> using node affinity or nodeSelector" :
+      "Pod <" + variables.anyObject.metadata.name + "> requests GPU resources but does not target nodes with label <" + variables.nodeLabelKey + "> matching one of <" + variables.nodeLabelValues.join(", ") + "> using node affinity or nodeSelector"
