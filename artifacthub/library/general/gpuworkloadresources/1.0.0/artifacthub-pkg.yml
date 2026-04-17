@@ -3,7 +3,7 @@ name: k8sgpuworkloadresources
 displayName: GPU Workload Resources
 createdAt: "2026-04-10T20:39:17Z"
 description: Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to set memory requests equal to limits for all non-exempt containers and to set a CPU request. Containers that request GPUs must also set matching GPU requests and limits. This keeps GPU workloads schedulable and predictable while still allowing CPU burst above request.
-digest: 6bf74a8091efbbf17a3538d159eafb85409150a634065da18fb0a04970cada13
+digest: 57c0fa75c82edc1e5df827b5a966c1a63b89ca63a5ac5ac50d7c57c8b3911d9b
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/gpuworkloadresources
 keywords:

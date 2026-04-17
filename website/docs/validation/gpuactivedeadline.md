@@ -5,6 +5,8 @@ title: GPU Active Deadline Required
 
 # GPU Active Deadline Required
 
+**Bundles:** `gatekeeper-ai-training-policies`
+
 ## Description
 Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to set activeDeadlineSeconds. This prevents runaway training jobs from holding GPU resources indefinitely.
 
@@ -17,6 +19,7 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "GPU Active Deadline Required"
     metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/bundle: "gatekeeper-ai-training-policies"
     description: >-
       Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to set
       activeDeadlineSeconds. This prevents runaway training jobs from holding

@@ -3,7 +3,7 @@ name: k8sgpunodetargeting
 displayName: GPU Node Targeting
 createdAt: "2026-04-10T20:39:17Z"
 description: Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to target GPU-labeled nodes using required node affinity or nodeSelector. This helps ensure GPU workloads only land on nodes that advertise GPU capacity.
-digest: 827a6586894298462f8485d2590cc502c25ba7676d3c6e774afc6c76df20d802
+digest: dbb3b0b95bd44bc4db167f587b141896143e9cee20a4e6f5b970e06e31f70448
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/gpunodetargeting
 keywords:

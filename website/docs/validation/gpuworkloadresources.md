@@ -5,6 +5,8 @@ title: GPU Workload Resources
 
 # GPU Workload Resources
 
+**Bundles:** `gatekeeper-gpu-safety-policies` `gatekeeper-ai-training-policies` `gatekeeper-ai-inference-policies`
+
 ## Description
 Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to set memory requests equal to limits for all non-exempt containers and to set a CPU request. Containers that request GPUs must also set matching GPU requests and limits. This keeps GPU workloads schedulable and predictable while still allowing CPU burst above request.
 
@@ -17,6 +19,7 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "GPU Workload Resources"
     metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/bundle: "gatekeeper-gpu-safety-policies, gatekeeper-ai-training-policies, gatekeeper-ai-inference-policies"
     description: >-
       Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to set
       memory requests equal to limits for all non-exempt containers and to set

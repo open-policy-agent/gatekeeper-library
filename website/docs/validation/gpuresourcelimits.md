@@ -5,6 +5,8 @@ title: GPU Resource Limits
 
 # GPU Resource Limits
 
+**Bundles:** `gatekeeper-gpu-safety-policies` `gatekeeper-ai-training-policies` `gatekeeper-ai-inference-policies`
+
 ## Description
 Enforces a maximum number of NVIDIA GPUs (nvidia.com/gpu) that a single container may request. This prevents individual containers from hoarding GPU resources on shared clusters, particularly for AI/ML training workloads.
 
@@ -17,6 +19,7 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "GPU Resource Limits"
     metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/bundle: "gatekeeper-gpu-safety-policies, gatekeeper-ai-training-policies, gatekeeper-ai-inference-policies"
     description: >-
       Enforces a maximum number of NVIDIA GPUs (nvidia.com/gpu) that a single
       container may request. This prevents individual containers from hoarding

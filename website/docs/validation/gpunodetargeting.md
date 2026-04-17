@@ -5,6 +5,8 @@ title: GPU Node Targeting
 
 # GPU Node Targeting
 
+**Bundles:** `gatekeeper-gpu-safety-policies` `gatekeeper-ai-training-policies` `gatekeeper-ai-inference-policies`
+
 ## Description
 Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to target GPU-labeled nodes using required node affinity or nodeSelector. This helps ensure GPU workloads only land on nodes that advertise GPU capacity.
 
@@ -17,6 +19,7 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "GPU Node Targeting"
     metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/bundle: "gatekeeper-gpu-safety-policies, gatekeeper-ai-training-policies, gatekeeper-ai-inference-policies"
     description: >-
       Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to target
       GPU-labeled nodes using required node affinity or nodeSelector. This helps

@@ -5,6 +5,8 @@ title: Required GPU Toleration
 
 # Required GPU Toleration
 
+**Bundles:** `gatekeeper-gpu-safety-policies` `gatekeeper-ai-training-policies` `gatekeeper-ai-inference-policies`
+
 ## Description
 Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to include a toleration for the specified GPU node taint. This ensures GPU workloads are properly configured to schedule on GPU nodes.
 
@@ -17,6 +19,7 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "Required GPU Toleration"
     metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/bundle: "gatekeeper-gpu-safety-policies, gatekeeper-ai-training-policies, gatekeeper-ai-inference-policies"
     description: >-
       Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to include
       a toleration for the specified GPU node taint. This ensures GPU workloads

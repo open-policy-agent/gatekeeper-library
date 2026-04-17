@@ -5,6 +5,8 @@ title: GPU Shared Memory Required
 
 # GPU Shared Memory Required
 
+**Bundles:** `gatekeeper-ai-training-policies`
+
 ## Description
 Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to mount a memory-backed emptyDir volume at /dev/shm. PyTorch DataLoader, NCCL multi-GPU communication, and most training frameworks require shared memory beyond the default 64MB.
 
@@ -17,6 +19,7 @@ metadata:
   annotations:
     metadata.gatekeeper.sh/title: "GPU Shared Memory Required"
     metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/bundle: "gatekeeper-ai-training-policies"
     description: >-
       Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to mount a
       memory-backed emptyDir volume at /dev/shm. PyTorch DataLoader, NCCL
