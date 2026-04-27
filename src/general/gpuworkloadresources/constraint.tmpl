@@ -44,3 +44,6 @@ spec:
         source:
           rego: |
 {{ file.Read "src/general/gpuworkloadresources/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}
+          libs:
+            - |
+{{ file.Read "src/general/gpuworkloadresources/lib_exempt_container.rego" | strings.Indent 14 | strings.TrimSuffix "\n" }}

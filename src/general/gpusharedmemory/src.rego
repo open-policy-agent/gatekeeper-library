@@ -1,5 +1,7 @@
 package k8sgpusharedmemory
 
+import data.lib.exempt_container.is_exempt
+
 violation[{"msg": msg}] {
     container := input.review.object.spec.containers[_]
     not is_exempt(container)
@@ -19,22 +21,4 @@ has_shm_mount(container) {
     volume := input.review.object.spec.volumes[_]
     volume.name == mount.name
     volume.emptyDir.medium == "Memory"
-}
-
-is_exempt(container) {
-    exempt_images := object.get(input, ["parameters", "exemptImages"], [])
-    img := container.image
-    exemption := exempt_images[_]
-    _matches_exemption(img, exemption)
-}
-
-_matches_exemption(img, exemption) {
-    not endswith(exemption, "*")
-    exemption == img
-}
-
-_matches_exemption(img, exemption) {
-    endswith(exemption, "*")
-    prefix := trim_suffix(exemption, "*")
-    startswith(img, prefix)
 }

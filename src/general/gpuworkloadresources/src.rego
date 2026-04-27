@@ -1,5 +1,7 @@
 package k8sgpuworkloadresources
 
+import data.lib.exempt_container.is_exempt
+
 missing(obj, field) = true {
   not obj[field]
 }
@@ -186,22 +188,4 @@ has_matching_memory_request_and_limit(container) {
 has_cpu_request(container) {
   requests := object.get(object.get(container, "resources", {}), "requests", {})
   not missing(requests, "cpu")
-}
-
-is_exempt(container) {
-  exempt_images := object.get(input, ["parameters", "exemptImages"], [])
-  img := container.image
-  exemption := exempt_images[_]
-  _matches_exemption(img, exemption)
-}
-
-_matches_exemption(img, exemption) {
-  not endswith(exemption, "*")
-  exemption == img
-}
-
-_matches_exemption(img, exemption) {
-  endswith(exemption, "*")
-  prefix := trim_suffix(exemption, "*")
-  startswith(img, prefix)
 }

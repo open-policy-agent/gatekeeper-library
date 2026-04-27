@@ -3,7 +3,7 @@ name: k8sgpuactivedeadline
 displayName: GPU Active Deadline Required
 createdAt: "2026-03-17T00:04:28Z"
 description: Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to set activeDeadlineSeconds. This prevents runaway training jobs from holding GPU resources indefinitely.
-digest: 2323b5133eb00c4a276a9c20cbc02dfd4e9735ef5267b12805d2be90ac3d9578
+digest: f15fa92d15ee17101b77cea310b9766253332b9bfcd50447c4487f9eeaef856c
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/gpuactivedeadline
 keywords:

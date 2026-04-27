@@ -88,6 +88,8 @@ spec:
           rego: |
             package k8snounsupportedgpu
 
+            import data.lib.exempt_container.is_exempt
+
             violation[{"msg": msg}] {
                 container := input_containers[_]
                 not is_exempt(container)
@@ -117,24 +119,27 @@ spec:
             input_containers[c] {
                 c := input.review.object.spec.ephemeralContainers[_]
             }
+          libs:
+            - |
+              package lib.exempt_container
 
-            is_exempt(container) {
-                exempt_images := object.get(input, ["parameters", "exemptImages"], [])
-                img := container.image
-                exemption := exempt_images[_]
-                _matches_exemption(img, exemption)
-            }
+              is_exempt(container) {
+                  exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+                  img := container.image
+                  exemption := exempt_images[_]
+                  _matches_exemption(img, exemption)
+              }
 
-            _matches_exemption(img, exemption) {
-                not endswith(exemption, "*")
-                exemption == img
-            }
+              _matches_exemption(img, exemption) {
+                  not endswith(exemption, "*")
+                  exemption == img
+              }
 
-            _matches_exemption(img, exemption) {
-                endswith(exemption, "*")
-                prefix := trim_suffix(exemption, "*")
-                startswith(img, prefix)
-            }
+              _matches_exemption(img, exemption) {
+                  endswith(exemption, "*")
+                  prefix := trim_suffix(exemption, "*")
+                  startswith(img, prefix)
+              }
 
 ```
 

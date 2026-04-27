@@ -43,3 +43,6 @@ spec:
         source:
           rego: |
 {{ file.Read "src/general/gpuactivedeadline/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}
+          libs:
+            - |
+{{ file.Read "src/general/gpuactivedeadline/lib_exempt_container.rego" | strings.Indent 14 | strings.TrimSuffix "\n" }}

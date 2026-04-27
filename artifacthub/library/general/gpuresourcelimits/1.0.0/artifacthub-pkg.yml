@@ -3,7 +3,7 @@ name: k8sgpuresourcelimits
 displayName: GPU Resource Limits
 createdAt: "2026-03-17T00:04:28Z"
 description: Enforces a maximum number of NVIDIA GPUs (nvidia.com/gpu) that a single container may request. This prevents individual containers from hoarding GPU resources on shared clusters, particularly for AI/ML training workloads.
-digest: ee26dc9886938817c8a6a46b11e915d87d1f854c5c8b9c57fc6684a85c2373e0
+digest: cc06ded085ae8ba815f0f1b22884d714d2989dd70cbb4ec4c09334d854cc51eb
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/gpuresourcelimits
 keywords:

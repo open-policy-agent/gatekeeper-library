@@ -3,7 +3,7 @@ name: k8srequiredgputoleration
 displayName: Required GPU Toleration
 createdAt: "2026-03-17T00:04:29Z"
 description: Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to include a toleration for the specified GPU node taint. This ensures GPU workloads are properly configured to schedule on GPU nodes.
-digest: f0a41b673004d5a13edd16b5904aa7cd03e20b6cd64710fe5e3e737ecf22912d
+digest: fa8687581fa25bc9a772f086440b04f8fcc594dd5eed0215dad02563255eee3c
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/requiredgputoleration
 keywords:

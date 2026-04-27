@@ -1,5 +1,7 @@
 package k8sgpuactivedeadline
 
+import data.lib.exempt_container.is_exempt
+
 violation[{"msg": msg}] {
     pod_requests_gpu
     not has_active_deadline
@@ -37,22 +39,4 @@ input_containers[c] {
 
 input_containers[c] {
     c := input.review.object.spec.ephemeralContainers[_]
-}
-
-is_exempt(container) {
-    exempt_images := object.get(input, ["parameters", "exemptImages"], [])
-    img := container.image
-    exemption := exempt_images[_]
-    _matches_exemption(img, exemption)
-}
-
-_matches_exemption(img, exemption) {
-    not endswith(exemption, "*")
-    exemption == img
-}
-
-_matches_exemption(img, exemption) {
-    endswith(exemption, "*")
-    prefix := trim_suffix(exemption, "*")
-    startswith(img, prefix)
 }

@@ -3,7 +3,7 @@ name: k8snounsupportedgpu
 displayName: No Unsupported GPU Requests
 createdAt: "2026-03-17T00:04:28Z"
 description: Containers which request NVIDIA GPU resources (nvidia.com/gpu) must set the NVIDIA_VISIBLE_DEVICES environment variable, indicating the container image is built to consume GPUs via the NVIDIA CUDA runtime. This prevents GPU resource waste from containers that request GPUs but cannot use them.
-digest: 45dd291438cebc7768af3bd8748cf518bc85e44c3528396dd91a191f8a9fd81b
+digest: a128ee4cb1ec36fada48fc2b85ad617f1e83ae21574a7c2909ce92bb0c9d2ec8
 license: Apache-2.0
 homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/nounsupportedgpu
 keywords:

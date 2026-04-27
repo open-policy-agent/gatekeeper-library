@@ -137,6 +137,8 @@ spec:
           rego: |
             package k8sgpunodetargeting
 
+            import data.lib.exempt_container.is_exempt
+
             violation[{"msg": msg}] {
               pod_requests_gpu
               label_key := object.get(input.parameters, "nodeLabelKey", "")
@@ -220,24 +222,27 @@ spec:
               expr.operator == "In"
               expr.values[_] == label_values[_]
             }
+          libs:
+            - |
+              package lib.exempt_container
 
-            is_exempt(container) {
-              exempt_images := object.get(input, ["parameters", "exemptImages"], [])
-              img := container.image
-              exemption := exempt_images[_]
-              _matches_exemption(img, exemption)
-            }
+              is_exempt(container) {
+                  exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+                  img := container.image
+                  exemption := exempt_images[_]
+                  _matches_exemption(img, exemption)
+              }
 
-            _matches_exemption(img, exemption) {
-              not endswith(exemption, "*")
-              exemption == img
-            }
+              _matches_exemption(img, exemption) {
+                  not endswith(exemption, "*")
+                  exemption == img
+              }
 
-            _matches_exemption(img, exemption) {
-              endswith(exemption, "*")
-              prefix := trim_suffix(exemption, "*")
-              startswith(img, prefix)
-            }
+              _matches_exemption(img, exemption) {
+                  endswith(exemption, "*")
+                  prefix := trim_suffix(exemption, "*")
+                  startswith(img, prefix)
+              }
 ```
 
 ### Usage
