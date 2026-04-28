@@ -12,6 +12,18 @@ test_gpu_pod_with_node_selector_allowed {
     count(results) == 0
 }
 
+test_gpu_pod_node_selector_key_only_allowed {
+    inp := {"review": review_with_node_selector([gpu_container("trainer")], {"nvidia.com/gpu.present": "true"}), "parameters": {"nodeLabelKey": "nvidia.com/gpu.present"}}
+    results := violation with input as inp
+    count(results) == 0
+}
+
+test_gpu_pod_node_selector_key_only_empty_value_denied {
+    inp := {"review": review_with_node_selector([gpu_container("trainer")], {"nvidia.com/gpu.present": ""}), "parameters": {"nodeLabelKey": "nvidia.com/gpu.present"}}
+    results := violation with input as inp
+    count(results) == 1
+}
+
 test_gpu_pod_without_targeting_denied {
     inp := {"review": review([gpu_container("trainer")]), "parameters": {"nodeLabelKey": "nvidia.com/gpu.present", "nodeLabelValues": ["true"]}}
     results := violation with input as inp

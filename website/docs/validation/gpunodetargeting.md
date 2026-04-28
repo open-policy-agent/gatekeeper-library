@@ -106,7 +106,9 @@ spec:
           - name: hasMatchingNodeSelector
             expression: |
               !has(variables.anyObject.spec.nodeSelector) || !(variables.nodeLabelKey in variables.anyObject.spec.nodeSelector) ? false :
-                size(variables.nodeLabelValues) == 0 || variables.anyObject.spec.nodeSelector[variables.nodeLabelKey] in variables.nodeLabelValues
+                (size(variables.nodeLabelValues) == 0 ?
+                  string(variables.anyObject.spec.nodeSelector[variables.nodeLabelKey]) != "" :
+                  variables.anyObject.spec.nodeSelector[variables.nodeLabelKey] in variables.nodeLabelValues)
           - name: hasMatchingNodeAffinity
             expression: |
               !has(variables.anyObject.spec.affinity) ||
@@ -313,6 +315,39 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 
 </details>
+<details>
+<summary>example-disallowed-wrong-value</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-pod-with-wrong-node-affinity
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: nvidia.com/gpu.present
+                operator: In
+                values:
+                  - "false"
+  containers:
+    - name: training
+      image: nvidia/cuda:12.0-runtime
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpunodetargeting/samples/gpu-pod-with-node-affinity/example_disallowed_wrong_value.yaml
+```
+
+</details>
 
 
 </details><details>
@@ -481,6 +516,146 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpunodetargeting/samples/non-gpu-pod/example_allowed.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>gpu-pod-node-selector-key-only</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sGpuNodeTargeting
+metadata:
+  name: require-gpu-node-targeting
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    nodeLabelKey: "nvidia.com/gpu.present"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpunodetargeting/samples/gpu-pod-node-selector-key-only/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-pod-node-selector-key-only
+spec:
+  nodeSelector:
+    nvidia.com/gpu.present: "true"
+  containers:
+    - name: training
+      image: nvidia/cuda:12.0-runtime
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpunodetargeting/samples/gpu-pod-node-selector-key-only/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-empty-value</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-pod-node-selector-empty-value
+spec:
+  nodeSelector:
+    nvidia.com/gpu.present: ""
+  containers:
+    - name: training
+      image: nvidia/cuda:12.0-runtime
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpunodetargeting/samples/gpu-pod-node-selector-key-only/example_disallowed_empty_value.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>gpu-pod-exempt</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sGpuNodeTargeting
+metadata:
+  name: require-gpu-node-targeting
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    nodeLabelKey: "nvidia.com/gpu.present"
+    nodeLabelValues:
+      - "true"
+    exemptImages:
+      - "nvidia/dcgm-exporter:*"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpunodetargeting/samples/gpu-pod-exempt/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-pod-exempt
+spec:
+  containers:
+    - name: dcgm
+      image: nvidia/dcgm-exporter:3.1.7
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpunodetargeting/samples/gpu-pod-exempt/example_allowed.yaml
 ```
 
 </details>

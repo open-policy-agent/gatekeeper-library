@@ -27,3 +27,27 @@ tests:
     object: samples/no-gpu/example_allowed.yaml
     assertions:
     - violations: no
+- name: gpu-wrong-runtimeclass
+  template: template.yaml
+  constraint: samples/gpu-wrong-runtimeclass/constraint.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/gpu-wrong-runtimeclass/example_disallowed.yaml
+    assertions:
+    - violations: yes
+- name: gpu-runtimeclass-disabled
+  template: template.yaml
+  constraint: samples/gpu-runtimeclass-disabled/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/gpu-runtimeclass-disabled/example_allowed.yaml
+    assertions:
+    - violations: no
+- name: gpu-exempt-without-runtimeclass
+  template: template.yaml
+  constraint: samples/gpu-exempt-without-runtimeclass/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/gpu-exempt-without-runtimeclass/example_allowed.yaml
+    assertions:
+    - violations: no

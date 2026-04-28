@@ -42,7 +42,9 @@ variables:
 - name: hasMatchingNodeSelector
   expression: |
     !has(variables.anyObject.spec.nodeSelector) || !(variables.nodeLabelKey in variables.anyObject.spec.nodeSelector) ? false :
-      size(variables.nodeLabelValues) == 0 || variables.anyObject.spec.nodeSelector[variables.nodeLabelKey] in variables.nodeLabelValues
+      (size(variables.nodeLabelValues) == 0 ?
+        string(variables.anyObject.spec.nodeSelector[variables.nodeLabelKey]) != "" :
+        variables.anyObject.spec.nodeSelector[variables.nodeLabelKey] in variables.nodeLabelValues)
 - name: hasMatchingNodeAffinity
   expression: |
     !has(variables.anyObject.spec.affinity) ||

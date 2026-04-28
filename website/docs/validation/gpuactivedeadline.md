@@ -220,6 +220,31 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 
 </details>
+<details>
+<summary>example-disallowed-exceeds-max</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-job-exceeds-deadline
+spec:
+  activeDeadlineSeconds: 172800
+  containers:
+    - name: training
+      image: nvidia/cuda:12.0-runtime
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpuactivedeadline/samples/gpu-job-with-deadline/example_disallowed_exceeds_max.yaml
+```
+
+</details>
 
 
 </details><details>
@@ -326,6 +351,62 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpuactivedeadline/samples/non-gpu-job/example_allowed.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>gpu-job-exempt</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sGpuActiveDeadline
+metadata:
+  name: require-gpu-deadline
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    maxActiveDeadlineSeconds: 86400
+    exemptImages:
+      - "nvidia/dcgm-exporter:*"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpuactivedeadline/samples/gpu-job-exempt/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-job-exempt
+spec:
+  containers:
+    - name: dcgm
+      image: nvidia/dcgm-exporter:3.1.7
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpuactivedeadline/samples/gpu-job-exempt/example_allowed.yaml
 ```
 
 </details>

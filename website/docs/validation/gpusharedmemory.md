@@ -317,4 +317,176 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
+</details><details>
+<summary>gpu-shm-non-memory</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sGpuSharedMemory
+metadata:
+  name: require-gpu-shm
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpusharedmemory/samples/gpu-shm-non-memory/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-shm-non-memory
+spec:
+  volumes:
+    - name: dshm
+      emptyDir: {}
+  containers:
+    - name: training
+      image: nvidia/cuda:12.0-runtime
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+      volumeMounts:
+        - name: dshm
+          mountPath: /dev/shm
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpusharedmemory/samples/gpu-shm-non-memory/example_disallowed.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>gpu-shm-wrong-path</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sGpuSharedMemory
+metadata:
+  name: require-gpu-shm
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpusharedmemory/samples/gpu-shm-wrong-path/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-shm-wrong-path
+spec:
+  volumes:
+    - name: dshm
+      emptyDir:
+        medium: Memory
+  containers:
+    - name: training
+      image: nvidia/cuda:12.0-runtime
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+      volumeMounts:
+        - name: dshm
+          mountPath: /cache
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpusharedmemory/samples/gpu-shm-wrong-path/example_disallowed.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>gpu-exempt-without-shm</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sGpuSharedMemory
+metadata:
+  name: require-gpu-shm
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    exemptImages:
+      - "nvidia/dcgm-exporter:*"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpusharedmemory/samples/gpu-exempt-without-shm/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-exempt-without-shm
+spec:
+  containers:
+    - name: dcgm
+      image: nvidia/dcgm-exporter:3.1.7
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpusharedmemory/samples/gpu-exempt-without-shm/example_allowed.yaml
+```
+
+</details>
+
+
 </details>

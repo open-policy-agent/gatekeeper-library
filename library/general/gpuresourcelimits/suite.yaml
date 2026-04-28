@@ -19,3 +19,35 @@ tests:
     object: samples/gpu-exceeds-limit/example_disallowed.yaml
     assertions:
     - violations: yes
+- name: non-gpu-pod
+  template: template.yaml
+  constraint: samples/non-gpu-pod/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/non-gpu-pod/example_allowed.yaml
+    assertions:
+    - violations: no
+- name: gpu-exempt-over-limit
+  template: template.yaml
+  constraint: samples/gpu-exempt-over-limit/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/gpu-exempt-over-limit/example_allowed.yaml
+    assertions:
+    - violations: no
+- name: gpu-max-disabled
+  template: template.yaml
+  constraint: samples/gpu-max-disabled/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/gpu-max-disabled/example_allowed.yaml
+    assertions:
+    - violations: no
+- name: init-gpu-exceeds-limit
+  template: template.yaml
+  constraint: samples/init-gpu-exceeds-limit/constraint.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/init-gpu-exceeds-limit/example_disallowed.yaml
+    assertions:
+    - violations: yes

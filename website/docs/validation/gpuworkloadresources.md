@@ -598,4 +598,232 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
+</details><details>
+<summary>gpu-pod-gpu-request-missing</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sGpuWorkloadResources
+metadata:
+  name: require-gpu-workload-resources
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpuworkloadresources/samples/gpu-pod-gpu-request-missing/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-pod-gpu-request-missing
+spec:
+  containers:
+    - name: training
+      image: nvidia/cuda:12.0-runtime
+      resources:
+        requests:
+          memory: "16Gi"
+          cpu: "2"
+        limits:
+          nvidia.com/gpu: "1"
+          memory: "16Gi"
+          cpu: "4"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpuworkloadresources/samples/gpu-pod-gpu-request-missing/example_disallowed.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>gpu-pod-gpu-mismatch</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sGpuWorkloadResources
+metadata:
+  name: require-gpu-workload-resources
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpuworkloadresources/samples/gpu-pod-gpu-mismatch/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-pod-gpu-mismatch
+spec:
+  containers:
+    - name: training
+      image: nvidia/cuda:12.0-runtime
+      resources:
+        requests:
+          nvidia.com/gpu: "1"
+          memory: "16Gi"
+          cpu: "2"
+        limits:
+          nvidia.com/gpu: "2"
+          memory: "16Gi"
+          cpu: "4"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpuworkloadresources/samples/gpu-pod-gpu-mismatch/example_disallowed.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>gpu-pod-memory-equivalent</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sGpuWorkloadResources
+metadata:
+  name: require-gpu-workload-resources
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpuworkloadresources/samples/gpu-pod-memory-equivalent/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-pod-memory-equivalent
+spec:
+  containers:
+    - name: training
+      image: nvidia/cuda:12.0-runtime
+      resources:
+        requests:
+          nvidia.com/gpu: "1"
+          memory: "1024Mi"
+          cpu: "2"
+        limits:
+          nvidia.com/gpu: "1"
+          memory: "1Gi"
+          cpu: "4"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpuworkloadresources/samples/gpu-pod-memory-equivalent/example_allowed.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>gpu-pod-exempt</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sGpuWorkloadResources
+metadata:
+  name: require-gpu-workload-resources
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    exemptImages:
+      - "nvidia/dcgm-exporter:*"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpuworkloadresources/samples/gpu-pod-exempt/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-pod-exempt
+spec:
+  containers:
+    - name: dcgm
+      image: nvidia/dcgm-exporter:3.1.7
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpuworkloadresources/samples/gpu-pod-exempt/example_allowed.yaml
+```
+
+</details>
+
+
 </details>

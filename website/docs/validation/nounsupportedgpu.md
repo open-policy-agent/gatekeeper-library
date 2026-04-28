@@ -342,4 +342,175 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
+</details><details>
+<summary>gpu-init-without-env-var</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sNoUnsupportedGpu
+metadata:
+  name: require-gpu-env-var
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/nounsupportedgpu/samples/gpu-init-without-env-var/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-init-without-env-var
+spec:
+  initContainers:
+    - name: setup
+      image: nvidia/cuda:12.0-runtime
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+  containers:
+    - name: app
+      image: nginx:1.25
+      resources:
+        limits:
+          cpu: "500m"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/nounsupportedgpu/samples/gpu-init-without-env-var/example_disallowed.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>gpu-ephemeral-without-env-var</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sNoUnsupportedGpu
+metadata:
+  name: require-gpu-env-var
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/nounsupportedgpu/samples/gpu-ephemeral-without-env-var/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-ephemeral-without-env-var
+spec:
+  containers:
+    - name: app
+      image: nginx:1.25
+      resources:
+        limits:
+          cpu: "500m"
+  ephemeralContainers:
+    - name: debug-gpu
+      image: nvidia/cuda:12.0-runtime
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/nounsupportedgpu/samples/gpu-ephemeral-without-env-var/example_disallowed.yaml
+```
+
+</details>
+
+
+</details><details>
+<summary>gpu-exact-exempt</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sNoUnsupportedGpu
+metadata:
+  name: require-gpu-env-var
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    exemptImages:
+      - "nvidia/dcgm-exporter:3.1.7"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/nounsupportedgpu/samples/gpu-exact-exempt/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-exact-exempt
+spec:
+  containers:
+    - name: dcgm
+      image: nvidia/dcgm-exporter:3.1.7
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/nounsupportedgpu/samples/gpu-exact-exempt/example_allowed.yaml
+```
+
+</details>
+
+
 </details>

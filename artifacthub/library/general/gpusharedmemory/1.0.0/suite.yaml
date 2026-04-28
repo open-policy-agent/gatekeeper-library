@@ -27,3 +27,27 @@ tests:
     object: samples/no-gpu/example_allowed.yaml
     assertions:
     - violations: no
+- name: gpu-shm-non-memory
+  template: template.yaml
+  constraint: samples/gpu-shm-non-memory/constraint.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/gpu-shm-non-memory/example_disallowed.yaml
+    assertions:
+    - violations: yes
+- name: gpu-shm-wrong-path
+  template: template.yaml
+  constraint: samples/gpu-shm-wrong-path/constraint.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/gpu-shm-wrong-path/example_disallowed.yaml
+    assertions:
+    - violations: yes
+- name: gpu-exempt-without-shm
+  template: template.yaml
+  constraint: samples/gpu-exempt-without-shm/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/gpu-exempt-without-shm/example_allowed.yaml
+    assertions:
+    - violations: no

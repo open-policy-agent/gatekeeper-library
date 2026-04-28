@@ -11,6 +11,10 @@ tests:
     object: samples/gpu-pod-with-node-affinity/example_allowed.yaml
     assertions:
     - violations: no
+  - name: example-disallowed-wrong-value
+    object: samples/gpu-pod-with-node-affinity/example_disallowed_wrong_value.yaml
+    assertions:
+    - violations: yes
 - name: gpu-pod-with-node-selector
   template: template.yaml
   constraint: samples/gpu-pod-with-node-selector/constraint.yaml
@@ -33,5 +37,25 @@ tests:
   cases:
   - name: example-allowed
     object: samples/non-gpu-pod/example_allowed.yaml
+    assertions:
+    - violations: no
+- name: gpu-pod-node-selector-key-only
+  template: template.yaml
+  constraint: samples/gpu-pod-node-selector-key-only/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/gpu-pod-node-selector-key-only/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed-empty-value
+    object: samples/gpu-pod-node-selector-key-only/example_disallowed_empty_value.yaml
+    assertions:
+    - violations: yes
+- name: gpu-pod-exempt
+  template: template.yaml
+  constraint: samples/gpu-pod-exempt/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/gpu-pod-exempt/example_allowed.yaml
     assertions:
     - violations: no

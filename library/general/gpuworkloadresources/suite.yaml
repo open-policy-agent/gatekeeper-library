@@ -35,3 +35,35 @@ tests:
     object: samples/non-gpu-pod/example_allowed.yaml
     assertions:
     - violations: no
+- name: gpu-pod-gpu-request-missing
+  template: template.yaml
+  constraint: samples/gpu-pod-gpu-request-missing/constraint.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/gpu-pod-gpu-request-missing/example_disallowed.yaml
+    assertions:
+    - violations: yes
+- name: gpu-pod-gpu-mismatch
+  template: template.yaml
+  constraint: samples/gpu-pod-gpu-mismatch/constraint.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/gpu-pod-gpu-mismatch/example_disallowed.yaml
+    assertions:
+    - violations: yes
+- name: gpu-pod-memory-equivalent
+  template: template.yaml
+  constraint: samples/gpu-pod-memory-equivalent/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/gpu-pod-memory-equivalent/example_allowed.yaml
+    assertions:
+    - violations: no
+- name: gpu-pod-exempt
+  template: template.yaml
+  constraint: samples/gpu-pod-exempt/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/gpu-pod-exempt/example_allowed.yaml
+    assertions:
+    - violations: no

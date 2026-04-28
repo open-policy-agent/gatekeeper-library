@@ -1,0 +1,13 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sGpuResourceLimits
+metadata:
+  name: max-gpu-per-container
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    maxGpuPerContainer: 4
+    exemptImages:
+      - "nvidia/dcgm-exporter:*"
