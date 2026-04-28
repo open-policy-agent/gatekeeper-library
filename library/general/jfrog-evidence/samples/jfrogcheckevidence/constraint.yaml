@@ -1,0 +1,14 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sJfrogCheckEvidence
+metadata:
+  name: jfrog-check-evidence
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    checkedRegistries: ["my-jfrog-registry.jfrog.io"]
+    # add whitelist for repositories, uncomment to enable
+    # checkedRepositories: ["docker-local"]
+    checkedPredicateTypes: ["https://slsa.dev/provenance/v1"]

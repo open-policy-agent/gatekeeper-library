@@ -1,0 +1,18 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: replicalimits
+tests:
+- name: replica-limit
+  template: template.yaml
+  constraint: samples/jfrogcheckevidence/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/jfrogcheckevidence/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/jfrogcheckevidence/example_disallowed.yaml
+    assertions:
+    - violations: yes
+
