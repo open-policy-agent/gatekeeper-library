@@ -15,6 +15,10 @@ tests:
     object: samples/gpu-pod-with-node-affinity/example_disallowed_wrong_value.yaml
     assertions:
     - violations: yes
+  - name: example-disallowed-mixed-values
+    object: samples/gpu-pod-with-node-affinity/example_disallowed_mixed_values.yaml
+    assertions:
+    - violations: yes
 - name: gpu-pod-with-node-selector
   template: template.yaml
   constraint: samples/gpu-pod-with-node-selector/constraint.yaml

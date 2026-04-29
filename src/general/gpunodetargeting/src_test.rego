@@ -36,6 +36,12 @@ test_gpu_pod_wrong_node_label_value_denied {
     count(results) == 1
 }
 
+test_gpu_pod_mixed_node_label_values_denied {
+    inp := {"review": review_with_affinity([gpu_container("trainer")], required_gpu_affinity("nvidia.com/gpu.present", ["true", "false"])), "parameters": {"nodeLabelKey": "nvidia.com/gpu.present", "nodeLabelValues": ["true"]}}
+    results := violation with input as inp
+    count(results) == 1
+}
+
 test_non_gpu_pod_allowed {
     inp := {"review": review([non_gpu_container("web")]), "parameters": {"nodeLabelKey": "nvidia.com/gpu.present", "nodeLabelValues": ["true"]}}
     results := violation with input as inp

@@ -60,7 +60,8 @@ variables:
               expr.operator == "Exists" :
               expr.operator == "In" &&
               has(expr.values) &&
-              variables.nodeLabelValues.exists(value, expr.values.exists(exprValue, exprValue == value))
+              size(expr.values) > 0 &&
+              expr.values.all(exprValue, exprValue in variables.nodeLabelValues)
           )
         )
       )

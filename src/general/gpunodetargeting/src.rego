@@ -83,5 +83,16 @@ has_matching_node_affinity(label_key) {
   label_values := object.get(input.parameters, "nodeLabelValues", [])
   count(label_values) > 0
   expr.operator == "In"
-  expr.values[_] == label_values[_]
+  values := object.get(expr, "values", [])
+  count(values) > 0
+  not has_disallowed_affinity_value(values, label_values)
+}
+
+has_disallowed_affinity_value(values, label_values) {
+  value := values[_]
+  not allowed_affinity_value(value, label_values)
+}
+
+allowed_affinity_value(value, label_values) {
+  label_values[_] == value
 }

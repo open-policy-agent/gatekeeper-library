@@ -124,7 +124,8 @@ spec:
                         expr.operator == "Exists" :
                         expr.operator == "In" &&
                         has(expr.values) &&
-                        variables.nodeLabelValues.exists(value, expr.values.exists(exprValue, exprValue == value))
+                        size(expr.values) > 0 &&
+                        expr.values.all(exprValue, exprValue in variables.nodeLabelValues)
                     )
                   )
                 )
@@ -222,7 +223,18 @@ spec:
               label_values := object.get(input.parameters, "nodeLabelValues", [])
               count(label_values) > 0
               expr.operator == "In"
-              expr.values[_] == label_values[_]
+              values := object.get(expr, "values", [])
+              count(values) > 0
+              not has_disallowed_affinity_value(values, label_values)
+            }
+
+            has_disallowed_affinity_value(values, label_values) {
+              value := values[_]
+              not allowed_affinity_value(value, label_values)
+            }
+
+            allowed_affinity_value(value, label_values) {
+              label_values[_] == value
             }
           libs:
             - |
@@ -345,6 +357,40 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpunodetargeting/samples/gpu-pod-with-node-affinity/example_disallowed_wrong_value.yaml
+```
+
+</details>
+<details>
+<summary>example-disallowed-mixed-values</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-pod-with-mixed-node-affinity
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: nvidia.com/gpu.present
+                operator: In
+                values:
+                  - "true"
+                  - "false"
+  containers:
+    - name: training
+      image: nvidia/cuda:12.0-runtime
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpunodetargeting/samples/gpu-pod-with-node-affinity/example_disallowed_mixed_values.yaml
 ```
 
 </details>
