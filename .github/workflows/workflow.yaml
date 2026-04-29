@@ -86,7 +86,7 @@ jobs:
 
       - name: Run integration test
         run: |
-          make test-integration
+          make test-integration POLICY_ENGINE=${{ matrix.engine }}
 
       - name: Save logs
         run: |
