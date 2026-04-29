@@ -1,0 +1,22 @@
+version: 1.0.0
+name: k8srequiredgputoleration
+displayName: Required GPU Toleration
+createdAt: "2026-03-17T00:04:29Z"
+description: Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to include a toleration for the specified GPU node taint. This ensures GPU workloads are properly configured to schedule on GPU nodes.
+digest: fa8687581fa25bc9a772f086440b04f8fcc594dd5eed0215dad02563255eee3c
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/requiredgputoleration
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Required GPU Toleration
+    Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to include a toleration for the specified GPU node taint. This ensures GPU workloads are properly configured to schedule on GPU nodes.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/requiredgputoleration/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

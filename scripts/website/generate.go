@@ -26,6 +26,11 @@ const (
 
 	// regex patterns.
 	pspReadmeLinkPattern = `\[([^\[\]]+)\]\(([^(]+)\)`
+
+	// AI workload bundle names.
+	aiWorkloadInferenceBundle = "gatekeeper-ai-inference-policies"
+	aiWorkloadTrainingBundle  = "gatekeeper-ai-training-policies"
+	aiWorkloadSafetyBundle    = "gatekeeper-gpu-safety-policies"
 )
 
 // Skip including examples for the following Kinds.
@@ -350,8 +355,40 @@ func main() {
 	// update sidebar from template
 	fmt.Println("Updating sidebar")
 
+	// Generate AI workload profile items for sidebar (policies organized by bundle).
+	// Policies appear in every profile they belong to, since safety, training, and
+	// inference bundles intentionally overlap.
+	aiWorkloadSafetyItemsList := generateSidebarItems(bundleItems[aiWorkloadSafetyBundle], "validation/", "                    ")
+	aiWorkloadTrainingItemsList := generateSidebarItems(bundleItems[aiWorkloadTrainingBundle], "validation/", "                    ")
+	aiWorkloadInferenceItemsList := generateSidebarItems(bundleItems[aiWorkloadInferenceBundle], "validation/", "                    ")
+
+	allAIWorkloadItems := make(map[string]bool)
+	for _, bundleName := range []string{aiWorkloadSafetyBundle, aiWorkloadTrainingBundle, aiWorkloadInferenceBundle} {
+		for _, item := range bundleItems[bundleName] {
+			allAIWorkloadItems[item] = true
+		}
+	}
+
+	var otherAIWorkloadItems []string
+	for _, item := range validationSidebarItems["general"] {
+		if isAIWorkloadItem(item) {
+			if !allAIWorkloadItems[item] {
+				otherAIWorkloadItems = append(otherAIWorkloadItems, item)
+			}
+			allAIWorkloadItems[item] = true
+		}
+	}
+	otherAIWorkloadItemsList := generateSidebarItems(otherAIWorkloadItems, "validation/", "                ")
+
+	var generalItems []string
+	for _, item := range validationSidebarItems["general"] {
+		if !allAIWorkloadItems[item] {
+			generalItems = append(generalItems, item)
+		}
+	}
+
 	// Generate General items
-	generalItemsList := generateSidebarItems(validationSidebarItems["general"], "validation/", "            ")
+	generalItemsList := generateSidebarItems(generalItems, "validation/", "            ")
 
 	// Generate Mutation items
 	mutationItemsList := generateSidebarItems(mutationSidebarItems["pod-security-policy"], "mutation-examples/", "        ")
@@ -389,6 +426,10 @@ func main() {
 	sidebarReplacer := strings.NewReplacer(
 		"%GENERAL_ITEMS%", generalItemsList,
 		"%MUTATION_ITEMS%", mutationItemsList,
+		"%AI_WORKLOAD_SAFETY_ITEMS%", aiWorkloadSafetyItemsList,
+		"%AI_WORKLOAD_TRAINING_ITEMS%", aiWorkloadTrainingItemsList,
+		"%AI_WORKLOAD_INFERENCE_ITEMS%", aiWorkloadInferenceItemsList,
+		"%OTHER_AI_WORKLOAD_ITEMS%", otherAIWorkloadItemsList,
 		"%BASELINE_ITEMS%", baselineItemsList,
 		"%RESTRICTED_ITEMS%", restrictedItemsList,
 		"%OTHER_PSP_ITEMS%", otherPSPItemsList,
@@ -416,6 +457,10 @@ func generateSidebarItems(items []string, prefix string, indent string) string {
 	}
 
 	return strings.Join(itemStrings, "\n")
+}
+
+func isAIWorkloadItem(item string) bool {
+	return strings.Contains(strings.ToLower(item), "gpu")
 }
 
 // TODO: Use shared pkg.
