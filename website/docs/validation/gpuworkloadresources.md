@@ -530,7 +530,6 @@ spec:
           memory: "256Mi"
         limits:
           memory: "256Mi"
-          cpu: "500m"
 ```
 
 Usage
@@ -624,35 +623,6 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 
 </details>
 
-<details>
-<summary>example-disallowed</summary>
-
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: gpu-pod-gpu-request-missing
-spec:
-  containers:
-    - name: training
-      image: nvidia/cuda:12.0-runtime
-      resources:
-        requests:
-          memory: "16Gi"
-          cpu: "2"
-        limits:
-          nvidia.com/gpu: "1"
-          memory: "16Gi"
-          cpu: "4"
-```
-
-Usage
-
-```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/general/gpuworkloadresources/samples/gpu-pod-gpu-request-missing/example_disallowed.yaml
-```
-
-</details>
 
 
 </details><details>

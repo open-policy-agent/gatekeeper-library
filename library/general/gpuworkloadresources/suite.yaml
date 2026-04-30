@@ -40,7 +40,7 @@ tests:
   constraint: samples/gpu-pod-gpu-request-missing/constraint.yaml
   cases:
   - name: example-disallowed
-    object: samples/gpu-pod-gpu-request-missing/example_disallowed.yaml
+    object: samples/gpu-pod-gpu-request-missing/example_gator_disallowed.yaml
     assertions:
     - violations: yes
 - name: gpu-pod-gpu-mismatch

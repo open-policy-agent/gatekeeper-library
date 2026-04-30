@@ -7,11 +7,11 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 
 	"gopkg.in/yaml.v3"
-	k8sslices "k8s.io/utils/strings/slices"
 )
 
 const (
@@ -155,6 +155,10 @@ func main() {
 
 						examples := ""
 						for _, testCase := range test.Cases {
+							if strings.Contains(filepath.Base(testCase.Object), "example_gator_") {
+								continue
+							}
+
 							exampleRawURL := sourceURL + filepath.Join(entryPoint, entry.Name(), dir.Name(), testCase.Object)
 
 							exampleContent, err := os.ReadFile(filepath.Join(basePath, dir.Name(), testCase.Object))
@@ -173,7 +177,7 @@ func main() {
 							if exampleKind, ok := exampleResource["kind"].(string); !ok {
 								fmt.Printf("error while parsing kind: %v", exampleRawURL)
 								panic(err)
-							} else if !k8sslices.Contains(skipExampleKinds, exampleKind) {
+							} else if !slices.Contains(skipExampleKinds, exampleKind) {
 								examples += fmt.Sprintf("<details>\n<summary>%s</summary>\n\n```yaml\n%s\n```\n\nUsage\n\n```shell\nkubectl apply -f %s\n```\n\n</details>\n", testCase.Name, exampleContent, exampleRawURL)
 							}
 						}

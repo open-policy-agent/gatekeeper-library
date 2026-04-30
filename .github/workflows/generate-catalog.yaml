@@ -128,7 +128,7 @@ jobs:
           labels: automation
 
       - name: Create PR comment (on PR)
-        if: github.event_name == 'pull_request' && steps.diff.outputs.changed == 'true'
+        if: github.event_name == 'pull_request' && steps.diff.outputs.changed == 'true' && github.event.pull_request.head.repo.full_name == github.repository
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
