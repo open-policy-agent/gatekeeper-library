@@ -109,3 +109,47 @@ constraint_enforced() {
   echo "ready: ${ready_count}, expected: ${pod_count}"
   [[ "${ready_count}" -eq "${pod_count}" ]]
 }
+
+validating_admission_policy_available() {
+  kubectl api-resources --api-group=admissionregistration.k8s.io -o name | grep -qx "validatingadmissionpolicies"
+}
+
+template_uses_k8s_native_validation() {
+  local policy="$1"
+  grep -q "engine: K8sNativeValidation" "${policy}/template.yaml"
+}
+
+should_wait_for_vap_enforcement() {
+  local policy="$1"
+  [[ "${POLICY_ENGINE:-rego}" == "cel" ]] && \
+    template_uses_k8s_native_validation "${policy}" && \
+    validating_admission_policy_available
+}
+
+constraint_vap_enforced() {
+  local kind="$1"
+  local name="$2"
+  local pod_list="$(kubectl -n gatekeeper-system get pod -l gatekeeper.sh/operation=webhook -o json)"
+  if [[ $? -ne 0 ]]; then
+    echo "error gathering pods"
+    return 1
+  fi
+
+  local pod_count=$(echo "${pod_list}" | jq '.items | length')
+  if [[ ${pod_count} -lt 1 ]]; then
+    echo "Gatekeeper pod count is < 1"
+    return 2
+  fi
+
+  local cstr="$(kubectl get ${kind} ${name} -ojson)"
+  if [[ $? -ne 0 ]]; then
+    echo "Error gathering constraint ${kind} ${name}"
+    return 3
+  fi
+
+  echo "checking VAP enforcement for constraint ${cstr}"
+
+  local ready_count=$(echo "${cstr}" | jq '.metadata.generation as $generation | [.status.byPod[]? | select(.operations[]? == "webhook" and .observedGeneration == $generation) | .enforcementPointsStatus[]? | select(.enforcementPoint == "vap.k8s.io" and .state == "generated" and .observedGeneration == $generation)] | length')
+  echo "VAP ready: ${ready_count}, expected: ${pod_count}"
+  [[ "${ready_count}" -eq "${pod_count}" ]]
+}

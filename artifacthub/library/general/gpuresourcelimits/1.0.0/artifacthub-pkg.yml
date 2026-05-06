@@ -1,0 +1,22 @@
+version: 1.0.0
+name: k8sgpuresourcelimits
+displayName: GPU Resource Limits
+createdAt: "2026-03-17T00:04:28Z"
+description: Enforces a maximum number of NVIDIA GPUs (nvidia.com/gpu) that a single container may request. This prevents individual containers from hoarding GPU resources on shared clusters, particularly for AI/ML training workloads.
+digest: cc06ded085ae8ba815f0f1b22884d714d2989dd70cbb4ec4c09334d854cc51eb
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/gpuresourcelimits
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # GPU Resource Limits
+    Enforces a maximum number of NVIDIA GPUs (nvidia.com/gpu) that a single container may request. This prevents individual containers from hoarding GPU resources on shared clusters, particularly for AI/ML training workloads.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/gpuresourcelimits/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

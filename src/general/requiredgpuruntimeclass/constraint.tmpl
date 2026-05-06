@@ -1,0 +1,49 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequiredgpuruntimeclass
+  annotations:
+    metadata.gatekeeper.sh/title: "Required GPU Runtime Class"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to specify
+      a runtimeClassName from an allowed list. This ensures GPU workloads use
+      the proper container runtime (e.g., nvidia) rather than relying on default
+      runtime hooks.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequiredGpuRuntimeClass
+      validation:
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Requires GPU pods to specify an allowed runtimeClassName.
+          properties:
+            allowedRuntimeClassNames:
+              description: >-
+                List of allowed runtime class names for GPU workloads (e.g., ["nvidia"]).
+              type: array
+              items:
+                type: string
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`.
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+{{ file.Read "src/general/requiredgpuruntimeclass/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+      - engine: Rego
+        source:
+          rego: |
+{{ file.Read "src/general/requiredgpuruntimeclass/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}
+          libs:
+            - |
+{{ file.Read "src/general/requiredgpuruntimeclass/lib_exempt_container.rego" | strings.Indent 14 | strings.TrimSuffix "\n" }}
