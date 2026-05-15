@@ -1,0 +1,23 @@
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx-flexvolume-driver-disallowed
+      labels:
+        app: nginx-flexvolume-driver
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        volumeMounts:
+        - mountPath: /test
+          name: test-volume
+          readOnly: true
+      volumes:
+      - name: test-volume
+        flexVolume:
+          driver: "example/testdriver" #"example/lvm"
