@@ -1,0 +1,42 @@
+variables:
+- name: containers
+  expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+- name: exemptImagePrefixes
+  expression: |
+    !has(variables.params.exemptImages) ? [] :
+      variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+- name: exemptImageExplicit
+  expression: |
+    !has(variables.params.exemptImages) ? [] :
+      variables.params.exemptImages.filter(image, !image.endsWith("*"))
+- name: exemptImages
+  expression: |
+    variables.containers.filter(container,
+      container.image in variables.exemptImageExplicit ||
+      variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))
+    ).map(container, container.image)
+- name: volumes
+  expression: 'has(variables.anyObject.spec.volumes) ? variables.anyObject.spec.volumes : []'
+- name: memoryVolNames
+  expression: |
+    variables.volumes.filter(v,
+      has(v.emptyDir) && has(v.emptyDir.medium) && v.emptyDir.medium == "Memory"
+    ).map(v, v.name)
+- name: badContainers
+  expression: |
+    variables.containers.filter(container,
+      !(container.image in variables.exemptImages) &&
+      has(container.resources) &&
+      has(container.resources.limits) &&
+      "nvidia.com/gpu" in container.resources.limits &&
+      quantity(string(container.resources.limits["nvidia.com/gpu"])).compareTo(quantity("0")) > 0 &&
+      (!has(container.volumeMounts) ||
+        !container.volumeMounts.exists(vm,
+          vm.mountPath == "/dev/shm" &&
+          vm.name in variables.memoryVolNames
+        )
+      )
+    ).map(container, "Container <" + container.name + "> requests GPU resources but does not mount a memory-backed volume at /dev/shm")
+validations:
+- expression: 'size(variables.badContainers) == 0'
+  messageExpression: 'variables.badContainers.join(", ")'

@@ -1,0 +1,47 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequiredgputoleration
+  annotations:
+    metadata.gatekeeper.sh/title: "Required GPU Toleration"
+    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/bundle: "gatekeeper-gpu-safety-policies, gatekeeper-ai-training-policies, gatekeeper-ai-inference-policies"
+    description: >-
+      Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to include
+      a toleration for the specified GPU node taint. This ensures GPU workloads
+      are properly configured to schedule on GPU nodes.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequiredGpuToleration
+      validation:
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Requires pods requesting GPUs to include a specified toleration.
+          properties:
+            tolerationKey:
+              description: >-
+                The taint key that GPU pods must tolerate (e.g., "nvidia.com/gpu").
+              type: string
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`.
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+{{ file.Read "src/general/requiredgputoleration/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+      - engine: Rego
+        source:
+          rego: |
+{{ file.Read "src/general/requiredgputoleration/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}
+          libs:
+            - |
+{{ file.Read "src/general/requiredgputoleration/lib_exempt_container.rego" | strings.Indent 14 | strings.TrimSuffix "\n" }}

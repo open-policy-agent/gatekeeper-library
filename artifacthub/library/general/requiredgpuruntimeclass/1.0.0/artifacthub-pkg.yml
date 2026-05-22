@@ -1,0 +1,22 @@
+version: 1.0.0
+name: k8srequiredgpuruntimeclass
+displayName: Required GPU Runtime Class
+createdAt: "2026-03-17T00:04:29Z"
+description: Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to specify a runtimeClassName from an allowed list. This ensures GPU workloads use the proper container runtime (e.g., nvidia) rather than relying on default runtime hooks.
+digest: 5197dff6a2680b6eccb1a805f75df87a2772d702867e25ad8be509166f19d41b
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/requiredgpuruntimeclass
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Required GPU Runtime Class
+    Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to specify a runtimeClassName from an allowed list. This ensures GPU workloads use the proper container runtime (e.g., nvidia) rather than relying on default runtime hooks.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/requiredgpuruntimeclass/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

@@ -23,6 +23,52 @@ module.exports = {
         },
         {
           type: 'category',
+          label: 'AI Workload Policies',
+          collapsed: true,
+          items: [
+            {
+              type: 'category',
+              label: 'Profiles',
+              collapsed: true,
+              items: [
+                {
+                  type: 'category',
+                  label: 'GPU Safety',
+                  collapsed: true,
+                  items: [
+%AI_WORKLOAD_SAFETY_ITEMS%
+                  ],
+                },
+                {
+                  type: 'category',
+                  label: 'Training',
+                  collapsed: true,
+                  items: [
+%AI_WORKLOAD_TRAINING_ITEMS%
+                  ],
+                },
+                {
+                  type: 'category',
+                  label: 'Inference',
+                  collapsed: true,
+                  items: [
+%AI_WORKLOAD_INFERENCE_ITEMS%
+                  ],
+                },
+              ],
+            },
+            {
+              type: 'category',
+              label: 'Other',
+              collapsed: true,
+              items: [
+%OTHER_AI_WORKLOAD_ITEMS%
+              ],
+            },
+          ],
+        },
+        {
+          type: 'category',
           label: 'Pod Security Standards',
           collapsed: true,
           items: [
