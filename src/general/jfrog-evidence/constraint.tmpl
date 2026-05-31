@@ -1,0 +1,35 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sjfrogcheckevidence
+  annotations:
+    metadata.gatekeeper.sh/title: "Check JFrog Evidence"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      Checks if the images in a pod comply with regulations or corporate policies by validating they have required verified evidence.
+      This policy is based on the JFrog OPA provider. To deploy JFrog OPA Provider, please visit: https://github.com/jfrog/jfrog-opa-policy
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sJfrogCheckEvidence
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            checkedPredicateTypes:
+              type: array
+              items:
+                type: string
+            checkedRegistries:
+              type: array
+              items:
+                type: string
+            checkedRepositories: 
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ file.Read "src/general/jfrog-evidence/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
