@@ -61,7 +61,7 @@ spec:
         violation[{"msg": msg}] {
           obj := input.review.object
           pdb := data.inventory.namespace[obj.metadata.namespace]["policy/v1"].PodDisruptionBudget[_]
-          
+
           matchLabels := { [label, value] | some label; value := pdb.spec.selector.matchLabels[label] }
           labels := { [label, value] | some label; value := obj.spec.template.metadata.labels[label] }
           count(matchLabels - labels) == 0
