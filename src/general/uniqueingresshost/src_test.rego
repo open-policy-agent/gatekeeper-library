@@ -1,11 +1,15 @@
 package k8suniqueingresshost
 
-test_no_data {
+import future.keywords.contains
+import future.keywords.if
+
+test_no_data if {
     inp := {"review": review(ingress("my-ingress", "prod", my_rules1, "extensions/v1beta1"), "extensions")}
     results := violation with input as inp
     count(results) == 0
 }
-test_identical {
+
+test_identical if {
     inp := {"review": review(ingress("my-ingress", "prod", my_rules1, "extensions/v1beta1"), "extensions")}
     inv := inventory_data([ingress("my-ingress", "prod", my_rules1, "extensions/v1beta1")])
             trace(sprintf("%v", [inv]))
@@ -15,70 +19,78 @@ test_identical {
 
     count(results) == 0
 }
-test_collision {
+
+test_collision if {
     inp := {"review": review(ingress("my-ingress", "prod", my_rules1, "extensions/v1beta1"), "extensions")}
     inv := inventory_data([ingress("my-ingress", "prod2", my_rules1, "extensions/v1beta1")])
     results := violation with input as inp with data.inventory as inv
     count(results) == 1
 }
-test_collision_with_multiple {
+
+test_collision_with_multiple if {
     inp := {"review": review(ingress("my-ingress", "prod", my_rules3, "extensions/v1beta1"), "extensions")}
     inv := inventory_data([ingress("my-ingress", "prod2", my_rules1, "extensions/v1beta1"), ingress("my-ingress1", "prod2", my_rules2, "extensions/v1beta1")])
     results := violation with input as inp with data.inventory as inv
     count(results) == 2
 }
-test_no_collision {
+
+test_no_collision if {
     inp := {"review": review(ingress("my-ingress", "prod", my_rules1, "extensions/v1beta1"), "extensions")}
     inv := inventory_data([ingress("my-ingress", "prod2", my_rules2, "extensions/v1beta1")])
     results := violation with input as inp with data.inventory as inv
     count(results) == 0
 }
-test_no_collision_with_multiple {
+
+test_no_collision_with_multiple if {
     inp := {"review": review(ingress("my-ingress", "prod", my_rules4, "extensions/v1beta1"), "extensions")}
     inv := inventory_data([ingress("my-ingress", "prod2", my_rules1, "extensions/v1beta1"), ingress("my-ingress", "prod3", my_rules2, "extensions/v1beta1")])
     results := violation with input as inp with data.inventory as inv
     count(results) == 0
 }
-test_no_collision_with_multiple_apis {
+
+test_no_collision_with_multiple_apis if {
     inp := {"review": review(ingress("my-ingress", "prod", my_rules4, "networking.k8s.io/v1beta1"), "networking.k8s.io")}
     inv := inventory_data2([ingress("my-ingress", "prod2", my_rules1, "networking.k8s.io/v1beta1"), ingress("my-ingress", "prod3", my_rules2, "networking.k8s.io/v1beta1")])
     results := violation with input as inp with data.inventory as inv
     count(results) == 0
 }
-test_collision_with_multiple_apis {
+
+test_collision_with_multiple_apis if {
     inp := {"review": review(ingress("my-ingress", "prod", my_rules3, "networking.k8s.io/v1beta1"), "networking.k8s.io")}
     inv := inventory_data2([ingress("my-ingress", "prod2", my_rules1, "networking.k8s.io/v1beta1"), ingress("my-ingress", "prod3", my_rules2, "networking.k8s.io/v1beta1")])
     results := violation with input as inp with data.inventory as inv
     count(results) == 2
 }
-test_no_collision_with_multiple_bad_review_apis {
+
+test_no_collision_with_multiple_bad_review_apis if {
     inp := {"review": review(ingress("my-ingress", "prod", my_rules1, "app/v1beta1"), "app")}
     inv := inventory_data([ingress("my-ingress", "prod2", my_rules1, "extensions/v1beta1"), ingress("my-ingress", "prod3", my_rules2, "extensions/v1beta1")])
     results := violation with input as inp with data.inventory as inv
     count(results) == 0
 }
-test_no_collision_with_multiple_bad_review_apis2 {
+
+test_no_collision_with_multiple_bad_review_apis2 if {
     inp := {"review": review(ingress("my-ingress", "prod", my_rules1, "test.extensions/v1beta1"), "test.extensions")}
     inv := inventory_data([ingress("my-ingress", "prod2", my_rules1, "extensions/v1beta1"), ingress("my-ingress", "prod3", my_rules2, "extensions/v1beta1")])
     results := violation with input as inp with data.inventory as inv
     count(results) == 0
 }
-test_collision_with_multiple_apis_mixed {
+
+test_collision_with_multiple_apis_mixed if {
     inp := {"review": review(ingress("my-ingress", "prod", my_rules1, "networking.k8s.io/v1beta1"), "networking.k8s.io")}
     inv := inventory_data([ingress("my-ingress", "prod2", my_rules1, "extensions/v1beta1"), ingress("my-ingress", "prod3", my_rules2, "extensions/v1beta1")])
     results := violation with input as inp with data.inventory as inv
     count(results) == 1
 }
-test_no_collision_with_multiple_apis_slash {
+
+test_no_collision_with_multiple_apis_slash if {
     inp := {"review": review(ingress("my-ingress", "prod", my_rules1, "networking.k8s.io/v1beta1"), "networking.k8s.io")}
     inv := inventory_data1([ingress("my-ingress", "prod2", my_rules1, "extensions.something.io/v1beta1"), ingress("my-ingress", "prod3", my_rules2, "extensions.something.io/v1beta1")])
     results := violation with input as inp with data.inventory as inv
     count(results) == 0
 }
 
-
-
-review(ing, group) = output {
+review(ing, group) := output if {
   output = {
     "kind": {
       "kind": "Ingress",
@@ -91,32 +103,32 @@ review(ing, group) = output {
   }
 }
 
-my_rule(host) = {
+my_rule(host) := {
   "host": host,
   "http": {
     "paths": [{"backend": {"serviceName": "nginx", "servicePort": 80}}]
   },
 }
 
-my_rules1 = [
+my_rules1 := [
     my_rule("a.abc.com")
 ]
-my_rules2 = [
+
+my_rules2 := [
     my_rule("a1.abc.com")
 ]
 
-my_rules3 = [
+my_rules3 := [
     my_rule("a.abc.com"),
     my_rule("a1.abc.com")
 ]
 
-my_rules4 = [
+my_rules4 := [
     my_rule("a2.abc.com"),
     my_rule("a3.abc.com")
 ]
 
-
-ingress(name, ns, rules, apiversion) = out {
+ingress(name, ns, rules, apiversion) := out if {
   out = {
     "kind": "Ingress",
     "apiVersion": apiversion,
@@ -130,7 +142,7 @@ ingress(name, ns, rules, apiversion) = out {
   }
 }
 
-inventory_data(ingresses) = out {
+inventory_data(ingresses) := out if {
   namespaces := {ns | ns = ingresses[_].metadata.namespace}
   out = {
     "namespace": {
@@ -141,9 +153,9 @@ inventory_data(ingresses) = out {
       } | ns := namespaces[_]
     }
   }
-}
+        }
 
-inventory_data1(ingresses) = out {
+inventory_data1(ingresses) := out if {
   namespaces := {ns | ns = ingresses[_].metadata.namespace}
   out = {
     "namespace": {
@@ -154,9 +166,9 @@ inventory_data1(ingresses) = out {
       } | ns := namespaces[_]
     }
   }
-}
+    }
 
-inventory_data2(ingresses) = out {
+inventory_data2(ingresses) := out if {
   namespaces := {ns | ns = ingresses[_].metadata.namespace}
   out = {
     "namespace": {
@@ -167,8 +179,8 @@ inventory_data2(ingresses) = out {
       } | ns := namespaces[_]
     }
   }
-}
+  }
 
-flatten_by_name(ingresses, ns) = out {
+flatten_by_name(ingresses, ns) := out if {
   out = {o.metadata.name: o | o = ingresses[_]; o.metadata.namespace = ns}
 }

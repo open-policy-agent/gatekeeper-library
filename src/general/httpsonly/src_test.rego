@@ -1,68 +1,81 @@
 package k8shttpsonly
 
-test_http_disallowed {
+import future.keywords.contains
+import future.keywords.if
+
+test_http_disallowed if {
     inp := {"review": review_ingress(annotation("false"), tls)}
     results := violation with input as inp
     count(results) == 0
 }
-test_boolean_annotation {
+
+test_boolean_annotation if {
     inp := {"review": review_ingress(annotation(false), tls)}
     results := violation with input as inp
     count(results) == 1
 }
-test_true_annotation {
+
+test_true_annotation if {
     inp := {"review": review_ingress(annotation("true"), tls)}
     results := violation with input as inp
     count(results) == 1
 }
-test_missing_annotation {
+
+test_missing_annotation if {
     inp := {"review": review_ingress({}, tls)}
     results := violation with input as inp
     count(results) == 1
 }
-test_empty_tls {
+
+test_empty_tls if {
     inp := {"review": review_ingress({}, empty_tls)}
     results := violation with input as inp
     count(results) == 1
 }
-test_missing_tls {
+
+test_missing_tls if {
     inp := {"review": review_ingress(annotation("false"), {})}
     results := violation with input as inp
     count(results) == 1
 }
-test_missing_all {
+
+test_missing_all if {
     inp := {"review": review_ingress({}, {})}
     results := violation with input as inp
     count(results) == 1
 }
-test_tls_optional_missing_tls {
+
+test_tls_optional_missing_tls if {
     inp := {"review": review_ingress(annotation("false"), {}), "parameters": {"tlsOptional": true}}
     results := violation with input as inp
     count(results) == 0
 }
-test_tls_optional_empty_tls {
+
+test_tls_optional_empty_tls if {
     inp := {"review": review_ingress(annotation("false"), empty_tls), "parameters": {"tlsOptional": true}}
     results := violation with input as inp
     count(results) == 0
 }
-test_tls_optional_with_tls {
+
+test_tls_optional_with_tls if {
     inp := {"review": review_ingress(annotation("false"), tls), "parameters": {"tlsOptional": true}}
     results := violation with input as inp
     count(results) == 0
 }
-test_tls_optional_true_annotation {
+
+test_tls_optional_true_annotation if {
     inp := {"review": review_ingress(annotation("true"), {}), "parameters": {"tlsOptional": true}}
     results := violation with input as inp
     count(results) == 1
 }
-test_tls_optional_missing_annotation {
+
+test_tls_optional_missing_annotation if {
     inp := {"review": review_ingress({}, {}), "parameters": {"tlsOptional": true}}
     results := violation with input as inp
     count(results) == 1
 }
 
-
-review_ingress(annotationVal, tlsVal) = out {
+review_ingress(annotationVal, tlsVal) := out if {
   out = {
     "object": {
       "kind": "Ingress",
@@ -74,18 +87,18 @@ review_ingress(annotationVal, tlsVal) = out {
       "spec": tlsVal
     }
   }
-}
+    }
 
-annotation(val) = out {
+annotation(val) := out if {
   out = {
     "kubernetes.io/ingress.allow-http": val
   }
-}
+  }
 
-empty_tls = {
+empty_tls := {
   "tls": []
 }
 
-tls = {
+tls := {
   "tls": [{"secretName": "secret-cert"}]
 }

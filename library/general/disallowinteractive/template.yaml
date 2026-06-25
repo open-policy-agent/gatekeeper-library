@@ -4,7 +4,7 @@ metadata:
   name: k8sdisallowinteractivetty
   annotations:
     metadata.gatekeeper.sh/title: "Disallow Interactive TTY Containers"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Requires that objects have the fields `spec.tty` and `spec.stdin` set to false or unset.
 spec:
@@ -35,53 +35,64 @@ spec:
     rego: |
         package k8sdisallowinteractivetty
 
+        import future.keywords.contains
+        import future.keywords.if
+
         import data.lib.exempt_container.is_exempt
 
-        violation[{"msg": msg, "details": {}}] {
+        violation contains {"msg": msg, "details": {}} if {
             c := input_containers[_]
             not is_exempt(c)
             input_allow_interactive_fields(c)
             msg := sprintf("Containers using tty or stdin (%v) are not allowed running image: %v", [c.name, c.image])
         }
 
-        input_allow_interactive_fields(c) {
+        input_allow_interactive_fields(c) if {
             has_field(c, "stdin")
             not c.stdin == false
         }
-        input_allow_interactive_fields(c) {
+
+        input_allow_interactive_fields(c) if {
             has_field(c, "tty")
             not c.tty == false
         }
-        input_containers[c] {
+
+        input_containers contains c if {
             c := input.review.object.spec.containers[_]
         }
-        input_containers[c] {
+
+        input_containers contains c if {
             c := input.review.object.spec.ephemeralContainers[_]
         }
-        input_containers[c] {
+
+        input_containers contains c if {
             c := input.review.object.spec.initContainers[_]
         }
+
         # has_field returns whether an object has a field
-        has_field(object, field) = true {
+        has_field(object, field) if {
             object[field]
         }
     libs:
       - |
         package lib.exempt_container
 
-        is_exempt(container) {
+        import future.keywords.contains
+        import future.keywords.if
+
+        is_exempt(container) if {
             exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
             img := container.image
             exemption := exempt_images[_]
             _matches_exemption(img, exemption)
         }
 
-        _matches_exemption(img, exemption) {
+        _matches_exemption(img, exemption) if {
             not endswith(exemption, "*")
             exemption == img
         }
 
-        _matches_exemption(img, exemption) {
+        _matches_exemption(img, exemption) if {
             endswith(exemption, "*")
             prefix := trim_suffix(exemption, "*")
             startswith(img, prefix)

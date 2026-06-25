@@ -1,6 +1,9 @@
 package k8sblocknodeport
 
-test_block_node_port {
+import future.keywords.contains
+import future.keywords.if
+
+test_block_node_port if {
   inp := {
     "review": {
       "kind": {"kind": "Service"},
@@ -18,8 +21,9 @@ test_block_node_port {
   }
   result := violation with input as inp
   count(result) == 1
-}
-test_allow_other_service_types {
+            }
+
+test_allow_other_service_types if {
   inp := {
     "review": {
       "kind": {"kind": "Service"},
@@ -37,4 +41,4 @@ test_allow_other_service_types {
   }
   result := violation with input as inp
   count(result) == 0
-}
+        }

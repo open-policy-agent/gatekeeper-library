@@ -1,10 +1,13 @@
 package k8spspselinux
 
+import future.keywords.contains
+import future.keywords.if
+
 import data.lib.exclude_update.is_update
 import data.lib.exempt_container.is_exempt
 
 # Disallow top level custom SELinux options
-violation[{"msg": msg, "details": {}}] {
+violation contains {"msg": msg, "details": {}} if {
     # spec.securityContext.seLinuxOptions field is immutable.
     not is_update(input.review)
 
@@ -12,8 +15,9 @@ violation[{"msg": msg, "details": {}}] {
     not input_seLinuxOptions_allowed(input.review.object.spec.securityContext.seLinuxOptions)
     msg := sprintf("SELinux options is not allowed, pod: %v. Allowed options: %v", [input.review.object.metadata.name, input.parameters.allowedSELinuxOptions])
 }
+
 # Disallow container level custom SELinux options
-violation[{"msg": msg, "details": {}}] {
+violation contains {"msg": msg, "details": {}} if {
     # spec.containers.securityContext.seLinuxOptions field is immutable.
     not is_update(input.review)
 
@@ -24,7 +28,7 @@ violation[{"msg": msg, "details": {}}] {
     msg := sprintf("SELinux options is not allowed, pod: %v, container: %v. Allowed options: %v", [input.review.object.metadata.name, c.name, input.parameters.allowedSELinuxOptions])
 }
 
-input_seLinuxOptions_allowed(options) {
+input_seLinuxOptions_allowed(options) if {
     params := input.parameters.allowedSELinuxOptions[_]
     field_allowed("level", options, params)
     field_allowed("role", options, params)
@@ -32,27 +36,30 @@ input_seLinuxOptions_allowed(options) {
     field_allowed("user", options, params)
 }
 
-field_allowed(field, options, params) {
+field_allowed(field, options, params) if {
     params[field] == options[field]
 }
-field_allowed(field, options, _) {
+
+field_allowed(field, options, _) if {
     not has_field(options, field)
 }
 
-input_security_context[c] {
+input_security_context contains c if {
     c := input.review.object.spec.containers[_]
     has_field(c.securityContext, "seLinuxOptions")
 }
-input_security_context[c] {
+
+input_security_context contains c if {
     c := input.review.object.spec.initContainers[_]
     has_field(c.securityContext, "seLinuxOptions")
 }
-input_security_context[c] {
+
+input_security_context contains c if {
     c := input.review.object.spec.ephemeralContainers[_]
     has_field(c.securityContext, "seLinuxOptions")
 }
 
 # has_field returns whether an object has a field
-has_field(object, field) = true {
+has_field(object, field) if {
     object[field]
 }

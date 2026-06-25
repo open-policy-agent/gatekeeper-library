@@ -1,34 +1,37 @@
 package k8srequiredprobes
 
-test_one_ctr_no_violations {
+import future.keywords.contains
+import future.keywords.if
+
+test_one_ctr_no_violations if {
     inp := {"review": review([{"name": "my-container","image": "my-image:latest","readinessProbe": {"tcpSocket": {"port":80}}, "livenessProbe": {"tcpSocket": {"port":80}}}]),
               "parameters": parameters}
     results := violation with input as inp
     count(results) == 0
 }
 
-test_one_ctr_readiness_violation {
+test_one_ctr_readiness_violation if {
     inp := {"review": review([{"name": "my-container","image": "my-image:latest", "livenessProbe": {"tcpSocket": {"port":80}}}]),
               "parameters": parameters}
     results := violation with input as inp
     count(results) == 1
 }
 
-test_one_ctr_liveness_violation {
+test_one_ctr_liveness_violation if {
     inp := {"review": review([{"name": "my-container","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":80}}}]),
               "parameters": parameters}
     results := violation with input as inp
     count(results) == 1
 }
 
-test_one_ctr_all_violations {
+test_one_ctr_all_violations if {
     inp := {"review": review([{"name": "my-container","image": "my-image:latest"}]),
               "parameters": parameters}
     results := violation with input as inp
     count(results) == 2
 }
 
-test_two_ctrs_no_violations {
+test_two_ctrs_no_violations if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest","readinessProbe": {"tcpSocket": {"port":80}}, "livenessProbe": {"tcpSocket": {"port":80}}},
                                 {"name": "my-container2","image": "my-image:latest","readinessProbe": {"tcpSocket": {"port":8080}}, "livenessProbe": {"tcpSocket": {"port":8080}}}]),
               "parameters": parameters}
@@ -36,7 +39,7 @@ test_two_ctrs_no_violations {
     count(results) == 0
 }
 
-test_two_ctrs_all_violations_in_both {
+test_two_ctrs_all_violations_in_both if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest"},
                                 {"name": "my-container2","image": "my-image:latest"}]),
               "parameters": parameters}
@@ -44,7 +47,7 @@ test_two_ctrs_all_violations_in_both {
     count(results) == 4
 }
 
-test_two_ctrs_all_violations_in_ctr_one {
+test_two_ctrs_all_violations_in_ctr_one if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest"},
                                 {"name": "my-container2","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":80}}, "livenessProbe": {"tcpSocket": {"port":80}}}]),
               "parameters": parameters}
@@ -52,7 +55,7 @@ test_two_ctrs_all_violations_in_ctr_one {
     count(results) == 2
 }
 
-test_two_ctrs_all_violations_in_ctr_two {
+test_two_ctrs_all_violations_in_ctr_two if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":80}}, "livenessProbe": {"tcpSocket": {"port":80}}},
                                 {"name": "my-container2","image": "my-image:latest"}]),
               "parameters": parameters}
@@ -60,7 +63,7 @@ test_two_ctrs_all_violations_in_ctr_two {
     count(results) == 2
 }
 
-test_two_ctrs_readiness_violation_in_ctr_one {
+test_two_ctrs_readiness_violation_in_ctr_one if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "livenessProbe": {"tcpSocket": {"port":80}}},
                                 {"name": "my-container2","image": "my-image:latest","readinessProbe": {"tcpSocket": {"port":8080}}, "livenessProbe": {"tcpSocket": {"port":8080}}}]),
               "parameters": parameters}
@@ -68,7 +71,7 @@ test_two_ctrs_readiness_violation_in_ctr_one {
     count(results) == 1
 }
 
-test_two_ctrs_readiness_violation_in_ctr_two {
+test_two_ctrs_readiness_violation_in_ctr_two if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":8080}}, "livenessProbe": {"tcpSocket": {"port":8080}}},
                                 {"name": "my-container2","image": "my-image:latest", "livenessProbe": {"tcpSocket": {"port":80}}}]),
               "parameters": parameters}
@@ -76,7 +79,7 @@ test_two_ctrs_readiness_violation_in_ctr_two {
     count(results) == 1
 }
 
-test_two_ctrs_readiness_violation_in_both {
+test_two_ctrs_readiness_violation_in_both if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "livenessProbe": {"tcpSocket": {"port":80}}},
                                 {"name": "my-container2","image": "my-image:latest", "livenessProbe": {"tcpSocket": {"port":8080}}}]),
               "parameters": parameters}
@@ -84,7 +87,7 @@ test_two_ctrs_readiness_violation_in_both {
     count(results) == 2
 }
 
-test_two_ctrs_liveness_violation_in_ctr_one {
+test_two_ctrs_liveness_violation_in_ctr_one if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":80}}},
                                 {"name": "my-container2","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":8080}}, "livenessProbe": {"tcpSocket": {"port":8080}}}]),
               "parameters": parameters}
@@ -92,7 +95,7 @@ test_two_ctrs_liveness_violation_in_ctr_one {
     count(results) == 1
 }
 
-test_two_ctrs_liveness_violation_in_ctr_two {
+test_two_ctrs_liveness_violation_in_ctr_two if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":8080}}, "livenessProbe": {"tcpSocket": {"port":8080}}},
                                 {"name": "my-container2","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":80}}}]),
               "parameters": parameters}
@@ -100,7 +103,7 @@ test_two_ctrs_liveness_violation_in_ctr_two {
     count(results) == 1
 }
 
-test_two_ctrs_liveness_violation_in_both {
+test_two_ctrs_liveness_violation_in_both if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":8080}}},
                                 {"name": "my-container2","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":80}}}]),
               "parameters": parameters}
@@ -108,7 +111,7 @@ test_two_ctrs_liveness_violation_in_both {
     count(results) == 2
 }
 
-test_two_ctrs_readiness_in_one_liveness_in_two {
+test_two_ctrs_readiness_in_one_liveness_in_two if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "livenessProbe": {"tcpSocket": {"port":80}}},
                                 {"name": "my-container2","image": "my-image:latest","readinessProbe": {"tcpSocket": {"port":8080}}}]),
               "parameters": parameters}
@@ -116,7 +119,7 @@ test_two_ctrs_readiness_in_one_liveness_in_two {
     count(results) == 2
 }
 
-test_two_ctrs_liveness_in_one_readiness_in_two {
+test_two_ctrs_liveness_in_one_readiness_in_two if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":80}}},
                                 {"name": "my-container2","image": "my-image:latest", "livenessProbe": {"tcpSocket": {"port":8080}}}]),
               "parameters": parameters}
@@ -124,7 +127,7 @@ test_two_ctrs_liveness_in_one_readiness_in_two {
     count(results) == 2
 }
 
-test_two_ctrs_readiness_violation_in_ctr_one_all_violations_in_ctr_two {
+test_two_ctrs_readiness_violation_in_ctr_one_all_violations_in_ctr_two if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "livenessProbe": {"tcpSocket": {"port":80}}},
                                 {"name": "my-container2","image": "my-image:latest"}]),
               "parameters": parameters}
@@ -132,7 +135,7 @@ test_two_ctrs_readiness_violation_in_ctr_one_all_violations_in_ctr_two {
     count(results) == 3
 }
 
-test_two_ctrs_liveness_violation_in_ctr_one_all_violations_in_ctr_two {
+test_two_ctrs_liveness_violation_in_ctr_one_all_violations_in_ctr_two if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":80}}},
                                 {"name": "my-container2","image": "my-image:latest"}]),
               "parameters": parameters}
@@ -140,7 +143,7 @@ test_two_ctrs_liveness_violation_in_ctr_one_all_violations_in_ctr_two {
     count(results) == 3
 }
 
-test_two_ctrs_readiness_violation_in_ctr_two_all_violations_in_ctr_one {
+test_two_ctrs_readiness_violation_in_ctr_two_all_violations_in_ctr_one if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest"},
                                 {"name": "my-container2","image": "my-image:latest", "livenessProbe": {"tcpSocket": {"port":80}}}]),
               "parameters": parameters}
@@ -148,36 +151,36 @@ test_two_ctrs_readiness_violation_in_ctr_two_all_violations_in_ctr_one {
     count(results) == 3
 }
 
-test_two_ctrs_liveness_violation_in_ctr_two_all_violations_in_ctr_one {
+test_two_ctrs_liveness_violation_in_ctr_two_all_violations_in_ctr_one if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest"},
                                 {"name": "my-container2","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":80}}}]),
               "parameters": parameters}
     results := violation with input as inp
     count(results) == 3
-}
+        }
 
-test_one_ctr_empty_readiness_violation {
+test_one_ctr_empty_readiness_violation if {
     inp := {"review": review([{"name": "my-container","image": "my-image:latest", "readinessProbe": {}, "livenessProbe": {"tcpSocket": {"port":80}}}]),
               "parameters": parameters}
     results := violation with input as inp
     count(results) == 1
 }
 
-test_one_ctr_empty_liveness_violation {
+test_one_ctr_empty_liveness_violation if {
     inp := {"review": review([{"name": "my-container","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":80}}, "livenessProbe": {}}]),
               "parameters": parameters}
     results := violation with input as inp
     count(results) == 1
 }
 
-test_one_ctr_empty_probes_violations {
+test_one_ctr_empty_probes_violations if {
     inp := {"review": review([{"name": "my-container","image": "my-image:latest", "readinessProbe": {}, "livenessProbe": {}}]),
               "parameters": parameters}
     results := violation with input as inp
     count(results) == 2
 }
 
-test_two_ctrs_empty_probes_violation_in_both {
+test_two_ctrs_empty_probes_violation_in_both if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {}, "livenessProbe": {}},
                                 {"name": "my-container2","image": "my-image:latest", "readinessProbe": {}, "livenessProbe": {}}]),
               "parameters": parameters}
@@ -185,7 +188,7 @@ test_two_ctrs_empty_probes_violation_in_both {
     count(results) == 4
 }
 
-test_two_ctrs_empty_probes_violation_in_ctr_one {
+test_two_ctrs_empty_probes_violation_in_ctr_one if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {}, "livenessProbe": {}},
                                 {"name": "my-container2","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":80}}, "livenessProbe": {"tcpSocket": {"port":80}}}]),
               "parameters": parameters}
@@ -193,7 +196,7 @@ test_two_ctrs_empty_probes_violation_in_ctr_one {
     count(results) == 2
 }
 
-test_two_ctrs_empty_probes_violation_in_ctr_two {
+test_two_ctrs_empty_probes_violation_in_ctr_two if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":80}}, "livenessProbe": {"tcpSocket": {"port":80}}},
                                 {"name": "my-container2","image": "my-image:latest", "readinessProbe": {}, "livenessProbe": {}}]),
               "parameters": parameters}
@@ -201,7 +204,7 @@ test_two_ctrs_empty_probes_violation_in_ctr_two {
     count(results) == 2
 }
 
-test_two_ctrs_empty_readiness_violation_in_ctr_one {
+test_two_ctrs_empty_readiness_violation_in_ctr_one if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "livenessProbe": {"tcpSocket": {"port":80}}, "readinessProbe": {}},
                                 {"name": "my-container2","image": "my-image:latest","readinessProbe": {"tcpSocket": {"port":8080}}, "livenessProbe": {"tcpSocket": {"port":8080}}}]),
               "parameters": parameters}
@@ -209,7 +212,7 @@ test_two_ctrs_empty_readiness_violation_in_ctr_one {
     count(results) == 1
 }
 
-test_two_ctrs_empty_readiness_violation_in_ctr_two {
+test_two_ctrs_empty_readiness_violation_in_ctr_two if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":8080}}, "livenessProbe": {"tcpSocket": {"port":8080}}},
                                 {"name": "my-container2","image": "my-image:latest", "readinessProbe": {}, "livenessProbe": {"tcpSocket": {"port":80}}}]),
               "parameters": parameters}
@@ -217,7 +220,7 @@ test_two_ctrs_empty_readiness_violation_in_ctr_two {
     count(results) == 1
 }
 
-test_two_ctrs_empty_readiness_violation_in_both {
+test_two_ctrs_empty_readiness_violation_in_both if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {}, "livenessProbe": {"tcpSocket": {"port":80}}},
                                 {"name": "my-container2","image": "my-image:latest", "readinessProbe": {}, "livenessProbe": {"tcpSocket": {"port":8080}}}]),
               "parameters": parameters}
@@ -225,7 +228,7 @@ test_two_ctrs_empty_readiness_violation_in_both {
     count(results) == 2
 }
 
-test_two_ctrs_empty_liveness_violation_in_ctr_one {
+test_two_ctrs_empty_liveness_violation_in_ctr_one if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":80}}, "livenessProbe": {}},
                                 {"name": "my-container2","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":8080}}, "livenessProbe": {"tcpSocket": {"port":8080}}}]),
               "parameters": parameters}
@@ -233,7 +236,7 @@ test_two_ctrs_empty_liveness_violation_in_ctr_one {
     count(results) == 1
 }
 
-test_two_ctrs_empty_liveness_violation_in_ctr_two {
+test_two_ctrs_empty_liveness_violation_in_ctr_two if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":8080}}, "livenessProbe": {"tcpSocket": {"port":8080}}},
                                 {"name": "my-container2","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":80}}, "livenessProbe": {}}]),
               "parameters": parameters}
@@ -241,7 +244,7 @@ test_two_ctrs_empty_liveness_violation_in_ctr_two {
     count(results) == 1
 }
 
-test_two_ctrs_empty_liveness_violation_in_both {
+test_two_ctrs_empty_liveness_violation_in_both if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":8080}}, "livenessProbe": {}},
                                 {"name": "my-container2","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":80}}, "livenessProbe": {}}]),
               "parameters": parameters}
@@ -249,7 +252,7 @@ test_two_ctrs_empty_liveness_violation_in_both {
     count(results) == 2
 }
 
-test_two_ctrs_empty_readiness_in_ctr_one_empty_liveness_in_ctr_two {
+test_two_ctrs_empty_readiness_in_ctr_one_empty_liveness_in_ctr_two if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe":{}, "livenessProbe": {"tcpSocket": {"port":80}}},
                                 {"name": "my-container2","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":8080}}, "livenessProbe": {}}]),
               "parameters": parameters}
@@ -257,7 +260,7 @@ test_two_ctrs_empty_readiness_in_ctr_one_empty_liveness_in_ctr_two {
     count(results) == 2
 }
 
-test_two_ctrs_empty_liveness_in_one_empty_readiness_in_two {
+test_two_ctrs_empty_liveness_in_one_empty_readiness_in_two if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":80}}, "livenessProbe": {}},
                                 {"name": "my-container2","image": "my-image:latest", "readinessProbe": {}, "livenessProbe": {"tcpSocket": {"port":8080}}}]),
               "parameters": parameters}
@@ -265,7 +268,7 @@ test_two_ctrs_empty_liveness_in_one_empty_readiness_in_two {
     count(results) == 2
 }
 
-test_two_ctrs_empty_readiness_in_ctr_one_both_empty_probes_in_ctr_two {
+test_two_ctrs_empty_readiness_in_ctr_one_both_empty_probes_in_ctr_two if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {}, "livenessProbe": {"tcpSocket": {"port":80}}},
                                 {"name": "my-container2","image": "my-image:latest", "readinessProbe": {}, "livenessProbe": {}}]),
               "parameters": parameters}
@@ -273,7 +276,7 @@ test_two_ctrs_empty_readiness_in_ctr_one_both_empty_probes_in_ctr_two {
     count(results) == 3
 }
 
-test_two_ctrs_empty_liveness_in_ctr_one_both_empty_probes_in_ctr_two {
+test_two_ctrs_empty_liveness_in_ctr_one_both_empty_probes_in_ctr_two if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":80}}, "livenessProbe": {}},
                                 {"name": "my-container2","image": "my-image:latest", "readinessProbe": {}, "livenessProbe": {}}]),
               "parameters": parameters}
@@ -281,7 +284,7 @@ test_two_ctrs_empty_liveness_in_ctr_one_both_empty_probes_in_ctr_two {
     count(results) == 3
 }
 
-test_two_ctrs_empty_readiness_in_ctr_two_both_empty_probes_in_ctr_one {
+test_two_ctrs_empty_readiness_in_ctr_two_both_empty_probes_in_ctr_one if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {}, "livenessProbe": {}},
                                 {"name": "my-container2","image": "my-image:latest", "readinessProbe": {}, "livenessProbe": {"tcpSocket": {"port":80}}}]),
               "parameters": parameters}
@@ -289,7 +292,7 @@ test_two_ctrs_empty_readiness_in_ctr_two_both_empty_probes_in_ctr_one {
     count(results) == 3
 }
 
-test_two_ctrs_empty_liveness_in_ctr_two_both_empty_probes_in_ctr_one {
+test_two_ctrs_empty_liveness_in_ctr_two_both_empty_probes_in_ctr_one if {
     inp := {"review": review([{"name": "my-container1","image": "my-image:latest", "readinessProbe": {}, "livenessProbe": {}},
                                 {"name": "my-container2","image": "my-image:latest", "readinessProbe": {"tcpSocket": {"port":80}}, "livenessProbe": {}}]),
               "parameters": parameters}
@@ -297,7 +300,7 @@ test_two_ctrs_empty_liveness_in_ctr_two_both_empty_probes_in_ctr_one {
     count(results) == 3
 }
 
-test_update {
+test_update if {
     inp := {"review": object.union(review([{"name": "my-container","image": "my-image:latest", "livenessProbe": {"tcpSocket": {"port":80}}}]), {"operation": "UPDATE"}),
               "parameters": parameters}
     results := violation with input as inp
@@ -318,5 +321,5 @@ review(containers) := {
     }
 }
 
-parameters = {"probes": ["readinessProbe", "livenessProbe"], "probeTypes": ["tcpSocket", "httpGet", "exec"]}
-kinds = ["Pod"]
+parameters := {"probes": ["readinessProbe", "livenessProbe"], "probeTypes": ["tcpSocket", "httpGet", "exec"]}
+kinds := ["Pod"]

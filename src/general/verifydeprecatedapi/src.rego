@@ -1,6 +1,9 @@
 package verifydeprecatedapi
 
-violation[{"msg": msg}] {
+import future.keywords.contains
+import future.keywords.if
+
+violation contains ({"msg": msg}) if {
   kvs := input.parameters.kvs[_]
   kvs.deprecatedAPI == input.review.object.apiVersion
   k := kvs.kinds[_]
@@ -8,16 +11,16 @@ violation[{"msg": msg}] {
   msg := get_message(input.review.object.kind, input.review.object.apiVersion, input.parameters.k8sVersion, kvs.targetAPI)
 }
 
-get_message(kind, apiVersion, k8sVersion, targetAPI) = msg {
+get_message(kind, apiVersion, k8sVersion, targetAPI) := msg if {
   not match(targetAPI)
   msg := sprintf("API %v for %v is deprecated in Kubernetes version %v, please use %v instead", [kind, apiVersion, k8sVersion, targetAPI])
 }
 
-get_message(kind, apiVersion, k8sVersion, targetAPI) = msg {
+get_message(kind, apiVersion, k8sVersion, targetAPI) := msg if {
   match(targetAPI)
   msg := sprintf("API %v for %v is deprecated in Kubernetes version %v, please see Kubernetes API deprecation guide", [kind, apiVersion, k8sVersion])
 }
 
-match(api) {
+match(api) if {
   api == "None"
 }

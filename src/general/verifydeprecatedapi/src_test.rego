@@ -1,18 +1,21 @@
 package verifydeprecatedapi
 
-test_hpa_with_deprecated_api {
+import future.keywords.contains
+import future.keywords.if
+
+test_hpa_with_deprecated_api if {
     inp := {"review": hpa("autoscaling/v2beta2"), "parameters": {"kvs": [{"deprecatedAPI": "autoscaling/v2beta2", "kinds": ["HorizontalPodAutoscaler"], "targetAPI": "autoscaling/v2"}], "k8sVersion": 1.26}}
     results := violation with input as inp
     count(results) == 0
 }
 
-test_hpa_without_deprecated_api {
+test_hpa_without_deprecated_api if {
     inp := {"review": hpa("autoscaling/v2"), "parameters": {"kvs": [{"deprecatedAPI": "autoscaling/v2beta2", "kinds": ["HorizontalPodAutoscaler"], "targetAPI": "autoscaling/v2"}], "k8sVersion": 1.26}}
     results := violation with input as inp
     count(results) == 0
 }
 
-hpa(api) = output {
+hpa(api) := output if {
   output :=  {
     "apiVersion": api,
     "kind": "HorizontalPodAutoscaler",
@@ -40,4 +43,4 @@ hpa(api) = output {
       }
     }
   }
-}
+      }
