@@ -16,6 +16,11 @@ tests:
     assertions:
     - violations: yes
       message: "missing required annotation"
+  - name: wrong-annotation-value
+    object: samples/ai-model-must-audit-and-use-secrets/example_disallowed_wrong_annotation_value.yaml
+    assertions:
+    - violations: yes
+      message: "annotation"
   - name: plain-text-credential
     object: samples/ai-model-must-audit-and-use-secrets/example_disallowed_plain_credential.yaml
     assertions:

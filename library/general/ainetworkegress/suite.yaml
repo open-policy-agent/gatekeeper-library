@@ -21,3 +21,8 @@ tests:
     assertions:
     - violations: yes
       message: "egress label"
+  - name: wrong-egress-label-value
+    object: samples/ai-workload-network-controls/example_disallowed_wrong_label_value.yaml
+    assertions:
+    - violations: yes
+      message: "egress label"
