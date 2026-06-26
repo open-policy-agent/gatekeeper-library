@@ -1,4 +1,12 @@
 variables:
+- name: containers
+  expression: 'has(variables.anyObject.spec) && has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+- name: initContainers
+  expression: 'has(variables.anyObject.spec) && has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+- name: ephemeralContainers
+  expression: 'has(variables.anyObject.spec) && has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+- name: allContainers
+  expression: 'variables.containers + variables.initContainers + variables.ephemeralContainers'
 - name: requiredAnnotations
   expression: 'has(variables.params.requiredAnnotations) ? variables.params.requiredAnnotations : []'
 - name: credentialEnvPatterns
@@ -8,5 +16,5 @@ validations:
   messageExpression: '"AI workload is missing required annotation(s): " + variables.requiredAnnotations.filter(req, !(has(variables.anyObject.metadata.annotations) && req.key in variables.anyObject.metadata.annotations)).map(req, req.key).join(", ")'
 - expression: '!has(variables.anyObject.metadata) || variables.requiredAnnotations.all(req, !has(req.value) || req.value == "" || !has(variables.anyObject.metadata.annotations) || !(req.key in variables.anyObject.metadata.annotations) || variables.anyObject.metadata.annotations[req.key] == req.value)'
   message: "AI workload annotation value does not match the required value"
-- expression: '!has(variables.anyObject.spec) || !has(variables.anyObject.spec.containers) || variables.anyObject.spec.containers.all(c, !has(c.env) || c.env.all(e, !(variables.credentialEnvPatterns.exists(p, e.name.matches(p))) || !has(e.value) || e.value == ""))'
+- expression: 'variables.allContainers.all(c, !has(c.env) || c.env.all(e, !(variables.credentialEnvPatterns.exists(p, e.name.matches(p))) || !has(e.value) || e.value == ""))'
   message: "AI workload container has a plain-text credential env var; use secretKeyRef instead"

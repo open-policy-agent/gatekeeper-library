@@ -1,8 +1,16 @@
 variables:
+- name: containers
+  expression: 'has(variables.anyObject.spec) && has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+- name: initContainers
+  expression: 'has(variables.anyObject.spec) && has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+- name: ephemeralContainers
+  expression: 'has(variables.anyObject.spec) && has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+- name: allContainers
+  expression: 'variables.containers + variables.initContainers + variables.ephemeralContainers'
 - name: approvedRegistries
   expression: 'has(variables.params.approvedRegistries) ? variables.params.approvedRegistries : []'
 validations:
-- expression: '!has(variables.anyObject.spec) || !has(variables.anyObject.spec.containers) || variables.approvedRegistries.size() == 0 || variables.anyObject.spec.containers.all(c, variables.approvedRegistries.exists(r, c.image.startsWith(r)))'
+- expression: 'variables.approvedRegistries.size() == 0 || variables.allContainers.all(c, variables.approvedRegistries.exists(r, c.image.startsWith(r)))'
   messageExpression: '"Container image is not from an approved model registry. Approved prefixes: " + variables.approvedRegistries.join(", ")'
-- expression: '!has(variables.params.requireDigestPin) || variables.params.requireDigestPin != true || !has(variables.anyObject.spec) || !has(variables.anyObject.spec.containers) || variables.anyObject.spec.containers.all(c, c.image.contains("@sha256:"))'
+- expression: '!has(variables.params.requireDigestPin) || variables.params.requireDigestPin != true || variables.allContainers.all(c, c.image.contains("@sha256:"))'
   message: "AI workload container image must be digest-pinned (append @sha256:<digest>)"
