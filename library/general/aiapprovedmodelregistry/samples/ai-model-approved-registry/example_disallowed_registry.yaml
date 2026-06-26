@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ai-model-unapproved-registry
+  labels:
+    workload-type: ai-model
+spec:
+  containers:
+    - name: model-server
+      image: docker.io/someuser/mymodel:latest
+      resources:
+        limits:
+          cpu: "4"
+          memory: "16Gi"

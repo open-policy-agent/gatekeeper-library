@@ -1,0 +1,7 @@
+validations:
+- expression: '!has(variables.params.blockHostNetwork) || variables.params.blockHostNetwork != true || !has(variables.anyObject.spec) || !has(variables.anyObject.spec.hostNetwork) || !variables.anyObject.spec.hostNetwork'
+  message: "AI workload pod must not use spec.hostNetwork=true; it bypasses NetworkPolicy egress controls"
+- expression: '!has(variables.anyObject.metadata) || variables.params.requiredEgressLabels.all(lbl, has(variables.anyObject.metadata.labels) && lbl.key in variables.anyObject.metadata.labels)'
+  messageExpression: '"AI workload pod is missing required network egress label(s): " + variables.params.requiredEgressLabels.filter(lbl, !(has(variables.anyObject.metadata.labels) && lbl.key in variables.anyObject.metadata.labels)).map(lbl, lbl.key).join(", ")'
+- expression: '!has(variables.anyObject.metadata) || variables.params.requiredEgressLabels.all(lbl, !has(lbl.value) || lbl.value == "" || (has(variables.anyObject.metadata.labels) && lbl.key in variables.anyObject.metadata.labels && variables.anyObject.metadata.labels[lbl.key] == lbl.value))'
+  message: "Network egress label value does not match the required value"

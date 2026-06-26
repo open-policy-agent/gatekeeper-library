@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ai-model-network-compliant
+  labels:
+    workload-type: ai-model
+    network-policy/ai-egress: "enforced"
+spec:
+  containers:
+    - name: model-server
+      image: model-registry.example.com/llama3:v2.1@sha256:abc123def456789
+      resources:
+        limits:
+          cpu: "4"
+          memory: "16Gi"

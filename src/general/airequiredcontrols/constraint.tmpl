@@ -1,0 +1,53 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sairequiredcontrols
+  annotations:
+    metadata.gatekeeper.sh/title: "AI Workload Required Controls"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      Enforces security controls on AI model workload pods: requires specified
+      annotations (e.g. audit-logging enabled) and prevents plain-text credentials
+      in environment variables by requiring secretKeyRef for names matching
+      configurable patterns.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sAIRequiredControls
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            requiredAnnotations:
+              description: >-
+                Annotations that must be present on AI workload pods.
+                Specify key and optional value; omit or leave value empty to
+                require the annotation key with any value.
+              type: array
+              items:
+                type: object
+                properties:
+                  key:
+                    type: string
+                    description: The annotation key.
+                  value:
+                    type: string
+                    description: Required annotation value. Empty means any value is accepted.
+            credentialEnvPatterns:
+              description: >-
+                RE2 regex patterns for env var names that must use secretKeyRef.
+                Example patterns: ".*_KEY$", ".*_TOKEN$", ".*_SECRET$".
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+{{ file.Read "src/general/airequiredcontrols/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+      - engine: Rego
+        source:
+          rego: |
+{{ file.Read "src/general/airequiredcontrols/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}

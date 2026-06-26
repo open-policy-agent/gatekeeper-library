@@ -1,0 +1,20 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sAIRequiredControls
+metadata:
+  name: ai-model-must-audit-and-use-secrets
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    labelSelector:
+      matchLabels:
+        workload-type: ai-model
+  parameters:
+    requiredAnnotations:
+      - key: "ai-controls/audit-logging"
+        value: "enabled"
+    credentialEnvPatterns:
+      - ".*_API_KEY$"
+      - ".*_TOKEN$"
+      - ".*_SECRET$"
