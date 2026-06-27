@@ -21,3 +21,8 @@ tests:
     assertions:
     - violations: yes
       message: "digest-pinned"
+  - name: init-container-unapproved-registry
+    object: samples/ai-model-approved-registry/example_disallowed_init_registry.yaml
+    assertions:
+    - violations: yes
+      message: "not from an approved model registry"

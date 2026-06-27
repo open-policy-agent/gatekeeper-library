@@ -26,3 +26,13 @@ tests:
     assertions:
     - violations: yes
       message: "plain-text"
+  - name: plain-text-credential-init-container
+    object: samples/ai-model-must-audit-and-use-secrets/example_disallowed_init_plain_credential.yaml
+    assertions:
+    - violations: yes
+      message: "plain-text"
+  - name: plain-text-credential-ephemeral-container
+    object: samples/ai-model-must-audit-and-use-secrets/example_disallowed_ephemeral_plain_credential.yaml
+    assertions:
+    - violations: yes
+      message: "plain-text"
