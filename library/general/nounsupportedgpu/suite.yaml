@@ -1,0 +1,57 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: nounsupportedgpu
+tests:
+- name: gpu-with-env-var
+  template: template.yaml
+  constraint: samples/gpu-with-env-var/constraint.yaml
+  cases:
+  - name: example-allowed-gpu-with-env
+    object: samples/gpu-with-env-var/example_allowed.yaml
+    assertions:
+    - violations: no
+- name: gpu-without-env-var
+  template: template.yaml
+  constraint: samples/gpu-without-env-var/constraint.yaml
+  cases:
+  - name: example-disallowed-gpu-no-env
+    object: samples/gpu-without-env-var/example_disallowed.yaml
+    assertions:
+    - violations: yes
+  - name: example-allowed-exempt-image
+    object: samples/gpu-without-env-var/example_allowed_exempt.yaml
+    assertions:
+    - violations: no
+- name: no-gpu-requested
+  template: template.yaml
+  constraint: samples/no-gpu-requested/constraint.yaml
+  cases:
+  - name: example-allowed-no-gpu
+    object: samples/no-gpu-requested/example_allowed.yaml
+    assertions:
+    - violations: no
+- name: gpu-init-without-env-var
+  template: template.yaml
+  constraint: samples/gpu-init-without-env-var/constraint.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/gpu-init-without-env-var/example_disallowed.yaml
+    assertions:
+    - violations: yes
+- name: gpu-ephemeral-without-env-var
+  template: template.yaml
+  constraint: samples/gpu-ephemeral-without-env-var/constraint.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/gpu-ephemeral-without-env-var/example_disallowed.yaml
+    assertions:
+    - violations: yes
+- name: gpu-exact-exempt
+  template: template.yaml
+  constraint: samples/gpu-exact-exempt/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/gpu-exact-exempt/example_allowed.yaml
+    assertions:
+    - violations: no

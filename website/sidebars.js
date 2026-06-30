@@ -52,6 +52,64 @@ module.exports = {
         },
         {
           type: 'category',
+          label: 'AI Workload Policies',
+          collapsed: true,
+          items: [
+            {
+              type: 'category',
+              label: 'Profiles',
+              collapsed: true,
+              items: [
+                {
+                  type: 'category',
+                  label: 'GPU Safety',
+                  collapsed: true,
+                  items: [
+                    'validation/gpunodetargeting',
+                    'validation/gpuresourcelimits',
+                    'validation/gpuworkloadresources',
+                    'validation/requiredgputoleration',
+                  ],
+                },
+                {
+                  type: 'category',
+                  label: 'Training',
+                  collapsed: true,
+                  items: [
+                    'validation/gpuactivedeadline',
+                    'validation/gpunodetargeting',
+                    'validation/gpuresourcelimits',
+                    'validation/gpusharedmemory',
+                    'validation/gpuworkloadresources',
+                    'validation/requiredgputoleration',
+                  ],
+                },
+                {
+                  type: 'category',
+                  label: 'Inference',
+                  collapsed: true,
+                  items: [
+                    'validation/gpunodetargeting',
+                    'validation/gpuresourcelimits',
+                    'validation/gpuworkloadresources',
+                    'validation/requiredgputoleration',
+                  ],
+                },
+              ],
+            },
+            {
+              type: 'category',
+              label: 'Other',
+              collapsed: true,
+              items: [
+                'validation/nounsupportedgpu',
+                'validation/requiredgpuruntimeclass',
+              ],
+            },
+          ],
+        },
+        {
+          type: 'category',
           label: 'Pod Security Standards',
           collapsed: true,
           items: [
