@@ -1,0 +1,28 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: ainetworkegress
+tests:
+- name: ai-workload-network-controls
+  template: template.yaml
+  constraint: samples/ai-workload-network-controls/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/ai-workload-network-controls/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: host-network-disallowed
+    object: samples/ai-workload-network-controls/example_disallowed_host_network.yaml
+    assertions:
+    - violations: yes
+      message: "hostNetwork"
+  - name: missing-egress-label
+    object: samples/ai-workload-network-controls/example_disallowed_no_egress_label.yaml
+    assertions:
+    - violations: yes
+      message: "egress label"
+  - name: wrong-egress-label-value
+    object: samples/ai-workload-network-controls/example_disallowed_wrong_label_value.yaml
+    assertions:
+    - violations: yes
+      message: "egress label"

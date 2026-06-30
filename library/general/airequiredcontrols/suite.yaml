@@ -1,0 +1,38 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: airequiredcontrols
+tests:
+- name: ai-model-must-audit-and-use-secrets
+  template: template.yaml
+  constraint: samples/ai-model-must-audit-and-use-secrets/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/ai-model-must-audit-and-use-secrets/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: missing-annotation
+    object: samples/ai-model-must-audit-and-use-secrets/example_disallowed_no_annotation.yaml
+    assertions:
+    - violations: yes
+      message: "missing required annotation"
+  - name: wrong-annotation-value
+    object: samples/ai-model-must-audit-and-use-secrets/example_disallowed_wrong_annotation_value.yaml
+    assertions:
+    - violations: yes
+      message: "annotation"
+  - name: plain-text-credential
+    object: samples/ai-model-must-audit-and-use-secrets/example_disallowed_plain_credential.yaml
+    assertions:
+    - violations: yes
+      message: "plain-text"
+  - name: plain-text-credential-init-container
+    object: samples/ai-model-must-audit-and-use-secrets/example_disallowed_init_plain_credential.yaml
+    assertions:
+    - violations: yes
+      message: "plain-text"
+  - name: plain-text-credential-ephemeral-container
+    object: samples/ai-model-must-audit-and-use-secrets/example_disallowed_ephemeral_plain_credential.yaml
+    assertions:
+    - violations: yes
+      message: "plain-text"

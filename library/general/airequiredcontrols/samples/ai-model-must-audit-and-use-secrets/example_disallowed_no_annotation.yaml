@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ai-model-no-audit
+  labels:
+    workload-type: ai-model
+spec:
+  containers:
+    - name: model-server
+      image: model-registry.example.com/llama3:v2.1
+      resources:
+        limits:
+          cpu: "2"
+          memory: "8Gi"

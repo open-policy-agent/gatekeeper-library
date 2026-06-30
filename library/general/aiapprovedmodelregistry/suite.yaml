@@ -1,0 +1,28 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: aiapprovedmodelregistry
+tests:
+- name: ai-model-approved-registry
+  template: template.yaml
+  constraint: samples/ai-model-approved-registry/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/ai-model-approved-registry/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: unapproved-registry
+    object: samples/ai-model-approved-registry/example_disallowed_registry.yaml
+    assertions:
+    - violations: yes
+      message: "not from an approved model registry"
+  - name: unpinned-digest
+    object: samples/ai-model-approved-registry/example_disallowed_unpinned.yaml
+    assertions:
+    - violations: yes
+      message: "digest-pinned"
+  - name: init-container-unapproved-registry
+    object: samples/ai-model-approved-registry/example_disallowed_init_registry.yaml
+    assertions:
+    - violations: yes
+      message: "not from an approved model registry"
