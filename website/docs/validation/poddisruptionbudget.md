@@ -17,7 +17,7 @@ metadata:
   name: k8spoddisruptionbudget
   annotations:
     metadata.gatekeeper.sh/title: "Pod Disruption Budget"
-    metadata.gatekeeper.sh/version: 1.0.4
+    metadata.gatekeeper.sh/version: 1.0.5
     metadata.gatekeeper.sh/requires-sync-data: |
       "[
         [
@@ -61,7 +61,7 @@ spec:
           pdb := data.inventory.namespace[obj.metadata.namespace]["policy/v1"].PodDisruptionBudget[_]
 
           matchLabels := { [label, value] | some label; value := pdb.spec.selector.matchLabels[label] }
-          labels := { [label, value] | some label; value := obj.spec.selector.matchLabels[label] }
+          labels := { [label, value] | some label; value := obj.spec.template.metadata.labels[label] }
           count(matchLabels - labels) == 0
 
           not valid_pdb_max_unavailable(pdb)
@@ -76,7 +76,7 @@ spec:
           pdb := data.inventory.namespace[obj.metadata.namespace]["policy/v1"].PodDisruptionBudget[_]
           
           matchLabels := { [label, value] | some label; value := pdb.spec.selector.matchLabels[label] }
-          labels := { [label, value] | some label; value := obj.spec.selector.matchLabels[label] }
+          labels := { [label, value] | some label; value := obj.spec.template.metadata.labels[label] }
           count(matchLabels - labels) == 0
 
           not valid_pdb_min_available(obj, pdb)
