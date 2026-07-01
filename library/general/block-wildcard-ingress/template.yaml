@@ -4,7 +4,7 @@ metadata:
   name: k8sblockwildcardingress
   annotations:
     metadata.gatekeeper.sh/title: "Block Wildcard Ingress"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.0.2
     description: >-
       Users should not be able to create Ingresses with a blank or wildcard (*) hostname since that would enable them to intercept traffic for other services in the cluster, even if they don't have access to those services.
 spec:
@@ -17,16 +17,20 @@ spec:
       rego: |
         package K8sBlockWildcardIngress
 
-        contains_wildcard(hostname) = true {
+        import future.keywords.contains
+        import future.keywords.if
+
+        contains_wildcard(hostname) if {
           hostname == ""
         }
 
-        contains_wildcard(hostname) = true {
+        contains_wildcard(hostname) if {
           contains(hostname, "*")
         }
 
-        violation[{"msg": msg}] {
+        violation contains ({"msg": msg}) if {
           input.review.kind.kind == "Ingress"
+
           # object.get is required to detect omitted host fields
           hostname := object.get(input.review.object.spec.rules[_], "host", "")
           contains_wildcard(hostname)

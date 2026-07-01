@@ -1,52 +1,63 @@
 package k8sdisallowinteractivetty
 
-test_input_container_not_tty_allowed {
+import future.keywords.contains
+import future.keywords.if
+
+test_input_container_not_tty_allowed if {
     inp := {"review": input_review}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_container_stdin_not_allowed {
+
+test_input_container_stdin_not_allowed if {
     inp:= {"review": input_review_stdin}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_container_tty_not_allowed {
+
+test_input_container_tty_not_allowed if {
     inp := {"review": input_review_tty}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_one_container_with_exemption {
+
+test_input_one_container_with_exemption if {
     inp := {"review": input_review_stdin, "parameters": {"exemptImages": ["one/*"]}}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_container_many_not_stdin_allowed {
+
+test_input_container_many_not_stdin_allowed if {
     inp := {"review": input_review_many}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_container_many_mixed_stdin_not_allowed {
+
+test_input_container_many_mixed_stdin_not_allowed if {
     inp := {"review": input_review_many_mixed}
     results := violation with input as inp
     count(results) == 2
 }
-test_input_container_many_mixed_stdin_not_allowed_one_exempted {
+
+test_input_container_many_mixed_stdin_not_allowed_one_exempted if {
     inp := {"review": input_review_many_mixed, "parameters": {"exemptImages": ["one/*"]}}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_container_many_mixed_stdin_not_allowed_all_exempted {
+
+test_input_container_many_mixed_stdin_not_allowed_all_exempted if {
     inp := {"review": input_review_many_mixed, "parameters": {"exemptImages": ["one/*", "two/*", "three/*"]}}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_container_many_mixed_stdin_not_allowed_two {
+
+test_input_container_many_mixed_stdin_not_allowed_two if {
     inp := {"review": input_review_many_mixed_two}
     results := violation with input as inp
     count(results) == 2
 }
 
-input_review = {
+input_review := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -57,7 +68,7 @@ input_review = {
     }
 }
 
-input_review_stdin = {
+input_review_stdin := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -68,7 +79,7 @@ input_review_stdin = {
     }
 }
 
-input_review_tty = {
+input_review_tty := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -79,7 +90,7 @@ input_review_tty = {
     }
 }
 
-input_review_many = {
+input_review_many := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -91,7 +102,7 @@ input_review_many = {
     }
 }
 
-input_review_many_mixed = {
+input_review_many_mixed := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -103,7 +114,7 @@ input_review_many_mixed = {
     }
 }
 
-input_review_many_mixed_two = {
+input_review_many_mixed_two := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -115,27 +126,27 @@ input_review_many_mixed_two = {
     }
 }
 
-input_containers_one = [
+input_containers_one := [
 {
     "name": "nginx",
     "image": "one/nginx",
 }]
 
-input_containers_one_stdin = [
+input_containers_one_stdin := [
 {
     "name": "nginx",
     "image": "one/nginx",
     "stdin": true
 }]
 
-input_containers_one_tty = [
+input_containers_one_tty := [
 {
     "name": "nginx",
     "image": "one/nginx",
     "tty": true
 }]
 
-input_containers_many = [
+input_containers_many := [
 {
     "name": "nginx",
     "image": "one/nginx",
@@ -152,7 +163,7 @@ input_containers_many = [
 
 }]
 
-input_containers_many_mixed = [
+input_containers_many_mixed := [
 {
     "name": "nginx",
     "image": "one/nginx",

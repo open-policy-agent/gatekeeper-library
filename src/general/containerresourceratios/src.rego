@@ -1,34 +1,37 @@
 package k8scontainerratios
 
+import future.keywords.contains
+import future.keywords.if
+
 import data.lib.exempt_container.is_exempt
 
-missing(obj, field) = true {
+missing(obj, field) if {
   not obj[field]
 }
 
-missing(obj, field) = true {
+missing(obj, field) if {
   obj[field] == ""
 }
 
-canonify_cpu(orig) = new {
+canonify_cpu(orig) := new if {
   is_number(orig)
   new := orig * 1000
 }
 
-canonify_cpu(orig) = new {
+canonify_cpu(orig) := new if {
   not is_number(orig)
   endswith(orig, "m")
   new := to_number(replace(orig, "m", ""))
 }
 
-canonify_cpu(orig) = new {
+canonify_cpu(orig) := new if {
   not is_number(orig)
   not endswith(orig, "m")
   regex.match("^[0-9]+$", orig)
   new := to_number(orig) * 1000
 }
 
-canonify_cpu(orig) = new {
+canonify_cpu(orig) := new if {
   not is_number(orig)
   not endswith(orig, "m")
   regex.match("^[0-9]+[.][0-9]+$", orig)
@@ -36,69 +39,69 @@ canonify_cpu(orig) = new {
 }
 
 # 10 ** 21
-mem_multiple("E") = 1000000000000000000000 { true }
+mem_multiple("E") := 1000000000000000000000
 
 # 10 ** 18
-mem_multiple("P") = 1000000000000000000 { true }
+mem_multiple("P") := 1000000000000000000
 
 # 10 ** 15
-mem_multiple("T") = 1000000000000000 { true }
+mem_multiple("T") := 1000000000000000
 
 # 10 ** 12
-mem_multiple("G") = 1000000000000 { true }
+mem_multiple("G") := 1000000000000
 
 # 10 ** 9
-mem_multiple("M") = 1000000000 { true }
+mem_multiple("M") := 1000000000
 
 # 10 ** 6
-mem_multiple("k") = 1000000 { true }
+mem_multiple("k") := 1000000
 
 # 10 ** 3
-mem_multiple("") = 1000 { true }
+mem_multiple("") := 1000
 
 # Kubernetes accepts millibyte precision when it probably shouldn't.
 # https://github.com/kubernetes/kubernetes/issues/28741
 # 10 ** 0
-mem_multiple("m") = 1 { true }
+mem_multiple("m") := 1
 
 # 1000 * 2 ** 10
-mem_multiple("Ki") = 1024000 { true }
+mem_multiple("Ki") := 1024000
 
 # 1000 * 2 ** 20
-mem_multiple("Mi") = 1048576000 { true }
+mem_multiple("Mi") := 1048576000
 
 # 1000 * 2 ** 30
-mem_multiple("Gi") = 1073741824000 { true }
+mem_multiple("Gi") := 1073741824000
 
 # 1000 * 2 ** 40
-mem_multiple("Ti") = 1099511627776000 { true }
+mem_multiple("Ti") := 1099511627776000
 
 # 1000 * 2 ** 50
-mem_multiple("Pi") = 1125899906842624000 { true }
+mem_multiple("Pi") := 1125899906842624000
 
 # 1000 * 2 ** 60
-mem_multiple("Ei") = 1152921504606846976000 { true }
+mem_multiple("Ei") := 1152921504606846976000
 
-get_suffix(mem) = suffix {
+get_suffix(mem) := suffix if {
   not is_string(mem)
   suffix := ""
 }
 
-get_suffix(mem) = suffix {
+get_suffix(mem) := suffix if {
   is_string(mem)
   count(mem) > 0
   suffix := substring(mem, count(mem) - 1, -1)
   mem_multiple(suffix)
 }
 
-get_suffix(mem) = suffix {
+get_suffix(mem) := suffix if {
   is_string(mem)
   count(mem) > 1
   suffix := substring(mem, count(mem) - 2, -1)
   mem_multiple(suffix)
 }
 
-get_suffix(mem) = suffix {
+get_suffix(mem) := suffix if {
   is_string(mem)
   count(mem) > 1
   not mem_multiple(substring(mem, count(mem) - 1, -1))
@@ -106,25 +109,25 @@ get_suffix(mem) = suffix {
   suffix := ""
 }
 
-get_suffix(mem) = suffix {
+get_suffix(mem) := suffix if {
   is_string(mem)
   count(mem) == 1
   not mem_multiple(substring(mem, count(mem) - 1, -1))
   suffix := ""
 }
 
-get_suffix(mem) = suffix {
+get_suffix(mem) := suffix if {
   is_string(mem)
   count(mem) == 0
   suffix := ""
 }
 
-canonify_mem(orig) = new {
+canonify_mem(orig) := new if {
   is_number(orig)
   new := orig * 1000
 }
 
-canonify_mem(orig) = new {
+canonify_mem(orig) := new if {
   not is_number(orig)
   suffix := get_suffix(orig)
   raw := replace(orig, suffix, "")
@@ -132,17 +135,17 @@ canonify_mem(orig) = new {
   new := to_number(raw) * mem_multiple(suffix)
 }
 
-violation[{"msg": msg}] {
+violation contains ({"msg": msg}) if {
   general_violation[{"msg": msg, "field": "containers"}]
 }
 
-violation[{"msg": msg}] {
+violation contains ({"msg": msg}) if {
   general_violation[{"msg": msg, "field": "initContainers"}]
 }
 
 # Ephemeral containers not checked as it is not possible to set field.
 
-general_violation[{"msg": msg, "field": field}] {
+general_violation contains {"msg": msg, "field": field} if {
   container := input.review.object.spec[field][_]
   not is_exempt(container)
   cpu_orig := container.resources.limits.cpu
@@ -150,7 +153,7 @@ general_violation[{"msg": msg, "field": field}] {
   msg := sprintf("container <%v> cpu limit <%v> could not be parsed", [container.name, cpu_orig])
 }
 
-general_violation[{"msg": msg, "field": field}] {
+general_violation contains {"msg": msg, "field": field} if {
   container := input.review.object.spec[field][_]
   not is_exempt(container)
   mem_orig := container.resources.limits.memory
@@ -158,7 +161,7 @@ general_violation[{"msg": msg, "field": field}] {
   msg := sprintf("container <%v> memory limit <%v> could not be parsed", [container.name, mem_orig])
 }
 
-general_violation[{"msg": msg, "field": field}] {
+general_violation contains {"msg": msg, "field": field} if {
   container := input.review.object.spec[field][_]
   not is_exempt(container)
   cpu_orig := container.resources.requests.cpu
@@ -166,7 +169,7 @@ general_violation[{"msg": msg, "field": field}] {
   msg := sprintf("container <%v> cpu request <%v> could not be parsed", [container.name, cpu_orig])
 }
 
-general_violation[{"msg": msg, "field": field}] {
+general_violation contains {"msg": msg, "field": field} if {
   container := input.review.object.spec[field][_]
   not is_exempt(container)
   mem_orig := container.resources.requests.memory
@@ -174,56 +177,56 @@ general_violation[{"msg": msg, "field": field}] {
   msg := sprintf("container <%v> memory request <%v> could not be parsed", [container.name, mem_orig])
 }
 
-general_violation[{"msg": msg, "field": field}] {
+general_violation contains {"msg": msg, "field": field} if {
   container := input.review.object.spec[field][_]
   not is_exempt(container)
   not container.resources
   msg := sprintf("container <%v> has no resource limits", [container.name])
 }
 
-general_violation[{"msg": msg, "field": field}] {
+general_violation contains {"msg": msg, "field": field} if {
   container := input.review.object.spec[field][_]
   not is_exempt(container)
   not container.resources.limits
   msg := sprintf("container <%v> has no resource limits", [container.name])
 }
 
-general_violation[{"msg": msg, "field": field}] {
+general_violation contains {"msg": msg, "field": field} if {
   container := input.review.object.spec[field][_]
   not is_exempt(container)
   missing(container.resources.limits, "cpu")
   msg := sprintf("container <%v> has no cpu limit", [container.name])
 }
 
-general_violation[{"msg": msg, "field": field}] {
+general_violation contains {"msg": msg, "field": field} if {
   container := input.review.object.spec[field][_]
   not is_exempt(container)
   missing(container.resources.limits, "memory")
   msg := sprintf("container <%v> has no memory limit", [container.name])
 }
 
-general_violation[{"msg": msg, "field": field}] {
+general_violation contains {"msg": msg, "field": field} if {
   container := input.review.object.spec[field][_]
   not is_exempt(container)
   not container.resources.requests
   msg := sprintf("container <%v> has no resource requests", [container.name])
 }
 
-general_violation[{"msg": msg, "field": field}] {
+general_violation contains {"msg": msg, "field": field} if {
   container := input.review.object.spec[field][_]
   not is_exempt(container)
   missing(container.resources.requests, "cpu")
   msg := sprintf("container <%v> has no cpu request", [container.name])
 }
 
-general_violation[{"msg": msg, "field": field}] {
+general_violation contains {"msg": msg, "field": field} if {
   container := input.review.object.spec[field][_]
   not is_exempt(container)
   missing(container.resources.requests, "memory")
   msg := sprintf("container <%v> has no memory request", [container.name])
 }
 
-general_violation[{"msg": msg, "field": field}] {
+general_violation contains {"msg": msg, "field": field} if {
   container := input.review.object.spec[field][_]
   not is_exempt(container)
   cpu_limits_orig := container.resources.limits.cpu
@@ -235,7 +238,7 @@ general_violation[{"msg": msg, "field": field}] {
   msg := sprintf("container <%v> cpu limit <%v> is higher than the maximum allowed ratio of <%v>", [container.name, cpu_limits_orig, cpu_ratio])
 }
 
-general_violation[{"msg": msg, "field": field}] {
+general_violation contains {"msg": msg, "field": field} if {
   container := input.review.object.spec[field][_]
   not is_exempt(container)
   mem_limits_orig := container.resources.limits.memory

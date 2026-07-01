@@ -1,12 +1,15 @@
 package k8srequiredlabels
 
-get_message(parameters, _default) := _default {
+import future.keywords.contains
+import future.keywords.if
+
+get_message(parameters, _default) := _default if {
   not parameters.message
 }
 
 get_message(parameters, _) := parameters.message
 
-violation[{"msg": msg, "details": {"missing_labels": missing}}] {
+violation contains {"msg": msg, "details": {"missing_labels": missing}} if {
   provided := {label | input.review.object.metadata.labels[label]}
   required := {label | label := input.parameters.labels[_].key}
   missing := required - provided
@@ -15,10 +18,11 @@ violation[{"msg": msg, "details": {"missing_labels": missing}}] {
   msg := get_message(input.parameters, def_msg)
 }
 
-violation[{"msg": msg}] {
+violation contains ({"msg": msg}) if {
   value := input.review.object.metadata.labels[key]
   expected := input.parameters.labels[_]
   expected.key == key
+
   # do not match if allowedRegex is not defined, or is an empty string
   expected.allowedRegex != ""
   not regex.match(expected.allowedRegex, value)

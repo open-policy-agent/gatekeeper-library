@@ -1,5 +1,8 @@
 package lib.exclude_update
 
-is_update(review) {
+import future.keywords.contains
+import future.keywords.if
+
+is_update(review) if {
     review.operation == "UPDATE"
 }

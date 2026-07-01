@@ -4,7 +4,7 @@ metadata:
   name: k8spspreadonlyrootfilesystem
   annotations:
     metadata.gatekeeper.sh/title: "Read Only Root Filesystem"
-    metadata.gatekeeper.sh/version: 1.1.1
+    metadata.gatekeeper.sh/version: 1.1.2
     description: >-
       Requires the use of a read-only root file system by pod containers.
       Corresponds to the `readOnlyRootFilesystem` field in a
@@ -77,10 +77,13 @@ spec:
           rego: |
             package k8spspreadonlyrootfilesystem
 
+            import future.keywords.contains
+            import future.keywords.if
+
             import data.lib.exclude_update.is_update
             import data.lib.exempt_container.is_exempt
 
-            violation[{"msg": msg, "details": {}}] {
+            violation contains {"msg": msg, "details": {}} if {
                 # spec.containers.readOnlyRootFilesystem field is immutable.
                 not is_update(input.review)
 
@@ -90,50 +93,59 @@ spec:
                 msg := sprintf("only read-only root filesystem container is allowed: %v", [c.name])
             }
 
-            input_read_only_root_fs(c) {
+            input_read_only_root_fs(c) if {
                 not has_field(c, "securityContext")
             }
-            input_read_only_root_fs(c) {
+
+            input_read_only_root_fs(c) if {
                 not c.securityContext.readOnlyRootFilesystem == true
             }
 
-            input_containers[c] {
+            input_containers contains c if {
                 c := input.review.object.spec.containers[_]
             }
-            input_containers[c] {
+
+            input_containers contains c if {
                 c := input.review.object.spec.initContainers[_]
             }
-            input_containers[c] {
+
+            input_containers contains c if {
                 c := input.review.object.spec.ephemeralContainers[_]
             }
 
             # has_field returns whether an object has a field
-            has_field(object, field) = true {
+            has_field(object, field) if {
                 object[field]
             }
           libs:
             - |
               package lib.exclude_update
 
-              is_update(review) {
+              import future.keywords.contains
+              import future.keywords.if
+
+              is_update(review) if {
                   review.operation == "UPDATE"
               }
             - |
               package lib.exempt_container
 
-              is_exempt(container) {
+              import future.keywords.contains
+              import future.keywords.if
+
+              is_exempt(container) if {
                   exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
                   img := container.image
                   exemption := exempt_images[_]
                   _matches_exemption(img, exemption)
               }
 
-              _matches_exemption(img, exemption) {
+              _matches_exemption(img, exemption) if {
                   not endswith(exemption, "*")
                   exemption == img
               }
 
-              _matches_exemption(img, exemption) {
+              _matches_exemption(img, exemption) if {
                   endswith(exemption, "*")
                   prefix := trim_suffix(exemption, "*")
                   startswith(img, prefix)

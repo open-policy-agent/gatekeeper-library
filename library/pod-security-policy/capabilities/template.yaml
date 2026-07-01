@@ -4,7 +4,7 @@ metadata:
   name: k8spspcapabilities
   annotations:
     metadata.gatekeeper.sh/title: "Capabilities"
-    metadata.gatekeeper.sh/version: 1.1.3
+    metadata.gatekeeper.sh/version: 1.1.4
     metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Controls Linux capabilities on containers. Corresponds to the
@@ -115,10 +115,14 @@ spec:
           rego: |
             package capabilities
 
+            import future.keywords.contains
+            import future.keywords.if
+
             import data.lib.exclude_update.is_update
             import data.lib.exempt_container.is_exempt
 
-            violation[{"msg": msg}] {
+            violation contains ({"msg": msg}) if {
+
               # spec.containers.securityContext.capabilities field is immutable.
               not is_update(input.review)
 
@@ -128,7 +132,7 @@ spec:
               msg := sprintf("container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
             }
 
-            violation[{"msg": msg}] {
+            violation contains ({"msg": msg}) if {
               not is_update(input.review)
               container := input.review.object.spec.containers[_]
               not is_exempt(container)
@@ -136,7 +140,7 @@ spec:
               msg := sprintf("container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
             }
 
-            violation[{"msg": msg}] {
+            violation contains ({"msg": msg}) if {
               not is_update(input.review)
               container := input.review.object.spec.initContainers[_]
               not is_exempt(container)
@@ -144,7 +148,7 @@ spec:
               msg := sprintf("init container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
             }
 
-            violation[{"msg": msg}] {
+            violation contains ({"msg": msg}) if {
               not is_update(input.review)
               container := input.review.object.spec.initContainers[_]
               not is_exempt(container)
@@ -152,7 +156,7 @@ spec:
               msg := sprintf("init container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
             }
 
-            violation[{"msg": msg}] {
+            violation contains ({"msg": msg}) if {
               not is_update(input.review)
               container := input.review.object.spec.ephemeralContainers[_]
               not is_exempt(container)
@@ -160,7 +164,7 @@ spec:
               msg := sprintf("ephemeral container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
             }
 
-            violation[{"msg": msg}] {
+            violation contains ({"msg": msg}) if {
               not is_update(input.review)
               container := input.review.object.spec.ephemeralContainers[_]
               not is_exempt(container)
@@ -168,7 +172,7 @@ spec:
               msg := sprintf("ephemeral container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
             }
 
-            has_disallowed_capabilities(container) {
+            has_disallowed_capabilities(container) if {
               allowed := {c | c := lower(input.parameters.allowedCapabilities[_])}
               not allowed["*"]
               capabilities := {c | c := lower(container.securityContext.capabilities.add[_])}
@@ -176,7 +180,7 @@ spec:
               count(capabilities - allowed) > 0
             }
 
-            missing_drop_capabilities(container) {
+            missing_drop_capabilities(container) if {
               must_drop := {c | c := lower(input.parameters.requiredDropCapabilities[_])}
               all := {"all"}
               dropped := {c | c := lower(container.securityContext.capabilities.drop[_])}
@@ -187,7 +191,7 @@ spec:
 
             get_default(obj, param, _) := obj[param]
 
-            get_default(obj, param, _default) := _default {
+            get_default(obj, param, _default) := _default if {
               not obj[param]
               not obj[param] == false
             }
@@ -195,25 +199,31 @@ spec:
           - |
             package lib.exclude_update
 
-            is_update(review) {
+            import future.keywords.contains
+            import future.keywords.if
+
+            is_update(review) if {
                 review.operation == "UPDATE"
             }
           - |
             package lib.exempt_container
 
-            is_exempt(container) {
+            import future.keywords.contains
+            import future.keywords.if
+
+            is_exempt(container) if {
                 exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
                 img := container.image
                 exemption := exempt_images[_]
                 _matches_exemption(img, exemption)
             }
 
-            _matches_exemption(img, exemption) {
+            _matches_exemption(img, exemption) if {
                 not endswith(exemption, "*")
                 exemption == img
             }
 
-            _matches_exemption(img, exemption) {
+            _matches_exemption(img, exemption) if {
                 endswith(exemption, "*")
                 prefix := trim_suffix(exemption, "*")
                 startswith(img, prefix)

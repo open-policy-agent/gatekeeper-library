@@ -1,6 +1,9 @@
 package noupdateserviceaccount
 
-privileged(userInfo, allowedUsers, _) {
+import future.keywords.contains
+import future.keywords.if
+
+privileged(userInfo, allowedUsers, _) if {
   # Allow if the user is in allowedUsers.
   # Use object.get so omitted parameters can't cause policy bypass by
   # evaluating to undefined.
@@ -8,7 +11,7 @@ privileged(userInfo, allowedUsers, _) {
   allowedUsers[_] == username
 }
 
-privileged(userInfo, _, allowedGroups) {
+privileged(userInfo, _, allowedGroups) if {
   # Allow if the user's groups intersect allowedGroups.
   # Use object.get so omitted parameters can't cause policy bypass by
   # evaluating to undefined.
@@ -19,33 +22,34 @@ privileged(userInfo, _, allowedGroups) {
   count(intersection) > 0
 }
 
-get_service_account(obj) = spec {
+get_service_account(obj) := spec if {
   obj.kind == "Pod"
   spec := obj.spec.serviceAccountName
-} {
+} else := spec if {
   obj.kind == "ReplicationController"
   spec := obj.spec.template.spec.serviceAccountName
-} {
+} else := spec if {
   obj.kind == "ReplicaSet"
   spec := obj.spec.template.spec.serviceAccountName
-} {
+} else := spec if {
   obj.kind == "Deployment"
   spec := obj.spec.template.spec.serviceAccountName
-} {
+} else := spec if {
   obj.kind == "StatefulSet"
   spec := obj.spec.template.spec.serviceAccountName
-} {
+} else := spec if {
   obj.kind == "DaemonSet"
   spec := obj.spec.template.spec.serviceAccountName
-} {
+} else := spec if {
   obj.kind == "Job"
   spec := obj.spec.template.spec.serviceAccountName
-} {
+} else := spec if {
   obj.kind == "CronJob"
   spec := obj.spec.jobTemplate.spec.template.spec.serviceAccountName
 }
 
-violation[{"msg": msg}] {
+violation contains ({"msg": msg}) if {
+
   # This policy only applies to updates of existing resources.
   input.review.operation == "UPDATE"
 
@@ -63,12 +67,18 @@ violation[{"msg": msg}] {
   not privileged(input.review.userInfo, allowedUsers, allowedGroups)
   oldKSA != newKSA
   msg := "user does not have permission to modify serviceAccountName"
-} {
+}
+
+violation contains ({"msg": msg}) if {
+
   # Defensively require object to have a serviceAccountName.
   input.review.operation == "UPDATE"
   not get_service_account(input.review.object)
   msg := "missing serviceAccountName field in object under review"
-} {
+}
+
+violation contains ({"msg": msg}) if {
+
   # Defensively require oldObject to have a serviceAccountName.
   input.review.operation == "UPDATE"
   not get_service_account(input.review.oldObject)

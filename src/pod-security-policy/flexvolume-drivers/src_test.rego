@@ -1,66 +1,75 @@
 package k8spspflexvolumes
 
-test_input_flexvolume_empty_params {
+import future.keywords.contains
+import future.keywords.if
+
+test_input_flexvolume_empty_params if {
     inp := { "review": input_review, "parameters": input_parameters_empty}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_flexvolume_many_empty_params{
+
+test_input_flexvolume_many_empty_params if {
     inp := { "review": input_review_many, "parameters": input_parameters_empty}
     results := violation with input as inp
     count(results) == 2
 }
-test_input_no_flexvolume_is_allowed {
+
+test_input_no_flexvolume_is_allowed if {
     inp := { "review": input_review_no_flexvolume, "parameters": input_parameter_in_list}
     results := violation with input as inp
     count(results) == 0
 }
 
-test_input_flexvolume_allowed {
+test_input_flexvolume_allowed if {
     inp := { "review": input_review, "parameters": input_parameter_in_list}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_flexvolume_many_is_allowed {
+
+test_input_flexvolume_many_is_allowed if {
     inp := { "review": input_review_many, "parameters": input_parameters_in_list}
     results := violation with input as inp
     count(results) == 0
 }
 
-test_input_flexvolume_many_is_allowed_no_flexvolume {
+test_input_flexvolume_many_is_allowed_no_flexvolume if {
     inp := { "review": input_review_many_no_flexvolume, "parameters": input_parameters_in_list}
     results := violation with input as inp
     count(results) == 0
 }
 
-test_input_flexvolume_not_allowed {
+test_input_flexvolume_not_allowed if {
     inp := { "review": input_review, "parameters": input_parameters_not_in_list}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_flexvolume_many_not_allowed {
+
+test_input_flexvolume_many_not_allowed if {
     inp := { "review": input_review_many_not_allowed, "parameters": input_parameters_not_in_list}
     results := violation with input as inp
     count(results) == 2
 }
-test_input_flexvolume_many_one_allowed {
+
+test_input_flexvolume_many_one_allowed if {
     inp := { "review": input_review_many, "parameters": input_parameter_in_list}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_flexvolume_many_mixed_allowed {
+
+test_input_flexvolume_many_mixed_allowed if {
     inp := { "review": input_review_many, "parameters": input_parameters_not_in_list}
     results := violation with input as inp
     count(results) == 1
 }
 
-test_update {
+test_update if {
     inp := { "review": object.union(input_review, {"operation": "UPDATE"}), "parameters": input_parameters_empty}
     results := violation with input as inp
     count(results) == 0
 }
 
-input_review = {
+input_review := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -77,7 +86,7 @@ input_review = {
     }
 }
 
-input_review_no_flexvolume = {
+input_review_no_flexvolume := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -88,7 +97,7 @@ input_review_no_flexvolume = {
     }
 }
 
-input_review_many = {
+input_review_many := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -100,7 +109,7 @@ input_review_many = {
     }
 }
 
-input_review_many_no_flexvolume = {
+input_review_many_no_flexvolume := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -112,7 +121,7 @@ input_review_many_no_flexvolume = {
     }
 }
 
-input_review_many_not_allowed = {
+input_review_many_not_allowed := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -124,7 +133,7 @@ input_review_many_not_allowed = {
     }
 }
 
-input_containers_one = [{
+input_containers_one := [{
     "name": "nginx",
     "image": "nginx",
     "volumeMounts":[
@@ -134,7 +143,7 @@ input_containers_one = [{
     }]
 }]
 
-input_containers_many = [
+input_containers_many := [
 {
     "name": "nginx",
     "image": "nginx",
@@ -156,7 +165,7 @@ input_containers_many = [
     }]
 }]
 
-input_volumes_many = [
+input_volumes_many := [
 {
     "name": "cache-volume",
     "flexVolume": {
@@ -176,7 +185,7 @@ input_volumes_many = [
     }
 }]
 
-input_volumes_many_no_flexvolume = [
+input_volumes_many_no_flexvolume := [
 {
     "name": "certs",
     "secret": {
@@ -191,7 +200,7 @@ input_volumes_many_no_flexvolume = [
     }
 }]
 
-input_volumes_not_allowed = [
+input_volumes_not_allowed := [
 {
     "name": "cache-volume",
     "flexVolume": {
@@ -205,22 +214,22 @@ input_volumes_not_allowed = [
     }
 }]
 
-input_parameters_empty = {
+input_parameters_empty := {
     "allowedFlexVolumes": []
 }
 
-input_parameter_in_list = {
+input_parameter_in_list := {
     "allowedFlexVolumes": [{"driver": "example/lvm"}]
 }
 
-input_parameters_in_list = {
+input_parameters_in_list := {
     "allowedFlexVolumes": [
         {"driver": "example/lvm"},
         {"driver": "example/cifs"}
     ]
 }
 
-input_parameters_not_in_list = {
+input_parameters_not_in_list := {
     "allowedFlexVolumes": [
         {"driver": "example/testdriver"},
         {"driver": "example/cifs"}

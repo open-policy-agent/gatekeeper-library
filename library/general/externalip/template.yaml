@@ -4,7 +4,7 @@ metadata:
   name: k8sexternalips
   annotations:
     metadata.gatekeeper.sh/title: "External IPs"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Restricts Service externalIPs to an allowed list of IP addresses.
 
@@ -29,7 +29,10 @@ spec:
       rego: |
         package k8sexternalips
 
-        violation[{"msg": msg}] {
+        import future.keywords.contains
+        import future.keywords.if
+
+        violation contains ({"msg": msg}) if {
           input.review.kind.kind == "Service"
           input.review.kind.group == ""
           allowedIPs := {ip | ip := input.parameters.allowedIPs[_]}

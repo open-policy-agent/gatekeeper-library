@@ -4,7 +4,7 @@ metadata:
   name: k8spsphostnetworkingports
   annotations:
     metadata.gatekeeper.sh/title: "Host Networking Ports"
-    metadata.gatekeeper.sh/version: 1.1.5
+    metadata.gatekeeper.sh/version: 1.1.6
     metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Controls usage of host network namespace by pod containers. HostNetwork verification happens without exception for exemptImages. Specific
@@ -98,10 +98,13 @@ spec:
           rego: |
             package k8spsphostnetworkingports
 
+            import future.keywords.contains
+            import future.keywords.if
+
             import data.lib.exclude_update.is_update
             import data.lib.exempt_container.is_exempt
 
-            violation[{"msg": msg, "details": {}}] {
+            violation contains {"msg": msg, "details": {}} if {
                 # spec.hostNetwork field is immutable.
                 not is_update(input.review)
 
@@ -109,32 +112,32 @@ spec:
                 msg := sprintf("The specified hostNetwork and hostPort are not allowed, pod: %v. Allowed values: %v", [input.review.object.metadata.name, input.parameters])
             }
 
-            input_share_hostnetwork(o) {
+            input_share_hostnetwork(o) if {
                 not input.parameters.hostNetwork
                 o.spec.hostNetwork
             }
 
-            input_share_hostnetwork(_) {
+            input_share_hostnetwork(_) if {
                 hostPort := input_containers[_].ports[_].hostPort
                 hostPort < input.parameters.min
             }
 
-            input_share_hostnetwork(_) {
+            input_share_hostnetwork(_) if {
                 hostPort := input_containers[_].ports[_].hostPort
                 hostPort > input.parameters.max
             }
 
-            input_containers[c] {
+            input_containers contains c if {
                 c := input.review.object.spec.containers[_]
                 not is_exempt(c)
             }
 
-            input_containers[c] {
+            input_containers contains c if {
                 c := input.review.object.spec.initContainers[_]
                 not is_exempt(c)
             }
 
-            input_containers[c] {
+            input_containers contains c if {
                 c := input.review.object.spec.ephemeralContainers[_]
                 not is_exempt(c)
             }
@@ -142,25 +145,31 @@ spec:
             - |
               package lib.exclude_update
 
-              is_update(review) {
+              import future.keywords.contains
+              import future.keywords.if
+
+              is_update(review) if {
                   review.operation == "UPDATE"
               }
             - |
               package lib.exempt_container
 
-              is_exempt(container) {
+              import future.keywords.contains
+              import future.keywords.if
+
+              is_exempt(container) if {
                   exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
                   img := container.image
                   exemption := exempt_images[_]
                   _matches_exemption(img, exemption)
               }
 
-              _matches_exemption(img, exemption) {
+              _matches_exemption(img, exemption) if {
                   not endswith(exemption, "*")
                   exemption == img
               }
 
-              _matches_exemption(img, exemption) {
+              _matches_exemption(img, exemption) if {
                   endswith(exemption, "*")
                   prefix := trim_suffix(exemption, "*")
                   startswith(img, prefix)

@@ -4,7 +4,7 @@ metadata:
   name: k8srequiredlabels
   annotations:
     metadata.gatekeeper.sh/title: "Required Labels"
-    metadata.gatekeeper.sh/version: 1.1.2
+    metadata.gatekeeper.sh/version: 1.1.3
     description: >-
       Requires resources to contain specified labels, with values matching
       provided regular expressions.
@@ -51,13 +51,16 @@ spec:
           rego: |
             package k8srequiredlabels
 
-            get_message(parameters, _default) := _default {
+            import future.keywords.contains
+            import future.keywords.if
+
+            get_message(parameters, _default) := _default if {
               not parameters.message
             }
 
             get_message(parameters, _) := parameters.message
 
-            violation[{"msg": msg, "details": {"missing_labels": missing}}] {
+            violation contains {"msg": msg, "details": {"missing_labels": missing}} if {
               provided := {label | input.review.object.metadata.labels[label]}
               required := {label | label := input.parameters.labels[_].key}
               missing := required - provided
@@ -66,10 +69,11 @@ spec:
               msg := get_message(input.parameters, def_msg)
             }
 
-            violation[{"msg": msg}] {
+            violation contains ({"msg": msg}) if {
               value := input.review.object.metadata.labels[key]
               expected := input.parameters.labels[_]
               expected.key == key
+
               # do not match if allowedRegex is not defined, or is an empty string
               expected.allowedRegex != ""
               not regex.match(expected.allowedRegex, value)

@@ -1,11 +1,15 @@
 package k8suniqueserviceselector
 
-test_no_data {
+import future.keywords.contains
+import future.keywords.if
+
+test_no_data if {
     inp := {"review": review(service("my-service", "prod", {"a": "b"}))}
     results := violation with input as inp
     count(results) == 0
 }
-test_identical {
+
+test_identical if {
     inp := {"review": review(service("my-service", "prod", {"a": "b"}))}
     inv := tmp_data([service("my-service", "prod", {"a": "b"})])
             trace(sprintf("%v", [inv]))
@@ -15,46 +19,50 @@ test_identical {
 
     count(results) == 0
 }
-test_collision {
+
+test_collision if {
     inp := {"review": review(service("my-service", "prod", {"a": "b"}))}
     inv := tmp_data([service("my-service", "prod2", {"a": "b"})])
     results := violation with input as inp with data.inventory as inv
     count(results) == 1
 }
-test_collision_with_multiple {
+
+test_collision_with_multiple if {
     inp := {"review": review(service("my-service", "prod", {"a": "b"}))}
     inv := tmp_data([service("my-service", "prod2", {"a": "b"}), service("my-service", "prod3", {"a": "b"})])
     results := violation with input as inp with data.inventory as inv
     count(results) == 2
 }
-test_no_collision {
+
+test_no_collision if {
     inp := {"review": review(service("my-service", "prod", {"a": "b"}))}
     inv := tmp_data([service("my-service", "prod2", {"a": "c"})])
     results := violation with input as inp with data.inventory as inv
     count(results) == 0
 }
-test_no_collision_with_multiple {
+
+test_no_collision_with_multiple if {
     inp := {"review": review(service("my-service", "prod", {"a": "b"}))}
     inv := tmp_data([service("my-service", "prod2", {"a": "b2"}), service("my-service", "prod3", {"a": "b2"})])
     results := violation with input as inp with data.inventory as inv
     count(results) == 0
 }
-test_compound_selector_collision {
+
+test_compound_selector_collision if {
     inp := {"review": review(service("my-service", "prod", {"r": "d", "a": "b"}))}
     inv := tmp_data([service("my-service", "prod2", {"a": "b", "r": "d"})])
     results := violation with input as inp with data.inventory as inv
     count(results) == 1
 }
 
-test_no_service_selector {
+test_no_service_selector if {
     inp := {"review": review(service_without_selector("kubernetes", "default"))}
     inv := data_networkpolicy("default")
     results := violation with input as inp with data.inventory as inv
     count(results) == 0
 }
 
-
-review(srv) = output {
+review(srv) := output if {
   output = {
     "kind": {
       "kind": "Service",
@@ -67,7 +75,7 @@ review(srv) = output {
   }
 }
 
-service_without_selector(name, ns) = out {
+service_without_selector(name, ns) := out if {
   out = {
     "kind": "Service",
     "apiVersion": "v1",
@@ -92,9 +100,9 @@ service_without_selector(name, ns) = out {
         "type": "ClusterIP"
     }
   }
-}
+    }
 
-service(name, ns, selector) = out {
+service(name, ns, selector) := out if {
   out = {
     "kind": "Service",
     "apiVersion": "v1",
@@ -106,7 +114,7 @@ service(name, ns, selector) = out {
   }
 }
 
-data_networkpolicy(ns) = out {
+data_networkpolicy(ns) := out if {
   out = {
     "namespace": {
       ns: {
@@ -140,9 +148,9 @@ data_networkpolicy(ns) = out {
       }
     }
   }
-}
+  }
 
-tmp_data(services) = out {
+tmp_data(services) := out if {
   namespaces := {ns | ns = services[_].metadata.namespace}
   out = {
     "namespace": {
@@ -155,6 +163,6 @@ tmp_data(services) = out {
   }
 }
 
-flatten_by_name(services, ns) = out {
+flatten_by_name(services, ns) := out if {
   out = {o.metadata.name: o | o = services[_]; o.metadata.namespace = ns}
-}
+                      }

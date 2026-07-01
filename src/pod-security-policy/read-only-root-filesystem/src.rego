@@ -1,9 +1,12 @@
 package k8spspreadonlyrootfilesystem
 
+import future.keywords.contains
+import future.keywords.if
+
 import data.lib.exclude_update.is_update
 import data.lib.exempt_container.is_exempt
 
-violation[{"msg": msg, "details": {}}] {
+violation contains {"msg": msg, "details": {}} if {
     # spec.containers.readOnlyRootFilesystem field is immutable.
     not is_update(input.review)
 
@@ -13,24 +16,27 @@ violation[{"msg": msg, "details": {}}] {
     msg := sprintf("only read-only root filesystem container is allowed: %v", [c.name])
 }
 
-input_read_only_root_fs(c) {
+input_read_only_root_fs(c) if {
     not has_field(c, "securityContext")
 }
-input_read_only_root_fs(c) {
+
+input_read_only_root_fs(c) if {
     not c.securityContext.readOnlyRootFilesystem == true
 }
 
-input_containers[c] {
+input_containers contains c if {
     c := input.review.object.spec.containers[_]
 }
-input_containers[c] {
+
+input_containers contains c if {
     c := input.review.object.spec.initContainers[_]
 }
-input_containers[c] {
+
+input_containers contains c if {
     c := input.review.object.spec.ephemeralContainers[_]
 }
 
 # has_field returns whether an object has a field
-has_field(object, field) = true {
+has_field(object, field) if {
     object[field]
 }

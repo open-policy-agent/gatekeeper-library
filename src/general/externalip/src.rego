@@ -1,6 +1,9 @@
 package k8sexternalips
 
-violation[{"msg": msg}] {
+import future.keywords.contains
+import future.keywords.if
+
+violation contains ({"msg": msg}) if {
   input.review.kind.kind == "Service"
   input.review.kind.group == ""
   allowedIPs := {ip | ip := input.parameters.allowedIPs[_]}

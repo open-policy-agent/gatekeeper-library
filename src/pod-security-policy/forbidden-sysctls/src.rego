@@ -1,9 +1,12 @@
 package k8spspforbiddensysctls
 
+import future.keywords.contains
+import future.keywords.if
+
 import data.lib.exclude_update.is_update
 
 # Block if forbidden
-violation[{"msg": msg, "details": {}}] {
+violation contains {"msg": msg, "details": {}} if {
     # spec.securityContext.sysctls field is immutable.
     not is_update(input.review)
 
@@ -13,7 +16,7 @@ violation[{"msg": msg, "details": {}}] {
 }
 
 # Block if not explicitly allowed
-violation[{"msg": msg, "details": {}}] {
+violation contains {"msg": msg, "details": {}} if {
     not is_update(input.review)
     sysctl := input.review.object.spec.securityContext.sysctls[_].name
     not allowed_sysctl(sysctl)
@@ -22,42 +25,44 @@ violation[{"msg": msg, "details": {}}] {
 }
 
 # * may be used to forbid all sysctls
-forbidden_sysctl(_) {
+forbidden_sysctl(_) if {
     input.parameters.forbiddenSysctls[_] == "*"
 }
 
-forbidden_sysctl(sysctl) {
+forbidden_sysctl(sysctl) if {
     input.parameters.forbiddenSysctls[_] == sysctl
 }
 
-forbidden_sysctl(sysctl) {
+forbidden_sysctl(sysctl) if {
     forbidden := input.parameters.forbiddenSysctls[_]
     endswith(forbidden, "*")
     startswith(sysctl, trim_suffix(forbidden, "*"))
 }
 
 # * may be used to allow all sysctls
-allowed_sysctl(_) {
+allowed_sysctl(_) if {
     input.parameters.allowedSysctls[_] == "*"
 }
 
-allowed_sysctl(sysctl) {
+allowed_sysctl(sysctl) if {
     input.parameters.allowedSysctls[_] == sysctl
 }
 
-allowed_sysctl(sysctl) {
+allowed_sysctl(sysctl) if {
     allowed := input.parameters.allowedSysctls[_]
     endswith(allowed, "*")
     startswith(sysctl, trim_suffix(allowed, "*"))
 }
 
-allowed_sysctl(_) {
+allowed_sysctl(_) if {
     not input.parameters.allowedSysctls
 }
-allowed_sysctl_string() = out {
+
+allowed_sysctl_string := out if {
     not input.parameters.allowedSysctls
     out = "unspecified"
 }
-allowed_sysctl_string() = out {
+
+allowed_sysctl_string := out if {
     out = input.parameters.allowedSysctls
 }

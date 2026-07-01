@@ -4,7 +4,7 @@ metadata:
   name: k8spsphostnamespace
   annotations:
     metadata.gatekeeper.sh/title: "Host Namespace"
-    metadata.gatekeeper.sh/version: 1.1.1
+    metadata.gatekeeper.sh/version: 1.1.2
     metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Disallows sharing of host PID and IPC namespaces by pod containers.
@@ -48,9 +48,12 @@ spec:
           rego: |
             package k8spsphostnamespace
 
+            import future.keywords.contains
+            import future.keywords.if
+
             import data.lib.exclude_update.is_update
 
-            violation[{"msg": msg, "details": {}}] {
+            violation contains {"msg": msg, "details": {}} if {
                 # spec.hostPID and spec.hostIPC fields are immutable.
                 not is_update(input.review)
 
@@ -58,16 +61,20 @@ spec:
                 msg := sprintf("Sharing the host namespace is not allowed: %v", [input.review.object.metadata.name])
             }
 
-            input_share_hostnamespace(o) {
+            input_share_hostnamespace(o) if {
                 o.spec.hostPID
             }
-            input_share_hostnamespace(o) {
+
+            input_share_hostnamespace(o) if {
                 o.spec.hostIPC
             }
           libs:
             - |
               package lib.exclude_update
 
-              is_update(review) {
+              import future.keywords.contains
+              import future.keywords.if
+
+              is_update(review) if {
                   review.operation == "UPDATE"
               }

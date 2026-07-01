@@ -1,20 +1,23 @@
 package noupdateserviceaccount
 
+import future.keywords.contains
+import future.keywords.if
+
 # Pod
-pod_spec(sa_name) = spec {
+pod_spec(sa_name) := spec if {
     spec = {
         "serviceAccountName": sa_name,
     }
-}
+    }
 
-pod(sa_name) = obj {
+pod(sa_name) := obj if {
     obj = {
         "kind": "Pod",
         "spec": pod_spec(sa_name),
     }
-}
+    }
 
-test_deny_pod {
+test_deny_pod if {
     inp := {
         "review": update(pod("sa1"), pod("sa2"), {}),
         "parameters": {},
@@ -22,10 +25,10 @@ test_deny_pod {
     result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     result == policy_violation
-}
+    }
 
 # ReplicationController
-rc(sa_name) = obj {
+rc(sa_name) := obj if {
     obj = {
         "kind": "ReplicationController",
         "spec": {
@@ -34,9 +37,9 @@ rc(sa_name) = obj {
             }
         }
     }
-}
+            }
 
-test_deny_rc {
+test_deny_rc if {
     inp := {
         "review": update(rc("sa1"), rc("sa2"), {}),
         "parameters": {},
@@ -44,10 +47,10 @@ test_deny_rc {
     result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     result == policy_violation
-}
+    }
 
 # ReplicaSet
-rs(sa_name) = obj {
+rs(sa_name) := obj if {
     obj = {
         "kind": "ReplicaSet",
         "spec": {
@@ -56,9 +59,9 @@ rs(sa_name) = obj {
             }
         }
     }
-}
+    }
 
-test_deny_rs {
+test_deny_rs if {
     inp := {
         "review": update(rs("sa1"), rs("sa2"), {}),
         "parameters": {},
@@ -66,10 +69,10 @@ test_deny_rs {
     result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     result == policy_violation
-}
+            }
 
 # Deployment
-deploy(sa_name) = obj {
+deploy(sa_name) := obj if {
     obj = {
         "kind": "Deployment",
         "spec": {
@@ -78,9 +81,9 @@ deploy(sa_name) = obj {
             }
         }
     }
-}
+    }
 
-test_deny_deploy {
+test_deny_deploy if {
     inp := {
         "review": update(deploy("sa1"), deploy("sa2"), {}),
         "parameters": {},
@@ -88,10 +91,10 @@ test_deny_deploy {
     result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     result == policy_violation
-}
+    }
 
 # StatefulSet
-ss(sa_name) = obj {
+ss(sa_name) := obj if {
     obj = {
         "kind": "StatefulSet",
         "spec": {
@@ -100,9 +103,9 @@ ss(sa_name) = obj {
             }
         }
     }
-}
+            }
 
-test_deny_ss {
+test_deny_ss if {
     inp := {
         "review": update(ss("sa1"), ss("sa2"), {}),
         "parameters": {},
@@ -110,10 +113,10 @@ test_deny_ss {
     result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     result == policy_violation
-}
+    }
 
 # DaemonSet
-ds(sa_name) = obj {
+ds(sa_name) := obj if {
     obj = {
         "kind": "DaemonSet",
         "spec": {
@@ -122,9 +125,9 @@ ds(sa_name) = obj {
             }
         }
     }
-}
+    }
 
-test_deny_ds {
+test_deny_ds if {
     inp := {
         "review": update(ds("sa1"), ds("sa2"), {}),
         "parameters": {},
@@ -132,10 +135,10 @@ test_deny_ds {
     result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     result == policy_violation
-}
+            }
 
 # Job
-job(sa_name) = obj {
+job(sa_name) := obj if {
     obj = {
         "kind": "Job",
         "spec": {
@@ -144,9 +147,9 @@ job(sa_name) = obj {
             }
         }
     }
-}
+    }
 
-test_deny_job {
+test_deny_job if {
     inp := {
         "review": update(job("sa1"), job("sa2"), {}),
         "parameters": {},
@@ -154,10 +157,10 @@ test_deny_job {
     result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     result == policy_violation
-}
+    }
 
 # CronJob
-cronjob(sa_name) = obj {
+cronjob(sa_name) := obj if {
     obj = {
         "kind": "CronJob",
         "spec": {
@@ -170,9 +173,9 @@ cronjob(sa_name) = obj {
             }
         }
     }
-}
+            }
 
-test_deny_cronjob {
+test_deny_cronjob if {
     inp := {
         "review": update(cronjob("sa1"), cronjob("sa2"), {}),
         "parameters": {},
@@ -180,10 +183,10 @@ test_deny_cronjob {
     result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     result == policy_violation
-}
+    }
 
 # Allow unrelated modification
-test_allow_unrelated {
+test_allow_unrelated if {
     a := deploy("sa")
     b := {
         "kind": "Deployment",
@@ -206,7 +209,7 @@ test_allow_unrelated {
 }
 
 # Allow create and delete
-test_allow_create {
+test_allow_create if {
     inp := {
         "review": create(deploy("sa1")),
         "parameters": {},
@@ -214,9 +217,9 @@ test_allow_create {
     result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     count(result) == 0
-}
+        }
 
-test_allow_delete {
+test_allow_delete if {
     inp := {
         "review": delete(deploy("sa1")),
         "parameters": {},
@@ -227,7 +230,7 @@ test_allow_delete {
 }
 
 # Allowlist users and groups
-test_allow_users {
+test_allow_users if {
     inp := {
         "review": update(deploy("sa1"), deploy("sa2"), {"username": "myuser"}),
         "parameters": allow(["myuser"], []),
@@ -237,7 +240,7 @@ test_allow_users {
     count(result) == 0
 }
 
-test_allow_groups {
+test_allow_groups if {
     inp := {
         "review": update(deploy("sa1"), deploy("sa2"), {"groups": ["mygroup"]}),
         "parameters": allow([], ["mygroup"]),
@@ -245,10 +248,10 @@ test_allow_groups {
     result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     count(result) == 0
-}
+                }
 
 # Malformed
-test_deny_missing_old {
+test_deny_missing_old if {
     inp := {
         "review": update({}, pod("sa"), {}),
         "parameters": {},
@@ -256,9 +259,9 @@ test_deny_missing_old {
     result := violation with input as inp
     trace(sprintf("%v", [result]))
     result == missing_old_violation
-}
+        }
 
-test_deny_missing_new {
+test_deny_missing_new if {
     inp := {
         "review": update(pod("sa"), {}, {}),
         "parameters": {},
@@ -270,7 +273,7 @@ test_deny_missing_new {
 
 # Other helpers
 
-update(old, new, user) = output {
+update(old, new, user) := output if {
     output = {
         "operation": "UPDATE",
         "oldObject": old,
@@ -279,39 +282,39 @@ update(old, new, user) = output {
     }
 }
 
-create(obj) = output {
+create(obj) := output if {
     output = {
         "operation": "CREATE",
         "oldObject": null,
         "object": obj,
         "userInfo": {},
     }
-}
+            }
 
-delete(obj) = output {
+delete(obj) := output if {
     output = {
         "operation": "DELETE",
         "oldObject": obj,
         "object": null,
         "userInfo": {},
     }
-}
+    }
 
-allow(users, groups) = params {
+allow(users, groups) := params if {
     params = {
         "allowedUsers": users,
         "allowedGroups": groups,
     }
 }
 
-missing_old_violation[{"msg": msg}] {
+missing_old_violation contains ({"msg": msg}) if {
     msg := "missing serviceAccountName field in oldObject under review"
-}
+    }
 
-missing_new_violation[{"msg": msg}] {
+missing_new_violation contains ({"msg": msg}) if {
     msg := "missing serviceAccountName field in object under review"
 }
 
-policy_violation[{"msg": msg}] {
+policy_violation contains ({"msg": msg}) if {
     msg := "user does not have permission to modify serviceAccountName"
-}
+    }

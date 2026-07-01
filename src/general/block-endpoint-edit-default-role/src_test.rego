@@ -1,36 +1,39 @@
 package k8sblockendpointeditdefaultrole
 
-test_input_no_endpoints_edit_role_allow {
+import future.keywords.contains
+import future.keywords.if
+
+test_input_no_endpoints_edit_role_allow if {
     inp := { "review": input_review_withoutendpoints }
     results := violation with input as inp
     count(results) == 0
 }
 
-test_input_endpoints_create_role_not_allow {
+test_input_endpoints_create_role_not_allow if {
     inp := { "review": input_review_with_endpoints_create }
     results := violation with input as inp
     count(results) == 1
 }
 
-test_input_endpoints_update_role_not_allow {
+test_input_endpoints_update_role_not_allow if {
     inp := { "review": input_review_with_endpoints_update }
     results := violation with input as inp
     count(results) == 1
 }
 
-test_input_endpoints_patch_role_not_allow {
+test_input_endpoints_patch_role_not_allow if {
     inp := { "review": input_review_with_endpoints_patch }
     results := violation with input as inp
     count(results) == 1
 }
 
-test_input_endpoints_delete_role_allow {
+test_input_endpoints_delete_role_allow if {
     inp := { "review": input_review_with_endpoints_delete }
     results := violation with input as inp
     count(results) == 0
 }
 
-input_review_withoutendpoints() = {
+input_review_withoutendpoints := {
     "object": {
         "metadata":{
             "annotations":{
@@ -45,7 +48,7 @@ input_review_withoutendpoints() = {
     }
 }
 
-input_review_with_endpoints_create() = {
+input_review_with_endpoints_create := {
     "object": {
         "metadata":{
             "annotations":{
@@ -60,7 +63,7 @@ input_review_with_endpoints_create() = {
     }
 }
 
-input_review_with_endpoints_update() = {
+input_review_with_endpoints_update := {
     "object": {
         "metadata":{
             "annotations":{
@@ -75,7 +78,7 @@ input_review_with_endpoints_update() = {
     }
 }
 
-input_review_with_endpoints_patch() = {
+input_review_with_endpoints_patch := {
     "object": {
         "metadata":{
             "annotations":{
@@ -90,7 +93,7 @@ input_review_with_endpoints_patch() = {
     }
 }
 
-input_review_with_endpoints_delete() = {
+input_review_with_endpoints_delete := {
     "object": {
         "metadata":{
             "annotations":{
@@ -105,7 +108,7 @@ input_review_with_endpoints_delete() = {
     }
 }
 
-input_rule(resources,verbs) = {
+input_rule(resources, verbs) := {
     "apiGroups": [""],
     "resources": resources,
     "verbs": verbs
