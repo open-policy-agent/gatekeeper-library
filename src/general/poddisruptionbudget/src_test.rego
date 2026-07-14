@@ -7,6 +7,8 @@ match_labels := {"matchLabels": {
   "key2": "val2",
 }}
 
+labels := object.union(match_labels["matchLabels"], {"key3": "val3"})
+
 test_input_pdb_0_max_unavailable {
   inp := {"review": input_pdb_max_unavailable(0)}
   results := violation with input as inp
@@ -47,6 +49,13 @@ test_input_deployment_pdb_1_max_unavailable {
   count(results) == 0
 }
 
+test_input_deployment_pdb_matches_template_labels_not_selector {
+  inp := {"review": input_deployment_with_selector(1, match_labels["matchLabels"])}
+  inv := inv_pdb_min_available_with_selector(1, {"matchLabels": {"key3": "val3"}})
+  results := violation with input as inp with data.inventory as inv
+  count(results) == 1
+}
+
 pdb_min_available(min_available) = output {
   output := {
     "apiVersion": "policy/v1",
@@ -57,6 +66,21 @@ pdb_min_available(min_available) = output {
     },
     "spec": {
       "selector": match_labels,
+      "minAvailable": min_available,
+    },
+  }
+}
+
+pdb_min_available_with_selector(min_available, selector) = output {
+  output := {
+    "apiVersion": "policy/v1",
+    "kind": "PodDisruptionBudget",
+    "metadata": {
+      "name": "pdb-1",
+      "namespace": "namespace-1",
+    },
+    "spec": {
+      "selector": selector,
       "minAvailable": min_available,
     },
   }
@@ -77,6 +101,28 @@ pdb_max_unavailable(max_unavailable) = output {
   }
 }
 
+deployment_with_selector(replicas, selector) = output {
+  output := {
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+      "name": "deployment-1",
+      "namespace": "namespace-1",
+    },
+    "spec": {
+      "replicas": replicas,
+      "selector": {
+        "matchLabels": selector,
+      },
+      "template": {
+        "metadata": {
+          "labels": labels,
+        }
+      }
+    },
+  }
+}
+
 deployment(replicas) = output {
   output := {
     "apiVersion": "apps/v1",
@@ -87,8 +133,19 @@ deployment(replicas) = output {
     },
     "spec": {
       "replicas": replicas,
-      "selector": match_labels,
+      "template": {
+        "metadata": {
+          "labels": labels,
+        }
+      }
     },
+  }
+}
+
+input_deployment_with_selector(replicas, selector) = output {
+  output := {
+    "kind": {"kind": "Deployment"},
+    "object": deployment_with_selector(replicas, selector),
   }
 }
 
@@ -112,6 +169,11 @@ inventory(obj) = output {
 
 inv_pdb_min_available(min_available) = output {
   pdb = pdb_min_available(min_available)
+  output := inventory(pdb)
+}
+
+inv_pdb_min_available_with_selector(min_available, selector) = output {
+  pdb = pdb_min_available_with_selector(min_available, selector)
   output := inventory(pdb)
 }
 
