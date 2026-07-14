@@ -1,16 +1,19 @@
 package k8srequiredresources
 
+import future.keywords.contains
+import future.keywords.if
+
 import data.lib.exempt_container.is_exempt
 
-violation[{"msg": msg}] {
+violation contains ({"msg": msg}) if {
   general_violation[{"msg": msg, "field": "containers"}]
 }
 
-violation[{"msg": msg}] {
+violation contains ({"msg": msg}) if {
   general_violation[{"msg": msg, "field": "initContainers"}]
 }
 
-general_violation[{"msg": msg, "field": field}] {
+general_violation contains {"msg": msg, "field": field} if {
   container := input.review.object.spec[field][_]
   not is_exempt(container)
   provided := {resource_type | container.resources.limits[resource_type]}
@@ -20,7 +23,7 @@ general_violation[{"msg": msg, "field": field}] {
   msg := sprintf("container <%v> does not have <%v> limits defined", [container.name, missing])
 }
 
-general_violation[{"msg": msg, "field": field}] {
+general_violation contains {"msg": msg, "field": field} if {
   container := input.review.object.spec[field][_]
   not is_exempt(container)
   provided := {resource_type | container.resources.requests[resource_type]}

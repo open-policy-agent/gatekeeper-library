@@ -1,62 +1,75 @@
 package k8spspfsgroup
 
-test_input_fsgroup_allowed_all {
+import future.keywords.contains
+import future.keywords.if
+
+test_input_fsgroup_allowed_all if {
     inp := { "review": input_review_with_fsgroup, "parameters": input_parameters_runasany}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_no_fsgroup_allowed_all {
+
+test_input_no_fsgroup_allowed_all if {
     inp := { "review": input_review, "parameters": input_parameters_runasany}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_fsgroup_MustRunAs_allowed {
+
+test_input_fsgroup_MustRunAs_allowed if {
     inp := { "review": input_review_with_fsgroup, "parameters": input_parameters_in_list_mustrunas}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_fsgroup_MustRunAs_not_allowed {
+
+test_input_fsgroup_MustRunAs_not_allowed if {
     inp := { "review": input_review_with_fsgroup, "parameters": input_parameters_in_list_mustrunas_outofrange}
     results := violation with input as inp
     count(results) > 0
 }
-test_input_no_fsgroup_MustRunAs_not_allowed {
+
+test_input_no_fsgroup_MustRunAs_not_allowed if {
     inp := { "review": input_review, "parameters": input_parameters_in_list_mustrunas}
     results := violation with input as inp
     count(results) > 0
 }
-test_input_securitycontext_no_fsgroup_MustRunAs_not_allowed {
+
+test_input_securitycontext_no_fsgroup_MustRunAs_not_allowed if {
     inp := { "review": input_review_with_securitycontext_no_fsgroup, "parameters": input_parameters_in_list_mustrunas}
     results := violation with input as inp
     count(results) > 0
 }
-test_input_fsgroup_MayRunAs_allowed {
+
+test_input_fsgroup_MayRunAs_allowed if {
     inp := { "review": input_review_with_fsgroup, "parameters": input_parameters_in_list_mayrunas}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_fsgroup_MayRunAs_not_allowed {
+
+test_input_fsgroup_MayRunAs_not_allowed if {
     inp := { "review": input_review_with_fsgroup, "parameters": input_parameters_in_list_mayrunas_outofrange}
     results := violation with input as inp
     count(results) > 0
 }
-test_input_no_fsgroup_MayRunAs_allowed {
+
+test_input_no_fsgroup_MayRunAs_allowed if {
     inp := { "review": input_review, "parameters": input_parameters_in_list_mayrunas}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_securitycontext_no_fsgroup_MayRunAs_allowed {
+
+test_input_securitycontext_no_fsgroup_MayRunAs_allowed if {
     inp := { "review": input_review_with_securitycontext_no_fsgroup, "parameters": input_parameters_in_list_mayrunas}
     results := violation with input as inp
     count(results) == 0
 }
-test_update {
+
+test_update if {
     inp := { "review": object.union(input_review_with_fsgroup, {"operation": "UPDATE"}), "parameters": input_parameters_in_list_mustrunas_outofrange}
     results := violation with input as inp
     count(results) == 0
 }
 
-input_review = {
+input_review := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -68,7 +81,7 @@ input_review = {
     }
 }
 
-input_review_with_fsgroup = {
+input_review_with_fsgroup := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -83,7 +96,7 @@ input_review_with_fsgroup = {
     }
 }
 
-input_review_with_securitycontext_no_fsgroup = {
+input_review_with_securitycontext_no_fsgroup := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -98,7 +111,7 @@ input_review_with_securitycontext_no_fsgroup = {
     }
 }
 
-input_containers_one = [
+input_containers_one := [
 {
     "name": "nginx",
     "image": "nginx",
@@ -109,17 +122,17 @@ input_containers_one = [
     }]
 }]
 
-input_volumes = [
+input_volumes := [
 {
     "name": "cache-volume",
     "emptyDir": {}
 }]
 
-input_parameters_runasany = {
+input_parameters_runasany := {
      "rule": "RunAsAny"
 }
 
-input_parameters_in_list_mustrunas = {
+input_parameters_in_list_mustrunas := {
     "rule": "MustRunAs",
     "ranges": [
     {
@@ -127,7 +140,8 @@ input_parameters_in_list_mustrunas = {
         "max": 2000
     }]
 }
-input_parameters_in_list_mustrunas_outofrange = {
+
+input_parameters_in_list_mustrunas_outofrange := {
     "rule": "MustRunAs",
     "ranges": [
     {
@@ -135,7 +149,8 @@ input_parameters_in_list_mustrunas_outofrange = {
         "max": 1000
     }]
 }
-input_parameters_in_list_mayrunas = {
+
+input_parameters_in_list_mayrunas := {
     "rule": "MayRunAs",
     "ranges": [
     {
@@ -143,7 +158,8 @@ input_parameters_in_list_mayrunas = {
         "max": 2000
     }]
 }
-input_parameters_in_list_mayrunas_outofrange = {
+
+input_parameters_in_list_mayrunas_outofrange := {
     "rule": "MayRunAs",
     "ranges": [
     {

@@ -1,79 +1,94 @@
 package k8sallowedrepos
 
-test_input_allowed_container {
+import future.keywords.contains
+import future.keywords.if
+
+test_input_allowed_container if {
     inp := { "review": input_review(input_container_allowed), "parameters": {"repos": ["allowed"]}}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_allowed_container_x2 {
+
+test_input_allowed_container_x2 if {
     inp := { "review": input_review(input_container_allowed), "parameters": {"repos": ["other", "allowed"]}}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_allowed_dual_container {
+
+test_input_allowed_dual_container if {
     inp := { "review": input_review(input_container_dual_allowed), "parameters": {"repos": ["allowed"]}}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_denied_container {
+
+test_input_denied_container if {
     inp := { "review": input_review(input_container_denied), "parameters": {"repos": ["allowed"]}}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_denied_container_x2 {
+
+test_input_denied_container_x2 if {
     inp := { "review": input_review(input_container_denied), "parameters": {"repos": ["other", "allowed"]}}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_denied_dual_container {
+
+test_input_denied_dual_container if {
     inp := { "review": input_review(input_container_dual_denied), "parameters": {"repos": ["allowed"]}}
     results := violation with input as inp
     count(results) == 2
 }
-test_input_denied_mixed_container {
+
+test_input_denied_mixed_container if {
     inp := { "review": input_review(array.concat(input_container_allowed, input_container_denied)), "parameters": {"repos": ["allowed"]}}
     results := violation with input as inp
     count(results) == 1
 }
 
 # init containers
-test_input_allowed_container {
+test_input_allowed_container if {
     inp := { "review": input_init_review(input_container_allowed), "parameters": {"repos": ["allowed"]}}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_allowed_container_x2 {
+
+test_input_allowed_container_x2 if {
     inp := { "review": input_init_review(input_container_allowed), "parameters": {"repos": ["other", "allowed"]}}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_allowed_dual_container {
+
+test_input_allowed_dual_container if {
     inp := { "review": input_init_review(input_container_dual_allowed), "parameters": {"repos": ["allowed"]}}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_denied_container {
+
+test_input_denied_container if {
     inp := { "review": input_init_review(input_container_denied), "parameters": {"repos": ["allowed"]}}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_denied_container_x2 {
+
+test_input_denied_container_x2 if {
     inp := { "review": input_init_review(input_container_denied), "parameters": {"repos": ["other", "allowed"]}}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_denied_dual_container {
+
+test_input_denied_dual_container if {
     inp := { "review": input_init_review(input_container_dual_denied), "parameters": {"repos": ["allowed"]}}
     results := violation with input as inp
     count(results) == 2
 }
-test_input_denied_mixed_container {
+
+test_input_denied_mixed_container if {
     inp := { "review": input_init_review(array.concat(input_container_allowed, input_container_denied)), "parameters": {"repos": ["allowed"]}}
     results := violation with input as inp
     count(results) == 1
 }
 
-input_review(containers) = output {
+input_review(containers) := output if {
     output = {
       "object": {
         "metadata": {
@@ -84,9 +99,9 @@ input_review(containers) = output {
         }
       }
      }
-}
+        }
 
-input_init_review(containers) = output {
+input_init_review(containers) := output if {
     output = {
       "object": {
         "metadata": {
@@ -97,21 +112,21 @@ input_init_review(containers) = output {
         }
       }
      }
-}
+      }
 
-input_container_allowed = [
+input_container_allowed := [
 {
     "name": "nginx",
     "image": "allowed/nginx",
 }]
 
-input_container_denied = [
+input_container_denied := [
 {
     "name": "nginx",
     "image": "denied/nginx",
 }]
 
-input_container_dual_allowed = [
+input_container_dual_allowed := [
 {
     "name": "nginx",
     "image": "allowed/nginx",
@@ -121,7 +136,7 @@ input_container_dual_allowed = [
     "image": "allowed/other",
 }]
 
-input_container_dual_denied = [
+input_container_dual_denied := [
 {
     "name": "nginx",
     "image": "denied/nginx",

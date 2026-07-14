@@ -4,7 +4,7 @@ metadata:
   name: k8suniqueserviceselector
   annotations:
     metadata.gatekeeper.sh/title: "Unique Service Selector"
-    metadata.gatekeeper.sh/version: 1.0.2
+    metadata.gatekeeper.sh/version: 1.0.3
     metadata.gatekeeper.sh/requires-sync-data: |
       "[
         [
@@ -32,36 +32,39 @@ spec:
       rego: |
         package k8suniqueserviceselector
 
-        make_apiversion(kind) = apiVersion {
+        import future.keywords.contains
+        import future.keywords.if
+
+        make_apiversion(kind) := apiVersion if {
           g := kind.group
           v := kind.version
           g != ""
           apiVersion = sprintf("%v/%v", [g, v])
         }
 
-        make_apiversion(kind) = apiVersion {
+        make_apiversion(kind) := apiVersion if {
           kind.group == ""
           apiVersion = kind.version
         }
 
-        identical(obj, review) {
+        identical(obj, review) if {
           obj.metadata.namespace == review.namespace
           obj.metadata.name == review.name
           obj.kind == review.kind.kind
           obj.apiVersion == make_apiversion(review.kind)
         }
 
-        flatten_selector(obj) = flattened {
+        flatten_selector(obj) := flattened if {
           selectors := [s | s = concat(":", [key, val]); val = obj.spec.selector[key]]
           flattened := concat(",", sort(selectors))
         }
 
-        violation[{"msg": msg}] {
+        violation contains ({"msg": msg}) if {
           input.review.kind.kind == "Service"
           input.review.kind.version == "v1"
           input.review.kind.group == ""
           input_selector := flatten_selector(input.review.object)
-          other := data.inventory.namespace[namespace][_]["Service"][name]
+          other := data.inventory.namespace[namespace][_].Service[name]
           not identical(other, input.review)
           other_selector := flatten_selector(other)
           input_selector == other_selector

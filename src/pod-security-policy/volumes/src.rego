@@ -1,8 +1,11 @@
 package k8spspvolumetypes
 
+import future.keywords.contains
+import future.keywords.if
+
 import data.lib.exclude_update.is_update
 
-violation[{"msg": msg, "details": {}}] {
+violation contains {"msg": msg, "details": {}} if {
     # spec.volumes field is immutable.
     not is_update(input.review)
 
@@ -13,10 +16,10 @@ violation[{"msg": msg, "details": {}}] {
 }
 
 # * may be used to allow all volume types
-input_volume_type_allowed(_) {
+input_volume_type_allowed(_) if {
     input.parameters.volumes[_] == "*"
 }
 
-input_volume_type_allowed(field) {
+input_volume_type_allowed(field) if {
     field == input.parameters.volumes[_]
 }

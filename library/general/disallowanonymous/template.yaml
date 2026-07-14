@@ -4,7 +4,7 @@ metadata:
   name: k8sdisallowanonymous
   annotations:
     metadata.gatekeeper.sh/title: "Disallow Anonymous Access"
-    metadata.gatekeeper.sh/version: 1.1.0
+    metadata.gatekeeper.sh/version: 1.1.1
     description: Disallows associating ClusterRole and Role resources to the system:anonymous user and system:unauthenticated group.
 spec:
   crd:
@@ -35,7 +35,10 @@ spec:
       rego: |
         package k8sdisallowanonymous
 
-        violation[{"msg": msg}] {
+        import future.keywords.contains
+        import future.keywords.if
+
+        violation contains ({"msg": msg}) if {
           not is_allowed(input.review.object.roleRef, object.get(input, ["parameters", "allowedRoles"], []))
 
           group := ["system:unauthenticated", "system:anonymous"][_]
@@ -44,7 +47,7 @@ spec:
           msg := message(group)
         }
 
-        violation[{"msg": msg}] {
+        violation contains ({"msg": msg}) if {
           not is_allowed(input.review.object.roleRef, object.get(input, ["parameters", "allowedRoles"], []))
 
           object.get(input, ["parameters", "disallowAuthenticated"], false)
@@ -55,14 +58,14 @@ spec:
           msg := message(group)
         }
 
-        is_allowed(role, allowedRoles) {
+        is_allowed(role, allowedRoles) if {
           role.name == allowedRoles[_]
         }
 
-        subject_is(subject, expected) {
+        subject_is(subject, expected) if {
           subject.name == expected
         }
 
-        message(name) := val {
+        message(name) := val if {
           val := sprintf("%v is not allowed as a subject name in %v %v", [name, input.review.object.kind, input.review.object.metadata.name])
         }

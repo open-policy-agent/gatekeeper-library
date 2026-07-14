@@ -1,79 +1,87 @@
 package k8spspvolumetypes
 
-test_input_volume_type_allowed_all {
+import future.keywords.contains
+import future.keywords.if
+
+test_input_volume_type_allowed_all if {
     inp := { "review": input_review, "parameters": input_parameters_wildcard}
     results := violation with input as inp
     count(results) == 0
 }
 
-test_input_volume_type_allowed_all_many_volumes {
+test_input_volume_type_allowed_all_many_volumes if {
     inp := { "review": input_review_many, "parameters": input_parameters_wildcard}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_volume_type_none_allowed {
+
+test_input_volume_type_none_allowed if {
     inp := { "review": input_review, "parameters": input_parameters_empty}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_volume_type_none_allowed_many_volumes {
+
+test_input_volume_type_none_allowed_many_volumes if {
     inp := { "review": input_review_many, "parameters": input_parameters_empty}
     results := violation with input as inp
     count(results) == 2
 }
-test_input_volume_type_allowed_all_no_volumes {
+
+test_input_volume_type_allowed_all_no_volumes if {
     inp := { "review": input_review_no_volumes, "parameters": input_parameters_wildcard}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_volume_type_none_allowed_no_volumes {
+
+test_input_volume_type_none_allowed_no_volumes if {
     inp := { "review": input_review_no_volumes, "parameters": input_parameters_empty}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_volume_type_allowed_in_list_no_volumes {
+
+test_input_volume_type_allowed_in_list_no_volumes if {
     inp := { "review": input_review_no_volumes, "parameters": input_parameters_in_list}
     results := violation with input as inp
     count(results) == 0
 }
 
-test_input_volume_type_allowed_in_list {
+test_input_volume_type_allowed_in_list if {
     inp := { "review": input_review, "parameters": input_parameters_in_list}
     results := violation with input as inp
     count(results) == 0
 }
 
-test_input_volume_type_allowed_not_in_list {
+test_input_volume_type_allowed_not_in_list if {
     inp := { "review": input_review, "parameters": input_parameters_not_in_list}
     results := violation with input as inp
     count(results) == 1
 }
 
-test_input_volume_type_allowed_in_list_many_volumes {
+test_input_volume_type_allowed_in_list_many_volumes if {
     inp := { "review": input_review_many, "parameters": input_parameters_in_list}
     results := violation with input as inp
     count(results) == 0
 }
 
-test_input_volume_type_allowed_not_all_in_list_many_volumes {
+test_input_volume_type_allowed_not_all_in_list_many_volumes if {
     inp := { "review": input_review_many, "parameters": input_parameters_not_in_list}
     results := violation with input as inp
     count(results) == 2
 }
 
-test_input_volume_type_allowed_in_list_many_volumes_mixed {
+test_input_volume_type_allowed_in_list_many_volumes_mixed if {
     inp := { "review": input_review_many, "parameters": input_parameters_mixed}
     results := violation with input as inp
     count(results) == 1
 }
 
-test_input_volume_type_update {
+test_input_volume_type_update if {
     inp := { "review": object.union(input_review, {"operation": "UPDATE"}), "parameters": input_parameters_empty}
     results := violation with input as inp
     count(results) == 0
 }
 
-input_review = {
+input_review := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -85,7 +93,7 @@ input_review = {
     }
 }
 
-input_review_many = {
+input_review_many := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -97,7 +105,7 @@ input_review_many = {
     }
 }
 
-input_review_no_volumes = {
+input_review_no_volumes := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -108,7 +116,7 @@ input_review_no_volumes = {
     }
 }
 
-input_containers = [
+input_containers := [
 {
     "name": "nginx",
     "image": "nginx",
@@ -119,13 +127,13 @@ input_containers = [
     }]
 }]
 
-input_containers_no_volumes = [
+input_containers_no_volumes := [
 {
     "name": "nginx",
     "image": "nginx"
 }]
 
-input_containers_many = [
+input_containers_many := [
 {
     "name": "nginx",
     "image": "nginx",
@@ -145,7 +153,7 @@ input_containers_many = [
     }]
 }]
 
-input_volumes = [
+input_volumes := [
 {
     "name": "cache-volume",
     "hostPath": {
@@ -153,7 +161,7 @@ input_volumes = [
     }
 }]
 
-input_volumes_many = [
+input_volumes_many := [
 {
     "name": "cache-volume",
     "hostPath": {
@@ -165,31 +173,31 @@ input_volumes_many = [
     "emptyDir": {}
 }]
 
-input_parameters_empty = {
+input_parameters_empty := {
      "volumes": []
 }
 
-input_parameters_wildcard = {
+input_parameters_wildcard := {
      "volumes": [
          "*"
     ]
 }
 
-input_parameters_in_list = {
+input_parameters_in_list := {
      "volumes": [
          "hostPath",
          "emptyDir"
     ]
 }
 
-input_parameters_mixed = {
+input_parameters_mixed := {
      "volumes": [
          "configMap",
          "emptyDir"
     ]
 }
 
-input_parameters_not_in_list = {
+input_parameters_not_in_list := {
      "volumes": [
          "configMap",
          "secret"

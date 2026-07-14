@@ -1,6 +1,9 @@
 package k8srequiredannotations
 
-violation[{"msg": msg, "details": {"missing_annotations": missing}}] {
+import future.keywords.contains
+import future.keywords.if
+
+violation contains {"msg": msg, "details": {"missing_annotations": missing}} if {
     provided := {annotation | input.review.object.metadata.annotations[annotation]}
     required := {annotation | annotation := input.parameters.annotations[_].key}
     missing := required - provided
@@ -8,7 +11,7 @@ violation[{"msg": msg, "details": {"missing_annotations": missing}}] {
     msg := sprintf("you must provide annotation(s): %v", [missing])
 }
 
-violation[{"msg": msg}] {
+violation contains ({"msg": msg}) if {
   value := input.review.object.metadata.annotations[key]
   expected := input.parameters.annotations[_]
   expected.key == key

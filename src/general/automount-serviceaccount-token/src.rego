@@ -1,8 +1,12 @@
 package k8sautomountserviceaccounttoken
 
+import future.keywords.contains
+import future.keywords.if
+
 import data.lib.exclude_update.is_update
 
-violation[{"msg": msg}] {
+violation contains ({"msg": msg}) if {
+
     # spec.automountServiceAccountToken and spec.containers.volumeMounts fields are immutable.
     not is_update(input.review)
 
@@ -11,27 +15,27 @@ violation[{"msg": msg}] {
     msg := sprintf("Automounting service account token is disallowed, pod: %v", [obj.metadata.name])
 }
 
-mountServiceAccountToken(spec) {
+mountServiceAccountToken(spec) if {
     spec.automountServiceAccountToken == true
 }
 
 # if there is no automountServiceAccountToken spec, check on volumeMount in containers. Service Account token is mounted on /var/run/secrets/kubernetes.io/serviceaccount
 # https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/#serviceaccount-admission-controller
-mountServiceAccountToken(spec) {
+mountServiceAccountToken(spec) if {
     not has_key(spec, "automountServiceAccountToken")
     "/var/run/secrets/kubernetes.io/serviceaccount" == input_containers[_].volumeMounts[_].mountPath
 }
 
-input_containers[c] {
+input_containers contains c if {
     c := input.review.object.spec.containers[_]
 }
 
-input_containers[c] {
+input_containers contains c if {
     c := input.review.object.spec.initContainers[_]
 }
 
 # Ephemeral containers not checked as it is not possible to set field.
 
-has_key(x, k) {
+has_key(x, k) if {
     _ = x[k]
 }

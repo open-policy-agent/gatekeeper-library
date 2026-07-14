@@ -1,37 +1,45 @@
 package k8spspreadonlyrootfilesystem
 
-test_input_container_not_readonlyrootfilesystem_allowed {
+import future.keywords.contains
+import future.keywords.if
+
+test_input_container_not_readonlyrootfilesystem_allowed if {
     inp := { "review": input_review}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_container_readonlyrootfilesystem_not_allowed {
+
+test_input_container_readonlyrootfilesystem_not_allowed if {
     inp := { "review": input_review_ro}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_container_many_mixed_readonlyrootfilesystem_not_allowed {
+
+test_input_container_many_mixed_readonlyrootfilesystem_not_allowed if {
     inp := { "review": input_review_many_mixed}
     results := violation with input as inp
     count(results) == 2
 }
-test_input_container_many_mixed_readonlyrootfilesystem_not_allowed_two {
+
+test_input_container_many_mixed_readonlyrootfilesystem_not_allowed_two if {
     inp := { "review": input_review_many_mixed_two}
     results := violation with input as inp
     count(results) == 3
 }
-test_input_container_many_mixed_readonlyrootfilesystem_not_allowed_two_but_exempt {
+
+test_input_container_many_mixed_readonlyrootfilesystem_not_allowed_two_but_exempt if {
     inp := { "review": input_review_many_mixed_two, "parameters": {"exemptImages": ["nginx"]} }
     results := violation with input as inp
     count(results) == 0
 }
-test_update {
+
+test_update if {
     inp := { "review": object.union(input_review, {"operation": "UPDATE"})}
     results := violation with input as inp
     count(results) == 0
 }
 
-input_review = {
+input_review := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -42,7 +50,7 @@ input_review = {
     }
 }
 
-input_review_ro = {
+input_review_ro := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -53,7 +61,7 @@ input_review_ro = {
     }
 }
 
-input_review_many_mixed = {
+input_review_many_mixed := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -65,7 +73,7 @@ input_review_many_mixed = {
     }
 }
 
-input_review_many_mixed_two = {
+input_review_many_mixed_two := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -77,7 +85,7 @@ input_review_many_mixed_two = {
     }
 }
 
-input_containers_one = [
+input_containers_one := [
 {
     "name": "nginx",
     "image": "nginx",
@@ -86,7 +94,7 @@ input_containers_one = [
     }
 }]
 
-input_containers_one_ro = [
+input_containers_one_ro := [
 {
     "name": "nginx",
     "image": "nginx",
@@ -95,7 +103,7 @@ input_containers_one_ro = [
     }
 }]
 
-input_containers_many = [
+input_containers_many := [
 {
     "name": "nginx",
     "image": "nginx",
@@ -108,7 +116,7 @@ input_containers_many = [
     "image": "nginx"
 }]
 
-input_containers_many_mixed = [
+input_containers_many_mixed := [
 {
     "name": "nginx",
     "image": "nginx",

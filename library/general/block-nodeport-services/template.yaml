@@ -4,7 +4,7 @@ metadata:
   name: k8sblocknodeport
   annotations:
     metadata.gatekeeper.sh/title: "Block NodePort"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Disallows all Services with type NodePort.
 
@@ -19,7 +19,10 @@ spec:
       rego: |
         package k8sblocknodeport
 
-        violation[{"msg": msg}] {
+        import future.keywords.contains
+        import future.keywords.if
+
+        violation contains ({"msg": msg}) if {
           input.review.kind.kind == "Service"
           input.review.object.spec.type == "NodePort"
           msg := "User is not allowed to create service of type NodePort"

@@ -1,6 +1,9 @@
 package k8spoddisruptionbudget
 
-violation[{"msg": msg}] {
+import future.keywords.contains
+import future.keywords.if
+
+violation contains ({"msg": msg}) if {
   input.review.kind.kind == "PodDisruptionBudget"
   pdb := input.review.object
 
@@ -11,7 +14,7 @@ violation[{"msg": msg}] {
   )
 }
 
-violation[{"msg": msg}] {
+violation contains ({"msg": msg}) if {
   obj := input.review.object
   pdb := data.inventory.namespace[obj.metadata.namespace]["policy/v1"].PodDisruptionBudget[_]
 
@@ -26,10 +29,10 @@ violation[{"msg": msg}] {
   )
 }
 
-violation[{"msg": msg}] {
+violation contains ({"msg": msg}) if {
   obj := input.review.object
   pdb := data.inventory.namespace[obj.metadata.namespace]["policy/v1"].PodDisruptionBudget[_]
-  
+
   matchLabels := { [label, value] | some label; value := pdb.spec.selector.matchLabels[label] }
   labels := { [label, value] | some label; value := obj.spec.selector.matchLabels[label] }
   count(matchLabels - labels) == 0
@@ -41,7 +44,7 @@ violation[{"msg": msg}] {
   )
 }
 
-valid_pdb_min_available(obj, pdb) {
+valid_pdb_min_available(obj, pdb) if {
   # default to -1 if minAvailable is not set so valid_pdb_min_available is always true
   # for objects with >= 0 replicas. If minAvailable defaults to >= 0, objects with
   # replicas field might violate this constraint if they are equal to the default set here
@@ -49,7 +52,7 @@ valid_pdb_min_available(obj, pdb) {
   obj.spec.replicas > min_available
 }
 
-valid_pdb_max_unavailable(pdb) {
+valid_pdb_max_unavailable(pdb) if {
   # default to 1 if maxUnavailable is not set so valid_pdb_max_unavailable always returns true.
   # If maxUnavailable defaults to 0, it violates this constraint because all pods needs to be
   # available and no pods can be evicted voluntarily

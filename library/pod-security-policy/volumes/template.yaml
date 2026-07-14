@@ -4,7 +4,7 @@ metadata:
   name: k8spspvolumetypes
   annotations:
     metadata.gatekeeper.sh/title: "Volume Types"
-    metadata.gatekeeper.sh/version: 1.0.3
+    metadata.gatekeeper.sh/version: 1.0.4
     metadata.gatekeeper.sh/bundle: "pod-security-restricted"
     description: >-
       Restricts mountable volume types to those specified by the user.
@@ -36,9 +36,12 @@ spec:
       rego: |
         package k8spspvolumetypes
 
+        import future.keywords.contains
+        import future.keywords.if
+
         import data.lib.exclude_update.is_update
 
-        violation[{"msg": msg, "details": {}}] {
+        violation contains {"msg": msg, "details": {}} if {
             # spec.volumes field is immutable.
             not is_update(input.review)
 
@@ -49,17 +52,20 @@ spec:
         }
 
         # * may be used to allow all volume types
-        input_volume_type_allowed(_) {
+        input_volume_type_allowed(_) if {
             input.parameters.volumes[_] == "*"
         }
 
-        input_volume_type_allowed(field) {
+        input_volume_type_allowed(field) if {
             field == input.parameters.volumes[_]
         }
       libs:
         - |
           package lib.exclude_update
 
-          is_update(review) {
+          import future.keywords.contains
+          import future.keywords.if
+
+          is_update(review) if {
               review.operation == "UPDATE"
           }

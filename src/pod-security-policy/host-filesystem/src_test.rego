@@ -1,142 +1,167 @@
 package k8spsphostfilesystem
 
-test_input_hostpath_block_all {
+import future.keywords.contains
+import future.keywords.if
+
+test_input_hostpath_block_all if {
     inp := { "review": input_review, "parameters": input_parameters_empty}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_hostpath_block_all_null_params {
+
+test_input_hostpath_block_all_null_params if {
     inp := { "review": input_review, "parameters": null }
     results := violation with input as inp
     count(results) == 1
 }
-test_input_hostpath_block_all_no_params {
+
+test_input_hostpath_block_all_no_params if {
     inp := { "review": input_review }
     results := violation with input as inp
     count(results) == 1
 }
-test_input_hostpath_block_all {
+
+test_input_hostpath_block_all if {
     inp := { "review": input_review_many, "parameters": input_parameters_empty}
     results := violation with input as inp
     count(results) == 2
 }
-test_input_hostpath_no_volumes {
+
+test_input_hostpath_no_volumes if {
     inp := { "review": input_review_no_volumes, "parameters": input_parameters_in_list}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_hostpath_mixed_volumes {
+
+test_input_hostpath_mixed_volumes if {
     inp := { "review": input_review_many_mixed_volumes, "parameters": input_parameters_in_list}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_hostpath_mixed_volumes_not_allowed {
+
+test_input_hostpath_mixed_volumes_not_allowed if {
     inp := { "review": input_review_many_mixed_volumes, "parameters": input_parameters_not_in_list}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_hostpath_no_hostpath {
+
+test_input_hostpath_no_hostpath if {
     inp := { "review": input_review_many_no_hostpath, "parameters": input_parameters_in_list}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_hostpath_allowed_readonly {
+
+test_input_hostpath_allowed_readonly if {
     inp := { "review": input_review_many, "parameters": input_parameters_in_list}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_hostpath_not_allowed_readonly {
+
+test_input_hostpath_not_allowed_readonly if {
     inp := { "review": input_review, "parameters": input_parameters_not_in_list}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_hostpath_many_not_allowed_readonly {
+
+test_input_hostpath_many_not_allowed_readonly if {
     inp := { "review": input_review_many, "parameters": input_parameters_not_in_list}
     results := violation with input as inp
     count(results) == 2
 }
-test_input_hostpath_allowed_writable_allowed {
+
+test_input_hostpath_allowed_writable_allowed if {
     inp := { "review": input_review_writable, "parameters": input_parameters_in_list_writable}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_hostpath_allowed_writable_not_allowed {
+
+test_input_hostpath_allowed_writable_not_allowed if {
     inp := { "review": input_review_writable, "parameters": input_parameters_in_list}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_hostpath_not_allowed_writable {
+
+test_input_hostpath_not_allowed_writable if {
     inp := { "review": input_review_writable, "parameters": input_parameters_not_in_list}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_hostpath_allowed_not_writable {
+
+test_input_hostpath_allowed_not_writable if {
     inp := { "review": input_review, "parameters": input_parameters_in_list}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_hostpath_allowed_is_writable {
+
+test_input_hostpath_allowed_is_writable if {
     inp := { "review": input_review, "parameters": input_parameters_in_list_writable}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_hostpath_not_allowed_is_writable {
+
+test_input_hostpath_not_allowed_is_writable if {
     inp := { "review": input_review, "parameters": input_parameters_not_in_list_writable}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_hostpath_not_allowed {
+
+test_input_hostpath_not_allowed if {
     inp := { "review": input_review, "parameters": input_parameters_not_in_list_writable}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_hostpath_allowed_readonly_mixed_parameters {
+
+test_input_hostpath_allowed_readonly_mixed_parameters if {
     inp := { "review": input_review_many_mixed_writable, "parameters": input_parameters_in_list}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_hostpath_allowed_readonly_mixed_parameters {
+
+test_input_hostpath_allowed_readonly_mixed_parameters if {
     inp := { "review": input_review_many_readonly, "parameters": input_parameters_in_list_mixed_writable}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_hostpath_allowed_mixed_writable_mixed_parameters {
+
+test_input_hostpath_allowed_mixed_writable_mixed_parameters if {
     inp := { "review": input_review_many_mixed_writable, "parameters": input_parameters_in_list_mixed_writable}
     results := violation with input as inp
     count(results) == 0
 }
-test_update {
+
+test_update if {
     inp := { "review": object.union(input_review, {"operation": "UPDATE"}), "parameters": input_parameters_empty}
     results := violation with input as inp
     count(results) == 0
 }
 
-
 # Init Containers
-test_input_hostpath_allowed_readonly_init_containers {
+test_input_hostpath_allowed_readonly_init_containers if {
     inp := { "review": input_init_review, "parameters": input_parameters_in_list}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_hostpath_allowed_readonly_many_init_containers {
+
+test_input_hostpath_allowed_readonly_many_init_containers if {
     inp := { "review": input_init_review_many, "parameters": input_parameters_in_list}
     results := violation with input as inp
     count(results) == 0
 }
-test_input_hostpath_not_allowed_readonly_init_containers {
+
+test_input_hostpath_not_allowed_readonly_init_containers if {
     inp := { "review": input_init_review, "parameters": input_parameters_not_in_list}
     results := violation with input as inp
     count(results) == 1
 }
-test_input_hostpath_many_not_allowed_readonly_init_containers {
+
+test_input_hostpath_many_not_allowed_readonly_init_containers if {
     inp := { "review": input_init_review_many, "parameters": input_parameters_not_in_list}
     results := violation with input as inp
     count(results) == 2
 }
 
-
 # Unit Tests
-test_path_matches {
+test_path_matches if {
     path_matches("/foo", "/foo/")
     path_matches("/foo", "/foo/r")
     path_matches("/", "/foo")
@@ -145,8 +170,7 @@ test_path_matches {
     not path_matches("/foo", "/")
 }
 
-
-input_review = {
+input_review := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -158,7 +182,7 @@ input_review = {
     }
 }
 
-input_init_review = {
+input_init_review := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -170,7 +194,7 @@ input_init_review = {
     }
 }
 
-input_review_writable = {
+input_review_writable := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -182,7 +206,7 @@ input_review_writable = {
     }
 }
 
-input_review_many = {
+input_review_many := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -194,7 +218,7 @@ input_review_many = {
     }
 }
 
-input_review_many_readonly = {
+input_review_many_readonly := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -206,7 +230,7 @@ input_review_many_readonly = {
     }
 }
 
-input_review_many_mixed_writable = {
+input_review_many_mixed_writable := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -218,7 +242,7 @@ input_review_many_mixed_writable = {
     }
 }
 
-input_init_review_many = {
+input_init_review_many := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -230,7 +254,7 @@ input_init_review_many = {
     }
 }
 
-input_review_no_volumes = {
+input_review_no_volumes := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -244,7 +268,7 @@ input_review_no_volumes = {
     }
 }
 
-input_review_many_mixed_volumes = {
+input_review_many_mixed_volumes := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -256,7 +280,7 @@ input_review_many_mixed_volumes = {
     }
 }
 
-input_review_many_no_hostpath = {
+input_review_many_no_hostpath := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -268,7 +292,7 @@ input_review_many_no_hostpath = {
     }
 }
 
-input_containers_one = [
+input_containers_one := [
 {
     "name": "nginx",
     "image": "nginx",
@@ -279,7 +303,7 @@ input_containers_one = [
     }]
 }]
 
-input_containers_writable = [
+input_containers_writable := [
 {
     "name": "nginx",
     "image": "nginx",
@@ -291,7 +315,7 @@ input_containers_writable = [
     }]
 }]
 
-input_containers_many = [
+input_containers_many := [
 {
     "name": "nginx",
     "image": "nginx",
@@ -313,7 +337,7 @@ input_containers_many = [
     }]
 }]
 
-input_containers_many_mixed_volume = [
+input_containers_many_mixed_volume := [
 {
     "name": "nginx",
     "image": "nginx",
@@ -329,8 +353,7 @@ input_containers_many_mixed_volume = [
     "image": "nginx"
 }]
 
-
-input_containers_many_mixed_writable = [
+input_containers_many_mixed_writable := [
 {
     "name": "nginx",
     "image": "nginx",
@@ -352,7 +375,7 @@ input_containers_many_mixed_writable = [
     }]
 }]
 
-input_volumes = [
+input_volumes := [
 {
     "name": "cache-volume",
     "hostPath": {
@@ -360,7 +383,7 @@ input_volumes = [
     }
 }]
 
-input_volumes_no_hostpath = [
+input_volumes_no_hostpath := [
 {
     "name": "cache-volume",
     "emptyDir": {}
@@ -372,7 +395,7 @@ input_volumes_no_hostpath = [
     }
 }]
 
-input_volumes_many = [
+input_volumes_many := [
 {
     "name": "cache-volume",
     "hostPath": {
@@ -386,7 +409,7 @@ input_volumes_many = [
     }
 }]
 
-input_volumes_many_mixed = [
+input_volumes_many_mixed := [
 {
     "name": "cache-volume",
     "hostPath": {
@@ -400,11 +423,11 @@ input_volumes_many_mixed = [
     }
 }]
 
-input_parameters_empty = {
+input_parameters_empty := {
      "allowedHostPaths": []
 }
 
-input_parameters_in_list = {
+input_parameters_in_list := {
     "allowedHostPaths": [
     {
         "readOnly": true,
@@ -412,7 +435,7 @@ input_parameters_in_list = {
     }]
 }
 
-input_parameters_not_in_list = {
+input_parameters_not_in_list := {
     "allowedHostPaths": [
     {
         "readOnly": true,
@@ -420,7 +443,7 @@ input_parameters_not_in_list = {
     }]
 }
 
-input_parameters_in_list_writable = {
+input_parameters_in_list_writable := {
     "allowedHostPaths": [
     {
         "pathPrefix": "/tmp"
@@ -430,14 +453,14 @@ input_parameters_in_list_writable = {
     }]
 }
 
-input_parameters_not_in_list_writable = {
+input_parameters_not_in_list_writable := {
     "allowedHostPaths": [
     {
         "pathPrefix": "/foo"
     }]
 }
 
-input_parameters_in_list_mixed_writable = {
+input_parameters_in_list_mixed_writable := {
     "allowedHostPaths": [
     {
         "pathPrefix": "/tmp",

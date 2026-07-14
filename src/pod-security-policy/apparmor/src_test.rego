@@ -1,72 +1,75 @@
 package k8spspapparmor
 
-test_input_apparmor_allowed_empty {
+import future.keywords.contains
+import future.keywords.if
+
+test_input_apparmor_allowed_empty if {
     inp := { "review": input_review_container, "parameters": input_parameters_empty}
     results := violation with input as inp
     count(results) == 1
 }
 
-test_input_apparmor_allowed_empty_but_exempted {
+test_input_apparmor_allowed_empty_but_exempted if {
     inp := { "review": input_review_container, "parameters": input_parameters_exempt_container}
     results := violation with input as inp
     count(results) == 1
 }
 
-test_input_apparmor_not_allowed_no_annotation_empty {
+test_input_apparmor_not_allowed_no_annotation_empty if {
     inp := { "review": input_review_no_annotation, "parameters": input_parameters_empty}
     results := violation with input as inp
     count(results) == 1
 }
 
-test_input_apparmor_not_allowed_no_annotation {
+test_input_apparmor_not_allowed_no_annotation if {
     inp := { "review": input_review_no_annotation, "parameters": input_parameters_in_list}
     results := violation with input as inp
     count(results) == 0
 }
 
-test_input_apparmor_container_allowed_in_list {
+test_input_apparmor_container_allowed_in_list if {
     inp := { "review": input_review_container, "parameters": input_parameters_in_list}
     results := violation with input as inp
     count(results) == 0
 }
 
-test_input_apparmor_container_not_allowed_not_in_list {
+test_input_apparmor_container_not_allowed_not_in_list if {
     inp := { "review": input_review_container, "parameters": input_parameters_not_in_list}
     results := violation with input as inp
     count(results) == 1
 }
 
-test_input_apparmor_containers_allowed_in_list {
+test_input_apparmor_containers_allowed_in_list if {
     inp := { "review": input_review_containers, "parameters": input_parameters_in_list}
     results := violation with input as inp
     count(results) == 0
 }
 
-test_input_apparmor_containers_not_allowed_not_in_list {
+test_input_apparmor_containers_not_allowed_not_in_list if {
     inp := { "review": input_review_containers, "parameters": input_parameters_not_in_list}
     results := violation with input as inp
     count(results) == 2
 }
 
-test_input_apparmor_containers_allowed_in_list_mixed_no_annotation {
+test_input_apparmor_containers_allowed_in_list_mixed_no_annotation if {
     inp := { "review": input_review_containers_missing_annotation, "parameters": input_parameters_in_list}
     results := violation with input as inp
     count(results) == 0
 }
 
-test_input_apparmor_containers_not_allowed_not_in_list_mixed_no_annotation {
+test_input_apparmor_containers_not_allowed_not_in_list_mixed_no_annotation if {
     inp := { "review": input_review_containers_missing_annotation, "parameters": input_parameters_not_in_list}
     results := violation with input as inp
     count(results) == 2
 }
 
-test_input_apparmor_containers_not_allowed_not_in_list_mixed {
+test_input_apparmor_containers_not_allowed_not_in_list_mixed if {
     inp := { "review": input_review_containers_mixed, "parameters": input_parameters_in_list}
     results := violation with input as inp
     count(results) == 1
 }
 
-input_review_container = {
+input_review_container := {
     "object": {
         "metadata": {
             "name": "nginx",
@@ -83,8 +86,7 @@ input_review_container = {
     }
 }
 
-
-input_review_no_annotation = {
+input_review_no_annotation := {
     "object": {
         "metadata": {
             "name": "nginx"
@@ -98,7 +100,7 @@ input_review_no_annotation = {
     }
 }
 
-input_review_containers = {
+input_review_containers := {
     "object": {
         "metadata": {
             "name": "nginx",
@@ -113,7 +115,7 @@ input_review_containers = {
     }
 }
 
-input_review_containers_missing_annotation = {
+input_review_containers_missing_annotation := {
     "object": {
         "metadata": {
             "name": "nginx",
@@ -127,7 +129,7 @@ input_review_containers_missing_annotation = {
     }
 }
 
-input_review_containers_mixed = {
+input_review_containers_mixed := {
     "object": {
         "metadata": {
             "name": "nginx",
@@ -142,7 +144,7 @@ input_review_containers_mixed = {
     }
 }
 
-two_containers = [{
+two_containers := [{
     "name": "nginx",
     "image": "nginx"
 },{
@@ -150,22 +152,22 @@ two_containers = [{
     "image": "nginx"
 }]
 
-input_parameters_empty = {
+input_parameters_empty := {
     "allowedProfiles": []
 }
 
-input_parameters_exempt_container = {
+input_parameters_exempt_container := {
     "allowedProfiles": [],
     "exemptImages": "nginx"
 }
 
-input_parameters_in_list = {
+input_parameters_in_list := {
     "allowedProfiles": [
         "runtime/default"
     ]
 }
 
-input_parameters_not_in_list = {
+input_parameters_not_in_list := {
     "allowedProfiles": [
         "unconfined"
     ]
