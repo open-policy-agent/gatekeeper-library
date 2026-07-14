@@ -1,0 +1,117 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sairequiredcontrols
+  annotations:
+    metadata.gatekeeper.sh/title: "AI Workload Required Controls"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      Enforces security controls on AI model workload pods: requires specified
+      annotations (e.g. audit-logging enabled) and prevents plain-text credentials
+      in environment variables by requiring secretKeyRef for names matching
+      configurable patterns.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sAIRequiredControls
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            requiredAnnotations:
+              description: >-
+                Annotations that must be present on AI workload pods.
+                Specify key and optional value; omit or leave value empty to
+                require the annotation key with any value.
+              type: array
+              items:
+                type: object
+                properties:
+                  key:
+                    type: string
+                    description: The annotation key.
+                  value:
+                    type: string
+                    description: Required annotation value. Empty means any value is accepted.
+            credentialEnvPatterns:
+              description: >-
+                RE2 regex patterns for env var names that must use secretKeyRef.
+                Example patterns: ".*_KEY$", ".*_TOKEN$", ".*_SECRET$".
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: containers
+            expression: 'has(variables.anyObject.spec) && has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+          - name: initContainers
+            expression: 'has(variables.anyObject.spec) && has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+          - name: ephemeralContainers
+            expression: 'has(variables.anyObject.spec) && has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+          - name: allContainers
+            expression: 'variables.containers + variables.initContainers + variables.ephemeralContainers'
+          - name: requiredAnnotations
+            expression: 'has(variables.params.requiredAnnotations) ? variables.params.requiredAnnotations : []'
+          - name: credentialEnvPatterns
+            expression: 'has(variables.params.credentialEnvPatterns) ? variables.params.credentialEnvPatterns : []'
+          validations:
+          - expression: '!has(variables.anyObject.metadata) || variables.requiredAnnotations.all(req, has(variables.anyObject.metadata.annotations) && req.key in variables.anyObject.metadata.annotations)'
+            messageExpression: '"AI workload is missing required annotation(s): " + variables.requiredAnnotations.filter(req, !(has(variables.anyObject.metadata.annotations) && req.key in variables.anyObject.metadata.annotations)).map(req, req.key).join(", ")'
+          - expression: '!has(variables.anyObject.metadata) || variables.requiredAnnotations.all(req, !has(req.value) || req.value == "" || !has(variables.anyObject.metadata.annotations) || !(req.key in variables.anyObject.metadata.annotations) || variables.anyObject.metadata.annotations[req.key] == req.value)'
+            message: "AI workload annotation value does not match the required value"
+          - expression: 'variables.allContainers.all(c, !has(c.env) || c.env.all(e, !(variables.credentialEnvPatterns.exists(p, e.name.matches(p))) || !has(e.value) || e.value == ""))'
+            message: "AI workload container has a plain-text credential env var; use secretKeyRef instead"
+      - engine: Rego
+        source:
+          rego: |
+            package k8sairequiredcontrols
+
+            # Verify required annotations are present with the expected values.
+            violation[{"msg": msg, "details": {"missing_annotations": missing}}] {
+              provided := {k | input.review.object.metadata.annotations[k]}
+              required := {req.key | req := input.parameters.requiredAnnotations[_]}
+              missing := required - provided
+              count(missing) > 0
+              msg := sprintf("AI workload is missing required annotation(s): %v", [missing])
+            }
+
+            violation[{"msg": msg}] {
+              ann := input.parameters.requiredAnnotations[_]
+              ann.value != ""
+              value := input.review.object.metadata.annotations[ann.key]
+              ann.value != value
+              msg := sprintf("Annotation <%v> must have value <%v>, got <%v>", [ann.key, ann.value, value])
+            }
+
+            # Verify credential env vars use secretKeyRef and not a plain-text value.
+            violation[{"msg": msg}] {
+              container := input.review.object.spec.containers[_]
+              env := container.env[_]
+              pattern := input.parameters.credentialEnvPatterns[_]
+              regex.match(pattern, env.name)
+              is_string(env.value)
+              msg := sprintf("container <%v> env var <%v> matches credential pattern <%v> but uses a plain-text value; use secretKeyRef instead", [container.name, env.name, pattern])
+            }
+
+            violation[{"msg": msg}] {
+              container := input.review.object.spec.initContainers[_]
+              env := container.env[_]
+              pattern := input.parameters.credentialEnvPatterns[_]
+              regex.match(pattern, env.name)
+              is_string(env.value)
+              msg := sprintf("initContainer <%v> env var <%v> matches credential pattern <%v> but uses a plain-text value; use secretKeyRef instead", [container.name, env.name, pattern])
+            }
+
+            violation[{"msg": msg}] {
+              container := input.review.object.spec.ephemeralContainers[_]
+              env := container.env[_]
+              pattern := input.parameters.credentialEnvPatterns[_]
+              regex.match(pattern, env.name)
+              is_string(env.value)
+              msg := sprintf("ephemeralContainer <%v> env var <%v> matches credential pattern <%v> but uses a plain-text value; use secretKeyRef instead", [container.name, env.name, pattern])
+            }

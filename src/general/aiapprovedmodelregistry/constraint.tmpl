@@ -1,0 +1,44 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8saiapprovedmodelregistry
+  annotations:
+    metadata.gatekeeper.sh/title: "AI Approved Model Registry"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      Requires AI workload container images to originate from operator-approved
+      model registries. Optionally enforces digest pinning (@sha256:) to prevent
+      floating tags and supply-chain substitution attacks.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sAIApprovedModelRegistry
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            approvedRegistries:
+              description: >-
+                List of approved model registry prefixes. Container images must
+                begin with one of these strings. Add a trailing '/' to prevent
+                prefix-spoofing (e.g. "model-registry.example.com/" not
+                "model-registry.example.com").
+              type: array
+              items:
+                type: string
+            requireDigestPin:
+              description: >-
+                If true, all container images must be pinned with a @sha256:
+                digest to prevent floating-tag substitution.
+              type: boolean
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+{{ file.Read "src/general/aiapprovedmodelregistry/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+      - engine: Rego
+        source:
+          rego: |
+{{ file.Read "src/general/aiapprovedmodelregistry/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}

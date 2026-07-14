@@ -1,0 +1,91 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sainetworkegress
+  annotations:
+    metadata.gatekeeper.sh/title: "AI Workload Network Egress Controls"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      Enforces network egress controls on AI workload pods: optionally blocks
+      spec.hostNetwork=true (which bypasses NetworkPolicy), and requires pods
+      to carry labels that declare their NetworkPolicy binding, ensuring a
+      matching NetworkPolicy selector exists before the pod is admitted.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sAINetworkEgress
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            blockHostNetwork:
+              description: >-
+                If true, reject pods with spec.hostNetwork=true. hostNetwork
+                gives the pod direct access to the node network and bypasses
+                all NetworkPolicy egress rules.
+              type: boolean
+            requiredEgressLabels:
+              description: >-
+                Labels that must be present on AI workload pods to declare their
+                NetworkPolicy binding. Use these labels as selectors in the
+                corresponding NetworkPolicy to ensure egress is controlled.
+                Specify key and optional value; leave value empty to require
+                the label key with any value.
+              type: array
+              items:
+                type: object
+                properties:
+                  key:
+                    type: string
+                    description: The label key.
+                  value:
+                    type: string
+                    description: Required label value. Empty means any value is accepted.
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: blockHostNetwork
+            expression: 'has(variables.params.blockHostNetwork) ? variables.params.blockHostNetwork : false'
+          - name: requiredEgressLabels
+            expression: 'has(variables.params.requiredEgressLabels) ? variables.params.requiredEgressLabels : []'
+          validations:
+          - expression: '!variables.blockHostNetwork || !has(variables.anyObject.spec) || !has(variables.anyObject.spec.hostNetwork) || !variables.anyObject.spec.hostNetwork'
+            message: "AI workload pod must not use spec.hostNetwork=true; it bypasses NetworkPolicy egress controls"
+          - expression: '!has(variables.anyObject.metadata) || variables.requiredEgressLabels.all(lbl, has(variables.anyObject.metadata.labels) && lbl.key in variables.anyObject.metadata.labels)'
+            messageExpression: '"AI workload pod is missing required network egress label(s): " + variables.requiredEgressLabels.filter(lbl, !(has(variables.anyObject.metadata.labels) && lbl.key in variables.anyObject.metadata.labels)).map(lbl, lbl.key).join(", ")'
+          - expression: '!has(variables.anyObject.metadata) || variables.requiredEgressLabels.all(lbl, !has(lbl.value) || lbl.value == "" || (has(variables.anyObject.metadata.labels) && lbl.key in variables.anyObject.metadata.labels && variables.anyObject.metadata.labels[lbl.key] == lbl.value))'
+            message: "Network egress label value does not match the required value"
+      - engine: Rego
+        source:
+          rego: |
+            package k8sainetworkegress
+
+            # Block hostNetwork on AI workload pods when configured.
+            # hostNetwork=true bypasses all NetworkPolicy egress controls.
+            violation[{"msg": msg}] {
+              input.parameters.blockHostNetwork == true
+              input.review.object.spec.hostNetwork == true
+              msg := "AI workload pod must not use spec.hostNetwork=true; it bypasses NetworkPolicy egress controls"
+            }
+
+            # Require pods to carry labels that declare their NetworkPolicy binding.
+            # This ensures a matching NetworkPolicy selector exists before the pod is admitted.
+            violation[{"msg": msg, "details": {"missing_labels": missing}}] {
+              provided := {k | input.review.object.metadata.labels[k]}
+              required := {lbl.key | lbl := input.parameters.requiredEgressLabels[_]}
+              missing := required - provided
+              count(missing) > 0
+              msg := sprintf("AI workload pod is missing required network egress label(s): %v", [missing])
+            }
+
+            violation[{"msg": msg}] {
+              lbl := input.parameters.requiredEgressLabels[_]
+              lbl.value != ""
+              value := input.review.object.metadata.labels[lbl.key]
+              lbl.value != value
+              msg := sprintf("Network egress label <%v> must have value <%v>, got <%v>", [lbl.key, lbl.value, value])
+            }

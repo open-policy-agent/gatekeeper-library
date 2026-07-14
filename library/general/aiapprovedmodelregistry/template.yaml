@@ -1,0 +1,100 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8saiapprovedmodelregistry
+  annotations:
+    metadata.gatekeeper.sh/title: "AI Approved Model Registry"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      Requires AI workload container images to originate from operator-approved
+      model registries. Optionally enforces digest pinning (@sha256:) to prevent
+      floating tags and supply-chain substitution attacks.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sAIApprovedModelRegistry
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            approvedRegistries:
+              description: >-
+                List of approved model registry prefixes. Container images must
+                begin with one of these strings. Add a trailing '/' to prevent
+                prefix-spoofing (e.g. "model-registry.example.com/" not
+                "model-registry.example.com").
+              type: array
+              items:
+                type: string
+            requireDigestPin:
+              description: >-
+                If true, all container images must be pinned with a @sha256:
+                digest to prevent floating-tag substitution.
+              type: boolean
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: containers
+            expression: 'has(variables.anyObject.spec) && has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+          - name: initContainers
+            expression: 'has(variables.anyObject.spec) && has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+          - name: ephemeralContainers
+            expression: 'has(variables.anyObject.spec) && has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+          - name: allContainers
+            expression: 'variables.containers + variables.initContainers + variables.ephemeralContainers'
+          - name: approvedRegistries
+            expression: 'has(variables.params.approvedRegistries) ? variables.params.approvedRegistries : []'
+          validations:
+          - expression: 'variables.approvedRegistries.size() == 0 || variables.allContainers.all(c, variables.approvedRegistries.exists(r, c.image.startsWith(r)))'
+            messageExpression: '"Container image is not from an approved model registry. Approved prefixes: " + variables.approvedRegistries.join(", ")'
+          - expression: '!has(variables.params.requireDigestPin) || variables.params.requireDigestPin != true || variables.allContainers.all(c, c.image.contains("@sha256:"))'
+            message: "AI workload container image must be digest-pinned (append @sha256:<digest>)"
+      - engine: Rego
+        source:
+          rego: |
+            package k8saiapprovedmodelregistry
+
+            # Require container images to start with an approved model registry prefix.
+            violation[{"msg": msg}] {
+              container := input.review.object.spec.containers[_]
+              not strings.any_prefix_match(container.image, input.parameters.approvedRegistries)
+              msg := sprintf("container <%v> image <%v> is not from an approved model registry; allowed prefixes: %v", [container.name, container.image, input.parameters.approvedRegistries])
+            }
+
+            violation[{"msg": msg}] {
+              container := input.review.object.spec.initContainers[_]
+              not strings.any_prefix_match(container.image, input.parameters.approvedRegistries)
+              msg := sprintf("initContainer <%v> image <%v> is not from an approved model registry; allowed prefixes: %v", [container.name, container.image, input.parameters.approvedRegistries])
+            }
+
+            violation[{"msg": msg}] {
+              container := input.review.object.spec.ephemeralContainers[_]
+              not strings.any_prefix_match(container.image, input.parameters.approvedRegistries)
+              msg := sprintf("ephemeralContainer <%v> image <%v> is not from an approved model registry; allowed prefixes: %v", [container.name, container.image, input.parameters.approvedRegistries])
+            }
+
+            # Optionally require images to be digest-pinned with @sha256:.
+            violation[{"msg": msg}] {
+              input.parameters.requireDigestPin == true
+              container := input.review.object.spec.containers[_]
+              not contains(container.image, "@sha256:")
+              msg := sprintf("container <%v> image <%v> must be digest-pinned (append @sha256:<digest>)", [container.name, container.image])
+            }
+
+            violation[{"msg": msg}] {
+              input.parameters.requireDigestPin == true
+              container := input.review.object.spec.initContainers[_]
+              not contains(container.image, "@sha256:")
+              msg := sprintf("initContainer <%v> image <%v> must be digest-pinned (append @sha256:<digest>)", [container.name, container.image])
+            }
+
+            violation[{"msg": msg}] {
+              input.parameters.requireDigestPin == true
+              container := input.review.object.spec.ephemeralContainers[_]
+              not contains(container.image, "@sha256:")
+              msg := sprintf("ephemeralContainer <%v> image <%v> must be digest-pinned (append @sha256:<digest>)", [container.name, container.image])
+            }

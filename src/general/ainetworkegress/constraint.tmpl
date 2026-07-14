@@ -1,0 +1,54 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sainetworkegress
+  annotations:
+    metadata.gatekeeper.sh/title: "AI Workload Network Egress Controls"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      Enforces network egress controls on AI workload pods: optionally blocks
+      spec.hostNetwork=true (which bypasses NetworkPolicy), and requires pods
+      to carry labels that declare their NetworkPolicy binding, ensuring a
+      matching NetworkPolicy selector exists before the pod is admitted.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sAINetworkEgress
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            blockHostNetwork:
+              description: >-
+                If true, reject pods with spec.hostNetwork=true. hostNetwork
+                gives the pod direct access to the node network and bypasses
+                all NetworkPolicy egress rules.
+              type: boolean
+            requiredEgressLabels:
+              description: >-
+                Labels that must be present on AI workload pods to declare their
+                NetworkPolicy binding. Use these labels as selectors in the
+                corresponding NetworkPolicy to ensure egress is controlled.
+                Specify key and optional value; leave value empty to require
+                the label key with any value.
+              type: array
+              items:
+                type: object
+                properties:
+                  key:
+                    type: string
+                    description: The label key.
+                  value:
+                    type: string
+                    description: Required label value. Empty means any value is accepted.
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+{{ file.Read "src/general/ainetworkegress/src.cel" | strings.Indent 10 | strings.TrimSuffix "\n" }}
+      - engine: Rego
+        source:
+          rego: |
+{{ file.Read "src/general/ainetworkegress/src.rego" | strings.Indent 12 | strings.TrimSuffix "\n" }}

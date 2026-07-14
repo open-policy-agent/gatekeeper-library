@@ -1,0 +1,17 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sAINetworkEgress
+metadata:
+  name: ai-workload-network-controls
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    labelSelector:
+      matchLabels:
+        workload-type: ai-model
+  parameters:
+    blockHostNetwork: true
+    requiredEgressLabels:
+      - key: "network-policy/ai-egress"
+        value: "enforced"

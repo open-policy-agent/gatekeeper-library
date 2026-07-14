@@ -1,0 +1,17 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sAIApprovedModelRegistry
+metadata:
+  name: ai-model-approved-registry
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    labelSelector:
+      matchLabels:
+        workload-type: ai-model
+  parameters:
+    approvedRegistries:
+      - "model-registry.example.com/"
+      - "ghcr.io/myorg/models/"
+    requireDigestPin: true
