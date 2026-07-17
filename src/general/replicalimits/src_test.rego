@@ -2,12 +2,7 @@ package k8sreplicalimits
 
 test_input_empty {
     # Missing ranges means the policy cannot evaluate a limit.
-    inp := { "review": empty, "parameters": {}}
-    results := violation with input as inp
-    count(results) == 0
-}
-
-test_input_missing_spec_without_ranges {
+    # (empty review object; no parameters.ranges)
     inp := { "review": empty, "parameters": {}}
     results := violation with input as inp
     count(results) == 0
