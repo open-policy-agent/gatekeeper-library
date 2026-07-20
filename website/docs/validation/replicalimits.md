@@ -6,7 +6,7 @@ title: Replica Limits
 # Replica Limits
 
 ## Description
-Requires that objects with the field `spec.replicas` (Deployments, ReplicaSets, etc.) specify a number of replicas within defined ranges.
+Requires that objects with the field `spec.replicas` (Deployments, ReplicaSets, Scale, etc.) specify a number of replicas within defined ranges. Missing `spec.replicas` is treated as 0.
 
 ## Template
 ```yaml
@@ -16,10 +16,11 @@ metadata:
   name: k8sreplicalimits
   annotations:
     metadata.gatekeeper.sh/title: "Replica Limits"
-    metadata.gatekeeper.sh/version: 1.0.2
+    metadata.gatekeeper.sh/version: 1.0.3
     description: >-
       Requires that objects with the field `spec.replicas` (Deployments,
-      ReplicaSets, etc.) specify a number of replicas within defined ranges.
+      ReplicaSets, Scale, etc.) specify a number of replicas within defined
+      ranges. Missing `spec.replicas` is treated as 0.
 spec:
   crd:
     spec:
@@ -52,14 +53,15 @@ spec:
         object_kind = input.review.kind.kind
 
         violation[{"msg": msg}] {
-            spec := input.review.object.spec
-            not input_replica_limit(spec)
+            # Scale requests for --replicas=0 may omit/empty spec; treat missing
+            # replicas as 0 so ranges that allow zero do not false-positive.
+            provided := object.get(input.review.object, ["spec", "replicas"], 0)
+            count(input.parameters.ranges) > 0
+            not input_replica_limit(provided)
             msg := sprintf("The provided number of replicas is not allowed for %v: %v. Allowed ranges: %v", [object_kind, object_name, input.parameters])
         }
 
-        input_replica_limit(spec) {
-            provided := spec.replicas
-            count(input.parameters.ranges) > 0
+        input_replica_limit(provided) {
             range := input.parameters.ranges[_]
             value_within_range(range, provided)
         }

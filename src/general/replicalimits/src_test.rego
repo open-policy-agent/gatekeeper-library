@@ -1,6 +1,8 @@
 package k8sreplicalimits
 
 test_input_empty {
+    # Missing ranges means the policy cannot evaluate a limit.
+    # (empty review object; no parameters.ranges)
     inp := { "review": empty, "parameters": {}}
     results := violation with input as inp
     count(results) == 0
@@ -42,6 +44,32 @@ test_input_zero_replicas {
     count(results) == 0
 }
 
+test_input_scale_empty_spec_zero_allowed {
+    # kubectl scale --replicas=0 can produce a Scale object with empty/missing
+    # spec.replicas; missing must be treated as 0 when zero is in range.
+    inp := { "review": scale_empty_spec, "parameters": input_parameters_zero_range}
+    results := violation with input as inp
+    count(results) == 0
+}
+
+test_input_scale_empty_spec_zero_disallowed {
+    inp := { "review": scale_empty_spec, "parameters": input_parameters_valid_range}
+    results := violation with input as inp
+    count(results) == 1
+}
+
+test_input_scale_replicas_within_range {
+    inp := { "review": scale_review(10), "parameters": input_parameters_valid_range}
+    results := violation with input as inp
+    count(results) == 0
+}
+
+test_input_scale_replicas_outside_range {
+    inp := { "review": scale_review(1), "parameters": input_parameters_valid_range}
+    results := violation with input as inp
+    count(results) == 1
+}
+
 empty = {
   "object": {
     "metadata": {
@@ -68,6 +96,38 @@ review(replicas) = output {
   }
 }
 
+scale_review(replicas) = output {
+  output = {
+    "kind": {
+      "kind": "Scale",
+      "version": "v1",
+      "group": "autoscaling",
+    },
+    "object": {
+      "metadata": {
+        "name": "nginx"
+      },
+      "spec": {
+        "replicas": replicas,
+      },
+    }
+  }
+}
+
+scale_empty_spec = {
+  "kind": {
+    "kind": "Scale",
+    "version": "v1",
+    "group": "autoscaling",
+  },
+  "object": {
+    "metadata": {
+      "name": "nginx"
+    },
+    "spec": {}
+  }
+}
+
 input_parameters_valid_range = {
     "ranges": [
     {
@@ -83,4 +143,3 @@ input_parameters_zero_range = {
         "max_replicas": 0
     }]
 }
-
