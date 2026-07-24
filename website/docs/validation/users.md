@@ -5,6 +5,8 @@ title: Allowed Users
 
 # Allowed Users
 
+**Bundles:** `pod-security-restricted`
+
 ## Description
 Controls the user and group IDs of the container and some volumes. Corresponds to the `runAsUser`, `runAsGroup`, `supplementalGroups`, and `fsGroup` fields in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#users-and-groups
 
@@ -16,7 +18,8 @@ metadata:
   name: k8spspallowedusers
   annotations:
     metadata.gatekeeper.sh/title: "Allowed Users"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.3
+    metadata.gatekeeper.sh/bundle: "pod-security-restricted"
     description: >-
       Controls the user and group IDs of the container and some volumes.
       Corresponds to the `runAsUser`, `runAsGroup`, `supplementalGroups`, and
@@ -147,9 +150,13 @@ spec:
       rego: |
         package k8spspallowedusers
 
+        import data.lib.exclude_update.is_update
         import data.lib.exempt_container.is_exempt
 
         violation[{"msg": msg}] {
+          # runAsUser, runAsGroup, supplementalGroups, fsGroup fields are immutable.
+          not is_update(input.review)
+
           fields := ["runAsUser", "runAsGroup", "supplementalGroups", "fsGroup"]
           field := fields[_]
           container := input_containers[_]
@@ -190,11 +197,11 @@ spec:
           msg := sprintf("Container %v is attempting to run without a required securityContext/runAsNonRoot or securityContext/runAsUser != 0", [container.name])
         }
 
-        accept_users("RunAsAny", provided_user) {true}
+        accept_users("RunAsAny", _)
 
-        accept_users("MustRunAsNonRoot", provided_user) = res {res := provided_user != 0}
+        accept_users("MustRunAsNonRoot", provided_user) := provided_user != 0
 
-        accept_users("MustRunAs", provided_user) = res  {
+        accept_users("MustRunAs", provided_user) := res  {
           ranges := input.parameters.runAsUser.ranges
           res := is_in_range(provided_user, ranges)
         }
@@ -223,18 +230,15 @@ spec:
           msg := sprintf("Container %v is attempting to run without a required securityContext/%v. Allowed %v: %v", [container.name, field, field, params])
         }
 
-        accept_value("RunAsAny", provided_value, ranges) {true}
+        accept_value("RunAsAny", _, _)
 
-        accept_value("MayRunAs", provided_value, ranges) = res { res := is_in_range(provided_value, ranges)}
+        accept_value("MayRunAs", provided_value, ranges) := is_in_range(provided_value, ranges)
 
-        accept_value("MustRunAs", provided_value, ranges) = res { res := is_in_range(provided_value, ranges)}
+        accept_value("MustRunAs", provided_value, ranges) := is_in_range(provided_value, ranges)
 
 
         # If container level is provided, that takes precedence
-        get_field_value(field, container, review) = out {
-          container_value := get_seccontext_field(field, container)
-          out := container_value
-        }
+        get_field_value(field, container, _) := get_seccontext_field(field, container)
 
         # If no container level exists, use pod level
         get_field_value(field, container, review) = out {
@@ -273,6 +277,12 @@ spec:
         }
       libs:
         - |
+          package lib.exclude_update
+
+          is_update(review) {
+              review.operation == "UPDATE"
+          }
+        - |
           package lib.exempt_container
 
           is_exempt(container) {
@@ -301,7 +311,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>users-and-groups-together</summary><blockquote>
+<summary>users-and-groups-together</summary>
 
 <details>
 <summary>constraint</summary>
@@ -318,25 +328,13 @@ spec:
         kinds: ["Pod"]
   parameters:
     runAsUser:
-      rule: MustRunAs # MustRunAsNonRoot # RunAsAny 
-      ranges:
-        - min: 100
-          max: 200
+      rule: MustRunAsNonRoot
     runAsGroup:
-      rule: MustRunAs # MayRunAs # RunAsAny 
-      ranges:
-        - min: 100
-          max: 200
+      rule: RunAsAny
     supplementalGroups:
-      rule: MustRunAs # MayRunAs # RunAsAny 
-      ranges:
-        - min: 100
-          max: 200
+      rule: RunAsAny
     fsGroup:
-      rule: MustRunAs # MayRunAs # RunAsAny 
-      ranges:
-        - min: 100
-          max: 200
+      rule: RunAsAny
 
 ```
 
@@ -359,16 +357,12 @@ metadata:
   labels:
     app: nginx-users
 spec:
-  securityContext:
-    supplementalGroups:
-      - 250
-    fsGroup: 250
   containers:
     - name: nginx
       image: nginx
       securityContext:
-        runAsUser: 250
-        runAsGroup: 250
+        runAsUser: 0
+        runAsGroup: 0
 
 ```
 
@@ -391,15 +385,13 @@ metadata:
     app: nginx-users
 spec:
   securityContext:
-    supplementalGroups:
-      - 199
-    fsGroup: 199
+    runAsNonRoot: true
   containers:
     - name: nginx
       image: nginx
       securityContext:
-        runAsUser: 199
-        runAsGroup: 199
+        runAsUser: 1000
+        runAsGroup: 1000
 
 ```
 
@@ -421,16 +413,12 @@ metadata:
   labels:
     app: nginx-users
 spec:
-  securityContext:
-    supplementalGroups:
-      - 250
-    fsGroup: 250
   ephemeralContainers:
     - name: nginx
       image: nginx
       securityContext:
-        runAsUser: 250
-        runAsGroup: 250
+        runAsUser: 0
+        runAsGroup: 0
 
 ```
 
@@ -443,4 +431,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

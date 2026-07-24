@@ -17,8 +17,8 @@ metadata:
   name: k8suniqueingresshost
   annotations:
     metadata.gatekeeper.sh/title: "Unique Ingress Host"
-    metadata.gatekeeper.sh/version: 1.0.2
-    metadata.gatekeeper.sh/requiresSyncData: |
+    metadata.gatekeeper.sh/version: 1.0.4
+    metadata.gatekeeper.sh/requires-sync-data: |
       "[
         [
           {
@@ -55,10 +55,10 @@ spec:
 
         violation[{"msg": msg}] {
           input.review.kind.kind == "Ingress"
-          re_match("^(extensions|networking.k8s.io)$", input.review.kind.group)
+          regex.match("^(extensions|networking.k8s.io)$", input.review.kind.group)
           host := input.review.object.spec.rules[_].host
           other := data.inventory.namespace[_][otherapiversion]["Ingress"][name]
-          re_match("^(extensions|networking.k8s.io)/.+$", otherapiversion)
+          regex.match("^(extensions|networking.k8s.io)/.+$", otherapiversion)
           other.spec.rules[_].host == host
           not identical(other, input.review)
           msg := sprintf("ingress host conflicts with an existing ingress <%v>", [host])
@@ -72,7 +72,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>unique-ingress-host</summary><blockquote>
+<summary>unique-ingress-host</summary>
 
 <details>
 <summary>constraint</summary>
@@ -213,4 +213,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

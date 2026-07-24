@@ -46,7 +46,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>block-loadbalancer-services</summary><blockquote>
+<summary>block-loadbalancer-services</summary>
 
 <details>
 <summary>constraint</summary>
@@ -61,9 +61,6 @@ spec:
     kinds:
       - apiGroups: [""]
         kinds: ["Service"]
-    excludedNamespaces:
-      - "ingress-nginx-private"
-      - "ingress-nginx-public"
 
 ```
 
@@ -124,4 +121,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

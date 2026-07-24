@@ -1,0 +1,29 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: containerresourceratios
+tests:
+  - name: memory-ratio-only
+    template: template.yaml
+    constraint: samples/container-must-meet-ratio/constraint.yaml
+    cases:
+      - name: example-allowed
+        object: samples/container-must-meet-ratio/example_allowed.yaml
+        assertions:
+          - violations: no
+      - name: example-disallowed
+        object: samples/container-must-meet-ratio/example_disallowed.yaml
+        assertions:
+          - violations: yes
+  - name: memory-and-cpu-ratios
+    template: template.yaml
+    constraint: samples/container-must-meet-memory-and-cpu-ratio/constraint.yaml
+    cases:
+      - name: example-allowed
+        object: samples/container-must-meet-memory-and-cpu-ratio/example_allowed.yaml
+        assertions:
+          - violations: no
+      - name: example-disallowed
+        object: samples/container-must-meet-memory-and-cpu-ratio/example_disallowed.yaml
+        assertions:
+          - violations: yes

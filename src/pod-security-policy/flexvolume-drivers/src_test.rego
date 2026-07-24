@@ -1,57 +1,63 @@
 package k8spspflexvolumes
 
 test_input_flexvolume_empty_params {
-    input := { "review": input_review, "parameters": input_parameters_empty}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_empty}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_flexvolume_many_empty_params{
-    input := { "review": input_review_many, "parameters": input_parameters_empty}
-    results := violation with input as input
+    inp := { "review": input_review_many, "parameters": input_parameters_empty}
+    results := violation with input as inp
     count(results) == 2
 }
 test_input_no_flexvolume_is_allowed {
-    input := { "review": input_review_no_flexvolume, "parameters": input_parameter_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_no_flexvolume, "parameters": input_parameter_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_flexvolume_allowed {
-    input := { "review": input_review, "parameters": input_parameter_in_list}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameter_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_flexvolume_many_is_allowed {
-    input := { "review": input_review_many, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_many, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_flexvolume_many_is_allowed_no_flexvolume {
-    input := { "review": input_review_many_no_flexvolume, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_many_no_flexvolume, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_flexvolume_not_allowed {
-    input := { "review": input_review, "parameters": input_parameters_not_in_list}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_not_in_list}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_flexvolume_many_not_allowed {
-    input := { "review": input_review_many_not_allowed, "parameters": input_parameters_not_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_many_not_allowed, "parameters": input_parameters_not_in_list}
+    results := violation with input as inp
     count(results) == 2
 }
 test_input_flexvolume_many_one_allowed {
-    input := { "review": input_review_many, "parameters": input_parameter_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_many, "parameters": input_parameter_in_list}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_flexvolume_many_mixed_allowed {
-    input := { "review": input_review_many, "parameters": input_parameters_not_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_many, "parameters": input_parameters_not_in_list}
+    results := violation with input as inp
     count(results) == 1
+}
+
+test_update {
+    inp := { "review": object.union(input_review, {"operation": "UPDATE"}), "parameters": input_parameters_empty}
+    results := violation with input as inp
+    count(results) == 0
 }
 
 input_review = {

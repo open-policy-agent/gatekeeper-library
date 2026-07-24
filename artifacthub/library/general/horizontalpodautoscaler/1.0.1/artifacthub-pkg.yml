@@ -1,0 +1,22 @@
+version: 1.0.1
+name: k8shorizontalpodautoscaler
+displayName: Horizontal Pod Autoscaler
+createdAt: "2023-06-12T20:47:46Z"
+description: Disallow the following scenarios when deploying `HorizontalPodAutoscalers` 1. Deployment of HorizontalPodAutoscalers with `.spec.minReplicas` or `.spec.maxReplicas` outside the ranges defined in the constraint 2. Deployment of HorizontalPodAutoscalers where the difference between `.spec.minReplicas` and `.spec.maxReplicas` is less than the configured `minimumReplicaSpread` 3. Deployment of HorizontalPodAutoscalers that do not reference a valid `scaleTargetRef` (e.g. Deployment, ReplicationController, ReplicaSet, StatefulSet).
+digest: 6ad69d08a3b11e856a1366f8dcdb370ca05ab83d8278d0e0df9698fd8b973e72
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/horizontalpodautoscaler
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Horizontal Pod Autoscaler
+    Disallow the following scenarios when deploying `HorizontalPodAutoscalers` 1. Deployment of HorizontalPodAutoscalers with `.spec.minReplicas` or `.spec.maxReplicas` outside the ranges defined in the constraint 2. Deployment of HorizontalPodAutoscalers where the difference between `.spec.minReplicas` and `.spec.maxReplicas` is less than the configured `minimumReplicaSpread` 3. Deployment of HorizontalPodAutoscalers that do not reference a valid `scaleTargetRef` (e.g. Deployment, ReplicationController, ReplicaSet, StatefulSet).
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/horizontalpodautoscaler/1.0.1/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

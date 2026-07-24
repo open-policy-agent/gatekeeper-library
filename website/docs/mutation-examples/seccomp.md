@@ -11,19 +11,22 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Mutation Examples
 ```yaml
-apiVersion: mutations.gatekeeper.sh/v1alpha1
-kind: AssignMetadata
+apiVersion: mutations.gatekeeper.sh/v1
+kind: Assign
 metadata:
   name: k8spspseccomp
 spec:
-  match:
-    scope: Namespaced
-    kinds:
-    - apiGroups: [""]
-      kinds: ["Pod"]
-  location: metadata.annotations."seccomp.security.alpha.kubernetes.io/pod"
+  applyTo:
+  - groups: [""]
+    kinds: ["Pod"]
+    versions: ["v1"]
+  location: spec.securityContext.seccompProfile
   parameters:
+    pathTests:
+    - subPath: spec.securityContext.seccompProfile
+      condition: MustNotExist
     assign:
-      value: runtime/default
+      value:
+        type: RuntimeDefault
 
 ```

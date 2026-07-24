@@ -1,0 +1,32 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sallowedreposv2
+  annotations:
+    metadata.gatekeeper.sh/title: "Allowed Images"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      This policy enforces that container images must begin with a string from a specified list.
+      The updated version, K8sAllowedReposv2, introduces support for exact match and glob-like syntax to enhance security:
+      1. Exact Match: By default, if the * character is not specified, the policy strictly checks for an exact match of the full registry, repository, and/or the image name.
+      2. Glob-like Syntax: Adding * at the end of a prefix allows prefix-based matching (e.g., registry.example.com/project/*). Only the * wildcard at the end of a string is supported.
+      3. Security Note: To avoid bypasses scenarios, ensure prefixes include a trailing / where appropriate (e.g., registry.example.com/project/*).
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sAllowedReposv2
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          properties:
+            allowedImages:
+              description: A list of allowed container image prefixes. Supports exact matches and prefixes ending with '*'.
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+{{ file.Read "src/general/allowedreposv2/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}

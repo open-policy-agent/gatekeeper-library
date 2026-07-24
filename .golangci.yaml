@@ -1,0 +1,62 @@
+version: "2"
+run:
+  timeout: 5m
+  go: "1.20"
+linters:
+  default: none
+  enable:
+    - errcheck
+    - errorlint
+    - forcetypeassert
+    - goconst
+    - gocritic
+    - godot
+    - gosec
+    - govet
+    - importas
+    - ineffassign
+    - misspell
+    - revive # replacement for golint
+    - staticcheck
+    - unconvert
+    - unused
+    - whitespace
+  settings:
+    gocritic:
+      enabled-tags:
+        - performance
+    gosec:
+      excludes:
+        - G108
+    importas:
+      alias:
+        - pkg: github.com/open-policy-agent/frameworks/constraint/pkg/client
+          alias: constraintclient
+      no-unaliased: true
+    lll:
+      line-length: 200
+    misspell:
+      locale: US
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

@@ -1,12 +1,13 @@
 docker := docker #You can build with podman by doing: make docker=podman
-KIND_VERSION ?= 0.17.0
+KIND_VERSION ?= 0.29.0
 # note: k8s version pinned since KIND image availability lags k8s releases
-KUBERNETES_VERSION ?= 1.26.0
-KUSTOMIZE_VERSION ?= 4.5.5
-GATEKEEPER_VERSION ?= release-3.11
-BATS_VERSION ?= 1.8.2
-GATOR_VERSION ?= 3.11.0
-GOMPLATE_VERSION ?= 3.10.0
+KUBERNETES_VERSION ?= 1.34.0
+KUSTOMIZE_VERSION ?= 5.7.1
+GATEKEEPER_VERSION ?= 3.21.0
+BATS_VERSION ?= 1.12.0
+GATOR_VERSION ?= 3.21.0
+GOMPLATE_VERSION ?= 3.11.6
+POLICY_ENGINE ?= rego
 
 REPO_ROOT := $(shell git rev-parse --show-toplevel)
 WEBSITE_SCRIPT_DIR := $(REPO_ROOT)/scripts/website
@@ -18,7 +19,7 @@ integration-bootstrap:
 	# Download and install kind
 	curl -L https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-linux-amd64 --output ${GITHUB_WORKSPACE}/bin/kind && chmod +x ${GITHUB_WORKSPACE}/bin/kind
 	# Download and install kubectl
-	curl -L https://storage.googleapis.com/kubernetes-release/release/v${KUBERNETES_VERSION}/bin/linux/amd64/kubectl -o ${GITHUB_WORKSPACE}/bin/kubectl && chmod +x ${GITHUB_WORKSPACE}/bin/kubectl
+	curl -L https://dl.k8s.io/release/v${KUBERNETES_VERSION}/bin/linux/amd64/kubectl -o ${GITHUB_WORKSPACE}/bin/kubectl && chmod +x ${GITHUB_WORKSPACE}/bin/kubectl
 	# Download and install kustomize
 	curl -L https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz -o kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz && tar -zxvf kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz && chmod +x kustomize && mv kustomize ${GITHUB_WORKSPACE}/bin/kustomize
 	# Download and install bats
@@ -31,21 +32,36 @@ integration-bootstrap:
 	TERM=dumb ${GITHUB_WORKSPACE}/bin/kind create cluster --image kindest/node:v${KUBERNETES_VERSION} --wait 5m --config=test/kind_config.yaml
 
 deploy:
-	kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper/${GATEKEEPER_VERSION}/deploy/gatekeeper.yaml
+	helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts
+ifeq ($(POLICY_ENGINE), rego)
+	helm install -n gatekeeper-system gatekeeper gatekeeper/gatekeeper --create-namespace --version $(GATEKEEPER_VERSION) --set enableK8sNativeValidation=false
+else ifeq ($(POLICY_ENGINE), cel)
+ifneq ($(GATEKEEPER_VERSION), 3.15.1)
+	helm install -n gatekeeper-system gatekeeper gatekeeper/gatekeeper --create-namespace --version $(GATEKEEPER_VERSION) --set enableK8sNativeValidation=true
+endif
+endif
 
 uninstall:
-	kubectl delete -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper/${GATEKEEPER_VERSION}/deploy/gatekeeper.yaml
+	helm uninstall -n gatekeeper-system gatekeeper
 
 test-integration:
 	bats -t test/bats/test.bats
 
 .PHONY: verify-gator
 verify-gator:
-	gator verify ./...
+ifeq ($(POLICY_ENGINE), rego)
+	gator verify ./... --enable-k8s-native-validation=false
+else ifeq ($(POLICY_ENGINE), cel)
+	gator verify ./... --enable-k8s-native-validation=true
+endif
 
 .PHONY: verify-gator-dockerized
 verify-gator-dockerized: __build-gator
-	$(docker) run -i -v $(shell pwd):/gatekeeper-library gator-container verify ./...
+ifeq ($(POLICY_ENGINE), rego)
+	$(docker) run -i -v $(shell pwd):/gatekeeper-library gator-container verify ./... --enable-k8s-native-validation=false
+else ifeq ($(POLICY_ENGINE), cel)
+	$(docker) run -i -v $(shell pwd):/gatekeeper-library gator-container verify ./... --enable-k8s-native-validation=true
+endif
 
 .PHONY: build-gator
 __build-gator:
@@ -78,6 +94,7 @@ generate-website-docs:
 unit-test:
 	cd $(ARTIFACTHUB_SCRIPT_DIR); go test -v
 	cd $(VALIDATE_SCRIPT_DIR); go test -v
+	cd $(REQUIRE_SYNC_SCRIPT_DIR); go test -v
 
 .PHONY: generate-artifacthub-artifacts
 generate-artifacthub-artifacts:

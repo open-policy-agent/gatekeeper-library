@@ -1,55 +1,55 @@
 package k8suniqueserviceselector
 
 test_no_data {
-    input := {"review": review(service("my-service", "prod", {"a": "b"}))}
-    results := violation with input as input
+    inp := {"review": review(service("my-service", "prod", {"a": "b"}))}
+    results := violation with input as inp
     count(results) == 0
 }
 test_identical {
-    input := {"review": review(service("my-service", "prod", {"a": "b"}))}
+    inp := {"review": review(service("my-service", "prod", {"a": "b"}))}
     inv := tmp_data([service("my-service", "prod", {"a": "b"})])
             trace(sprintf("%v", [inv]))
 
-    results := violation with input as input with data.inventory as inv
+    results := violation with input as inp with data.inventory as inv
                 trace(sprintf("%v", [results]))
 
     count(results) == 0
 }
 test_collision {
-    input := {"review": review(service("my-service", "prod", {"a": "b"}))}
+    inp := {"review": review(service("my-service", "prod", {"a": "b"}))}
     inv := tmp_data([service("my-service", "prod2", {"a": "b"})])
-    results := violation with input as input with data.inventory as inv
+    results := violation with input as inp with data.inventory as inv
     count(results) == 1
 }
 test_collision_with_multiple {
-    input := {"review": review(service("my-service", "prod", {"a": "b"}))}
+    inp := {"review": review(service("my-service", "prod", {"a": "b"}))}
     inv := tmp_data([service("my-service", "prod2", {"a": "b"}), service("my-service", "prod3", {"a": "b"})])
-    results := violation with input as input with data.inventory as inv
+    results := violation with input as inp with data.inventory as inv
     count(results) == 2
 }
 test_no_collision {
-    input := {"review": review(service("my-service", "prod", {"a": "b"}))}
+    inp := {"review": review(service("my-service", "prod", {"a": "b"}))}
     inv := tmp_data([service("my-service", "prod2", {"a": "c"})])
-    results := violation with input as input with data.inventory as inv
+    results := violation with input as inp with data.inventory as inv
     count(results) == 0
 }
 test_no_collision_with_multiple {
-    input := {"review": review(service("my-service", "prod", {"a": "b"}))}
+    inp := {"review": review(service("my-service", "prod", {"a": "b"}))}
     inv := tmp_data([service("my-service", "prod2", {"a": "b2"}), service("my-service", "prod3", {"a": "b2"})])
-    results := violation with input as input with data.inventory as inv
+    results := violation with input as inp with data.inventory as inv
     count(results) == 0
 }
 test_compound_selector_collision {
-    input := {"review": review(service("my-service", "prod", {"r": "d", "a": "b"}))}
+    inp := {"review": review(service("my-service", "prod", {"r": "d", "a": "b"}))}
     inv := tmp_data([service("my-service", "prod2", {"a": "b", "r": "d"})])
-    results := violation with input as input with data.inventory as inv
+    results := violation with input as inp with data.inventory as inv
     count(results) == 1
 }
 
 test_no_service_selector {
-    input := {"review": review(service_without_selector("kubernetes", "default"))}
+    inp := {"review": review(service_without_selector("kubernetes", "default"))}
     inv := data_networkpolicy("default")
-    results := violation with input as input with data.inventory as inv
+    results := violation with input as inp with data.inventory as inv
     count(results) == 0
 }
 

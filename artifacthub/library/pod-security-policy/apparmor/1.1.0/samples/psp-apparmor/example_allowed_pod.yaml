@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-apparmor-allowed
+  labels:
+    app: nginx-apparmor
+spec:
+  securityContext:
+    appArmorProfile:
+      type: "Localhost"
+      localhostProfile: "custom"
+  containers:
+  - name: nginx
+    image: nginx

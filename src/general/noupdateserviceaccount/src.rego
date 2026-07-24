@@ -1,12 +1,14 @@
 package noupdateserviceaccount
 
-privileged(userInfo, allowedUsers, allowedGroups) {
+privileged(userInfo, allowedUsers, _) {
   # Allow if the user is in allowedUsers.
   # Use object.get so omitted parameters can't cause policy bypass by
   # evaluating to undefined.
   username := object.get(userInfo, "username", "")
   allowedUsers[_] == username
-} {
+}
+
+privileged(userInfo, _, allowedGroups) {
   # Allow if the user's groups intersect allowedGroups.
   # Use object.get so omitted parameters can't cause policy bypass by
   # evaluating to undefined.

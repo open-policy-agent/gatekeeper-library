@@ -86,7 +86,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>verifydeprecatedapi-1.16</summary><blockquote>
+<summary>verifydeprecatedapi-1.16</summary>
 
 <details>
 <summary>constraint</summary>
@@ -204,8 +204,8 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details><details>
-<summary>verifydeprecatedapi-1.22</summary><blockquote>
+</details><details>
+<summary>verifydeprecatedapi-1.22</summary>
 
 <details>
 <summary>constraint</summary>
@@ -238,9 +238,9 @@ spec:
         kinds: ["IngressClass"]
       - apiGroups: ["rbac.authorization.k8s.io"]
         kinds: ["ClusterRole", "ClusterRoleBinding", "Role", "RoleBinding"]
-      - apiGroups: ["scheduling.k8s.io/v1beta1"]
+      - apiGroups: ["scheduling.k8s.io"]
         kinds: ["PriorityClass"]
-      - apiGroups: ["storage.k8s.io/v1beta1"]
+      - apiGroups: ["storage.k8s.io"]
         kinds: ["CSIDriver", "CSINode", "StorageClass", "VolumeAttachment"]
   parameters:
     kvs:
@@ -358,8 +358,8 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details><details>
-<summary>verifydeprecatedapi-1.25</summary><blockquote>
+</details><details>
+<summary>verifydeprecatedapi-1.25</summary>
 
 <details>
 <summary>constraint</summary>
@@ -382,8 +382,10 @@ spec:
         kinds: ["HorizontalPodAutoscaler"]
       - apiGroups: ["policy"]
         kinds: ["PodDisruptionBudget", "PodSecurityPolicy"]
+      - apiGroups: ["node.k8s.io"]
+        kinds: ["RuntimeClass"]
   parameters:
-    kvs: 
+    kvs:
       - deprecatedAPI: "batch/v1beta1"
         kinds: ["CronJob"]
         targetAPI: "batch/v1"
@@ -487,8 +489,8 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details><details>
-<summary>verifydeprecatedapi-1.26</summary><blockquote>
+</details><details>
+<summary>verifydeprecatedapi-1.26</summary>
 
 <details>
 <summary>constraint</summary>
@@ -597,8 +599,8 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details><details>
-<summary>verifydeprecatedapi-1.27</summary><blockquote>
+</details><details>
+<summary>verifydeprecatedapi-1.27</summary>
 
 <details>
 <summary>constraint</summary>
@@ -671,8 +673,8 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details><details>
-<summary>verifydeprecatedapi-1.29</summary><blockquote>
+</details><details>
+<summary>verifydeprecatedapi-1.29</summary>
 
 <details>
 <summary>constraint</summary>
@@ -776,4 +778,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

@@ -4,7 +4,7 @@ metadata:
   name: k8spspflexvolumes
   annotations:
     metadata.gatekeeper.sh/title: "FlexVolumes"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Controls the allowlist of FlexVolume drivers. Corresponds to the
       `allowedFlexVolumes` field in PodSecurityPolicy. For more information,
@@ -38,3 +38,6 @@ spec:
     - target: admission.k8s.gatekeeper.sh
       rego: |
 {{ file.Read "src/pod-security-policy/flexvolume-drivers/src.rego" | strings.Indent 8 | strings.TrimSuffix "\n" }}
+      libs:
+        - |
+{{ file.Read "src/pod-security-policy/flexvolume-drivers/lib_exclude_update.rego" | strings.Indent 10 | strings.TrimSuffix "\n" }}

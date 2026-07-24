@@ -1,131 +1,136 @@
 package k8spsphostfilesystem
 
 test_input_hostpath_block_all {
-    input := { "review": input_review, "parameters": input_parameters_empty}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_empty}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_hostpath_block_all_null_params {
-    input := { "review": input_review, "parameters": null }
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": null }
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_hostpath_block_all_no_params {
-    input := { "review": input_review }
-    results := violation with input as input
+    inp := { "review": input_review }
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_hostpath_block_all {
-    input := { "review": input_review_many, "parameters": input_parameters_empty}
-    results := violation with input as input
+    inp := { "review": input_review_many, "parameters": input_parameters_empty}
+    results := violation with input as inp
     count(results) == 2
 }
 test_input_hostpath_no_volumes {
-    input := { "review": input_review_no_volumes, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_no_volumes, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_hostpath_mixed_volumes {
-    input := { "review": input_review_many_mixed_volumes, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_many_mixed_volumes, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_hostpath_mixed_volumes_not_allowed {
-    input := { "review": input_review_many_mixed_volumes, "parameters": input_parameters_not_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_many_mixed_volumes, "parameters": input_parameters_not_in_list}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_hostpath_no_hostpath {
-    input := { "review": input_review_many_no_hostpath, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_many_no_hostpath, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_hostpath_allowed_readonly {
-    input := { "review": input_review_many, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_many, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_hostpath_not_allowed_readonly {
-    input := { "review": input_review, "parameters": input_parameters_not_in_list}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_not_in_list}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_hostpath_many_not_allowed_readonly {
-    input := { "review": input_review_many, "parameters": input_parameters_not_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_many, "parameters": input_parameters_not_in_list}
+    results := violation with input as inp
     count(results) == 2
 }
 test_input_hostpath_allowed_writable_allowed {
-    input := { "review": input_review_writable, "parameters": input_parameters_in_list_writable}
-    results := violation with input as input
+    inp := { "review": input_review_writable, "parameters": input_parameters_in_list_writable}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_hostpath_allowed_writable_not_allowed {
-    input := { "review": input_review_writable, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_writable, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_hostpath_not_allowed_writable {
-    input := { "review": input_review_writable, "parameters": input_parameters_not_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_writable, "parameters": input_parameters_not_in_list}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_hostpath_allowed_not_writable {
-    input := { "review": input_review, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_hostpath_allowed_is_writable {
-    input := { "review": input_review, "parameters": input_parameters_in_list_writable}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_in_list_writable}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_hostpath_not_allowed_is_writable {
-    input := { "review": input_review, "parameters": input_parameters_not_in_list_writable}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_not_in_list_writable}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_hostpath_not_allowed {
-    input := { "review": input_review, "parameters": input_parameters_not_in_list_writable}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_not_in_list_writable}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_hostpath_allowed_readonly_mixed_parameters {
-    input := { "review": input_review_many_mixed_writable, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_many_mixed_writable, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_hostpath_allowed_readonly_mixed_parameters {
-    input := { "review": input_review_many_readonly, "parameters": input_parameters_in_list_mixed_writable}
-    results := violation with input as input
+    inp := { "review": input_review_many_readonly, "parameters": input_parameters_in_list_mixed_writable}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_hostpath_allowed_mixed_writable_mixed_parameters {
-    input := { "review": input_review_many_mixed_writable, "parameters": input_parameters_in_list_mixed_writable}
-    results := violation with input as input
+    inp := { "review": input_review_many_mixed_writable, "parameters": input_parameters_in_list_mixed_writable}
+    results := violation with input as inp
+    count(results) == 0
+}
+test_update {
+    inp := { "review": object.union(input_review, {"operation": "UPDATE"}), "parameters": input_parameters_empty}
+    results := violation with input as inp
     count(results) == 0
 }
 
 
 # Init Containers
 test_input_hostpath_allowed_readonly_init_containers {
-    input := { "review": input_init_review, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_init_review, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_hostpath_allowed_readonly_many_init_containers {
-    input := { "review": input_init_review_many, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_init_review_many, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_hostpath_not_allowed_readonly_init_containers {
-    input := { "review": input_init_review, "parameters": input_parameters_not_in_list}
-    results := violation with input as input
+    inp := { "review": input_init_review, "parameters": input_parameters_not_in_list}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_hostpath_many_not_allowed_readonly_init_containers {
-    input := { "review": input_init_review_many, "parameters": input_parameters_not_in_list}
-    results := violation with input as input
+    inp := { "review": input_init_review_many, "parameters": input_parameters_not_in_list}
+    results := violation with input as inp
     count(results) == 2
 }
 

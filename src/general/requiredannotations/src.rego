@@ -13,6 +13,6 @@ violation[{"msg": msg}] {
   expected := input.parameters.annotations[_]
   expected.key == key
   expected.allowedRegex != ""
-  not re_match(expected.allowedRegex, value)
+  not regex.match(expected.allowedRegex, value)
   msg := sprintf("Annotation <%v: %v> does not satisfy allowed regex: %v", [key, value, expected.allowedRegex])
 }

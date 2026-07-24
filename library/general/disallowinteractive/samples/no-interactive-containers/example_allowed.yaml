@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-interactive-tty-allowed
+  labels:
+    app: nginx-interactive-tty
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    stdin: false
+    tty: false

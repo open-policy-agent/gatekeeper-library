@@ -17,7 +17,7 @@ metadata:
   name: k8scontainerephemeralstoragelimit
   annotations:
     metadata.gatekeeper.sh/title: "Container ephemeral storage limit"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.2
     description: >-
       Requires containers to have an ephemeral storage limit set and constrains
       the limit to be within the specified maximum values.
@@ -51,6 +51,7 @@ spec:
       rego: |
         package k8scontainerephemeralstoragelimit
 
+        import data.lib.exclude_update.is_update
         import data.lib.exempt_container.is_exempt
 
         missing(obj, field) = true {
@@ -158,15 +159,19 @@ spec:
           not is_number(orig)
           suffix := get_suffix(orig)
           raw := replace(orig, suffix, "")
-          re_match("^[0-9]+(\\.[0-9]+)?$", raw)
+          regex.match("^[0-9]+(\\.[0-9]+)?$", raw)
           new := to_number(raw) * storage_multiple(suffix)
         }
 
         violation[{"msg": msg}] {
+          # spec.containers.resources.limits["ephemeral-storage"] field is immutable.
+          not is_update(input.review)
+
           general_violation[{"msg": msg, "field": "containers"}]
         }
 
         violation[{"msg": msg}] {
+          not is_update(input.review)
           general_violation[{"msg": msg, "field": "initContainers"}]
         }
 
@@ -213,6 +218,12 @@ spec:
         }
       libs:
         - |
+          package lib.exclude_update
+
+          is_update(review) {
+              review.operation == "UPDATE"
+          }
+        - |
           package lib.exempt_container
 
           is_exempt(container) {
@@ -241,7 +252,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>ephemeral-storage-limit</summary><blockquote>
+<summary>ephemeral-storage-limit</summary>
 
 <details>
 <summary>constraint</summary>
@@ -463,4 +474,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

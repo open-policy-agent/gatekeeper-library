@@ -1,0 +1,33 @@
+# IMPORTANT: Before deploying this policy, make sure you allow-list any groups
+# or users that need to deploy workloads to kube-system, such as cluster-
+# lifecycle controllers, addon managers, etc. Such controllers may need to
+# update service account names during automated rollouts (e.g. of refactored
+# configurations). You can allow-list them with the allowedGroups and
+# allowedUsers properties of the NoUpdateServiceAccount Constraint.
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: NoUpdateServiceAccount
+metadata:
+  name: no-update-kube-system-service-account
+spec:
+  match:
+    namespaces: ["kube-system"]
+    kinds:
+    - apiGroups: [""]
+      kinds:
+      # You can optionally add "Pod" here, but it is unnecessary because
+      # Pod service account immutability is enforced by the Kubernetes API.
+      - "ReplicationController"
+    - apiGroups: ["apps"]
+      kinds:
+      - "ReplicaSet"
+      - "Deployment"
+      - "StatefulSet"
+      - "DaemonSet"
+    - apiGroups: ["batch"]
+      kinds:
+      # You can optionally add "Job" here, but it is unnecessary because
+      # Job service account immutability is enforced by the Kubernetes API.
+      - "CronJob"
+  parameters:
+    allowedGroups: []
+    allowedUsers: []

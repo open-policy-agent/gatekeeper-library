@@ -1,32 +1,32 @@
 package k8sblockendpointeditdefaultrole
 
 test_input_no_endpoints_edit_role_allow {
-    input := { "review": input_review_withoutendpoints }
-    results := violation with input as input
+    inp := { "review": input_review_withoutendpoints }
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_endpoints_create_role_not_allow {
-    input := { "review": input_review_with_endpoints_create }
-    results := violation with input as input
+    inp := { "review": input_review_with_endpoints_create }
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_endpoints_update_role_not_allow {
-    input := { "review": input_review_with_endpoints_update }
-    results := violation with input as input
+    inp := { "review": input_review_with_endpoints_update }
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_endpoints_patch_role_not_allow {
-    input := { "review": input_review_with_endpoints_patch }
-    results := violation with input as input
+    inp := { "review": input_review_with_endpoints_patch }
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_endpoints_delete_role_allow {
-    input := { "review": input_review_with_endpoints_delete }
-    results := violation with input as input
+    inp := { "review": input_review_with_endpoints_delete }
+    results := violation with input as inp
     count(results) == 0
 }
 

@@ -2,6 +2,10 @@
 
 set -eu
 
+# Ensure OPA strict mode compliance
+# https://www.openpolicyagent.org/docs/latest/policy-language/#strict-mode
+opa check --strict src
+
 for folder in src/*/*
 do
   # TODO: enforce coverage

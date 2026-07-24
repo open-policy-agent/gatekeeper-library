@@ -6,7 +6,7 @@ title: Storage Class
 # Storage Class
 
 ## Description
-Requires storage classes to be specified when used. Only Gatekeeper 3.9+ is supported.
+Requires storage classes to be specified when used. Only Gatekeeper 3.9+ and non-ephemeral containers are supported.
 
 ## Template
 ```yaml
@@ -16,8 +16,8 @@ metadata:
   name: k8sstorageclass
   annotations:
     metadata.gatekeeper.sh/title: "Storage Class"
-    metadata.gatekeeper.sh/version: 1.1.0
-    metadata.gatekeeper.sh/requiresSyncData: |
+    metadata.gatekeeper.sh/version: 1.1.2
+    metadata.gatekeeper.sh/requires-sync-data: |
       "[
         [
           {
@@ -28,7 +28,7 @@ metadata:
         ]
       ]"
     description: >-
-      Requires storage classes to be specified when used. Only Gatekeeper 3.9+ is supported.
+      Requires storage classes to be specified when used. Only Gatekeeper 3.9+ and non-ephemeral containers are supported.
 spec:
   crd:
     spec:
@@ -164,8 +164,6 @@ spec:
           []
         )
 
-        #FIXME pod generic ephemeral might be good to validate some day too.
-
 ```
 
 ### Usage
@@ -174,7 +172,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>storageclass</summary><blockquote>
+<summary>storageclass</summary>
 
 <details>
 <summary>constraint</summary>
@@ -415,8 +413,8 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details><details>
-<summary>storageclass-allowlist</summary><blockquote>
+</details><details>
+<summary>storageclass-allowlist</summary>
 
 <details>
 <summary>constraint</summary>
@@ -502,4 +500,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

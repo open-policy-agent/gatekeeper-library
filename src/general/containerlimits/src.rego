@@ -24,7 +24,7 @@ canonify_cpu(orig) = new {
 canonify_cpu(orig) = new {
   not is_number(orig)
   not endswith(orig, "m")
-  re_match("^[0-9]+(\\.[0-9]+)?$", orig)
+  regex.match("^[0-9]+(\\.[0-9]+)?$", orig)
   new := to_number(orig) * 1000
 }
 
@@ -121,7 +121,7 @@ canonify_mem(orig) = new {
   not is_number(orig)
   suffix := get_suffix(orig)
   raw := replace(orig, suffix, "")
-  re_match("^[0-9]+(\\.[0-9]+)?$", raw)
+  regex.match("^[0-9]+(\\.[0-9]+)?$", raw)
   new := to_number(raw) * mem_multiple(suffix)
 }
 
@@ -136,6 +136,7 @@ violation[{"msg": msg}] {
 # Ephemeral containers not checked as it is not possible to set field.
 
 general_violation[{"msg": msg, "field": field}] {
+  input.parameters.cpu != "-1"
   container := input.review.object.spec[field][_]
   not is_exempt(container)
   cpu_orig := container.resources.limits.cpu
@@ -166,6 +167,7 @@ general_violation[{"msg": msg, "field": field}] {
 }
 
 general_violation[{"msg": msg, "field": field}] {
+  input.parameters.cpu != "-1"
   container := input.review.object.spec[field][_]
   not is_exempt(container)
   missing(container.resources.limits, "cpu")
@@ -185,6 +187,7 @@ general_violation[{"msg": msg, "field": field}] {
   cpu_orig := container.resources.limits.cpu
   cpu := canonify_cpu(cpu_orig)
   max_cpu_orig := input.parameters.cpu
+  max_cpu_orig != "-1"
   max_cpu := canonify_cpu(max_cpu_orig)
   cpu > max_cpu
   msg := sprintf("container <%v> cpu limit <%v> is higher than the maximum allowed of <%v>", [container.name, cpu_orig, max_cpu_orig])

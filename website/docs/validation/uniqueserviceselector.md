@@ -17,8 +17,8 @@ metadata:
   name: k8suniqueserviceselector
   annotations:
     metadata.gatekeeper.sh/title: "Unique Service Selector"
-    metadata.gatekeeper.sh/version: 1.0.1
-    metadata.gatekeeper.sh/requiresSyncData: |
+    metadata.gatekeeper.sh/version: 1.0.2
+    metadata.gatekeeper.sh/requires-sync-data: |
       "[
         [
           {
@@ -89,7 +89,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>unique-service-selector</summary><blockquote>
+<summary>unique-service-selector</summary>
 
 <details>
 <summary>constraint</summary>
@@ -162,4 +162,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

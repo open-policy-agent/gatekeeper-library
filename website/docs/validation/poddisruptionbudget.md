@@ -17,8 +17,8 @@ metadata:
   name: k8spoddisruptionbudget
   annotations:
     metadata.gatekeeper.sh/title: "Pod Disruption Budget"
-    metadata.gatekeeper.sh/version: 1.0.2
-    metadata.gatekeeper.sh/requiresSyncData: |
+    metadata.gatekeeper.sh/version: 1.0.4
+    metadata.gatekeeper.sh/requires-sync-data: |
       "[
         [
           {
@@ -110,7 +110,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>pod-disruption-budget</summary><blockquote>
+<summary>pod-disruption-budget</summary>
 
 <details>
 <summary>constraint</summary>
@@ -124,7 +124,7 @@ spec:
   match:
     kinds:
       - apiGroups: ["apps"]
-        kinds: ["Deployment", "ReplicaSet", "StatefulSet"]
+        kinds: ["Deployment", "StatefulSet"]
       - apiGroups: ["policy"]
         kinds: ["PodDisruptionBudget"]
       - apiGroups: [""]
@@ -380,4 +380,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

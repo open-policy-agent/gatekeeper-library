@@ -1,13 +1,18 @@
 package k8spsphostfilesystem
 
+import data.lib.exclude_update.is_update
+
 violation[{"msg": msg, "details": {}}] {
+    # spec.volumes field is immutable.
+    not is_update(input.review)
+
     volume := input_hostpath_volumes[_]
     allowedPaths := get_allowed_paths(input)
     input_hostpath_violation(allowedPaths, volume)
     msg := sprintf("HostPath volume %v is not allowed, pod: %v. Allowed path: %v", [volume, input.review.object.metadata.name, allowedPaths])
 }
 
-input_hostpath_violation(allowedPaths, volume) {
+input_hostpath_violation(allowedPaths, _) {
     # An empty list means all host paths are blocked
     allowedPaths == []
 }

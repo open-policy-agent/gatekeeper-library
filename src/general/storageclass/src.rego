@@ -110,5 +110,3 @@ statefulset_vct_noname_msg := sprintf("statefulset did not specify a storage cla
   "statefulset did not specify a storage class name.",
   []
 )
-
-#FIXME pod generic ephemeral might be good to validate some day too.

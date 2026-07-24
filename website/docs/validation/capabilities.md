@@ -5,6 +5,8 @@ title: Capabilities
 
 # Capabilities
 
+**Bundles:** `pod-security-baseline` `pod-security-restricted`
+
 ## Description
 Controls Linux capabilities on containers. Corresponds to the `allowedCapabilities` and `requiredDropCapabilities` fields in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#capabilities
 
@@ -16,7 +18,8 @@ metadata:
   name: k8spspcapabilities
   annotations:
     metadata.gatekeeper.sh/title: "Capabilities"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.1.3
+    metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Controls Linux capabilities on containers. Corresponds to the
       `allowedCapabilities` and `requiredDropCapabilities` fields in a
@@ -59,105 +62,176 @@ spec:
                 type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package capabilities
+      code:
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: containers
+            expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+          - name: initContainers
+            expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+          - name: ephemeralContainers
+            expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+          - name: allContainers
+            expression: 'variables.containers + variables.initContainers + variables.ephemeralContainers'
+          - name: exemptImagePrefixes
+            expression: |
+              !has(variables.params.exemptImages) ? [] :
+                variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+          - name: exemptImageExplicit
+            expression: |
+              !has(variables.params.exemptImages) ? [] : 
+                variables.params.exemptImages.filter(image, !image.endsWith("*"))
+          - name: exemptImages
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                container.image in variables.exemptImageExplicit ||
+                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))
+              ).map(container, container.image)
+          - name: allowedCapabilities
+            expression: 'has(variables.params.allowedCapabilities) ? variables.params.allowedCapabilities : []'
+          - name: allCapabilitiesAllowed
+            expression: '"*" in variables.allowedCapabilities'
+          - name: disallowedCapabilitiesByContainer
+            expression: |
+              variables.allContainers.map(container, !(container.image in variables.exemptImages) &&
+                !variables.allCapabilitiesAllowed && has(container.securityContext) && has(container.securityContext.capabilities) && has(container.securityContext.capabilities.add) &&
+                  container.securityContext.capabilities.add.exists(capability, !(capability in variables.allowedCapabilities)),
+                [container.name, dyn(container.securityContext.capabilities.add.filter(capability, !(capability in variables.allowedCapabilities)).join(", "))]
+              )
+          - name: requiredDropCapabilities
+            expression: 'has(variables.params.requiredDropCapabilities) ? variables.params.requiredDropCapabilities : []'
+          - name: missingDropCapabilitiesByContainer
+            expression: |
+              variables.allContainers.map(container, !(container.image in variables.exemptImages) &&
+                size(variables.requiredDropCapabilities) > 0 && (
+                  !has(container.securityContext) || !has(container.securityContext.capabilities) || !has(container.securityContext.capabilities.drop) || (
+                    !(container.securityContext.capabilities.drop.exists(capability, capability.lowerAscii() == "all")) &&
+                    variables.requiredDropCapabilities.exists(capability, !(capability in container.securityContext.capabilities.drop))
+                  )
+                ),
+                [container.name, 
+                  !has(container.securityContext) ? variables.requiredDropCapabilities :
+                    !has(container.securityContext.capabilities) ? variables.requiredDropCapabilities :
+                      !has(container.securityContext.capabilities.drop) ? variables.requiredDropCapabilities : 
+                        variables.requiredDropCapabilities.filter(capability, !(capability in container.securityContext.capabilities.drop))
+                ]
+              )
+          validations:
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.disallowedCapabilitiesByContainer) == 0'
+            messageExpression: |
+              "containers have disallowed capabilities: " + variables.disallowedCapabilitiesByContainer.map(pair, "{container: " + pair[0] + ", capabilities: [" + pair[1] + "]}").join(", ")
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.missingDropCapabilitiesByContainer) == 0'
+            messageExpression: |
+              "containers are not dropping all required capabilities: " + variables.missingDropCapabilitiesByContainer.map(pair, "{container: " + pair[0] + ", capabilities: [" + pair[1].join(", ") + "]}").join(", ")
+      - engine: Rego
+        source:
+          rego: |
+            package capabilities
 
-        import data.lib.exempt_container.is_exempt
+            import data.lib.exclude_update.is_update
+            import data.lib.exempt_container.is_exempt
 
-        violation[{"msg": msg}] {
-          container := input.review.object.spec.containers[_]
-          not is_exempt(container)
-          has_disallowed_capabilities(container)
-          msg := sprintf("container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
-        }
+            violation[{"msg": msg}] {
+              # spec.containers.securityContext.capabilities field is immutable.
+              not is_update(input.review)
 
-        violation[{"msg": msg}] {
-          container := input.review.object.spec.containers[_]
-          not is_exempt(container)
-          missing_drop_capabilities(container)
-          msg := sprintf("container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
-        }
+              container := input.review.object.spec.containers[_]
+              not is_exempt(container)
+              has_disallowed_capabilities(container)
+              msg := sprintf("container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
+            }
 
+            violation[{"msg": msg}] {
+              not is_update(input.review)
+              container := input.review.object.spec.containers[_]
+              not is_exempt(container)
+              missing_drop_capabilities(container)
+              msg := sprintf("container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
+            }
 
+            violation[{"msg": msg}] {
+              not is_update(input.review)
+              container := input.review.object.spec.initContainers[_]
+              not is_exempt(container)
+              has_disallowed_capabilities(container)
+              msg := sprintf("init container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
+            }
 
-        violation[{"msg": msg}] {
-          container := input.review.object.spec.initContainers[_]
-          not is_exempt(container)
-          has_disallowed_capabilities(container)
-          msg := sprintf("init container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
-        }
+            violation[{"msg": msg}] {
+              not is_update(input.review)
+              container := input.review.object.spec.initContainers[_]
+              not is_exempt(container)
+              missing_drop_capabilities(container)
+              msg := sprintf("init container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
+            }
 
-        violation[{"msg": msg}] {
-          container := input.review.object.spec.initContainers[_]
-          not is_exempt(container)
-          missing_drop_capabilities(container)
-          msg := sprintf("init container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
-        }
+            violation[{"msg": msg}] {
+              not is_update(input.review)
+              container := input.review.object.spec.ephemeralContainers[_]
+              not is_exempt(container)
+              has_disallowed_capabilities(container)
+              msg := sprintf("ephemeral container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
+            }
 
+            violation[{"msg": msg}] {
+              not is_update(input.review)
+              container := input.review.object.spec.ephemeralContainers[_]
+              not is_exempt(container)
+              missing_drop_capabilities(container)
+              msg := sprintf("ephemeral container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
+            }
 
+            has_disallowed_capabilities(container) {
+              allowed := {c | c := lower(input.parameters.allowedCapabilities[_])}
+              not allowed["*"]
+              capabilities := {c | c := lower(container.securityContext.capabilities.add[_])}
 
-        violation[{"msg": msg}] {
-          container := input.review.object.spec.ephemeralContainers[_]
-          not is_exempt(container)
-          has_disallowed_capabilities(container)
-          msg := sprintf("ephemeral container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
-        }
+              count(capabilities - allowed) > 0
+            }
 
-        violation[{"msg": msg}] {
-          container := input.review.object.spec.ephemeralContainers[_]
-          not is_exempt(container)
-          missing_drop_capabilities(container)
-          msg := sprintf("ephemeral container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
-        }
+            missing_drop_capabilities(container) {
+              must_drop := {c | c := lower(input.parameters.requiredDropCapabilities[_])}
+              all := {"all"}
+              dropped := {c | c := lower(container.securityContext.capabilities.drop[_])}
 
+              count(must_drop - dropped) > 0
+              count(all - dropped) > 0
+            }
 
-        has_disallowed_capabilities(container) {
-          allowed := {c | c := lower(input.parameters.allowedCapabilities[_])}
-          not allowed["*"]
-          capabilities := {c | c := lower(container.securityContext.capabilities.add[_])}
+            get_default(obj, param, _) := obj[param]
 
-          count(capabilities - allowed) > 0
-        }
+            get_default(obj, param, _default) := _default {
+              not obj[param]
+              not obj[param] == false
+            }
+          libs:
+          - |
+            package lib.exclude_update
 
-        missing_drop_capabilities(container) {
-          must_drop := {c | c := lower(input.parameters.requiredDropCapabilities[_])}
-          all := {"all"}
-          dropped := {c | c := lower(container.securityContext.capabilities.drop[_])}
+            is_update(review) {
+                review.operation == "UPDATE"
+            }
+          - |
+            package lib.exempt_container
 
-          count(must_drop - dropped) > 0
-          count(all - dropped) > 0
-        }
+            is_exempt(container) {
+                exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+                img := container.image
+                exemption := exempt_images[_]
+                _matches_exemption(img, exemption)
+            }
 
-        get_default(obj, param, _default) = out {
-          out = obj[param]
-        }
+            _matches_exemption(img, exemption) {
+                not endswith(exemption, "*")
+                exemption == img
+            }
 
-        get_default(obj, param, _default) = out {
-          not obj[param]
-          not obj[param] == false
-          out = _default
-        }
-      libs:
-        - |
-          package lib.exempt_container
-
-          is_exempt(container) {
-              exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
-              img := container.image
-              exemption := exempt_images[_]
-              _matches_exemption(img, exemption)
-          }
-
-          _matches_exemption(img, exemption) {
-              not endswith(exemption, "*")
-              exemption == img
-          }
-
-          _matches_exemption(img, exemption) {
-              endswith(exemption, "*")
-              prefix := trim_suffix(exemption, "*")
-              startswith(img, prefix)
-          }
+            _matches_exemption(img, exemption) {
+                endswith(exemption, "*")
+                prefix := trim_suffix(exemption, "*")
+                startswith(img, prefix)
+            }
 
 ```
 
@@ -167,7 +241,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>capabilities</summary><blockquote>
+<summary>capabilities-baseline</summary>
 
 <details>
 <summary>constraint</summary>
@@ -176,24 +250,35 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sPSPCapabilities
 metadata:
-  name: capabilities-demo
+  name: psp-capabilities-baseline
 spec:
   match:
     kinds:
       - apiGroups: [""]
         kinds: ["Pod"]
-    namespaces:
-      - "default"
   parameters:
-    allowedCapabilities: ["something"]
-    requiredDropCapabilities: ["must_drop"]
+    allowedCapabilities:
+    - AUDIT_WRITE
+    - CHOWN
+    - DAC_OVERRIDE
+    - FOWNER
+    - FSETID
+    - KILL
+    - MKNOD
+    - NET_BIND_SERVICE
+    - NET_RAW
+    - SETFCAP
+    - SETGID
+    - SETPCAP
+    - SETUID
+    - SYS_CHROOT
 
 ```
 
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/capabilities-demo/constraint.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities-baseline/constraint.yaml
 ```
 
 </details>
@@ -218,17 +303,18 @@ spec:
         - "--addr=localhost:8080"
       securityContext:
         capabilities:
-          add: ["disallowedcapability"]
+          add: ["SYS_ADMIN"]
       resources:
         limits:
           cpu: "100m"
           memory: "30Mi"
+
 ```
 
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/capabilities-demo/example_disallowed.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities-baseline/example_disallowed.yaml
 ```
 
 </details>
@@ -252,8 +338,7 @@ spec:
         - "--addr=localhost:8080"
       securityContext:
         capabilities:
-          add: ["something"]
-          drop: ["must_drop", "another_one"]
+          add: ["NET_BIND_SERVICE"]
       resources:
         limits:
           cpu: "100m"
@@ -264,7 +349,7 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/capabilities-demo/example_allowed.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities-baseline/example_allowed.yaml
 ```
 
 </details>
@@ -288,7 +373,7 @@ spec:
         - "--addr=localhost:8080"
       securityContext:
         capabilities:
-          add: ["disallowedcapability"]
+          add: ["SYS_ADMIN"]
       resources:
         limits:
           cpu: "100m"
@@ -299,10 +384,148 @@ spec:
 Usage
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/capabilities-demo/disallowed_ephemeral.yaml
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities-baseline/disallowed_ephemeral.yaml
 ```
 
 </details>
 
 
-</blockquote></details>
+</details><details>
+<summary>capabilities-restricted</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPCapabilities
+metadata:
+  name: psp-capabilities-restricted
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    allowedCapabilities: ["NET_BIND_SERVICE"]
+    requiredDropCapabilities: ["ALL"]
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities-restricted/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>example-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-disallowed
+  labels:
+    owner: me.agilebank.demo
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      securityContext:
+        capabilities:
+          add: ["SYS_ADMIN"]
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "30Mi"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities-restricted/example_disallowed.yaml
+```
+
+</details>
+<details>
+<summary>example-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-allowed
+  labels:
+    owner: me.agilebank.demo
+spec:
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      securityContext:
+        capabilities:
+          add: ["NET_BIND_SERVICE"]
+          drop: ["ALL"]
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "30Mi"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities-restricted/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>disallowed-ephemeral</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-disallowed
+  labels:
+    owner: me.agilebank.demo
+spec:
+  ephemeralContainers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      securityContext:
+        capabilities:
+          add: ["SYS_ADMIN"]
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "30Mi"
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/capabilities/samples/psp-capabilities-restricted/disallowed_ephemeral.yaml
+```
+
+</details>
+
+
+</details>

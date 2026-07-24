@@ -1,53 +1,58 @@
 package k8spspfsgroup
 
 test_input_fsgroup_allowed_all {
-    input := { "review": input_review_with_fsgroup, "parameters": input_parameters_runasany}
-    results := violation with input as input
+    inp := { "review": input_review_with_fsgroup, "parameters": input_parameters_runasany}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_no_fsgroup_allowed_all {
-    input := { "review": input_review, "parameters": input_parameters_runasany}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_runasany}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_fsgroup_MustRunAs_allowed {
-    input := { "review": input_review_with_fsgroup, "parameters": input_parameters_in_list_mustrunas}
-    results := violation with input as input
+    inp := { "review": input_review_with_fsgroup, "parameters": input_parameters_in_list_mustrunas}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_fsgroup_MustRunAs_not_allowed {
-    input := { "review": input_review_with_fsgroup, "parameters": input_parameters_in_list_mustrunas_outofrange}
-    results := violation with input as input
+    inp := { "review": input_review_with_fsgroup, "parameters": input_parameters_in_list_mustrunas_outofrange}
+    results := violation with input as inp
     count(results) > 0
 }
 test_input_no_fsgroup_MustRunAs_not_allowed {
-    input := { "review": input_review, "parameters": input_parameters_in_list_mustrunas}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_in_list_mustrunas}
+    results := violation with input as inp
     count(results) > 0
 }
 test_input_securitycontext_no_fsgroup_MustRunAs_not_allowed {
-    input := { "review": input_review_with_securitycontext_no_fsgroup, "parameters": input_parameters_in_list_mustrunas}
-    results := violation with input as input
+    inp := { "review": input_review_with_securitycontext_no_fsgroup, "parameters": input_parameters_in_list_mustrunas}
+    results := violation with input as inp
     count(results) > 0
 }
 test_input_fsgroup_MayRunAs_allowed {
-    input := { "review": input_review_with_fsgroup, "parameters": input_parameters_in_list_mayrunas}
-    results := violation with input as input
+    inp := { "review": input_review_with_fsgroup, "parameters": input_parameters_in_list_mayrunas}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_fsgroup_MayRunAs_not_allowed {
-    input := { "review": input_review_with_fsgroup, "parameters": input_parameters_in_list_mayrunas_outofrange}
-    results := violation with input as input
+    inp := { "review": input_review_with_fsgroup, "parameters": input_parameters_in_list_mayrunas_outofrange}
+    results := violation with input as inp
     count(results) > 0
 }
 test_input_no_fsgroup_MayRunAs_allowed {
-    input := { "review": input_review, "parameters": input_parameters_in_list_mayrunas}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_in_list_mayrunas}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_securitycontext_no_fsgroup_MayRunAs_allowed {
-    input := { "review": input_review_with_securitycontext_no_fsgroup, "parameters": input_parameters_in_list_mayrunas}
-    results := violation with input as input
+    inp := { "review": input_review_with_securitycontext_no_fsgroup, "parameters": input_parameters_in_list_mayrunas}
+    results := violation with input as inp
+    count(results) == 0
+}
+test_update {
+    inp := { "review": object.union(input_review_with_fsgroup, {"operation": "UPDATE"}), "parameters": input_parameters_in_list_mustrunas_outofrange}
+    results := violation with input as inp
     count(results) == 0
 }
 

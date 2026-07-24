@@ -1,0 +1,18 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sAllowedReposv2
+metadata:
+  name: repo-is-openpolicyagent
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces:
+      - "default"
+  parameters:
+    allowedImages:
+      - "openpolicyagent/*"
+      - "myregistry.azurecr.io/*"
+      - "mydockerhub/*"
+      - "ubuntu:20.14"
+      - "123456789123.dkr.ecr.eu-west-1.amazonaws.com/postgres"

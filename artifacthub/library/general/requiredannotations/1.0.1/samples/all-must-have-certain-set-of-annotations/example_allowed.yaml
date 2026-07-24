@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: allowed-service
+  annotations:
+    a8r.io/owner: "dev-team-alfa@contoso.com"
+    a8r.io/runbook: "https://confluence.contoso.com/dev-team-alfa/runbooks"
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  selector:
+    app: foo

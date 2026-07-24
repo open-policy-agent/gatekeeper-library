@@ -11,7 +11,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Mutation Examples
 ```yaml
-apiVersion: mutations.gatekeeper.sh/v1alpha1
+apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
   name: k8spspdefaultallowprivilegeescalation
@@ -28,7 +28,7 @@ spec:
     assign:
       value: false
 ---
-apiVersion: mutations.gatekeeper.sh/v1alpha1
+apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
   name: k8spspdefaultallowprivilegeescalation-init
@@ -45,7 +45,7 @@ spec:
     assign:
       value: false
 ---
-apiVersion: mutations.gatekeeper.sh/v1alpha1
+apiVersion: mutations.gatekeeper.sh/v1
 kind: Assign
 metadata:
   name: k8spspdefaultallowprivilegeescalation-ephemeral

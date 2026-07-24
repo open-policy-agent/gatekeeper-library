@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: image-disallowed
+spec:
+  containers:
+    - name: image-1-malicious-basic-image-disallow
+      image: ubuntumalicious
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "30Mi"
+    - name: image-2-basic-image-allow
+      image: ubuntu:20.14
+      resources:
+        limits:
+          cpu: "200m"
+          memory: "50Mi"
+    - name: image-3-malicious-image-with-registry-disallow
+      image: 123456789123.dkr.ecr.eu-west-1.amazonaws.com/postgresmalicious
+      resources:
+        limits:
+          cpu: "50m"
+          memory: "10Mi"
+    - name: image-4-image-with-registry-allow
+      image: 123456789123.dkr.ecr.eu-west-1.amazonaws.com/postgres
+      resources:
+        limits:
+          cpu: "50m"
+          memory: "10Mi"

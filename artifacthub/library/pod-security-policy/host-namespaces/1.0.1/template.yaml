@@ -1,0 +1,54 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8spsphostnamespace
+  annotations:
+    metadata.gatekeeper.sh/title: "Host Namespace"
+    metadata.gatekeeper.sh/version: 1.0.1
+    description: >-
+      Disallows sharing of host PID and IPC namespaces by pod containers.
+      Corresponds to the `hostPID` and `hostIPC` fields in a PodSecurityPolicy.
+      For more information, see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPHostNamespace
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Disallows sharing of host PID and IPC namespaces by pod containers.
+            Corresponds to the `hostPID` and `hostIPC` fields in a PodSecurityPolicy.
+            For more information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8spsphostnamespace
+
+        import data.lib.exclude_update.is_update
+
+        violation[{"msg": msg, "details": {}}] {
+            # spec.hostPID and spec.hostIPC fields are immutable.
+            not is_update(input.review)
+
+            input_share_hostnamespace(input.review.object)
+            msg := sprintf("Sharing the host namespace is not allowed: %v", [input.review.object.metadata.name])
+        }
+
+        input_share_hostnamespace(o) {
+            o.spec.hostPID
+        }
+        input_share_hostnamespace(o) {
+            o.spec.hostIPC
+        }
+      libs:
+        - |
+          package lib.exclude_update
+
+          is_update(review) {
+              review.operation == "UPDATE"
+          }

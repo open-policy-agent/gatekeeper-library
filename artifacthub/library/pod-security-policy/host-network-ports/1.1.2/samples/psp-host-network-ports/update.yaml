@@ -1,0 +1,19 @@
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx-host-networking-ports-disallowed
+      labels:
+        app: nginx-host-networking-ports
+    spec:
+      hostNetwork: true
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 9001
+          hostPort: 9001

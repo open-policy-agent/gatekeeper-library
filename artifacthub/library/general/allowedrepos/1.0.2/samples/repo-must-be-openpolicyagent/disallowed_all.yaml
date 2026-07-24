@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-disallowed
+spec:
+  initContainers:
+  - name: nginx
+    image: nginx
+    resources:
+      limits:
+        cpu: "100m"
+        memory: "30Mi"
+  containers:
+    - name: nginx
+      image: nginx
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "30Mi"
+  ephemeralContainers:
+    - name: nginx
+      image: nginx
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "30Mi"

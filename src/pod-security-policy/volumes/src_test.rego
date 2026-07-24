@@ -1,70 +1,76 @@
 package k8spspvolumetypes
 
 test_input_volume_type_allowed_all {
-    input := { "review": input_review, "parameters": input_parameters_wildcard}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_wildcard}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_volume_type_allowed_all_many_volumes {
-    input := { "review": input_review_many, "parameters": input_parameters_wildcard}
-    results := violation with input as input
+    inp := { "review": input_review_many, "parameters": input_parameters_wildcard}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_volume_type_none_allowed {
-    input := { "review": input_review, "parameters": input_parameters_empty}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_empty}
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_volume_type_none_allowed_many_volumes {
-    input := { "review": input_review_many, "parameters": input_parameters_empty}
-    results := violation with input as input
+    inp := { "review": input_review_many, "parameters": input_parameters_empty}
+    results := violation with input as inp
     count(results) == 2
 }
 test_input_volume_type_allowed_all_no_volumes {
-    input := { "review": input_review_no_volumes, "parameters": input_parameters_wildcard}
-    results := violation with input as input
+    inp := { "review": input_review_no_volumes, "parameters": input_parameters_wildcard}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_volume_type_none_allowed_no_volumes {
-    input := { "review": input_review_no_volumes, "parameters": input_parameters_empty}
-    results := violation with input as input
+    inp := { "review": input_review_no_volumes, "parameters": input_parameters_empty}
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_volume_type_allowed_in_list_no_volumes {
-    input := { "review": input_review_no_volumes, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_no_volumes, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_volume_type_allowed_in_list {
-    input := { "review": input_review, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_volume_type_allowed_not_in_list {
-    input := { "review": input_review, "parameters": input_parameters_not_in_list}
-    results := violation with input as input
+    inp := { "review": input_review, "parameters": input_parameters_not_in_list}
+    results := violation with input as inp
     count(results) == 1
 }
 
 test_input_volume_type_allowed_in_list_many_volumes {
-    input := { "review": input_review_many, "parameters": input_parameters_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_many, "parameters": input_parameters_in_list}
+    results := violation with input as inp
     count(results) == 0
 }
 
 test_input_volume_type_allowed_not_all_in_list_many_volumes {
-    input := { "review": input_review_many, "parameters": input_parameters_not_in_list}
-    results := violation with input as input
+    inp := { "review": input_review_many, "parameters": input_parameters_not_in_list}
+    results := violation with input as inp
     count(results) == 2
 }
 
 test_input_volume_type_allowed_in_list_many_volumes_mixed {
-    input := { "review": input_review_many, "parameters": input_parameters_mixed}
-    results := violation with input as input
+    inp := { "review": input_review_many, "parameters": input_parameters_mixed}
+    results := violation with input as inp
     count(results) == 1
+}
+
+test_input_volume_type_update {
+    inp := { "review": object.union(input_review, {"operation": "UPDATE"}), "parameters": input_parameters_empty}
+    results := violation with input as inp
+    count(results) == 0
 }
 
 input_review = {

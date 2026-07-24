@@ -1,0 +1,22 @@
+version: 1.1.4
+name: k8spsphostnetworkingports
+displayName: Host Networking Ports
+createdAt: "2024-08-30T22:03:40Z"
+description: Controls usage of host network namespace by pod containers. HostNetwork verification happens without exception for exemptImages. Specific ports must be specified. Corresponds to the `hostNetwork` and `hostPorts` fields in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
+digest: 5e295f3ee2762996e89f926faae128ca3ae86166aac8fb9e518433ba1300deec
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/host-network-ports
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Host Networking Ports
+    Controls usage of host network namespace by pod containers. HostNetwork verification happens without exception for exemptImages. Specific ports must be specified. Corresponds to the `hostNetwork` and `hostPorts` fields in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/pod-security-policy/host-network-ports/1.1.4/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

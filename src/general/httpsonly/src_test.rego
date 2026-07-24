@@ -1,63 +1,63 @@
 package k8shttpsonly
 
 test_http_disallowed {
-    input := {"review": review_ingress(annotation("false"), tls)}
-    results := violation with input as input
+    inp := {"review": review_ingress(annotation("false"), tls)}
+    results := violation with input as inp
     count(results) == 0
 }
 test_boolean_annotation {
-    input := {"review": review_ingress(annotation(false), tls)}
-    results := violation with input as input
+    inp := {"review": review_ingress(annotation(false), tls)}
+    results := violation with input as inp
     count(results) == 1
 }
 test_true_annotation {
-    input := {"review": review_ingress(annotation("true"), tls)}
-    results := violation with input as input
+    inp := {"review": review_ingress(annotation("true"), tls)}
+    results := violation with input as inp
     count(results) == 1
 }
 test_missing_annotation {
-    input := {"review": review_ingress({}, tls)}
-    results := violation with input as input
+    inp := {"review": review_ingress({}, tls)}
+    results := violation with input as inp
     count(results) == 1
 }
 test_empty_tls {
-    input := {"review": review_ingress({}, empty_tls)}
-    results := violation with input as input
+    inp := {"review": review_ingress({}, empty_tls)}
+    results := violation with input as inp
     count(results) == 1
 }
 test_missing_tls {
-    input := {"review": review_ingress(annotation("false"), {})}
-    results := violation with input as input
+    inp := {"review": review_ingress(annotation("false"), {})}
+    results := violation with input as inp
     count(results) == 1
 }
 test_missing_all {
-    input := {"review": review_ingress({}, {})}
-    results := violation with input as input
+    inp := {"review": review_ingress({}, {})}
+    results := violation with input as inp
     count(results) == 1
 }
 test_tls_optional_missing_tls {
-    input := {"review": review_ingress(annotation("false"), {}), "parameters": {"tlsOptional": true}}
-    results := violation with input as input
+    inp := {"review": review_ingress(annotation("false"), {}), "parameters": {"tlsOptional": true}}
+    results := violation with input as inp
     count(results) == 0
 }
 test_tls_optional_empty_tls {
-    input := {"review": review_ingress(annotation("false"), empty_tls), "parameters": {"tlsOptional": true}}
-    results := violation with input as input
+    inp := {"review": review_ingress(annotation("false"), empty_tls), "parameters": {"tlsOptional": true}}
+    results := violation with input as inp
     count(results) == 0
 }
 test_tls_optional_with_tls {
-    input := {"review": review_ingress(annotation("false"), tls), "parameters": {"tlsOptional": true}}
-    results := violation with input as input
+    inp := {"review": review_ingress(annotation("false"), tls), "parameters": {"tlsOptional": true}}
+    results := violation with input as inp
     count(results) == 0
 }
 test_tls_optional_true_annotation {
-    input := {"review": review_ingress(annotation("true"), {}), "parameters": {"tlsOptional": true}}
-    results := violation with input as input
+    inp := {"review": review_ingress(annotation("true"), {}), "parameters": {"tlsOptional": true}}
+    results := violation with input as inp
     count(results) == 1
 }
 test_tls_optional_missing_annotation {
-    input := {"review": review_ingress({}, {}), "parameters": {"tlsOptional": true}}
-    results := violation with input as input
+    inp := {"review": review_ingress({}, {}), "parameters": {"tlsOptional": true}}
+    results := violation with input as inp
     count(results) == 1
 }
 

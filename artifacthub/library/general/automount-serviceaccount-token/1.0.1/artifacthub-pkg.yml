@@ -1,0 +1,22 @@
+version: 1.0.1
+name: k8spspautomountserviceaccounttokenpod
+displayName: Automount Service Account Token for Pod
+createdAt: "2023-05-23T09:47:24Z"
+description: Controls the ability of any Pod to enable automountServiceAccountToken.
+digest: 8b62e4b2324e9e60a66008e6edcc327bcd2b531d3a905f10bf25a1671079ce6e
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/automount-serviceaccount-token
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Automount Service Account Token for Pod
+    Controls the ability of any Pod to enable automountServiceAccountToken.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/automount-serviceaccount-token/1.0.1/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

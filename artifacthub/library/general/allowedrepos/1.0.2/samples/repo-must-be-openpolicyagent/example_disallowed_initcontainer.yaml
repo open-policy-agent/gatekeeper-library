@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-disallowed
+spec:
+  initContainers:
+    - name: nginxinit
+      image: nginx
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "30Mi"
+  containers:
+    - name: opa
+      image: openpolicyagent/opa:0.9.2
+      args:
+        - "run"
+        - "--server"
+        - "--addr=localhost:8080"
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "30Mi"

@@ -1,0 +1,22 @@
+version: 1.0.1
+name: k8spsphostnamespace
+displayName: Host Namespace
+createdAt: "2023-05-23T09:47:31Z"
+description: Disallows sharing of host PID and IPC namespaces by pod containers. Corresponds to the `hostPID` and `hostIPC` fields in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
+digest: a0e3fc6ed087233e70ae10bdc2a3ee550226207bf2bf7fb4567833710d39bed0
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/host-namespaces
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Host Namespace
+    Disallows sharing of host PID and IPC namespaces by pod containers. Corresponds to the `hostPID` and `hostIPC` fields in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/pod-security-policy/host-namespaces/1.0.1/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

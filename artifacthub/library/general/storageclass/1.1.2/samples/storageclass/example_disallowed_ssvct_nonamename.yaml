@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: novolumeclaimstorageclass
+spec:
+  selector:
+    matchLabels:
+      app: novolumeclaimstorageclass
+  serviceName: novolumeclaimstorageclass
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: novolumeclaimstorageclass
+    spec:
+      containers:
+      - name: main
+        image: registry.k8s.io/nginx-slim:0.8
+        volumeMounts:
+        - name: data
+          mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi

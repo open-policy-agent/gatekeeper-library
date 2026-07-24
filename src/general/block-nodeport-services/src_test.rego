@@ -1,7 +1,7 @@
 package k8sblocknodeport
 
 test_block_node_port {
-  input := {
+  inp := {
     "review": {
       "kind": {"kind": "Service"},
       "object": {
@@ -16,11 +16,11 @@ test_block_node_port {
         }
       }
   }
-  result := violation with input as input
+  result := violation with input as inp
   count(result) == 1
 }
 test_allow_other_service_types {
-  input := {
+  inp := {
     "review": {
       "kind": {"kind": "Service"},
       "object": {
@@ -35,6 +35,6 @@ test_allow_other_service_types {
         }
       }
   }
-  result := violation with input as input
+  result := violation with input as inp
   count(result) == 0
 }

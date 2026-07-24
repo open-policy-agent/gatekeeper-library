@@ -1,0 +1,166 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8spsphostnetworkingports
+  annotations:
+    metadata.gatekeeper.sh/title: "Host Networking Ports"
+    metadata.gatekeeper.sh/version: 1.1.4
+    description: >-
+      Controls usage of host network namespace by pod containers. HostNetwork verification happens without exception for exemptImages. Specific
+      ports must be specified. Corresponds to the `hostNetwork` and
+      `hostPorts` fields in a PodSecurityPolicy. For more information, see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPHostNetworkingPorts
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Controls usage of host network namespace by pod containers. HostNetwork verification happens without exception for exemptImages. Specific
+            ports must be specified. Corresponds to the `hostNetwork` and
+            `hostPorts` fields in a PodSecurityPolicy. For more information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#host-namespaces
+          properties:
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
+              type: array
+              items:
+                type: string
+            hostNetwork:
+              description: "Determines if the policy allows the use of HostNetwork in the pod spec."
+              type: boolean
+            min:
+              description: "The start of the allowed port range, inclusive."
+              type: integer
+            max:
+              description: "The end of the allowed port range, inclusive."
+              type: integer
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: containers
+            expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+          - name: initContainers
+            expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+          - name: ephemeralContainers
+            expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+          - name: exemptImagePrefixes
+            expression: |
+              !has(variables.params.exemptImages) ? [] :
+                variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+          - name: exemptImageExplicit
+            expression: |
+              !has(variables.params.exemptImages) ? [] : 
+                variables.params.exemptImages.filter(image, !image.endsWith("*"))
+          - name: exemptImages
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                container.image in variables.exemptImageExplicit ||
+                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))
+              ).map(container, container.image)
+          - name: badContainers
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                !(container.image in variables.exemptImages) && has(container.ports) &&
+                (
+                  (container.ports.all(port, has(port.hostPort) && has(variables.params.min) && port.hostPort < variables.params.min)) ||
+                  (container.ports.all(port, has(port.hostPort) && has(variables.params.max) && port.hostPort > variables.params.max))
+                )
+              )
+          - name: isUpdate
+            expression: has(request.operation) && request.operation == "UPDATE"
+          - name: hostNetworkAllowed
+            expression: has(variables.params.hostNetwork) && variables.params.hostNetwork
+          - name: hostNetworkEnabled
+            expression: has(variables.anyObject.spec.hostNetwork) && variables.anyObject.spec.hostNetwork
+          - name: hostNetworkViolation
+            expression: variables.hostNetworkEnabled && !variables.hostNetworkAllowed
+          validations:
+          - expression: 'variables.isUpdate || size(variables.badContainers) == 0'
+            messageExpression: '"The specified hostNetwork and hostPort are not allowed, pod: " + variables.anyObject.metadata.name'
+          - expression: variables.isUpdate || !variables.hostNetworkViolation
+            messageExpression: '"The specified hostNetwork and hostPort are not allowed, pod: " + variables.anyObject.metadata.name'
+      - engine: Rego
+        source:
+          rego: |
+            package k8spsphostnetworkingports
+
+            import data.lib.exclude_update.is_update
+            import data.lib.exempt_container.is_exempt
+
+            violation[{"msg": msg, "details": {}}] {
+                # spec.hostNetwork field is immutable.
+                not is_update(input.review)
+
+                input_share_hostnetwork(input.review.object)
+                msg := sprintf("The specified hostNetwork and hostPort are not allowed, pod: %v. Allowed values: %v", [input.review.object.metadata.name, input.parameters])
+            }
+
+            input_share_hostnetwork(o) {
+                not input.parameters.hostNetwork
+                o.spec.hostNetwork
+            }
+
+            input_share_hostnetwork(_) {
+                hostPort := input_containers[_].ports[_].hostPort
+                hostPort < input.parameters.min
+            }
+
+            input_share_hostnetwork(_) {
+                hostPort := input_containers[_].ports[_].hostPort
+                hostPort > input.parameters.max
+            }
+
+            input_containers[c] {
+                c := input.review.object.spec.containers[_]
+                not is_exempt(c)
+            }
+
+            input_containers[c] {
+                c := input.review.object.spec.initContainers[_]
+                not is_exempt(c)
+            }
+
+            input_containers[c] {
+                c := input.review.object.spec.ephemeralContainers[_]
+                not is_exempt(c)
+            }
+          libs:
+            - |
+              package lib.exclude_update
+
+              is_update(review) {
+                  review.operation == "UPDATE"
+              }
+            - |
+              package lib.exempt_container
+
+              is_exempt(container) {
+                  exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+                  img := container.image
+                  exemption := exempt_images[_]
+                  _matches_exemption(img, exemption)
+              }
+
+              _matches_exemption(img, exemption) {
+                  not endswith(exemption, "*")
+                  exemption == img
+              }
+
+              _matches_exemption(img, exemption) {
+                  endswith(exemption, "*")
+                  prefix := trim_suffix(exemption, "*")
+                  startswith(img, prefix)
+              }

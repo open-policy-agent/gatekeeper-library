@@ -1,0 +1,17 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: requiredannotations
+tests:
+- name: must-have-set-of-annotations
+  template: template.yaml
+  constraint: samples/all-must-have-certain-set-of-annotations/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/all-must-have-certain-set-of-annotations/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed
+    object: samples/all-must-have-certain-set-of-annotations/example_disallowed.yaml
+    assertions:
+    - violations: yes

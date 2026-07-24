@@ -1,0 +1,20 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: noupdateserviceaccount
+tests:
+  - name: noupdateserviceaccount
+    template: template.yaml
+    constraint: samples/noupdateserviceaccount/constraint.yaml
+    cases:
+      - name: example-allowed
+        object: samples/noupdateserviceaccount/example_allowed.yaml
+        assertions:
+          - violations: no
+      # Since the tests are currently stateless, they can't exercise level-triggered
+      # events like changing a field. For now, manually test example_disallowed.yaml
+      # instead.
+      # - name: example-disallowed
+      #   object: samples/noupdateserviceaccount/example_disallowed.yaml
+      #   assertions:
+      #     - violations: yes

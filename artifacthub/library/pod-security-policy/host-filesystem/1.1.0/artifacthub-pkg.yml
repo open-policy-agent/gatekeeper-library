@@ -1,0 +1,22 @@
+version: 1.1.0
+name: k8spsphostfilesystem
+displayName: Host Filesystem
+createdAt: "2024-06-05T20:31:16Z"
+description: Controls usage of the host filesystem. Corresponds to the `allowedHostPaths` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
+digest: 3883941aac9b7598a79c9bf6517c77a401b99d165bf584dce604a00eef79f8e7
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/host-filesystem
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Host Filesystem
+    Controls usage of the host filesystem. Corresponds to the `allowedHostPaths` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/pod-security-policy/host-filesystem/1.1.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

@@ -1,0 +1,22 @@
+version: 1.0.1
+name: k8sallowedrepos
+displayName: Allowed Repositories
+createdAt: "2023-10-30T20:59:57Z"
+description: Requires container images to begin with a string from the specified list.
+digest: 1ee1bb4b4fb6128bdcd6bd84c81d1d1e02b4b9c0f9bd3eb85f9fd30e82742dd1
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/allowedrepos
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Allowed Repositories
+    Requires container images to begin with a string from the specified list.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/allowedrepos/1.0.1/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

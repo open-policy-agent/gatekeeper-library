@@ -1,0 +1,42 @@
+variables:
+- name: containers
+  expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+- name: initContainers
+  expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+- name: ephemeralContainers
+  expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+- name: exemptImagePrefixes
+  expression: |
+    !has(variables.params.exemptImages) ? [] :
+      variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+- name: exemptImageExplicit
+  expression: |
+    !has(variables.params.exemptImages) ? [] : 
+      variables.params.exemptImages.filter(image, !image.endsWith("*"))
+- name: exemptImages
+  expression: |
+    (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(
+      container,
+      container.image in variables.exemptImageExplicit ||
+        variables.exemptImagePrefixes.exists(
+          exemption,
+          string(container.image).startsWith(exemption)
+        )
+    ).map(container, container.image)
+- name: allowedProcMount
+  expression: |
+    !has(variables.params) ? "default" : 
+      !has(variables.params.procMount) ? "default" : 
+        (variables.params.procMount.lowerAscii() == "default" || variables.params.procMount.lowerAscii() == "unmasked") ? variables.params.procMount.lowerAscii() : "default"
+- name: badContainers
+  expression: |
+    (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+      !(container.image in variables.exemptImages) &&
+      !(
+        (variables.allowedProcMount == "unmasked") ||
+        (variables.allowedProcMount == "default" && (!has(container.securityContext) || !has(container.securityContext.procMount) || container.securityContext.procMount == null || container.securityContext.procMount.lowerAscii() == "default"))
+      )
+    ).map(container, "ProcMount type is not allowed, container: " + container.name +". Allowed procMount types: " + variables.allowedProcMount)
+validations:
+- expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badContainers) == 0'
+  messageExpression: 'variables.badContainers.join("\n")' 

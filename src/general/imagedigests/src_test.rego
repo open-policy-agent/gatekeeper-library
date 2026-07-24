@@ -1,85 +1,85 @@
 package k8simagedigests
 
 test_input_allowed_container {
-    input := { "review": input_review(input_container_allowed) }
-    results := violation with input as input
+    inp := { "review": input_review(input_container_allowed) }
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_allowed_container_with_tag_and_digest {
-    input := { "review": input_review(input_container_allowed_with_tag) }
-    results := violation with input as input
+    inp := { "review": input_review(input_container_allowed_with_tag) }
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_allowed_containers_with_registered_algorithms {
-    input := { "review": input_review(input_container_allowed_registered_algorithms) }
-    results := violation with input as input
+    inp := { "review": input_review(input_container_allowed_registered_algorithms) }
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_allowed_containers_with_unregistered_algorithms {
-    input := { "review": input_review(input_container_allowed_unregistered_algorithms) }
-    results := violation with input as input
+    inp := { "review": input_review(input_container_allowed_unregistered_algorithms) }
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_denied_container {
-    input := { "review": input_review(input_container_denied) }
-    results := violation with input as input
+    inp := { "review": input_review(input_container_denied) }
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_denied_dual_container {
-    input := { "review": input_review(input_container_dual_denied) }
-    results := violation with input as input
+    inp := { "review": input_review(input_container_dual_denied) }
+    results := violation with input as inp
     count(results) == 2
 }
 test_input_denied_mixed_container {
-    input := { "review": input_review(array.concat(input_container_allowed, input_container_denied)) }
-    results := violation with input as input
+    inp := { "review": input_review(array.concat(input_container_allowed, input_container_denied)) }
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_denied_mixed_container_with_exemption {
-    input := { "review": input_review(array.concat(input_container_allowed, input_container_denied)), "parameters": {"exemptImages": ["denied/*"]} }
-    results := violation with input as input
+    inp := { "review": input_review(array.concat(input_container_allowed, input_container_denied)), "parameters": {"exemptImages": ["denied/*"]} }
+    results := violation with input as inp
     count(results) == 0
 }
 
 # init containers
 test_input_init_allowed_container {
-    input := { "review": input_init_review(input_container_allowed) }
-    results := violation with input as input
+    inp := { "review": input_init_review(input_container_allowed) }
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_init_allowed_container_with_tag_and_digest {
-    input := { "review": input_init_review(input_container_allowed_with_tag) }
-    results := violation with input as input
+    inp := { "review": input_init_review(input_container_allowed_with_tag) }
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_init_allowed_containers_with_registered_algorithms {
-    input := { "review": input_init_review(input_container_allowed_registered_algorithms) }
-    results := violation with input as input
+    inp := { "review": input_init_review(input_container_allowed_registered_algorithms) }
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_init_allowed_containers_with_unregistered_algorithms {
-    input := { "review": input_init_review(input_container_allowed_unregistered_algorithms) }
-    results := violation with input as input
+    inp := { "review": input_init_review(input_container_allowed_unregistered_algorithms) }
+    results := violation with input as inp
     count(results) == 0
 }
 test_input_init_denied_container {
-    input := { "review": input_init_review(input_container_denied) }
-    results := violation with input as input
+    inp := { "review": input_init_review(input_container_denied) }
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_init_denied_dual_container {
-    input := { "review": input_init_review(input_container_dual_denied) }
-    results := violation with input as input
+    inp := { "review": input_init_review(input_container_dual_denied) }
+    results := violation with input as inp
     count(results) == 2
 }
 test_input_init_denied_mixed_container {
-    input := { "review": input_init_review(array.concat(input_container_allowed, input_container_denied)) }
-    results := violation with input as input
+    inp := { "review": input_init_review(array.concat(input_container_allowed, input_container_denied)) }
+    results := violation with input as inp
     count(results) == 1
 }
 test_input_init_denied_mixed_container_with_exemption {
-    input := { "review": input_init_review(array.concat(input_container_allowed, input_container_denied)), "parameters": {"exemptImages": ["denied/*"]} }
-    results := violation with input as input
+    inp := { "review": input_init_review(array.concat(input_container_allowed, input_container_denied)), "parameters": {"exemptImages": ["denied/*"]} }
+    results := violation with input as inp
     count(results) == 0
 }
 

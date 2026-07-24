@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: registry-repository-disallowed
+spec:
+  containers:
+    - name: image-1-malicious-registry-disallow
+      image: myregistry.azurecr.io.malicious.com/malicious-image
+      resources:
+        limits:
+          cpu: "100m"
+          memory: "30Mi"
+    - name: image-2-registry-allow
+      image: myregistry.azurecr.io/nginx
+      resources:
+        limits:
+          cpu: "200m"
+          memory: "50Mi"
+    - name: image-3-malicious-image-with-registry-disallow
+      image: mydockerhubmalicious/python
+      resources:
+        limits:
+          cpu: "50m"
+          memory: "10Mi"
+    - name: image-4-image-with-registry-allow
+      image: mydockerhub/python
+      resources:
+        limits:
+          cpu: "50m"
+          memory: "10Mi"

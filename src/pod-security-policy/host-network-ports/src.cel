@@ -1,0 +1,43 @@
+variables:
+- name: containers
+  expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+- name: initContainers
+  expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+- name: ephemeralContainers
+  expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+- name: exemptImagePrefixes
+  expression: |
+    !has(variables.params.exemptImages) ? [] :
+      variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+- name: exemptImageExplicit
+  expression: |
+    !has(variables.params.exemptImages) ? [] : 
+      variables.params.exemptImages.filter(image, !image.endsWith("*"))
+- name: exemptImages
+  expression: |
+    (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+      container.image in variables.exemptImageExplicit ||
+      variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))
+    ).map(container, container.image)
+- name: badContainers
+  expression: |
+    (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+      !(container.image in variables.exemptImages) && has(container.ports) &&
+      (
+        (container.ports.all(port, has(port.hostPort) && has(variables.params.min) && port.hostPort < variables.params.min)) ||
+        (container.ports.all(port, has(port.hostPort) && has(variables.params.max) && port.hostPort > variables.params.max))
+      )
+    )
+- name: isUpdate
+  expression: has(request.operation) && request.operation == "UPDATE"
+- name: hostNetworkAllowed
+  expression: has(variables.params.hostNetwork) && variables.params.hostNetwork
+- name: hostNetworkEnabled
+  expression: has(variables.anyObject.spec.hostNetwork) && variables.anyObject.spec.hostNetwork
+- name: hostNetworkViolation
+  expression: variables.hostNetworkEnabled && !variables.hostNetworkAllowed
+validations:
+- expression: 'variables.isUpdate || size(variables.badContainers) == 0'
+  messageExpression: '"The specified hostNetwork and hostPort are not allowed, pod: " + variables.anyObject.metadata.name'
+- expression: variables.isUpdate || !variables.hostNetworkViolation
+  messageExpression: '"The specified hostNetwork and hostPort are not allowed, pod: " + variables.anyObject.metadata.name'

@@ -1,0 +1,17 @@
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx-host-namespace-disallowed
+      labels:
+        app: nginx-host-namespace
+    spec:
+      hostPID: true
+      hostIPC: true
+      containers:
+      - name: nginx
+        image: nginx

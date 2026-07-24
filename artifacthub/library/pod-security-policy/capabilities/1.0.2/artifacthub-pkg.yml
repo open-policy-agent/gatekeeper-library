@@ -1,0 +1,22 @@
+version: 1.0.2
+name: k8spspcapabilities
+displayName: Capabilities
+createdAt: "2023-10-30T21:00:01Z"
+description: Controls Linux capabilities on containers. Corresponds to the `allowedCapabilities` and `requiredDropCapabilities` fields in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#capabilities
+digest: 6a8f1f152f379ac8ca91ad35c9d0da66bdabd1d9f61c62cf15310b7f1a37de1d
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/capabilities
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Capabilities
+    Controls Linux capabilities on containers. Corresponds to the `allowedCapabilities` and `requiredDropCapabilities` fields in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#capabilities
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/pod-security-policy/capabilities/1.0.2/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

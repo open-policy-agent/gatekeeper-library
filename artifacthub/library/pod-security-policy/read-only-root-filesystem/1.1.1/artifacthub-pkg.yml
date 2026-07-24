@@ -1,0 +1,22 @@
+version: 1.1.1
+name: k8spspreadonlyrootfilesystem
+displayName: Read Only Root Filesystem
+createdAt: "2024-08-29T20:26:02Z"
+description: Requires the use of a read-only root file system by pod containers. Corresponds to the `readOnlyRootFilesystem` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
+digest: 9ec2743dce71b385161873179a1d70b6f801f72b077bd178334f75f2ee1023bd
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/read-only-root-filesystem
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Read Only Root Filesystem
+    Requires the use of a read-only root file system by pod containers. Corresponds to the `readOnlyRootFilesystem` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/pod-security-policy/read-only-root-filesystem/1.1.1/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

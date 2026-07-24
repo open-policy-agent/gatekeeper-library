@@ -1,0 +1,141 @@
+variables:
+- name: containers
+  expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+- name: initContainers
+  expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+- name: ephemeralContainers
+  expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+- name: allowAllProfiles
+  expression: |
+    has(variables.params.allowedProfiles) && variables.params.allowedProfiles.exists(profile, profile == "*")
+- name: exemptImagePrefixes
+  expression: |
+    !has(variables.params.exemptImages) ? [] :
+      variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+- name: exemptImageExplicit
+  expression: |
+    !has(variables.params.exemptImages) ? [] : 
+      variables.params.exemptImages.filter(image, !image.endsWith("*"))
+- name: exemptImages
+  expression: |
+    (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+      container.image in variables.exemptImageExplicit ||
+      variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))).map(container, container.image)
+- name: unverifiedContainers
+  expression: |
+    (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+      !variables.allowAllProfiles &&
+      !(container.image in variables.exemptImages))
+- name: inputAllowedProfiles
+  expression: |
+    !has(variables.params.allowedProfiles) ? [] : variables.params.allowedProfiles
+- name: allowedLocalhostFiles
+  expression: |
+    has(variables.params.allowedLocalhostFiles) ? variables.params.allowedLocalhostFiles : []
+- name: allowedProfilesTranslation
+  expression: |
+    (variables.inputAllowedProfiles.filter(profile,
+    profile != "Localhost").map(profile, profile == "Unconfined" ? "unconfined" : profile)) + 
+    (variables.inputAllowedProfiles.exists(profile, profile == "RuntimeDefault") ? ["runtime/default", "docker/default"] : [])
+- name: allowSecurityContextLocalhost
+  expression: |
+    variables.inputAllowedProfiles.exists(profile, profile == "Localhost")
+- name: derivedAllowedLocalhostFiles
+  expression: |
+    variables.allowSecurityContextLocalhost ? variables.params.allowedLocalhostFiles.map(file, "localhost/" + file) : []
+- name: localhostWildcardAllowed
+  expression: |
+    variables.inputAllowedProfiles.exists(profile, profile == "localhost/*") || variables.derivedAllowedLocalhostFiles.exists(profile, profile == "localhost/*")
+- name: allowedProfiles
+  expression: |
+    (variables.allowedProfilesTranslation + variables.derivedAllowedLocalhostFiles)
+- name: hasPodSeccomp
+  expression: |
+    has(variables.anyObject.spec.securityContext) && has(variables.anyObject.spec.securityContext.seccompProfile)
+- name: hasPodAnnotations
+  expression: |
+    has(variables.anyObject.metadata.annotations) && ("seccomp.security.alpha.kubernetes.io/pod" in variables.anyObject.metadata.annotations)
+- name: podAnnotationsProfiles
+  expression: |
+    variables.unverifiedContainers.filter(container, 
+      !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
+      !(has(variables.anyObject.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations)) && 
+      !variables.hasPodSeccomp && 
+      variables.hasPodAnnotations 
+    ).map(container, {
+      "container" : container.name,
+      "profile" : variables.anyObject.metadata.annotations["seccomp.security.alpha.kubernetes.io/pod"],
+      "file" : dyn(""),
+      "location" : dyn("annotation seccomp.security.alpha.kubernetes.io/pod"),
+    })
+- name: containerAnnotationsProfiles
+  expression: |
+    variables.unverifiedContainers.filter(container, 
+      !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
+      !variables.hasPodSeccomp && 
+      has(variables.anyObject.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations)
+    ).map(container, {
+      "container" : container.name,
+      "profile" : variables.anyObject.metadata.annotations["container.seccomp.security.alpha.kubernetes.io/" + container.name],
+      "file" : dyn(""),
+      "location" : dyn("annotation container.seccomp.security.alpha.kubernetes.io/" + container.name),
+    })
+- name: podLocalHostProfile
+  expression: |
+    variables.hasPodSeccomp && has(variables.anyObject.spec.securityContext.seccompProfile.localhostProfile) ? variables.anyObject.spec.securityContext.seccompProfile.localhostProfile : ""
+- name: canonicalPodSecurityContextProfile
+  expression: |
+    has(variables.hasPodSeccomp) && has(variables.anyObject.spec.securityContext.seccompProfile.type) ? 
+      (variables.anyObject.spec.securityContext.seccompProfile.type == "RuntimeDefault" ? (
+        variables.allowedProfiles.exists(profile, profile == "runtime/default") ? "runtime/default" : variables.allowedProfiles.exists(profile, profile == "docker/default") ? "docker/default" : "runtime/default") : 
+      variables.anyObject.spec.securityContext.seccompProfile.type == "Unconfined" ? "unconfined" : variables.anyObject.spec.securityContext.seccompProfile.type == "Localhost" ? "localhost/" + variables.podLocalHostProfile : "")
+      : ""
+- name: podSecurityContextProfiles
+  expression: |
+    variables.unverifiedContainers.filter(container, 
+      !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
+      variables.hasPodSeccomp
+    ).map(container, {
+      "container" : container.name,
+      "profile" : dyn(variables.canonicalPodSecurityContextProfile),
+      "file" : variables.podLocalHostProfile,
+      "location" : dyn("pod securityContext"),
+    })
+- name: containerSecurityContextProfiles
+  expression: |
+    variables.unverifiedContainers.filter(container, 
+      has(container.securityContext) && has(container.securityContext.seccompProfile)
+    ).map(container, {
+      "container" : container.name,
+      "profile" : dyn(has(container.securityContext.seccompProfile.type) ? (container.securityContext.seccompProfile.type == "RuntimeDefault" ? (
+        variables.allowedProfiles.exists(profile, profile == "runtime/default") ? "runtime/default" : variables.allowedProfiles.exists(profile, profile == "docker/default") ? "docker/default" : "runtime/default") : 
+      container.securityContext.seccompProfile.type == "Unconfined" ? "unconfined" : container.securityContext.seccompProfile.type == "Localhost" ? "localhost/" + container.securityContext.seccompProfile.localhostProfile : "")
+      : ""),
+      "file" : has(container.securityContext.seccompProfile.localhostProfile) ? container.securityContext.seccompProfile.localhostProfile : dyn(""),
+      "location" : dyn("container securityContext"),
+    })
+- name: containerProfilesMissing
+  expression: |
+    variables.unverifiedContainers.filter(container, 
+      !(has(container.securityContext) && has(container.securityContext.seccompProfile)) && 
+      !(has(variables.anyObject.metadata.annotations) && (("container.seccomp.security.alpha.kubernetes.io/" + container.name) in variables.anyObject.metadata.annotations)) && 
+      !variables.hasPodSeccomp && 
+      !variables.hasPodAnnotations 
+    ).map(container, {
+      "container" : container.name,
+      "profile" : dyn("not configured"),
+      "file" : dyn(""),
+      "location" : dyn("no explicit profile found"),
+    })
+- name: allContainerProfiles
+  expression: |
+    variables.podAnnotationsProfiles + variables.containerAnnotationsProfiles + variables.podSecurityContextProfiles + variables.containerSecurityContextProfiles + variables.containerProfilesMissing
+- name: badContainerProfiles
+  expression: |
+    variables.allContainerProfiles.filter(badContainerProfile,
+        !((badContainerProfile.profile in variables.allowedProfiles) || (badContainerProfile.profile.startsWith("localhost/") && variables.localhostWildcardAllowed))
+    ).map(badProfile, "Seccomp profile '" + badProfile.profile + "' is not allowed for container '" + badProfile.container + "'. Found at: " + badProfile.location + ". Allowed profiles: " + variables.allowedProfiles.join(", "))
+validations:
+- expression: 'size(variables.badContainerProfiles) == 0'
+  messageExpression: |
+    variables.badContainerProfiles.join(", ")

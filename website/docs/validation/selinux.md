@@ -5,6 +5,8 @@ title: SELinux V2
 
 # SELinux V2
 
+**Bundles:** `pod-security-baseline` `pod-security-restricted`
+
 ## Description
 Defines an allow-list of seLinuxOptions configurations for pod containers. Corresponds to a PodSecurityPolicy requiring SELinux configs. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#selinux
 
@@ -16,7 +18,8 @@ metadata:
   name: k8spspselinuxv2
   annotations:
     metadata.gatekeeper.sh/title: "SELinux V2"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.4
+    metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Defines an allow-list of seLinuxOptions configurations for pod
       containers. Corresponds to a PodSecurityPolicy requiring SELinux configs.
@@ -71,21 +74,28 @@ spec:
       rego: |
         package k8spspselinux
 
+        import data.lib.exclude_update.is_update
         import data.lib.exempt_container.is_exempt
 
         # Disallow top level custom SELinux options
         violation[{"msg": msg, "details": {}}] {
+            # spec.securityContext.seLinuxOptions field is immutable.
+            not is_update(input.review)
+
             has_field(input.review.object.spec.securityContext, "seLinuxOptions")
             not input_seLinuxOptions_allowed(input.review.object.spec.securityContext.seLinuxOptions)
             msg := sprintf("SELinux options is not allowed, pod: %v. Allowed options: %v", [input.review.object.metadata.name, input.parameters.allowedSELinuxOptions])
         }
         # Disallow container level custom SELinux options
         violation[{"msg": msg, "details": {}}] {
+            # spec.containers.securityContext.seLinuxOptions field is immutable.
+            not is_update(input.review)
+
             c := input_security_context[_]
             not is_exempt(c)
             has_field(c.securityContext, "seLinuxOptions")
             not input_seLinuxOptions_allowed(c.securityContext.seLinuxOptions)
-            msg := sprintf("SELinux options is not allowed, pod: %v, container %v. Allowed options: %v", [input.review.object.metadata.name, c.name, input.parameters.allowedSELinuxOptions])
+            msg := sprintf("SELinux options is not allowed, pod: %v, container: %v. Allowed options: %v", [input.review.object.metadata.name, c.name, input.parameters.allowedSELinuxOptions])
         }
 
         input_seLinuxOptions_allowed(options) {
@@ -99,7 +109,7 @@ spec:
         field_allowed(field, options, params) {
             params[field] == options[field]
         }
-        field_allowed(field, options, params) {
+        field_allowed(field, options, _) {
             not has_field(options, field)
         }
 
@@ -121,6 +131,12 @@ spec:
             object[field]
         }
       libs:
+        - |
+          package lib.exclude_update
+
+          is_update(review) {
+              review.operation == "UPDATE"
+          }
         - |
           package lib.exempt_container
 
@@ -150,7 +166,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>require-matching-selinux-options</summary><blockquote>
+<summary>require-matching-selinux-options</summary>
 
 <details>
 <summary>constraint</summary>
@@ -167,10 +183,10 @@ spec:
         kinds: ["Pod"]
   parameters:
     allowedSELinuxOptions:
-      - level: s0:c123,c456
-        role: object_r
-        type: svirt_sandbox_file_t
-        user: system_u
+      - type: container_t
+      - type: container_init_t
+      - type: container_kvm_t
+      - type: container_engine_t
 
 ```
 
@@ -198,10 +214,9 @@ spec:
     image: nginx
     securityContext:
       seLinuxOptions:
-        level: s1:c234,c567
+        type: svirt_lxc_net_t
         user: sysadm_u
         role: sysadm_r
-        type: svirt_lxc_net_t
 
 ```
 
@@ -228,10 +243,7 @@ spec:
     image: nginx
     securityContext:
       seLinuxOptions:
-        level: s0:c123,c456
-        role: object_r
-        type: svirt_sandbox_file_t
-        user: system_u
+        type: container_t
 
 ```
 
@@ -258,10 +270,9 @@ spec:
     image: nginx
     securityContext:
       seLinuxOptions:
-        level: s1:c234,c567
+        type: svirt_lxc_net_t
         user: sysadm_u
         role: sysadm_r
-        type: svirt_lxc_net_t
 
 ```
 
@@ -274,4 +285,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

@@ -1,12 +1,17 @@
 package k8spspfsgroup
 
+import data.lib.exclude_update.is_update
+
 violation[{"msg": msg, "details": {}}] {
+    # spec.securityContext.fsGroup field is immutable.
+    not is_update(input.review)
+    has_field(input.parameters, "rule")
     spec := input.review.object.spec
     not input_fsGroup_allowed(spec)
     msg := sprintf("The provided pod spec fsGroup is not allowed, pod: %v. Allowed fsGroup: %v", [input.review.object.metadata.name, input.parameters])
 }
 
-input_fsGroup_allowed(spec) {
+input_fsGroup_allowed(_) {
     # RunAsAny - No range is required. Allows any fsGroup ID to be specified.
     input.parameters.rule == "RunAsAny"
 }

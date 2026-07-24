@@ -1,0 +1,22 @@
+version: 1.0.2
+name: k8sreplicalimits
+displayName: Replica Limits
+createdAt: "2023-10-30T21:00:00Z"
+description: Requires that objects with the field `spec.replicas` (Deployments, ReplicaSets, etc.) specify a number of replicas within defined ranges.
+digest: 858bf59f6c7408f2fb390a181b2f6db5e4d8fbe5eb580aa45b5601d6ae2d4064
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/replicalimits
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Replica Limits
+    Requires that objects with the field `spec.replicas` (Deployments, ReplicaSets, etc.) specify a number of replicas within defined ranges.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/replicalimits/1.0.2/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

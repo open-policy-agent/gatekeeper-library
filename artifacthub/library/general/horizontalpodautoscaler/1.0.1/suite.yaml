@@ -1,0 +1,33 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: horizontalpodautoscaler
+tests:
+- name: horizontal-pod-autoscaler
+  template: template.yaml
+  constraint: samples/horizontalpodautoscaler/constraint.yaml
+  cases:
+  - name: example-allowed-hpa
+    object: samples/horizontalpodautoscaler/example_allowed_hpa.yaml
+    inventory:
+    - samples/horizontalpodautoscaler/example_inventory.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed-hpa-replicas
+    object: samples/horizontalpodautoscaler/example_disallowed_hpa_replicas.yaml
+    inventory:
+    - samples/horizontalpodautoscaler/example_inventory.yaml
+    assertions:
+    - violations: yes
+  - name: example-disallowed-hpa-replicaspread
+    object: samples/horizontalpodautoscaler/example_disallowed_hpa_replicaspread.yaml
+    inventory:
+    - samples/horizontalpodautoscaler/example_inventory.yaml
+    assertions:
+    - violations: yes
+  - name: example-disallowed-scaletarget
+    object: samples/horizontalpodautoscaler/example_disallowed_hpa_scaletarget.yaml
+    inventory:
+    - samples/horizontalpodautoscaler/example_inventory.yaml
+    assertions:
+    - violations: yes

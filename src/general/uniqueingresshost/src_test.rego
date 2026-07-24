@@ -1,78 +1,78 @@
 package k8suniqueingresshost
 
 test_no_data {
-    input := {"review": review(ingress("my-ingress", "prod", my_rules1, "extensions/v1beta1"), "extensions")}
-    results := violation with input as input
+    inp := {"review": review(ingress("my-ingress", "prod", my_rules1, "extensions/v1beta1"), "extensions")}
+    results := violation with input as inp
     count(results) == 0
 }
 test_identical {
-    input := {"review": review(ingress("my-ingress", "prod", my_rules1, "extensions/v1beta1"), "extensions")}
+    inp := {"review": review(ingress("my-ingress", "prod", my_rules1, "extensions/v1beta1"), "extensions")}
     inv := inventory_data([ingress("my-ingress", "prod", my_rules1, "extensions/v1beta1")])
             trace(sprintf("%v", [inv]))
 
-    results := violation with input as input with data.inventory as inv
+    results := violation with input as inp with data.inventory as inv
                 trace(sprintf("%v", [results]))
 
     count(results) == 0
 }
 test_collision {
-    input := {"review": review(ingress("my-ingress", "prod", my_rules1, "extensions/v1beta1"), "extensions")}
+    inp := {"review": review(ingress("my-ingress", "prod", my_rules1, "extensions/v1beta1"), "extensions")}
     inv := inventory_data([ingress("my-ingress", "prod2", my_rules1, "extensions/v1beta1")])
-    results := violation with input as input with data.inventory as inv
+    results := violation with input as inp with data.inventory as inv
     count(results) == 1
 }
 test_collision_with_multiple {
-    input := {"review": review(ingress("my-ingress", "prod", my_rules3, "extensions/v1beta1"), "extensions")}
+    inp := {"review": review(ingress("my-ingress", "prod", my_rules3, "extensions/v1beta1"), "extensions")}
     inv := inventory_data([ingress("my-ingress", "prod2", my_rules1, "extensions/v1beta1"), ingress("my-ingress1", "prod2", my_rules2, "extensions/v1beta1")])
-    results := violation with input as input with data.inventory as inv
+    results := violation with input as inp with data.inventory as inv
     count(results) == 2
 }
 test_no_collision {
-    input := {"review": review(ingress("my-ingress", "prod", my_rules1, "extensions/v1beta1"), "extensions")}
+    inp := {"review": review(ingress("my-ingress", "prod", my_rules1, "extensions/v1beta1"), "extensions")}
     inv := inventory_data([ingress("my-ingress", "prod2", my_rules2, "extensions/v1beta1")])
-    results := violation with input as input with data.inventory as inv
+    results := violation with input as inp with data.inventory as inv
     count(results) == 0
 }
 test_no_collision_with_multiple {
-    input := {"review": review(ingress("my-ingress", "prod", my_rules4, "extensions/v1beta1"), "extensions")}
+    inp := {"review": review(ingress("my-ingress", "prod", my_rules4, "extensions/v1beta1"), "extensions")}
     inv := inventory_data([ingress("my-ingress", "prod2", my_rules1, "extensions/v1beta1"), ingress("my-ingress", "prod3", my_rules2, "extensions/v1beta1")])
-    results := violation with input as input with data.inventory as inv
+    results := violation with input as inp with data.inventory as inv
     count(results) == 0
 }
 test_no_collision_with_multiple_apis {
-    input := {"review": review(ingress("my-ingress", "prod", my_rules4, "networking.k8s.io/v1beta1"), "networking.k8s.io")}
+    inp := {"review": review(ingress("my-ingress", "prod", my_rules4, "networking.k8s.io/v1beta1"), "networking.k8s.io")}
     inv := inventory_data2([ingress("my-ingress", "prod2", my_rules1, "networking.k8s.io/v1beta1"), ingress("my-ingress", "prod3", my_rules2, "networking.k8s.io/v1beta1")])
-    results := violation with input as input with data.inventory as inv
+    results := violation with input as inp with data.inventory as inv
     count(results) == 0
 }
 test_collision_with_multiple_apis {
-    input := {"review": review(ingress("my-ingress", "prod", my_rules3, "networking.k8s.io/v1beta1"), "networking.k8s.io")}
+    inp := {"review": review(ingress("my-ingress", "prod", my_rules3, "networking.k8s.io/v1beta1"), "networking.k8s.io")}
     inv := inventory_data2([ingress("my-ingress", "prod2", my_rules1, "networking.k8s.io/v1beta1"), ingress("my-ingress", "prod3", my_rules2, "networking.k8s.io/v1beta1")])
-    results := violation with input as input with data.inventory as inv
+    results := violation with input as inp with data.inventory as inv
     count(results) == 2
 }
 test_no_collision_with_multiple_bad_review_apis {
-    input := {"review": review(ingress("my-ingress", "prod", my_rules1, "app/v1beta1"), "app")}
+    inp := {"review": review(ingress("my-ingress", "prod", my_rules1, "app/v1beta1"), "app")}
     inv := inventory_data([ingress("my-ingress", "prod2", my_rules1, "extensions/v1beta1"), ingress("my-ingress", "prod3", my_rules2, "extensions/v1beta1")])
-    results := violation with input as input with data.inventory as inv
+    results := violation with input as inp with data.inventory as inv
     count(results) == 0
 }
 test_no_collision_with_multiple_bad_review_apis2 {
-    input := {"review": review(ingress("my-ingress", "prod", my_rules1, "test.extensions/v1beta1"), "test.extensions")}
+    inp := {"review": review(ingress("my-ingress", "prod", my_rules1, "test.extensions/v1beta1"), "test.extensions")}
     inv := inventory_data([ingress("my-ingress", "prod2", my_rules1, "extensions/v1beta1"), ingress("my-ingress", "prod3", my_rules2, "extensions/v1beta1")])
-    results := violation with input as input with data.inventory as inv
+    results := violation with input as inp with data.inventory as inv
     count(results) == 0
 }
 test_collision_with_multiple_apis_mixed {
-    input := {"review": review(ingress("my-ingress", "prod", my_rules1, "networking.k8s.io/v1beta1"), "networking.k8s.io")}
+    inp := {"review": review(ingress("my-ingress", "prod", my_rules1, "networking.k8s.io/v1beta1"), "networking.k8s.io")}
     inv := inventory_data([ingress("my-ingress", "prod2", my_rules1, "extensions/v1beta1"), ingress("my-ingress", "prod3", my_rules2, "extensions/v1beta1")])
-    results := violation with input as input with data.inventory as inv
+    results := violation with input as inp with data.inventory as inv
     count(results) == 1
 }
 test_no_collision_with_multiple_apis_slash {
-    input := {"review": review(ingress("my-ingress", "prod", my_rules1, "networking.k8s.io/v1beta1"), "networking.k8s.io")}
+    inp := {"review": review(ingress("my-ingress", "prod", my_rules1, "networking.k8s.io/v1beta1"), "networking.k8s.io")}
     inv := inventory_data1([ingress("my-ingress", "prod2", my_rules1, "extensions.something.io/v1beta1"), ingress("my-ingress", "prod3", my_rules2, "extensions.something.io/v1beta1")])
-    results := violation with input as input with data.inventory as inv
+    results := violation with input as inp with data.inventory as inv
     count(results) == 0
 }
 
@@ -92,7 +92,7 @@ review(ing, group) = output {
 }
 
 my_rule(host) = {
-  "host": host, 
+  "host": host,
   "http": {
     "paths": [{"backend": {"serviceName": "nginx", "servicePort": 80}}]
   },

@@ -10,6 +10,8 @@ resources:
 - host-filesystem
 - host-namespaces
 - host-network-ports
+- host-probes-lifecycle
+- host-process
 - privileged-containers
 - proc-mount
 - read-only-root-filesystem
@@ -17,3 +19,4 @@ resources:
 - selinux
 - users
 - volumes
+- seccompv2

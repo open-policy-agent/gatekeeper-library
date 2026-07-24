@@ -1,0 +1,16 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sHorizontalPodAutoscaler
+metadata:
+  name: horizontal-pod-autoscaler
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups: ["autoscaling"]
+        kinds: ["HorizontalPodAutoscaler"]
+  parameters:
+    minimumReplicaSpread: 1
+    enforceScaleTargetRef: true
+    ranges:
+    - min_replicas: 3
+      max_replicas: 6

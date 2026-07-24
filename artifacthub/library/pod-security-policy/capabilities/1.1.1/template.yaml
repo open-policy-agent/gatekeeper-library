@@ -1,0 +1,219 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8spspcapabilities
+  annotations:
+    metadata.gatekeeper.sh/title: "Capabilities"
+    metadata.gatekeeper.sh/version: 1.1.1
+    description: >-
+      Controls Linux capabilities on containers. Corresponds to the
+      `allowedCapabilities` and `requiredDropCapabilities` fields in a
+      PodSecurityPolicy. For more information, see
+      https://kubernetes.io/docs/concepts/policy/pod-security-policy/#capabilities
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPSPCapabilities
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Controls Linux capabilities on containers. Corresponds to the
+            `allowedCapabilities` and `requiredDropCapabilities` fields in a
+            PodSecurityPolicy. For more information, see
+            https://kubernetes.io/docs/concepts/policy/pod-security-policy/#capabilities
+          properties:
+            exemptImages:
+              description: >-
+                Any container that uses an image that matches an entry in this list will be excluded
+                from enforcement. Prefix-matching can be signified with `*`. For example: `my-image-*`.
+
+                It is recommended that users use the fully-qualified Docker image name (e.g. start with a domain name)
+                in order to avoid unexpectedly exempting images from an untrusted repository.
+              type: array
+              items:
+                type: string
+            allowedCapabilities:
+              type: array
+              description: "A list of Linux capabilities that can be added to a container."
+              items:
+                type: string
+            requiredDropCapabilities:
+              type: array
+              description: "A list of Linux capabilities that are required to be dropped from a container."
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      code:
+      - engine: K8sNativeValidation
+        source:
+          variables:
+          - name: containers
+            expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+          - name: initContainers
+            expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+          - name: ephemeralContainers
+            expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+          - name: allContainers
+            expression: 'variables.containers + variables.initContainers + variables.ephemeralContainers'
+          - name: exemptImagePrefixes
+            expression: |
+              !has(variables.params.exemptImages) ? [] :
+                variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+          - name: exemptImageExplicit
+            expression: |
+              !has(variables.params.exemptImages) ? [] : 
+                variables.params.exemptImages.filter(image, !image.endsWith("*"))
+          - name: exemptImages
+            expression: |
+              (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+                container.image in variables.exemptImageExplicit ||
+                variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))
+              ).map(container, container.image)
+          - name: allowedCapabilities
+            expression: 'has(variables.params.allowedCapabilities) ? variables.params.allowedCapabilities : []'
+          - name: allCapabilitiesAllowed
+            expression: '"*" in variables.allowedCapabilities'
+          - name: disallowedCapabilitiesByContainer
+            expression: |
+              variables.allContainers.map(container, !(container.image in variables.exemptImages) &&
+                !variables.allCapabilitiesAllowed && has(container.securityContext) && has(container.securityContext.capabilities) && has(container.securityContext.capabilities.add) &&
+                  container.securityContext.capabilities.add.exists(capability, !(capability in variables.allowedCapabilities)),
+                [container.name, dyn(container.securityContext.capabilities.add.filter(capability, !(capability in variables.allowedCapabilities)).join(", "))]
+              )
+          - name: requiredDropCapabilities
+            expression: 'has(variables.params.requiredDropCapabilities) ? variables.params.requiredDropCapabilities : []'
+          - name: missingDropCapabilitiesByContainer
+            expression: |
+              variables.allContainers.map(container, !(container.image in variables.exemptImages) &&
+                size(variables.requiredDropCapabilities) > 0 && (
+                  !has(container.securityContext) || !has(container.securityContext.capabilities) || !has(container.securityContext.capabilities.drop) || (
+                    !("all" in container.securityContext.capabilities.drop) &&
+                    variables.requiredDropCapabilities.exists(capability, !(capability in container.securityContext.capabilities.drop))
+                  )
+                ),
+                [container.name, 
+                  !has(container.securityContext) ? variables.requiredDropCapabilities :
+                    !has(container.securityContext.capabilities) ? variables.requiredDropCapabilities :
+                      !has(container.securityContext.capabilities.drop) ? variables.requiredDropCapabilities : 
+                        variables.requiredDropCapabilities.filter(capability, !(capability in container.securityContext.capabilities.drop))
+                ]
+              )
+          validations:
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.disallowedCapabilitiesByContainer) == 0'
+            messageExpression: |
+              "containers have disallowed capabilities: " + variables.disallowedCapabilitiesByContainer.map(pair, "{container: " + pair[0] + ", capabilities: [" + pair[1] + "]}").join(", ")
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.missingDropCapabilitiesByContainer) == 0'
+            messageExpression: |
+              "containers are not dropping all required capabilities: " + variables.missingDropCapabilitiesByContainer.map(pair, "{container: " + pair[0] + ", capabilities: [" + pair[1].join(", ") + "]}").join(", ")
+      - engine: Rego
+        source:
+          rego: |
+            package capabilities
+
+            import data.lib.exclude_update.is_update
+            import data.lib.exempt_container.is_exempt
+
+            violation[{"msg": msg}] {
+              # spec.containers.securityContext.capabilities field is immutable.
+              not is_update(input.review)
+
+              container := input.review.object.spec.containers[_]
+              not is_exempt(container)
+              has_disallowed_capabilities(container)
+              msg := sprintf("container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
+            }
+
+            violation[{"msg": msg}] {
+              not is_update(input.review)
+              container := input.review.object.spec.containers[_]
+              not is_exempt(container)
+              missing_drop_capabilities(container)
+              msg := sprintf("container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
+            }
+
+            violation[{"msg": msg}] {
+              not is_update(input.review)
+              container := input.review.object.spec.initContainers[_]
+              not is_exempt(container)
+              has_disallowed_capabilities(container)
+              msg := sprintf("init container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
+            }
+
+            violation[{"msg": msg}] {
+              not is_update(input.review)
+              container := input.review.object.spec.initContainers[_]
+              not is_exempt(container)
+              missing_drop_capabilities(container)
+              msg := sprintf("init container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
+            }
+
+            violation[{"msg": msg}] {
+              not is_update(input.review)
+              container := input.review.object.spec.ephemeralContainers[_]
+              not is_exempt(container)
+              has_disallowed_capabilities(container)
+              msg := sprintf("ephemeral container <%v> has a disallowed capability. Allowed capabilities are %v", [container.name, get_default(input.parameters, "allowedCapabilities", "NONE")])
+            }
+
+            violation[{"msg": msg}] {
+              not is_update(input.review)
+              container := input.review.object.spec.ephemeralContainers[_]
+              not is_exempt(container)
+              missing_drop_capabilities(container)
+              msg := sprintf("ephemeral container <%v> is not dropping all required capabilities. Container must drop all of %v or \"ALL\"", [container.name, input.parameters.requiredDropCapabilities])
+            }
+
+            has_disallowed_capabilities(container) {
+              allowed := {c | c := lower(input.parameters.allowedCapabilities[_])}
+              not allowed["*"]
+              capabilities := {c | c := lower(container.securityContext.capabilities.add[_])}
+
+              count(capabilities - allowed) > 0
+            }
+
+            missing_drop_capabilities(container) {
+              must_drop := {c | c := lower(input.parameters.requiredDropCapabilities[_])}
+              all := {"all"}
+              dropped := {c | c := lower(container.securityContext.capabilities.drop[_])}
+
+              count(must_drop - dropped) > 0
+              count(all - dropped) > 0
+            }
+
+            get_default(obj, param, _) := obj[param]
+
+            get_default(obj, param, _default) := _default {
+              not obj[param]
+              not obj[param] == false
+            }
+          libs:
+          - |
+            package lib.exclude_update
+
+            is_update(review) {
+                review.operation == "UPDATE"
+            }
+          - |
+            package lib.exempt_container
+
+            is_exempt(container) {
+                exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
+                img := container.image
+                exemption := exempt_images[_]
+                _matches_exemption(img, exemption)
+            }
+
+            _matches_exemption(img, exemption) {
+                not endswith(exemption, "*")
+                exemption == img
+            }
+
+            _matches_exemption(img, exemption) {
+                endswith(exemption, "*")
+                prefix := trim_suffix(exemption, "*")
+                startswith(img, prefix)
+            }

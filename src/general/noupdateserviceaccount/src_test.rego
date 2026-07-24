@@ -15,11 +15,11 @@ pod(sa_name) = obj {
 }
 
 test_deny_pod {
-    input := {
+    inp := {
         "review": update(pod("sa1"), pod("sa2"), {}),
         "parameters": {},
     }
-    result := violation with input as input
+    result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     result == policy_violation
 }
@@ -37,11 +37,11 @@ rc(sa_name) = obj {
 }
 
 test_deny_rc {
-    input := {
+    inp := {
         "review": update(rc("sa1"), rc("sa2"), {}),
         "parameters": {},
     }
-    result := violation with input as input
+    result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     result == policy_violation
 }
@@ -59,11 +59,11 @@ rs(sa_name) = obj {
 }
 
 test_deny_rs {
-    input := {
+    inp := {
         "review": update(rs("sa1"), rs("sa2"), {}),
         "parameters": {},
     }
-    result := violation with input as input
+    result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     result == policy_violation
 }
@@ -81,11 +81,11 @@ deploy(sa_name) = obj {
 }
 
 test_deny_deploy {
-    input := {
+    inp := {
         "review": update(deploy("sa1"), deploy("sa2"), {}),
         "parameters": {},
     }
-    result := violation with input as input
+    result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     result == policy_violation
 }
@@ -103,11 +103,11 @@ ss(sa_name) = obj {
 }
 
 test_deny_ss {
-    input := {
+    inp := {
         "review": update(ss("sa1"), ss("sa2"), {}),
         "parameters": {},
     }
-    result := violation with input as input
+    result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     result == policy_violation
 }
@@ -125,11 +125,11 @@ ds(sa_name) = obj {
 }
 
 test_deny_ds {
-    input := {
+    inp := {
         "review": update(ds("sa1"), ds("sa2"), {}),
         "parameters": {},
     }
-    result := violation with input as input
+    result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     result == policy_violation
 }
@@ -147,11 +147,11 @@ job(sa_name) = obj {
 }
 
 test_deny_job {
-    input := {
+    inp := {
         "review": update(job("sa1"), job("sa2"), {}),
         "parameters": {},
     }
-    result := violation with input as input
+    result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     result == policy_violation
 }
@@ -173,11 +173,11 @@ cronjob(sa_name) = obj {
 }
 
 test_deny_cronjob {
-    input := {
+    inp := {
         "review": update(cronjob("sa1"), cronjob("sa2"), {}),
         "parameters": {},
     }
-    result := violation with input as input
+    result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     result == policy_violation
 }
@@ -196,74 +196,74 @@ test_allow_unrelated {
             }
         }
     }
-    input := {
+    inp := {
         "review": update(a, b, {}),
         "parameters": {},
     }
-    result := violation with input as input
+    result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     count(result) == 0
 }
 
 # Allow create and delete
 test_allow_create {
-    input := {
+    inp := {
         "review": create(deploy("sa1")),
         "parameters": {},
     }
-    result := violation with input as input
+    result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     count(result) == 0
 }
 
 test_allow_delete {
-    input := {
+    inp := {
         "review": delete(deploy("sa1")),
         "parameters": {},
     }
-    result := violation with input as input
+    result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     count(result) == 0
 }
 
 # Allowlist users and groups
 test_allow_users {
-    input := {
+    inp := {
         "review": update(deploy("sa1"), deploy("sa2"), {"username": "myuser"}),
         "parameters": allow(["myuser"], []),
     }
-    result := violation with input as input
+    result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     count(result) == 0
 }
 
 test_allow_groups {
-    input := {
+    inp := {
         "review": update(deploy("sa1"), deploy("sa2"), {"groups": ["mygroup"]}),
         "parameters": allow([], ["mygroup"]),
     }
-    result := violation with input as input
+    result := violation with input as inp
     trace(sprintf("result: %v", [result]))
     count(result) == 0
 }
 
 # Malformed
 test_deny_missing_old {
-    input := {
+    inp := {
         "review": update({}, pod("sa"), {}),
         "parameters": {},
     }
-    result := violation with input as input
+    result := violation with input as inp
     trace(sprintf("%v", [result]))
     result == missing_old_violation
 }
 
 test_deny_missing_new {
-    input := {
+    inp := {
         "review": update(pod("sa"), {}, {}),
         "parameters": {},
     }
-    result := violation with input as input
+    result := violation with input as inp
     trace(sprintf("%v", [result]))
     result == missing_new_violation
 }

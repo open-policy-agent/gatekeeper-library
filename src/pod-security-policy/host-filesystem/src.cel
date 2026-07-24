@@ -1,0 +1,28 @@
+variables:
+- name: containers
+  expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+- name: initContainers
+  expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+- name: ephemeralContainers
+  expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+- name: allContainers
+  expression: 'variables.containers + variables.initContainers + variables.ephemeralContainers'
+- name: allowedPaths
+  expression: |
+    !has(variables.params.allowedHostPaths) ? [] : variables.params.allowedHostPaths
+- name: volumes
+  expression: |
+    !has(variables.anyObject.spec.volumes) ? [] : variables.anyObject.spec.volumes.filter(volume, has(volume.hostPath))
+- name: badHostPaths
+  expression: |
+    variables.volumes.filter(volume, 
+      (size(variables.allowedPaths) == 0) ||
+      !(variables.allowedPaths.exists(allowedPath, 
+          volume.hostPath.path.startsWith(allowedPath.pathPrefix) && (
+          (!has(allowedPath.readOnly) || !(allowedPath.readOnly)) ||
+            (has(allowedPath.readOnly) && allowedPath.readOnly && !variables.allContainers.exists(c, 
+            c.volumeMounts.exists(m, m.name == volume.name && (!has(m.readOnly) || !m.readOnly)))))))
+    ).map(volume, "{ hostPath: { path : " + volume.hostPath.path + " }, name: " + volume.name + "}").map(volume, "HostPath volume " + volume + " is not allowed, pod: " + object.metadata.name + ". Allowed path: " + variables.allowedPaths.map(path,  path.pathPrefix + ", readOnly: " + (path.readOnly ? "true" : "false") + "}").join(", "))
+validations:
+- expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badHostPaths) == 0'
+  messageExpression: 'variables.badHostPaths.join("\n")'

@@ -16,8 +16,8 @@ metadata:
   name: k8shorizontalpodautoscaler
   annotations:
     metadata.gatekeeper.sh/title: "Horizontal Pod Autoscaler"
-    metadata.gatekeeper.sh/version: 1.0.0
-    metadata.gatekeeper.sh/requiresSyncData: |
+    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/requires-sync-data: |
       "[
         [
           {
@@ -121,7 +121,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>horizontal-pod-autoscaler</summary><blockquote>
+<summary>horizontal-pod-autoscaler</summary>
 
 <details>
 <summary>constraint</summary>
@@ -288,4 +288,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

@@ -1,0 +1,22 @@
+version: 1.1.2
+name: k8sstorageclass
+displayName: Storage Class
+createdAt: "2023-11-06T20:56:52Z"
+description: Requires storage classes to be specified when used. Only Gatekeeper 3.9+ is supported.
+digest: 549bc0b8e3aea2c4410798d4f5357a3dbd2bd4225b580104b44fd4659b840b4d
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/storageclass
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Storage Class
+    Requires storage classes to be specified when used. Only Gatekeeper 3.9+ is supported.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/storageclass/1.1.2/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

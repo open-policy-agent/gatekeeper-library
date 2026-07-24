@@ -8,42 +8,42 @@ match_labels := {"matchLabels": {
 }}
 
 test_input_pdb_0_max_unavailable {
-  input := {"review": input_pdb_max_unavailable(0)}
-  results := violation with input as input
+  inp := {"review": input_pdb_max_unavailable(0)}
+  results := violation with input as inp
   count(results) == 1
 }
 
 test_input_pdb_1_max_unavailable {
-  input := {"review": input_pdb_max_unavailable(1)}
-  results := violation with input as input
+  inp := {"review": input_pdb_max_unavailable(1)}
+  results := violation with input as inp
   count(results) == 0
 }
 
 test_input_deployment_1_replica_pdb_1_min_available {
-  input := {"review": input_deployment(1)}
+  inp := {"review": input_deployment(1)}
   inv := inv_pdb_min_available(1)
-  results := violation with input as input with data.inventory as inv
+  results := violation with input as inp with data.inventory as inv
   count(results) == 1
 }
 
 test_input_deployment_2_replicas_pdb_1_min_available {
-  input := {"review": input_deployment(2)}
+  inp := {"review": input_deployment(2)}
   inv := inv_pdb_min_available(1)
-  results := violation with input as input with data.inventory as inv
+  results := violation with input as inp with data.inventory as inv
   count(results) == 0
 }
 
 test_input_deployment_pdb_0_max_unavailable {
-  input := {"review": input_deployment(2)}
+  inp := {"review": input_deployment(2)}
   inv := inv_pdb_max_unavailable(0)
-  results := violation with input as input with data.inventory as inv
+  results := violation with input as inp with data.inventory as inv
   count(results) == 1
 }
 
 test_input_deployment_pdb_1_max_unavailable {
-  input := {"review": input_deployment(2)}
+  inp := {"review": input_deployment(2)}
   inv := inv_pdb_max_unavailable(1)
-  results := violation with input as input with data.inventory as inv
+  results := violation with input as inp with data.inventory as inv
   count(results) == 0
 }
 

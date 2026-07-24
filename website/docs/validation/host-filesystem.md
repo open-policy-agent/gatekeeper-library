@@ -5,6 +5,8 @@ title: Host Filesystem
 
 # Host Filesystem
 
+**Bundles:** `pod-security-baseline` `pod-security-restricted`
+
 ## Description
 Controls usage of the host filesystem. Corresponds to the `allowedHostPaths` field in a PodSecurityPolicy. For more information, see https://kubernetes.io/docs/concepts/policy/pod-security-policy/#volumes-and-file-systems
 
@@ -16,7 +18,8 @@ metadata:
   name: k8spsphostfilesystem
   annotations:
     metadata.gatekeeper.sh/title: "Host Filesystem"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.1.2
+    metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Controls usage of the host filesystem. Corresponds to the
       `allowedHostPaths` field in a PodSecurityPolicy. For more information,
@@ -51,101 +54,146 @@ spec:
                     description: "when set to true, any container volumeMounts matching the pathPrefix must include `readOnly: true`."
   targets:
     - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8spsphostfilesystem
+      code:
+      - engine: K8sNativeValidation
+        source: 
+          variables:
+          - name: containers
+            expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+          - name: initContainers
+            expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+          - name: ephemeralContainers
+            expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+          - name: allContainers
+            expression: 'variables.containers + variables.initContainers + variables.ephemeralContainers'
+          - name: allowedPaths
+            expression: |
+              !has(variables.params.allowedHostPaths) ? [] : variables.params.allowedHostPaths
+          - name: volumes
+            expression: |
+              !has(variables.anyObject.spec.volumes) ? [] : variables.anyObject.spec.volumes.filter(volume, has(volume.hostPath))
+          - name: badHostPaths
+            expression: |
+              variables.volumes.filter(volume, 
+                (size(variables.allowedPaths) == 0) ||
+                !(variables.allowedPaths.exists(allowedPath, 
+                    volume.hostPath.path.startsWith(allowedPath.pathPrefix) && (
+                    (!has(allowedPath.readOnly) || !(allowedPath.readOnly)) ||
+                      (has(allowedPath.readOnly) && allowedPath.readOnly && !variables.allContainers.exists(c, 
+                      c.volumeMounts.exists(m, m.name == volume.name && (!has(m.readOnly) || !m.readOnly)))))))
+              ).map(volume, "{ hostPath: { path : " + volume.hostPath.path + " }, name: " + volume.name + "}").map(volume, "HostPath volume " + volume + " is not allowed, pod: " + object.metadata.name + ". Allowed path: " + variables.allowedPaths.map(path,  path.pathPrefix + ", readOnly: " + (path.readOnly ? "true" : "false") + "}").join(", "))
+          validations:
+          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badHostPaths) == 0'
+            messageExpression: 'variables.badHostPaths.join("\n")'
+      - engine: Rego
+        source:
+          rego: |
+            package k8spsphostfilesystem
 
-        violation[{"msg": msg, "details": {}}] {
-            volume := input_hostpath_volumes[_]
-            allowedPaths := get_allowed_paths(input)
-            input_hostpath_violation(allowedPaths, volume)
-            msg := sprintf("HostPath volume %v is not allowed, pod: %v. Allowed path: %v", [volume, input.review.object.metadata.name, allowedPaths])
-        }
+            import data.lib.exclude_update.is_update
 
-        input_hostpath_violation(allowedPaths, volume) {
-            # An empty list means all host paths are blocked
-            allowedPaths == []
-        }
-        input_hostpath_violation(allowedPaths, volume) {
-            not input_hostpath_allowed(allowedPaths, volume)
-        }
+            violation[{"msg": msg, "details": {}}] {
+                # spec.volumes field is immutable.
+                not is_update(input.review)
 
-        get_allowed_paths(arg) = out {
-            not arg.parameters
-            out = []
-        }
-        get_allowed_paths(arg) = out {
-            not arg.parameters.allowedHostPaths
-            out = []
-        }
-        get_allowed_paths(arg) = out {
-            out = arg.parameters.allowedHostPaths
-        }
+                volume := input_hostpath_volumes[_]
+                allowedPaths := get_allowed_paths(input)
+                input_hostpath_violation(allowedPaths, volume)
+                msg := sprintf("HostPath volume %v is not allowed, pod: %v. Allowed path: %v", [volume, input.review.object.metadata.name, allowedPaths])
+            }
 
-        input_hostpath_allowed(allowedPaths, volume) {
-            allowedHostPath := allowedPaths[_]
-            path_matches(allowedHostPath.pathPrefix, volume.hostPath.path)
-            not allowedHostPath.readOnly == true
-        }
+            input_hostpath_violation(allowedPaths, _) {
+                # An empty list means all host paths are blocked
+                allowedPaths == []
+            }
+            input_hostpath_violation(allowedPaths, volume) {
+                not input_hostpath_allowed(allowedPaths, volume)
+            }
 
-        input_hostpath_allowed(allowedPaths, volume) {
-            allowedHostPath := allowedPaths[_]
-            path_matches(allowedHostPath.pathPrefix, volume.hostPath.path)
-            allowedHostPath.readOnly
-            not writeable_input_volume_mounts(volume.name)
-        }
+            get_allowed_paths(arg) = out {
+                not arg.parameters
+                out = []
+            }
+            get_allowed_paths(arg) = out {
+                not arg.parameters.allowedHostPaths
+                out = []
+            }
+            get_allowed_paths(arg) = out {
+                out = arg.parameters.allowedHostPaths
+            }
 
-        writeable_input_volume_mounts(volume_name) {
-            container := input_containers[_]
-            mount := container.volumeMounts[_]
-            mount.name == volume_name
-            not mount.readOnly
-        }
+            input_hostpath_allowed(allowedPaths, volume) {
+                allowedHostPath := allowedPaths[_]
+                path_matches(allowedHostPath.pathPrefix, volume.hostPath.path)
+                not allowedHostPath.readOnly == true
+            }
 
-        # This allows "/foo", "/foo/", "/foo/bar" etc., but
-        # disallows "/fool", "/etc/foo" etc.
-        path_matches(prefix, path) {
-            a := path_array(prefix)
-            b := path_array(path)
-            prefix_matches(a, b)
-        }
-        path_array(p) = out {
-            p != "/"
-            out := split(trim(p, "/"), "/")
-        }
-        # This handles the special case for "/", since
-        # split(trim("/", "/"), "/") == [""]
-        path_array("/") = []
+            input_hostpath_allowed(allowedPaths, volume) {
+                allowedHostPath := allowedPaths[_]
+                path_matches(allowedHostPath.pathPrefix, volume.hostPath.path)
+                allowedHostPath.readOnly
+                not writeable_input_volume_mounts(volume.name)
+            }
 
-        prefix_matches(a, b) {
-            count(a) <= count(b)
-            not any_not_equal_upto(a, b, count(a))
-        }
+            writeable_input_volume_mounts(volume_name) {
+                container := input_containers[_]
+                mount := container.volumeMounts[_]
+                mount.name == volume_name
+                not mount.readOnly
+            }
 
-        any_not_equal_upto(a, b, n) {
-            a[i] != b[i]
-            i < n
-        }
+            # This allows "/foo", "/foo/", "/foo/bar" etc., but
+            # disallows "/fool", "/etc/foo" etc.
+            path_matches(prefix, path) {
+                a := path_array(prefix)
+                b := path_array(path)
+                prefix_matches(a, b)
+            }
+            path_array(p) = out {
+                p != "/"
+                out := split(trim(p, "/"), "/")
+            }
+            # This handles the special case for "/", since
+            # split(trim("/", "/"), "/") == [""]
+            path_array("/") = []
 
-        input_hostpath_volumes[v] {
-            v := input.review.object.spec.volumes[_]
-            has_field(v, "hostPath")
-        }
+            prefix_matches(a, b) {
+                count(a) <= count(b)
+                not any_not_equal_upto(a, b, count(a))
+            }
 
-        # has_field returns whether an object has a field
-        has_field(object, field) = true {
-            object[field]
-        }
-        input_containers[c] {
-            c := input.review.object.spec.containers[_]
-        }
+            any_not_equal_upto(a, b, n) {
+                a[i] != b[i]
+                i < n
+            }
 
-        input_containers[c] {
-            c := input.review.object.spec.initContainers[_]
-        }
+            input_hostpath_volumes[v] {
+                v := input.review.object.spec.volumes[_]
+                has_field(v, "hostPath")
+            }
 
-        input_containers[c] {
-            c := input.review.object.spec.ephemeralContainers[_]
-        }
+            # has_field returns whether an object has a field
+            has_field(object, field) = true {
+                object[field]
+            }
+            input_containers[c] {
+                c := input.review.object.spec.containers[_]
+            }
+
+            input_containers[c] {
+                c := input.review.object.spec.initContainers[_]
+            }
+
+            input_containers[c] {
+                c := input.review.object.spec.ephemeralContainers[_]
+            }
+          libs:
+            - |
+              package lib.exclude_update
+
+              is_update(review) {
+                  review.operation == "UPDATE"
+              }
 
 ```
 
@@ -155,7 +203,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>host-filesystem</summary><blockquote>
+<summary>host-filesystem</summary>
 
 <details>
 <summary>constraint</summary>
@@ -193,8 +241,6 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: nginx-host-filesystem
-  labels:
-    app: nginx-host-filesystem-disallowed
 spec:
   containers:
   - name: nginx
@@ -225,8 +271,6 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: nginx-host-filesystem
-  labels:
-    app: nginx-host-filesystem-disallowed
 spec:
   containers:
     - name: nginx
@@ -257,8 +301,6 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: nginx-host-filesystem
-  labels:
-    app: nginx-host-filesystem-disallowed
 spec:
   ephemeralContainers:
   - name: nginx
@@ -283,4 +325,85 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details><details>
+<summary>no-host-paths</summary>
+
+<details>
+<summary>constraint</summary>
+
+```yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPHostFilesystem
+metadata:
+  name: no-host-paths
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-filesystem/samples/no-host-paths/constraint.yaml
+```
+
+</details>
+
+<details>
+<summary>previously-allowed-path-disallowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-host-filesystem
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+      volumeMounts:
+        - mountPath: /cache
+          name: cache-volume
+          readOnly: true
+  volumes:
+    - name: cache-volume
+      hostPath:
+        path: /foo/bar
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-filesystem/samples/psp-host-filesystem/example_allowed.yaml
+```
+
+</details>
+<details>
+<summary>no-volumes-is-allowed</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-no-volumes
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-filesystem/samples/no-host-paths/example_allowed_no_volumes.yaml
+```
+
+</details>
+
+
+</details>

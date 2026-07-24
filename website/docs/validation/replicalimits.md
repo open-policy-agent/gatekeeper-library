@@ -16,7 +16,7 @@ metadata:
   name: k8sreplicalimits
   annotations:
     metadata.gatekeeper.sh/title: "Replica Limits"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.0.2
     description: >-
       Requires that objects with the field `spec.replicas` (Deployments,
       ReplicaSets, etc.) specify a number of replicas within defined ranges.
@@ -58,7 +58,7 @@ spec:
         }
 
         input_replica_limit(spec) {
-            provided := input.review.object.spec.replicas
+            provided := spec.replicas
             count(input.parameters.ranges) > 0
             range := input.parameters.ranges[_]
             value_within_range(range, provided)
@@ -77,7 +77,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>replica-limit</summary><blockquote>
+<summary>replica-limit</summary>
 
 <details>
 <summary>constraint</summary>
@@ -175,4 +175,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

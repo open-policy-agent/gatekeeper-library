@@ -1,0 +1,25 @@
+version: 1.0.1
+name: k8scontainerrequests
+displayName: Container Requests
+createdAt: "2023-10-30T20:59:58Z"
+description: |-
+    Requires containers to have memory and CPU requests set and constrains requests to be within the specified maximum values.
+    https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+digest: f8cb14a41eb63e15bd55178cdd4b3c7c4f7e9ec1aebd296ff36f51b201113254
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/containerrequests
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Container Requests
+    Requires containers to have memory and CPU requests set and constrains requests to be within the specified maximum values.
+    https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/containerrequests/1.0.1/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

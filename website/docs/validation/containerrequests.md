@@ -17,7 +17,7 @@ metadata:
   name: k8scontainerrequests
   annotations:
     metadata.gatekeeper.sh/title: "Container Requests"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.1
     description: >-
       Requires containers to have memory and CPU requests set and constrains
       requests to be within the specified maximum values.
@@ -78,7 +78,7 @@ spec:
         canonify_cpu(orig) = new {
           not is_number(orig)
           not endswith(orig, "m")
-          re_match("^[0-9]+(\\.[0-9]+)?$", orig)
+          regex.match("^[0-9]+(\\.[0-9]+)?$", orig)
           new := to_number(orig) * 1000
         }
 
@@ -175,7 +175,7 @@ spec:
           not is_number(orig)
           suffix := get_suffix(orig)
           raw := replace(orig, suffix, "")
-          re_match("^[0-9]+(\\.[0-9]+)?$", raw)
+          regex.match("^[0-9]+(\\.[0-9]+)?$", raw)
           new := to_number(raw) * mem_multiple(suffix)
         }
 
@@ -284,7 +284,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>container-requests</summary><blockquote>
+<summary>container-requests</summary>
 
 <details>
 <summary>constraint</summary>
@@ -379,4 +379,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>

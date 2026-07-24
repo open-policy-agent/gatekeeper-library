@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-seccomp-disallowed2
+  annotations:
+    seccomp.security.alpha.kubernetes.io/pod: unconfined
+  labels:
+    app: nginx-seccomp
+spec:
+  containers:
+  - name: nginx
+    image: nginx

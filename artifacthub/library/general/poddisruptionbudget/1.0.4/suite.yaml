@@ -1,0 +1,47 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: poddisruptionbudget
+tests:
+- name: pod-disruption-budget
+  template: template.yaml
+  constraint: samples/poddisruptionbudget/constraint.yaml
+  cases:
+  - name: example-allowed-pdb
+    object: samples/poddisruptionbudget/example_allowed_pdb.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed-pdb
+    object: samples/poddisruptionbudget/example_disallowed_pdb.yaml
+    assertions:
+    - violations: yes
+  - name: example-allowed-min-available
+    object: samples/poddisruptionbudget/example_allowed_deployment1.yaml
+    inventory:
+    - samples/poddisruptionbudget/example_inventory_allowed1.yaml
+    assertions:
+    - violations: no
+  - name: example-allowed-max-unavailable
+    object: samples/poddisruptionbudget/example_allowed_deployment2.yaml
+    inventory:
+    - samples/poddisruptionbudget/example_inventory_allowed2.yaml
+    assertions:
+    - violations: no
+  - name: example-allowed-subset-selector
+    object: samples/poddisruptionbudget/example_allowed_deployment3.yaml
+    inventory:
+    - samples/poddisruptionbudget/example_inventory_allowed3.yaml
+    assertions:
+    - violations: no
+  - name: example-allowed-nomatch-selector
+    object: samples/poddisruptionbudget/example_allowed_deployment4.yaml
+    inventory:
+    - samples/poddisruptionbudget/example_inventory_allowed4.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed-min-available
+    object: samples/poddisruptionbudget/example_disallowed_deployment.yaml
+    inventory:
+    - samples/poddisruptionbudget/example_inventory_disallowed.yaml
+    assertions:
+    - violations: yes

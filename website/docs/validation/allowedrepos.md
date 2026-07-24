@@ -6,7 +6,7 @@ title: Allowed Repositories
 # Allowed Repositories
 
 ## Description
-Requires container images to begin with a string from the specified list.
+Requires container images to begin with a string from the specified list. To prevent bypasses, ensure a '/' is added when specifying DockerHub repositories or custom registries. If exact matches or glob-like syntax are preferred, use the k8sallowedreposv2 policy.
 
 ## Template
 ```yaml
@@ -16,9 +16,11 @@ metadata:
   name: k8sallowedrepos
   annotations:
     metadata.gatekeeper.sh/title: "Allowed Repositories"
-    metadata.gatekeeper.sh/version: 1.0.0
+    metadata.gatekeeper.sh/version: 1.0.2
     description: >-
       Requires container images to begin with a string from the specified list.
+      To prevent bypasses, ensure a '/' is added when specifying DockerHub repositories or custom registries.
+      If exact matches or glob-like syntax are preferred, use the k8sallowedreposv2 policy.
 spec:
   crd:
     spec:
@@ -41,22 +43,19 @@ spec:
 
         violation[{"msg": msg}] {
           container := input.review.object.spec.containers[_]
-          satisfied := [good | repo = input.parameters.repos[_] ; good = startswith(container.image, repo)]
-          not any(satisfied)
+          not strings.any_prefix_match(container.image, input.parameters.repos)
           msg := sprintf("container <%v> has an invalid image repo <%v>, allowed repos are %v", [container.name, container.image, input.parameters.repos])
         }
 
         violation[{"msg": msg}] {
           container := input.review.object.spec.initContainers[_]
-          satisfied := [good | repo = input.parameters.repos[_] ; good = startswith(container.image, repo)]
-          not any(satisfied)
+          not strings.any_prefix_match(container.image, input.parameters.repos)
           msg := sprintf("initContainer <%v> has an invalid image repo <%v>, allowed repos are %v", [container.name, container.image, input.parameters.repos])
         }
 
         violation[{"msg": msg}] {
           container := input.review.object.spec.ephemeralContainers[_]
-          satisfied := [good | repo = input.parameters.repos[_] ; good = startswith(container.image, repo)]
-          not any(satisfied)
+          not strings.any_prefix_match(container.image, input.parameters.repos)
           msg := sprintf("ephemeralContainer <%v> has an invalid image repo <%v>, allowed repos are %v", [container.name, container.image, input.parameters.repos])
         }
 
@@ -68,7 +67,7 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 ```
 ## Examples
 <details>
-<summary>allowed-repos</summary><blockquote>
+<summary>allowed-repos</summary>
 
 <details>
 <summary>constraint</summary>
@@ -267,4 +266,4 @@ kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-
 </details>
 
 
-</blockquote></details>
+</details>
