@@ -178,6 +178,7 @@ spec:
 
         get_user_violation(params, container) = msg {
           params.rule = "MustRunAsNonRoot"
+          not host_users_false
           not get_field_value("runAsUser", container, input.review)
           not get_field_value("runAsNonRoot", container, input.review)
           msg := sprintf("Container %v is attempting to run without a required securityContext/runAsNonRoot or securityContext/runAsUser != 0", [container.name])
@@ -185,11 +186,23 @@ spec:
 
         accept_users("RunAsAny", _)
 
-        accept_users("MustRunAsNonRoot", provided_user) := provided_user != 0
+        accept_users("MustRunAsNonRoot", provided_user) {
+          provided_user != 0
+        }
+        accept_users("MustRunAsNonRoot", 0) {
+          host_users_false
+        }
 
-        accept_users("MustRunAs", provided_user) := res  {
+        accept_users("MustRunAs", provided_user) {
           ranges := input.parameters.runAsUser.ranges
-          res := is_in_range(provided_user, ranges)
+          is_in_range(provided_user, ranges)
+        }
+        accept_users("MustRunAs", 0) {
+          host_users_false
+        }
+
+        host_users_false {
+          input.review.object.spec.hostUsers == false
         }
 
         # Group Options
