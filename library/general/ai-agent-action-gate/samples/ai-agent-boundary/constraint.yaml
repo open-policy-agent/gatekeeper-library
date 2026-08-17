@@ -1,0 +1,13 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sAIAgentActionGate
+metadata:
+  name: ai-agent-action-boundary
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    requiredEnvVars:
+      - "AAG_PROVE_TOKEN"
+    disallowPrivileged: true
