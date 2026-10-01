@@ -16,7 +16,7 @@ metadata:
   name: k8spspautomountserviceaccounttokenpod
   annotations:
     metadata.gatekeeper.sh/title: "Automount Service Account Token for Pod"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.0.2
     description: >-
       Controls the ability of any Pod to enable automountServiceAccountToken.
 spec:
@@ -64,7 +64,11 @@ spec:
             c := input.review.object.spec.initContainers[_]
         }
 
-        # Ephemeral containers not checked as it is not possible to set field.
+        input_containers[c] {
+            # EphemeralContainerCommon includes volumeMounts; an explicit SA token
+            # mount on an ephemeral container must be caught when automount is unset.
+            c := input.review.object.spec.ephemeralContainers[_]
+        }
 
         has_key(x, k) {
             _ = x[k]
@@ -76,7 +80,6 @@ spec:
           is_update(review) {
               review.operation == "UPDATE"
           }
-
 ```
 
 ### Usage

@@ -58,3 +58,31 @@ input_containers_volumemount = [{
         "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
     }],
 }]
+
+test_input_ephemeral_container_sa_volumemount_not_allowed {
+    inp := {"review": input_review_ephemeral_sa_volumemount}
+    results := violation with input as inp
+    count(results) > 0
+}
+
+test_input_init_container_sa_volumemount_not_allowed {
+    inp := {"review": input_review_init_sa_volumemount}
+    results := violation with input as inp
+    count(results) > 0
+}
+
+input_review_ephemeral_sa_volumemount = {"object": {
+    "metadata": {"name": "nginx"},
+    "spec": {
+        "containers": input_containers_one,
+        "ephemeralContainers": input_containers_volumemount,
+    },
+}}
+
+input_review_init_sa_volumemount = {"object": {
+    "metadata": {"name": "nginx"},
+    "spec": {
+        "containers": input_containers_one,
+        "initContainers": input_containers_volumemount,
+    },
+}}
