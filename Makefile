@@ -8,6 +8,8 @@ BATS_VERSION ?= 1.12.0
 GATOR_VERSION ?= 3.21.0
 GOMPLATE_VERSION ?= 3.11.6
 POLICY_ENGINE ?= rego
+ENABLE_VAP ?= false
+POLICY_FILTER ?=
 
 REPO_ROOT := $(shell git rev-parse --show-toplevel)
 WEBSITE_SCRIPT_DIR := $(REPO_ROOT)/scripts/website
@@ -33,7 +35,9 @@ integration-bootstrap:
 
 deploy:
 	helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts
-ifeq ($(POLICY_ENGINE), rego)
+ifeq ($(ENABLE_VAP), true)
+	helm install -n gatekeeper-system gatekeeper gatekeeper/gatekeeper --create-namespace --version $(GATEKEEPER_VERSION) --set enableK8sNativeValidation=true --set defaultCreateVAPForTemplates=true --set defaultCreateVAPBindingForConstraints=true
+else ifeq ($(POLICY_ENGINE), rego)
 	helm install -n gatekeeper-system gatekeeper gatekeeper/gatekeeper --create-namespace --version $(GATEKEEPER_VERSION) --set enableK8sNativeValidation=false
 else ifeq ($(POLICY_ENGINE), cel)
 ifneq ($(GATEKEEPER_VERSION), 3.15.1)
@@ -45,7 +49,7 @@ uninstall:
 	helm uninstall -n gatekeeper-system gatekeeper
 
 test-integration:
-	bats -t test/bats/test.bats
+	ENABLE_VAP=$(ENABLE_VAP) POLICY_FILTER=$(POLICY_FILTER) bats -t test/bats/test.bats
 
 .PHONY: verify-gator
 verify-gator:
