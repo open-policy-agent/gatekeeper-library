@@ -6,6 +6,8 @@ spec:
   containers:
     - name: image
       image: ubuntu:20.14
+      securityContext:
+        allowPrivilegeEscalation: false
       resources:
         limits:
           cpu: "100m"

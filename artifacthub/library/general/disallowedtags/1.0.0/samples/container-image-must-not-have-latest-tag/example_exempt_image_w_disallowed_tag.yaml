@@ -10,15 +10,21 @@ spec:
         - "run"
         - "--server"
         - "--addr=localhost:8080"
+      securityContext:
+        allowPrivilegeEscalation: false
     - name: opa-init
       image: openpolicyagent/init:v1
       args:
         - "run"
         - "--server"
         - "--addr=localhost:8080"
+      securityContext:
+        allowPrivilegeEscalation: false
     - name: opa-exp2
       image: openpolicyagent/opa-exp2:latest
       args:
         - "run"
         - "--server"
         - "--addr=localhost:8080"
+      securityContext:
+        allowPrivilegeEscalation: false

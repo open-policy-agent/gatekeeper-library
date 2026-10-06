@@ -55,8 +55,8 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       algolia: {
-        appId: '50R2XL9XTU',
-        apiKey: 'c6cf0797aa351ac2c8640899d40c8821',
+        appId: process.env.ALGOLIA_APP_ID || '50R2XL9XTU',
+        apiKey: process.env.ALGOLIA_API_KEY,
         indexName: 'gatekeeper-library-web',
       },
       colorMode: {

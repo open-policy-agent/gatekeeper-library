@@ -14,3 +14,5 @@ spec:
         limits:
           cpu: "100m"
           memory: "30Mi"
+      securityContext:
+        allowPrivilegeEscalation: false

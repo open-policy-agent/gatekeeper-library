@@ -10,6 +10,8 @@ spec:
         - "run"
         - "--server"
         - "--addr=localhost:8080"
+      securityContext:
+        allowPrivilegeEscalation: false
       resources:
         limits:
           cpu: "100m"

@@ -6,6 +6,8 @@ spec:
   containers:
     - name: opa
       image: openpolicyagent/opa
+      securityContext:
+        allowPrivilegeEscalation: false
       args:
         - "run"
         - "--server"

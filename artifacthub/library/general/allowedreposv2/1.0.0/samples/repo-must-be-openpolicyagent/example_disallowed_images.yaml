@@ -10,21 +10,29 @@ spec:
         limits:
           cpu: "100m"
           memory: "30Mi"
+      securityContext:
+        allowPrivilegeEscalation: false
     - name: image-2-basic-image-allow
       image: ubuntu:20.14
       resources:
         limits:
           cpu: "200m"
           memory: "50Mi"
+      securityContext:
+        allowPrivilegeEscalation: false
     - name: image-3-malicious-image-with-registry-disallow
       image: 123456789123.dkr.ecr.eu-west-1.amazonaws.com/postgresmalicious
       resources:
         limits:
           cpu: "50m"
           memory: "10Mi"
+      securityContext:
+        allowPrivilegeEscalation: false
     - name: image-4-image-with-registry-allow
       image: 123456789123.dkr.ecr.eu-west-1.amazonaws.com/postgres
       resources:
         limits:
           cpu: "50m"
           memory: "10Mi"
+      securityContext:
+        allowPrivilegeEscalation: false

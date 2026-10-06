@@ -6,4 +6,6 @@ spec:
   containers:
     - name: kustomize
       image: k8s.gcr.io/kustomize/kustomize:v3.8.9
+      securityContext:
+        allowPrivilegeEscalation: false
 

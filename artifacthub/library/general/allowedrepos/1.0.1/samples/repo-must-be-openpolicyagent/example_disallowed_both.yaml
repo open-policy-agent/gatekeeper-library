@@ -6,6 +6,8 @@ spec:
   initContainers:
   - name: nginxinit
     image: nginx
+    securityContext:
+      allowPrivilegeEscalation: false
     resources:
       limits:
         cpu: "100m"
@@ -13,6 +15,8 @@ spec:
   containers:
     - name: nginx
       image: nginx
+      securityContext:
+        allowPrivilegeEscalation: false
       resources:
         limits:
           cpu: "100m"

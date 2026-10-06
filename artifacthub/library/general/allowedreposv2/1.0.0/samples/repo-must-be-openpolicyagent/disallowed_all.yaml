@@ -10,6 +10,8 @@ spec:
       limits:
         cpu: "100m"
         memory: "30Mi"
+    securityContext:
+      allowPrivilegeEscalation: false
   containers:
     - name: nginx
       image: nginx
@@ -17,6 +19,8 @@ spec:
         limits:
           cpu: "100m"
           memory: "30Mi"
+      securityContext:
+        allowPrivilegeEscalation: false
   ephemeralContainers:
     - name: nginx
       image: nginx
@@ -24,3 +28,5 @@ spec:
         limits:
           cpu: "100m"
           memory: "30Mi"
+      securityContext:
+        allowPrivilegeEscalation: false

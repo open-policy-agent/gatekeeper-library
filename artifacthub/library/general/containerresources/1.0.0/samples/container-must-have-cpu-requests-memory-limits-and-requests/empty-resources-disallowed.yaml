@@ -13,3 +13,5 @@ spec:
         - "--server"
         - "--addr=localhost:8080"
       resources: {}
+      securityContext:
+        allowPrivilegeEscalation: false
