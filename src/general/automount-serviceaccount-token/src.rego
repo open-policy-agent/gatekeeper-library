@@ -30,7 +30,11 @@ input_containers[c] {
     c := input.review.object.spec.initContainers[_]
 }
 
-# Ephemeral containers not checked as it is not possible to set field.
+input_containers[c] {
+    # EphemeralContainerCommon includes volumeMounts; an explicit SA token
+    # mount on an ephemeral container must be caught when automount is unset.
+    c := input.review.object.spec.ephemeralContainers[_]
+}
 
 has_key(x, k) {
     _ = x[k]
