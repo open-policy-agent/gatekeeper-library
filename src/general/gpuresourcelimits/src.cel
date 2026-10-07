@@ -1,0 +1,37 @@
+variables:
+- name: containers
+  expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+- name: initContainers
+  expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+- name: ephemeralContainers
+  expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+- name: exemptImagePrefixes
+  expression: |
+    !has(variables.params.exemptImages) ? [] :
+      variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+- name: exemptImageExplicit
+  expression: |
+    !has(variables.params.exemptImages) ? [] :
+      variables.params.exemptImages.filter(image, !image.endsWith("*"))
+- name: exemptImages
+  expression: |
+    (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+      container.image in variables.exemptImageExplicit ||
+      variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))
+    ).map(container, container.image)
+- name: maxGpu
+  expression: 'has(variables.params.maxGpuPerContainer) ? variables.params.maxGpuPerContainer : 0'
+- name: badContainers
+  expression: |
+    (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+      !(container.image in variables.exemptImages) &&
+      has(container.resources) &&
+      has(container.resources.limits) &&
+      "nvidia.com/gpu" in container.resources.limits &&
+      quantity(string(container.resources.limits["nvidia.com/gpu"])).compareTo(quantity("0")) > 0 &&
+      variables.maxGpu > 0 &&
+      quantity(string(container.resources.limits["nvidia.com/gpu"])).compareTo(quantity(string(variables.maxGpu))) > 0
+    ).map(container, "Container <" + container.name + "> requests " + string(container.resources.limits["nvidia.com/gpu"]) + " GPUs, which exceeds the maximum allowed " + string(variables.maxGpu))
+validations:
+- expression: 'size(variables.badContainers) == 0'
+  messageExpression: 'variables.badContainers.join(", ")'

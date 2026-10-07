@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: non-gpu-job
+spec:
+  containers:
+    - name: web
+      image: nginx:1.25
+      resources:
+        limits:
+          cpu: "500m"
+          memory: "128Mi"

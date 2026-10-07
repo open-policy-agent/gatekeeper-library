@@ -1,0 +1,65 @@
+package k8sgpusharedmemory
+
+test_gpu_with_shm_allowed {
+    inp := {"review": review_with_shm([gpu_container_with_shm("train", "nvidia/cuda:12.0", "1")]), "parameters": {}}
+    results := violation with input as inp
+    count(results) == 0
+}
+
+test_gpu_without_shm_denied {
+    inp := {"review": review([gpu_container("train", "nvidia/cuda:12.0", "1")]), "parameters": {}}
+    results := violation with input as inp
+    count(results) == 1
+}
+
+test_no_gpu_allowed {
+    inp := {"review": review([no_gpu_container("web", "nginx:latest")]), "parameters": {}}
+    results := violation with input as inp
+    count(results) == 0
+}
+
+test_gpu_init_container_with_shm_allowed {
+    inp := {"review": review_with_init_and_shm([no_gpu_container("web", "nginx:latest")], [gpu_container_with_shm("setup", "nvidia/cuda:12.0", "1")]), "parameters": {}}
+    results := violation with input as inp
+    count(results) == 0
+}
+
+test_gpu_init_container_without_shm_denied {
+    inp := {"review": review_with_init([no_gpu_container("web", "nginx:latest")], [gpu_container("setup", "nvidia/cuda:12.0", "1")]), "parameters": {}}
+    results := violation with input as inp
+    count(results) == 1
+}
+
+test_exempt_gpu_init_container_without_shm_allowed {
+    inp := {"review": review_with_init([no_gpu_container("web", "nginx:latest")], [gpu_container("monitor", "nvidia/dcgm-exporter:3.1", "1")]), "parameters": {"exemptImages": ["nvidia/dcgm-exporter:*"]}}
+    results := violation with input as inp
+    count(results) == 0
+}
+
+review(containers) = output {
+    output = {"object": {"metadata": {"name": "test-pod"}, "spec": {"containers": containers}}}
+}
+
+review_with_shm(containers) = output {
+    output = {"object": {"metadata": {"name": "test-pod"}, "spec": {"containers": containers, "volumes": [{"name": "dshm", "emptyDir": {"medium": "Memory"}}]}}}
+}
+
+review_with_init(containers, init_containers) = output {
+    output = {"object": {"metadata": {"name": "test-pod"}, "spec": {"containers": containers, "initContainers": init_containers}}}
+}
+
+review_with_init_and_shm(containers, init_containers) = output {
+    output = {"object": {"metadata": {"name": "test-pod"}, "spec": {"containers": containers, "initContainers": init_containers, "volumes": [{"name": "dshm", "emptyDir": {"medium": "Memory"}}]}}}
+}
+
+gpu_container(name, image, gpus) = c {
+    c := {"name": name, "image": image, "resources": {"limits": {"nvidia.com/gpu": gpus}}}
+}
+
+gpu_container_with_shm(name, image, gpus) = c {
+    c := {"name": name, "image": image, "resources": {"limits": {"nvidia.com/gpu": gpus}}, "volumeMounts": [{"name": "dshm", "mountPath": "/dev/shm"}]}
+}
+
+no_gpu_container(name, image) = c {
+    c := {"name": name, "image": image, "resources": {"limits": {"cpu": "100m"}}}
+}

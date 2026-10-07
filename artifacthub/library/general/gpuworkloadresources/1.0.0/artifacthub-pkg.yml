@@ -1,0 +1,22 @@
+version: 1.0.0
+name: k8sgpuworkloadresources
+displayName: GPU Workload Resources
+createdAt: "2026-04-10T20:39:17Z"
+description: Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to set memory requests equal to limits for all non-exempt containers and to set a CPU request. Containers that request GPUs must also set matching GPU requests and limits. This keeps GPU workloads schedulable and predictable while still allowing CPU burst above request.
+digest: 3e1179b7c9c0aecef6cc29593eb3a9bd88356490a64859ab4f0c2bf1eaf7bfbc
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/gpuworkloadresources
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # GPU Workload Resources
+    Requires pods that request NVIDIA GPU resources (nvidia.com/gpu) to set memory requests equal to limits for all non-exempt containers and to set a CPU request. Containers that request GPUs must also set matching GPU requests and limits. This keeps GPU workloads schedulable and predictable while still allowing CPU burst above request.
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/general/gpuworkloadresources/1.0.0/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

@@ -31,3 +31,11 @@ resources:
 - verifydeprecatedapi
 - storageclass
 - allowedreposv2
+- requiredgpuruntimeclass
+- gpuactivedeadline
+- gpunodetargeting
+- nounsupportedgpu
+- gpuworkloadresources
+- requiredgputoleration
+- gpuresourcelimits
+- gpusharedmemory

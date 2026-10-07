@@ -1,0 +1,39 @@
+variables:
+- name: containers
+  expression: 'has(variables.anyObject.spec.containers) ? variables.anyObject.spec.containers : []'
+- name: initContainers
+  expression: 'has(variables.anyObject.spec.initContainers) ? variables.anyObject.spec.initContainers : []'
+- name: ephemeralContainers
+  expression: 'has(variables.anyObject.spec.ephemeralContainers) ? variables.anyObject.spec.ephemeralContainers : []'
+- name: exemptImagePrefixes
+  expression: |
+    !has(variables.params.exemptImages) ? [] :
+      variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+- name: exemptImageExplicit
+  expression: |
+    !has(variables.params.exemptImages) ? [] :
+      variables.params.exemptImages.filter(image, !image.endsWith("*"))
+- name: exemptImages
+  expression: |
+    (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
+      container.image in variables.exemptImageExplicit ||
+      variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))
+    ).map(container, container.image)
+- name: podRequestsGpu
+  expression: |
+    (variables.containers + variables.initContainers + variables.ephemeralContainers).exists(container,
+      !(container.image in variables.exemptImages) &&
+      has(container.resources) &&
+      has(container.resources.limits) &&
+      "nvidia.com/gpu" in container.resources.limits &&
+      quantity(string(container.resources.limits["nvidia.com/gpu"])).compareTo(quantity("0")) > 0
+    )
+- name: hasDeadline
+  expression: 'has(variables.anyObject.spec.activeDeadlineSeconds)'
+- name: maxDeadline
+  expression: 'has(variables.params.maxActiveDeadlineSeconds) ? variables.params.maxActiveDeadlineSeconds : 0'
+validations:
+- expression: '!variables.podRequestsGpu || variables.hasDeadline'
+  messageExpression: '"Pod <" + variables.anyObject.metadata.name + "> requests GPU resources but does not set activeDeadlineSeconds"'
+- expression: '!variables.podRequestsGpu || !variables.hasDeadline || variables.maxDeadline == 0 || variables.anyObject.spec.activeDeadlineSeconds <= variables.maxDeadline'
+  messageExpression: '"Pod <" + variables.anyObject.metadata.name + "> sets activeDeadlineSeconds to " + string(variables.anyObject.spec.activeDeadlineSeconds) + ", which exceeds the maximum allowed " + string(variables.maxDeadline)'
