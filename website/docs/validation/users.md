@@ -18,7 +18,7 @@ metadata:
   name: k8spspallowedusers
   annotations:
     metadata.gatekeeper.sh/title: "Allowed Users"
-    metadata.gatekeeper.sh/version: 1.0.3
+    metadata.gatekeeper.sh/version: 1.0.4
     metadata.gatekeeper.sh/bundle: "pod-security-restricted"
     description: >-
       Controls the user and group IDs of the container and some volumes.
@@ -281,6 +281,14 @@ spec:
 
           is_update(review) {
               review.operation == "UPDATE"
+              not is_ephemeral_containers_update(review)
+          }
+
+          # Ephemeral containers can only be added with an UPDATE on the
+          # pods/ephemeralcontainers subresource (kubectl debug). That UPDATE carries
+          # new containers and must be validated like a CREATE.
+          is_ephemeral_containers_update(review) {
+              review.subResource == "ephemeralcontainers"
           }
         - |
           package lib.exempt_container

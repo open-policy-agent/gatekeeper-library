@@ -1,0 +1,22 @@
+version: 1.0.2
+name: k8spsphostprocess
+displayName: Host Process
+createdAt: "2026-10-17T10:10:49Z"
+description: Disallows HostProcess containers for Windows pods. HostProcess containers enable privileged access on Windows nodes and must be disallowed in Baseline and Restricted policies. Corresponds to the windowsOptions.hostProcess field in a Pod's securityContext or container securityContext. For more information, see https://kubernetes.io/docs/concepts/security/pod-security-standards/
+digest: 63e52b486aec7c81abad3e349d5a2420da49e521f27ecb17a10d699bc2ecd378
+license: Apache-2.0
+homeURL: https://open-policy-agent.github.io/gatekeeper-library/website/host-process
+keywords:
+    - gatekeeper
+    - open-policy-agent
+    - policies
+readme: |-
+    # Host Process
+    Disallows HostProcess containers for Windows pods. HostProcess containers enable privileged access on Windows nodes and must be disallowed in Baseline and Restricted policies. Corresponds to the windowsOptions.hostProcess field in a Pod's securityContext or container securityContext. For more information, see https://kubernetes.io/docs/concepts/security/pod-security-standards/
+install: |-
+    ### Usage
+    ```shell
+    kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/artifacthub/library/pod-security-policy/host-process/1.0.2/template.yaml
+    ```
+provider:
+    name: Gatekeeper Library

@@ -29,6 +29,10 @@ tests:
     object: samples/psp-readonlyrootfilesystem/example_allowed_exempted.yaml
     assertions:
     - violations: no
+  - name: update-ephemeral-containers
+    object: samples/psp-readonlyrootfilesystem/update_ephemeral.yaml
+    assertions:
+    - violations: yes
 - name: full-wildcard
   template: template.yaml
   constraint: samples/full_wildcard/constraint.yaml

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-privileged-allowed-exempt
+  labels:
+    app: nginx-privileged
+spec:
+  containers:
+  - name: nginx
+    image: safeimages.com/nginx
+    securityContext:
+      privileged: true

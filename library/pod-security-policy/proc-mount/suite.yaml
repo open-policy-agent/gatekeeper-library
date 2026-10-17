@@ -31,3 +31,7 @@ tests:
     object: samples/psp-proc-mount/example_allowed_exempt_image.yaml
     assertions:
     - violations: no
+  - name: update-ephemeral-containers
+    object: samples/psp-proc-mount/update_ephemeral.yaml
+    assertions:
+    - violations: yes

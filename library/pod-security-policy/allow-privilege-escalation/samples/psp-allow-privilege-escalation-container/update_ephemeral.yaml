@@ -1,0 +1,58 @@
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1
+request:
+  operation: "UPDATE"
+  kind:
+    group: ""
+    version: v1
+    kind: Pod
+  resource:
+    group: ""
+    version: v1
+    resource: pods
+  subResource: ephemeralcontainers
+  name: nginx-ephemeral-update
+  namespace: default
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx-ephemeral-update
+      namespace: default
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        securityContext:
+          privileged: false
+          allowPrivilegeEscalation: false
+          runAsUser: 1000
+          runAsNonRoot: true
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
+      ephemeralContainers:
+      - name: debugger
+        image: busybox
+        stdin: true
+        tty: true
+        securityContext:
+          allowPrivilegeEscalation: true
+  oldObject:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx-ephemeral-update
+      namespace: default
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        securityContext:
+          privileged: false
+          allowPrivilegeEscalation: false
+          runAsUser: 1000
+          runAsNonRoot: true
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
