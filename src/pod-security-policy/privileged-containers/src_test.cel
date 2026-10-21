@@ -1,0 +1,259 @@
+tests:
+# ---- Variable-level tests ----
+
+- name: "containers extracts spec.containers"
+  variable: containers
+  object:
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+  expect:
+    size: 1
+
+- name: "containers returns empty when field missing"
+  variable: containers
+  object:
+    spec: {}
+  expect:
+    value: []
+
+- name: "initContainers extracts init containers"
+  variable: initContainers
+  object:
+    spec:
+      initContainers:
+      - name: init
+        image: busybox
+  expect:
+    size: 1
+
+- name: "initContainers returns empty when missing"
+  variable: initContainers
+  object:
+    spec: {}
+  expect:
+    value: []
+
+- name: "exemptImagePrefixes extracts wildcard prefixes"
+  variable: exemptImagePrefixes
+  params:
+    exemptImages:
+    - "registry.k8s.io/*"
+    - "exact-image:latest"
+  object:
+    spec:
+      containers: []
+  expect:
+    value:
+    - "registry.k8s.io/"
+
+- name: "exemptImageExplicit extracts non-wildcard images"
+  variable: exemptImageExplicit
+  params:
+    exemptImages:
+    - "registry.k8s.io/*"
+    - "exact-image:latest"
+  object:
+    spec:
+      containers: []
+  expect:
+    value:
+    - "exact-image:latest"
+
+- name: "exemptImages empty when no params"
+  variable: exemptImages
+  object:
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+  expect:
+    value: []
+
+- name: "badContainers finds privileged container"
+  variable: badContainers
+  object:
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        securityContext:
+          privileged: true
+  expect:
+    size: 1
+    contains: "Privileged container is not allowed: nginx"
+
+- name: "badContainers empty for non-privileged"
+  variable: badContainers
+  object:
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        securityContext:
+          privileged: false
+  expect:
+    value: []
+
+- name: "badContainers skips exempt image"
+  variable: badContainers
+  params:
+    exemptImages:
+    - "nginx"
+  object:
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        securityContext:
+          privileged: true
+  expect:
+    value: []
+
+- name: "badContainers skips wildcard exempt"
+  variable: badContainers
+  params:
+    exemptImages:
+    - "registry.k8s.io/*"
+  object:
+    spec:
+      containers:
+      - name: special
+        image: registry.k8s.io/special:latest
+        securityContext:
+          privileged: true
+  expect:
+    value: []
+
+- name: "badContainers skips no securityContext"
+  variable: badContainers
+  object:
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+  expect:
+    value: []
+
+- name: "isUpdate false on CREATE"
+  variable: isUpdate
+  object:
+    spec:
+      containers: []
+  expect:
+    value: false
+
+- name: "isUpdate true on UPDATE"
+  variable: isUpdate
+  request:
+    operation: UPDATE
+  object:
+    spec:
+      containers: []
+  expect:
+    value: true
+
+# ---- Policy-level tests (whole validations) ----
+
+- name: "denies privileged container"
+  object:
+    metadata:
+      name: test-pod
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        securityContext:
+          privileged: true
+  expect:
+    allowed: false
+    messageContains: "Privileged container is not allowed: nginx"
+
+- name: "allows non-privileged container"
+  object:
+    metadata:
+      name: test-pod
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        securityContext:
+          privileged: false
+  expect:
+    allowed: true
+
+- name: "allows when no securityContext"
+  object:
+    metadata:
+      name: test-pod
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+  expect:
+    allowed: true
+
+- name: "allows exempt image even if privileged"
+  params:
+    exemptImages:
+    - "registry.k8s.io/special:latest"
+  object:
+    metadata:
+      name: test-pod
+    spec:
+      containers:
+      - name: special
+        image: registry.k8s.io/special:latest
+        securityContext:
+          privileged: true
+  expect:
+    allowed: true
+
+- name: "allows wildcard exempt image"
+  params:
+    exemptImages:
+    - "registry.k8s.io/*"
+  object:
+    metadata:
+      name: test-pod
+    spec:
+      containers:
+      - name: special
+        image: registry.k8s.io/special:latest
+        securityContext:
+          privileged: true
+  expect:
+    allowed: true
+
+- name: "denies privileged init container"
+  object:
+    metadata:
+      name: test-pod
+    spec:
+      containers:
+      - name: app
+        image: app
+      initContainers:
+      - name: init
+        image: init
+        securityContext:
+          privileged: true
+  expect:
+    allowed: false
+    messageContains: "Privileged container is not allowed: init"
+
+- name: "allows on UPDATE regardless"
+  request:
+    operation: UPDATE
+  object:
+    metadata:
+      name: test-pod
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        securityContext:
+          privileged: true
+  expect:
+    allowed: true

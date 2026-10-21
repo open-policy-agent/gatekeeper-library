@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: exempt-gpu-init-container-without-shm
+spec:
+  initContainers:
+    - name: monitor
+      image: nvidia/dcgm-exporter:3.1.7
+      resources:
+        requests:
+          cpu: "1"
+          memory: 1Gi
+          nvidia.com/gpu: "1"
+        limits:
+          cpu: "1"
+          memory: 1Gi
+          nvidia.com/gpu: "1"
+  containers:
+    - name: application
+      image: nginx:1.25
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi

@@ -1,0 +1,41 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: gpuactivedeadline
+tests:
+- name: gpu-job-with-deadline
+  template: template.yaml
+  constraint: samples/gpu-job-with-deadline/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/gpu-job-with-deadline/example_allowed.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed-exceeds-max
+    object: samples/gpu-job-with-deadline/example_disallowed_exceeds_max.yaml
+    assertions:
+    - violations: yes
+- name: gpu-job-without-deadline
+  template: template.yaml
+  constraint: samples/gpu-job-without-deadline/constraint.yaml
+  cases:
+  - name: example-disallowed
+    object: samples/gpu-job-without-deadline/example_disallowed.yaml
+    assertions:
+    - violations: yes
+- name: non-gpu-job
+  template: template.yaml
+  constraint: samples/non-gpu-job/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/non-gpu-job/example_allowed.yaml
+    assertions:
+    - violations: no
+- name: gpu-job-exempt
+  template: template.yaml
+  constraint: samples/gpu-job-exempt/constraint.yaml
+  cases:
+  - name: example-allowed
+    object: samples/gpu-job-exempt/example_allowed.yaml
+    assertions:
+    - violations: no

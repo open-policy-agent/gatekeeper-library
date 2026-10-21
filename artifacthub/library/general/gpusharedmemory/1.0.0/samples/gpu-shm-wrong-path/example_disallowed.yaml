@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: gpu-shm-wrong-path
+spec:
+  volumes:
+    - name: dshm
+      emptyDir:
+        medium: Memory
+  containers:
+    - name: training
+      image: nvidia/cuda:12.0-runtime
+      resources:
+        limits:
+          nvidia.com/gpu: "1"
+      volumeMounts:
+        - name: dshm
+          mountPath: /cache
