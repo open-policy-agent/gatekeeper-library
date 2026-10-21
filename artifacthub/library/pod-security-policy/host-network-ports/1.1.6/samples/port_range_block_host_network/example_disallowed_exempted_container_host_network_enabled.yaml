@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-host-networking-hn-ok-bad-port
+  labels:
+    app: nginx-host-networking-ports
+spec:
+  hostNetwork: true
+  containers:
+  - name: nginx
+    image: safeimages.com/nginx
+    ports:
+    - containerPort: 9001
+      hostPort: 9001

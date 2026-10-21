@@ -4,7 +4,7 @@ metadata:
   name: k8spsphostnetworkingports
   annotations:
     metadata.gatekeeper.sh/title: "Host Networking Ports"
-    metadata.gatekeeper.sh/version: 1.1.5
+    metadata.gatekeeper.sh/version: 1.1.6
     metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Controls usage of host network namespace by pod containers. HostNetwork verification happens without exception for exemptImages. Specific
@@ -76,8 +76,8 @@ spec:
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
                 !(container.image in variables.exemptImages) && has(container.ports) &&
                 (
-                  (container.ports.all(port, has(port.hostPort) && has(variables.params.min) && port.hostPort < variables.params.min)) ||
-                  (container.ports.all(port, has(port.hostPort) && has(variables.params.max) && port.hostPort > variables.params.max))
+                  (container.ports.exists(port, has(port.hostPort) && has(variables.params.min) && port.hostPort < variables.params.min)) ||
+                  (container.ports.exists(port, has(port.hostPort) && has(variables.params.max) && port.hostPort > variables.params.max))
                 )
               )
           - name: isUpdate
