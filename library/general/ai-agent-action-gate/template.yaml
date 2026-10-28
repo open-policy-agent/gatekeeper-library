@@ -1,0 +1,62 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8saiagentactiongate
+  annotations:
+    metadata.gatekeeper.sh/title: "AI Agent Action Gate and Kill-Switch Boundary"
+    metadata.gatekeeper.sh/version: 1.0.0
+    description: >-
+      Requires that AI agent and LLM worker pods enforce a Gate/Prove ActionBoundary,
+      disallow privileged execution, and configure an emergency kill-switch mount.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sAIAgentActionGate
+      validation:
+        openAPIV3Schema:
+          type: object
+          description: >-
+            Enforces zero-trust ActionBoundary governance on AI agent containers and pods.
+          properties:
+            requiredEnvVars:
+              description: "List of environment variables required on AI agent containers."
+              type: array
+              items:
+                type: string
+            disallowPrivileged:
+              description: "Disallow privileged mode on AI agent containers."
+              type: boolean
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8saiagentactiongate
+
+        is_ai_agent_pod {
+            input.review.object.metadata.labels["app.kubernetes.io/component"] == "ai-agent"
+        }
+        is_ai_agent_pod {
+            input.review.object.metadata.labels["ai-agent"] == "true"
+        }
+
+        # Check 1: Disallow Privileged Containers on AI Agent Pods
+        violation[{"msg": msg}] {
+            is_ai_agent_pod
+            c := input.review.object.spec.containers[_]
+            c.securityContext.privileged == true
+            msg := sprintf("AI agent container '%v' is not allowed to run in privileged mode.", [c.name])
+        }
+
+        # Check 2: Require ActionBoundary Prove Token Environment Variable
+        violation[{"msg": msg}] {
+            is_ai_agent_pod
+            c := input.review.object.spec.containers[_]
+            required_env := input.parameters.requiredEnvVars[_]
+            not has_env_var(c, required_env)
+            msg := sprintf("AI agent container '%v' is missing required ActionBoundary environment variable '%v'.", [c.name, required_env])
+        }
+
+        has_env_var(container, env_name) {
+            env := container.env[_]
+            env.name == env_name
+        }

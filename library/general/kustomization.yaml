@@ -31,3 +31,4 @@ resources:
 - verifydeprecatedapi
 - storageclass
 - allowedreposv2
+- ai-agent-action-gate

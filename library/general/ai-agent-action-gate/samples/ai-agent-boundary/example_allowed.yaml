@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secured-agent-worker
+  labels:
+    app.kubernetes.io/component: ai-agent
+spec:
+  containers:
+    - name: langgraph-worker
+      image: ghcr.io/langchain-ai/langgraph:latest
+      securityContext:
+        privileged: false
+      env:
+        - name: AAG_PROVE_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: action-gate-secrets
+              key: prove-token

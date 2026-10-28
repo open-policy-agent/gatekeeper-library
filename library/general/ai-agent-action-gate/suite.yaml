@@ -1,0 +1,17 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: ai-agent-action-gate
+tests:
+  - name: ai-agent-action-boundary
+    template: template.yaml
+    constraint: samples/ai-agent-boundary/constraint.yaml
+    cases:
+      - name: example-allowed
+        object: samples/ai-agent-boundary/example_allowed.yaml
+        assertions:
+          - violations: no
+      - name: example-disallowed
+        object: samples/ai-agent-boundary/example_disallowed.yaml
+        assertions:
+          - violations: yes
