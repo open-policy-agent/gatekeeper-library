@@ -18,7 +18,7 @@ metadata:
   name: k8spspprivilegedcontainer
   annotations:
     metadata.gatekeeper.sh/title: "Privileged Container"
-    metadata.gatekeeper.sh/version: 1.1.3
+    metadata.gatekeeper.sh/version: 1.2.0
     metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Controls the ability of any container to enable privileged mode.
@@ -88,13 +88,14 @@ spec:
             messageExpression: 'variables.badContainers.join(", ")' 
       - engine: Rego
         source:
+          version: "v1"
           rego: |
             package k8spspprivileged
 
             import data.lib.exclude_update.is_update
             import data.lib.exempt_container.is_exempt
 
-            violation[{"msg": msg, "details": {}}] {
+            violation contains {"msg": msg, "details": {}} if {
                 # spec.containers.privileged field is immutable.
                 not is_update(input.review)
 
@@ -104,45 +105,44 @@ spec:
                 msg := sprintf("Privileged container is not allowed: %v, securityContext: %v", [c.name, c.securityContext])
             }
 
-            input_containers[c] {
+            input_containers contains c if {
                 c := input.review.object.spec.containers[_]
             }
 
-            input_containers[c] {
+            input_containers contains c if {
                 c := input.review.object.spec.initContainers[_]
             }
 
-            input_containers[c] {
+            input_containers contains c if {
                 c := input.review.object.spec.ephemeralContainers[_]
             }
           libs:
             - |
               package lib.exclude_update
 
-              is_update(review) {
+              is_update(review) if {
                   review.operation == "UPDATE"
               }
             - |
               package lib.exempt_container
 
-              is_exempt(container) {
+              is_exempt(container) if {
                   exempt_images := object.get(object.get(input, "parameters", {}), "exemptImages", [])
                   img := container.image
                   exemption := exempt_images[_]
                   _matches_exemption(img, exemption)
               }
 
-              _matches_exemption(img, exemption) {
+              _matches_exemption(img, exemption) if {
                   not endswith(exemption, "*")
                   exemption == img
               }
 
-              _matches_exemption(img, exemption) {
+              _matches_exemption(img, exemption) if {
                   endswith(exemption, "*")
                   prefix := trim_suffix(exemption, "*")
                   startswith(img, prefix)
               }
-
 ```
 
 ### Usage
