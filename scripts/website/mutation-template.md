@@ -7,7 +7,7 @@ title: %TITLE%
 
 ### Usage
 ```shell
-kubectl apply -f %RAWURL%
+%USAGE%
 ```
 ## Mutation Examples
 ```yaml
