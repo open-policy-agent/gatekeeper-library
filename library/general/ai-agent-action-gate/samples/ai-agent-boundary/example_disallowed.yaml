@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: un-gated-agent-worker
+  labels:
+    app.kubernetes.io/component: ai-agent
+spec:
+  containers:
+    - name: rogue-worker
+      image: alpine:latest
+      securityContext:
+        privileged: true
+      # Missing required ActionBoundary AAG_PROVE_TOKEN env var
