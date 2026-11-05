@@ -1,0 +1,14 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredGpuRuntimeClass
+metadata:
+  name: require-gpu-runtime
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    allowedRuntimeClassNames:
+      - "nvidia"
+    exemptImages:
+      - "nvidia/dcgm-exporter:*"

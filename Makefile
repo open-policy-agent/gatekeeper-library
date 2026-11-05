@@ -45,7 +45,7 @@ uninstall:
 	helm uninstall -n gatekeeper-system gatekeeper
 
 test-integration:
-	bats -t test/bats/test.bats
+	POLICY_ENGINE=$(POLICY_ENGINE) bats -t test/bats/test.bats
 
 .PHONY: verify-gator
 verify-gator:

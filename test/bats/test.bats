@@ -95,6 +95,9 @@ setup() {
         wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "kubectl apply -f ${sample}/constraint.yaml"
         local name=$(yq e .metadata.name "$sample"/constraint.yaml)
         wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "constraint_enforced $kind $name"
+        if should_wait_for_vap_enforcement "$policy"; then
+          wait_for_process ${WAIT_TIME} ${SLEEP_TIME} "constraint_vap_enforced $kind $name"
+        fi
 
         for inventory in "$sample"/example_inventory*.yaml; do
           if [[ -e "$inventory" ]]; then
