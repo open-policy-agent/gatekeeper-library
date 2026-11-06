@@ -8,7 +8,7 @@ violation[{"msg": msg, "details": {}}] {
 
     c := input_containers[_]
     not is_exempt(c)
-    probe := get_probe(c)
+    probe := c[probe_fields[_]]
     probe.httpGet.host != ""
     msg := sprintf("Container %v has probe with host field set: %v", [c.name, probe.httpGet.host])
 }
@@ -18,7 +18,7 @@ violation[{"msg": msg, "details": {}}] {
 
     c := input_containers[_]
     not is_exempt(c)
-    probe := get_probe(c)
+    probe := c[probe_fields[_]]
     probe.tcpSocket.host != ""
     msg := sprintf("Container %v has probe with host field set: %v", [c.name, probe.tcpSocket.host])
 }
@@ -28,7 +28,7 @@ violation[{"msg": msg, "details": {}}] {
 
     c := input_containers[_]
     not is_exempt(c)
-    hook := get_lifecycle_hook(c)
+    hook := c.lifecycle[lifecycle_fields[_]]
     hook.httpGet.host != ""
     msg := sprintf("Container %v has lifecycle hook with host field set: %v", [c.name, hook.httpGet.host])
 }
@@ -38,30 +38,14 @@ violation[{"msg": msg, "details": {}}] {
 
     c := input_containers[_]
     not is_exempt(c)
-    hook := get_lifecycle_hook(c)
+    hook := c.lifecycle[lifecycle_fields[_]]
     hook.tcpSocket.host != ""
     msg := sprintf("Container %v has lifecycle hook with host field set: %v", [c.name, hook.tcpSocket.host])
 }
 
-get_probe(c) = probe {
-    probe := c.livenessProbe
-}
+probe_fields := ["livenessProbe", "readinessProbe", "startupProbe"]
 
-get_probe(c) = probe {
-    probe := c.readinessProbe
-}
-
-get_probe(c) = probe {
-    probe := c.startupProbe
-}
-
-get_lifecycle_hook(c) = hook {
-    hook := c.lifecycle.postStart
-}
-
-get_lifecycle_hook(c) = hook {
-    hook := c.lifecycle.preStop
-}
+lifecycle_fields := ["postStart", "preStop"]
 
 input_containers[c] {
     c := input.review.object.spec.containers[_]
