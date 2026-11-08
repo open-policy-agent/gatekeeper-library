@@ -18,7 +18,7 @@ metadata:
   name: k8spspapparmor
   annotations:
     metadata.gatekeeper.sh/title: "App Armor"
-    metadata.gatekeeper.sh/version: 1.1.1
+    metadata.gatekeeper.sh/version: 1.1.2
     metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Configures an allow-list of AppArmor profiles for use by containers.
@@ -113,7 +113,7 @@ spec:
           - name: exemptImagePrefixes
             expression: |
               !has(variables.params.exemptImages) ? [] :
-                variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+                variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).substring(0, size(image) - 1))
           - name: exemptImageExplicit
             expression: |
               !has(variables.params.exemptImages) ? [] : 
