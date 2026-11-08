@@ -35,7 +35,7 @@ variables:
       container.securityContext.windowsOptions.hostProcess
     ).map(container, "HostProcess container is not allowed: " + container.name + ", securityContext.windowsOptions.hostProcess: true")
 - name: isUpdate
-  expression: has(request.operation) && request.operation == "UPDATE"
+  expression: has(request.operation) && request.operation == "UPDATE" && !(has(request.subResource) && request.subResource == "ephemeralcontainers")
 validations:
 - expression: 'variables.isUpdate || !variables.podHostProcess'
   messageExpression: '"HostProcess is not allowed at pod level: " + variables.anyObject.metadata.name'

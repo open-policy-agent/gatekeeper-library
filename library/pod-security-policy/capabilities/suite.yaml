@@ -23,6 +23,10 @@ tests:
         object: samples/psp-capabilities-baseline/update.yaml
         assertions:
           - violations: no
+      - name: update-ephemeral-containers
+        object: samples/psp-capabilities-baseline/update_ephemeral.yaml
+        assertions:
+          - violations: yes
   - name: capabilities-restricted
     template: template.yaml
     constraint: samples/psp-capabilities-restricted/constraint.yaml

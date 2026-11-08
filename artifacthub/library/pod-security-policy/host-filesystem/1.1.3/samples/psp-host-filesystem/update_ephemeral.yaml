@@ -1,0 +1,59 @@
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1
+request:
+  operation: "UPDATE"
+  kind:
+    group: ""
+    version: v1
+    kind: Pod
+  resource:
+    group: ""
+    version: v1
+    resource: pods
+  subResource: ephemeralcontainers
+  name: nginx-ephemeral-update
+  namespace: default
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx-ephemeral-update
+      namespace: default
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        volumeMounts:
+        - mountPath: /logs
+          name: logs
+          readOnly: true
+      ephemeralContainers:
+      - name: debugger
+        image: busybox
+        stdin: true
+        tty: true
+        volumeMounts:
+        - mountPath: /logs
+          name: logs
+      volumes:
+      - name: logs
+        hostPath:
+          path: /foo/logs
+  oldObject:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx-ephemeral-update
+      namespace: default
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        volumeMounts:
+        - mountPath: /logs
+          name: logs
+          readOnly: true
+      volumes:
+      - name: logs
+        hostPath:
+          path: /foo/logs

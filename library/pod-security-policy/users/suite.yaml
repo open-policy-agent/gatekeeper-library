@@ -23,3 +23,7 @@ tests:
     object: samples/psp-pods-allowed-user-ranges/update.yaml
     assertions:
     - violations: no
+  - name: update-ephemeral-containers
+    object: samples/psp-pods-allowed-user-ranges/update_ephemeral.yaml
+    assertions:
+    - violations: yes

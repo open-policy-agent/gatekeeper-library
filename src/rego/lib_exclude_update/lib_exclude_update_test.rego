@@ -11,3 +11,11 @@ test_create {
 test_empty {
     not is_update({"operation": ""})
 }
+
+test_ephemeral_containers_update {
+    not is_update({"operation": "UPDATE", "subResource": "ephemeralcontainers"})
+}
+
+test_other_subresource_update {
+    is_update({"operation": "UPDATE", "subResource": "status"})
+}

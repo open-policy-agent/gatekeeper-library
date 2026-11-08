@@ -23,6 +23,10 @@ tests:
         object: samples/psp-host-filesystem/update.yaml
         assertions:
           - violations: no
+      - name: update-ephemeral-containers
+        object: samples/psp-host-filesystem/update_ephemeral.yaml
+        assertions:
+          - violations: yes
   - name: no-host-paths
     template: template.yaml
     constraint: samples/no-host-paths/constraint.yaml

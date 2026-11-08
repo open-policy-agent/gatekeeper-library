@@ -1,0 +1,25 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPCapabilities
+metadata:
+  name: psp-capabilities-baseline
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    allowedCapabilities:
+    - AUDIT_WRITE
+    - CHOWN
+    - DAC_OVERRIDE
+    - FOWNER
+    - FSETID
+    - KILL
+    - MKNOD
+    - NET_BIND_SERVICE
+    - NET_RAW
+    - SETFCAP
+    - SETGID
+    - SETPCAP
+    - SETUID
+    - SYS_CHROOT

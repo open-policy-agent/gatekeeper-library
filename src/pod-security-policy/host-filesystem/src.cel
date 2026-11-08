@@ -24,5 +24,5 @@ variables:
             c.volumeMounts.exists(m, m.name == volume.name && (!has(m.readOnly) || !m.readOnly)))))))
     ).map(volume, "{ hostPath: { path : " + volume.hostPath.path + " }, name: " + volume.name + "}").map(volume, "HostPath volume " + volume + " is not allowed, pod: " + object.metadata.name + ". Allowed path: " + variables.allowedPaths.map(path,  path.pathPrefix + ", readOnly: " + (path.readOnly ? "true" : "false") + "}").join(", "))
 validations:
-- expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badHostPaths) == 0'
+- expression: '(has(request.operation) && request.operation == "UPDATE" && !(has(request.subResource) && request.subResource == "ephemeralcontainers")) || size(variables.badHostPaths) == 0'
   messageExpression: 'variables.badHostPaths.join("\n")'

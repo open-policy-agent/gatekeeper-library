@@ -4,7 +4,7 @@ metadata:
   name: k8spsphostprocess
   annotations:
     metadata.gatekeeper.sh/title: "Host Process"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.0.2
     metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Disallows HostProcess containers for Windows pods.
@@ -83,7 +83,7 @@ spec:
                 container.securityContext.windowsOptions.hostProcess
               ).map(container, "HostProcess container is not allowed: " + container.name + ", securityContext.windowsOptions.hostProcess: true")
           - name: isUpdate
-            expression: has(request.operation) && request.operation == "UPDATE"
+            expression: has(request.operation) && request.operation == "UPDATE" && !(has(request.subResource) && request.subResource == "ephemeralcontainers")
           validations:
           - expression: 'variables.isUpdate || !variables.podHostProcess'
             messageExpression: '"HostProcess is not allowed at pod level: " + variables.anyObject.metadata.name'
@@ -133,6 +133,14 @@ spec:
 
               is_update(review) {
                   review.operation == "UPDATE"
+                  not is_ephemeral_containers_update(review)
+              }
+
+              # Ephemeral containers can only be added with an UPDATE on the
+              # pods/ephemeralcontainers subresource (kubectl debug). That UPDATE carries
+              # new containers and must be validated like a CREATE.
+              is_ephemeral_containers_update(review) {
+                  review.subResource == "ephemeralcontainers"
               }
             - |
               package lib.exempt_container
