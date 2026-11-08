@@ -12,6 +12,18 @@ test_input_container_probe_without_host_allowed {
     count(results) == 0
 }
 
+test_input_container_multiple_probes_no_host_allowed {
+    inp := { "review": input_review_multiple_probes_no_host}
+    results := violation with input as inp
+    count(results) == 0
+}
+
+test_input_container_multiple_lifecycles_no_host_allowed {
+    inp := { "review": input_review_multiple_lifecycles_no_host}
+    results := violation with input as inp
+    count(results) == 0
+}
+
 test_input_container_probe_with_host_not_allowed {
     inp := { "review": input_review_probe_with_host}
     results := violation with input as inp
@@ -78,6 +90,59 @@ input_review_probe_no_host = {
         },
         "spec": {
             "containers": input_containers_probe_no_host
+        }
+    }
+}
+
+input_review_multiple_probes_no_host = {
+    "object": {
+        "metadata": {
+            "name": "nginx"
+        },
+        "spec": {
+            "containers": [{
+                "name": "nginx",
+                "image": "nginx",
+                "livenessProbe": {
+                    "tcpSocket": {
+                        "port": 80
+                    }
+                },
+                "readinessProbe": {
+                    "httpGet": {
+                        "path": "/",
+                        "port": 80
+                    }
+                }
+            }]
+        }
+    }
+}
+
+input_review_multiple_lifecycles_no_host = {
+    "object": {
+        "metadata": {
+            "name": "nginx"
+        },
+        "spec": {
+            "containers": [{
+                "name": "nginx",
+                "image": "nginx",
+                "lifecycle": {
+                    "postStart": {
+                        "httpGet": {
+                            "path": "/healthz",
+                            "port": 8080
+                        }
+                    },
+                    "preStop": {
+                        "httpGet": {
+                            "path": "/shutdown",
+                            "port": 8080
+                        }
+                    }
+                }
+            }]
         }
     }
 }
