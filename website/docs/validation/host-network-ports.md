@@ -18,7 +18,7 @@ metadata:
   name: k8spsphostnetworkingports
   annotations:
     metadata.gatekeeper.sh/title: "Host Networking Ports"
-    metadata.gatekeeper.sh/version: 1.1.5
+    metadata.gatekeeper.sh/version: 1.1.6
     metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Controls usage of host network namespace by pod containers. HostNetwork verification happens without exception for exemptImages. Specific
@@ -90,8 +90,8 @@ spec:
               (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
                 !(container.image in variables.exemptImages) && has(container.ports) &&
                 (
-                  (container.ports.all(port, has(port.hostPort) && has(variables.params.min) && port.hostPort < variables.params.min)) ||
-                  (container.ports.all(port, has(port.hostPort) && has(variables.params.max) && port.hostPort > variables.params.max))
+                  (container.ports.exists(port, has(port.hostPort) && has(variables.params.min) && port.hostPort < variables.params.min)) ||
+                  (container.ports.exists(port, has(port.hostPort) && has(variables.params.max) && port.hostPort > variables.params.max))
                 )
               )
           - name: isUpdate
@@ -353,6 +353,65 @@ Usage
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/example_allowed_out_of_range_exempted.yaml
+```
+
+</details>
+<details>
+<summary>mixed-containerport-and-out-of-range-hostport</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-host-networking-ports-disallowed-mixed-container-and-host
+  labels:
+    app: nginx-host-networking-ports
+spec:
+  hostNetwork: true
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+    - containerPort: 9001
+      hostPort: 9001
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/example_disallowed_mixed_containerport_and_hostport.yaml
+```
+
+</details>
+<details>
+<summary>mixed-in-range-and-out-of-range-hostports</summary>
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-host-networking-ports-disallowed-mixed-host-ports
+  labels:
+    app: nginx-host-networking-ports
+spec:
+  hostNetwork: true
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+      hostPort: 80
+    - containerPort: 9001
+      hostPort: 9001
+
+```
+
+Usage
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/open-policy-agent/gatekeeper-library/master/library/pod-security-policy/host-network-ports/samples/psp-host-network-ports/example_disallowed_mixed_hostports.yaml
 ```
 
 </details>

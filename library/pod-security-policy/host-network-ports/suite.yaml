@@ -31,6 +31,14 @@ tests:
     object: samples/psp-host-network-ports/example_allowed_out_of_range_exempted.yaml
     assertions:
     - violations: no
+  - name: mixed-containerport-and-out-of-range-hostport
+    object: samples/psp-host-network-ports/example_disallowed_mixed_containerport_and_hostport.yaml
+    assertions:
+    - violations: yes
+  - name: mixed-in-range-and-out-of-range-hostports
+    object: samples/psp-host-network-ports/example_disallowed_mixed_hostports.yaml
+    assertions:
+    - violations: yes
 - name: host-network-forbidden
   template: template.yaml
   constraint: samples/block_host_network/constraint.yaml
