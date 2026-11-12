@@ -242,45 +242,32 @@ func main() {
 				}
 				mutationSidebarItems[entry.Name()] = append(mutationSidebarItems[entry.Name()], dir.Name())
 
-				// get all files with name starting with "mutation"
-				files, err := os.ReadDir(filepath.Join(basePath, dir.Name(), "samples"))
-				if err != nil {
-					panic(err)
-				}
-
 				mutationTemplateContent, err := os.ReadFile(filepath.Join(pwd, "mutation-template.md"))
 				if err != nil {
 					fmt.Println("error while reading mutation-template.md")
 					panic(err)
 				}
 
-				for _, file := range files {
-					var fileContentBytes []byte
-					if strings.HasPrefix(file.Name(), "mutation") {
-						// read mutation.yaml
-						fileContentBytes, err = os.ReadFile(filepath.Join(basePath, dir.Name(), "samples", file.Name()))
-						if err != nil {
-							fmt.Println("error while reading ", file.Name())
-							panic(err)
-						}
+				// render all files with name starting with "mutation" into a single page
+				content, err := generateMutationMarkdown(
+					string(mutationTemplateContent),
+					filepath.Join(basePath, dir.Name(), "samples"),
+					sourceURL+filepath.Join(mutationEntryPoint, entry.Name(), dir.Name(), "samples")+"/",
+					dir.Name(),
+				)
+				if err != nil {
+					fmt.Println("error while generating markdown for ", dir.Name())
+					panic(err)
+				}
 
-						replacer := strings.NewReplacer(
-							"%RAWURL%", sourceURL+filepath.Join(mutationEntryPoint, entry.Name(), dir.Name(), "samples", file.Name()),
-							"%EXAMPLES%", string(fileContentBytes),
-							"%TITLE%", dir.Name(),
-							"%FILENAME%", dir.Name(),
-						)
-
-						err := os.WriteFile(
-							filepath.Join(rootDir, "website/docs/mutation-examples", fmt.Sprintf("%s.md", dir.Name())),
-							[]byte(replacer.Replace(string(mutationTemplateContent))),
-							0o600,
-						)
-						if err != nil {
-							fmt.Println("error while writing ", file.Name())
-							panic(err)
-						}
-					}
+				err = os.WriteFile(
+					filepath.Join(rootDir, "website/docs/mutation-examples", fmt.Sprintf("%s.md", dir.Name())),
+					[]byte(content),
+					0o600,
+				)
+				if err != nil {
+					fmt.Println("error while writing ", dir.Name())
+					panic(err)
 				}
 			}
 		}
@@ -400,6 +387,41 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+// generateMutationMarkdown renders the website page for a mutation sample directory.
+// Every file in samplesDir whose name starts with "mutation" is included, so
+// directories with more than one mutation sample list all of them.
+func generateMutationMarkdown(templateContent, samplesDir, rawURLPrefix, name string) (string, error) {
+	files, err := os.ReadDir(samplesDir)
+	if err != nil {
+		return "", err
+	}
+
+	var usage []string
+	var examples []string
+	for _, file := range files {
+		if file.IsDir() || !strings.HasPrefix(file.Name(), "mutation") {
+			continue
+		}
+
+		fileContentBytes, err := os.ReadFile(filepath.Join(samplesDir, file.Name()))
+		if err != nil {
+			return "", err
+		}
+
+		usage = append(usage, "kubectl apply -f "+rawURLPrefix+file.Name())
+		examples = append(examples, string(fileContentBytes))
+	}
+
+	replacer := strings.NewReplacer(
+		"%USAGE%", strings.Join(usage, "\n"),
+		"%EXAMPLES%", strings.Join(examples, "---\n"),
+		"%TITLE%", name,
+		"%FILENAME%", name,
+	)
+
+	return replacer.Replace(templateContent), nil
 }
 
 // generateSidebarItems creates a list of sidebar items with proper indentation.
