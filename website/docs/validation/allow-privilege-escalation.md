@@ -18,7 +18,7 @@ metadata:
   name: k8spspallowprivilegeescalationcontainer
   annotations:
     metadata.gatekeeper.sh/title: "Allow Privilege Escalation in Container"
-    metadata.gatekeeper.sh/version: 1.1.1
+    metadata.gatekeeper.sh/version: 1.1.2
     metadata.gatekeeper.sh/bundle: "pod-security-restricted"
     description: >-
       Controls restricting escalation to root privileges. Corresponds to the
@@ -85,7 +85,7 @@ spec:
                 )
               )
           validations:
-          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badContainers) == 0'
+          - expression: '(has(request.operation) && request.operation == "UPDATE" && !(has(request.subResource) && request.subResource == "ephemeralcontainers")) || size(variables.badContainers) == 0'
             messageExpression: '"Privilege escalation container is not allowed: " + variables.badContainers.map(c, c.image).join(", ")'
       - engine: Rego
         source:
@@ -130,6 +130,14 @@ spec:
 
             is_update(review) {
                 review.operation == "UPDATE"
+                not is_ephemeral_containers_update(review)
+            }
+
+            # Ephemeral containers can only be added with an UPDATE on the
+            # pods/ephemeralcontainers subresource (kubectl debug). That UPDATE carries
+            # new containers and must be validated like a CREATE.
+            is_ephemeral_containers_update(review) {
+                review.subResource == "ephemeralcontainers"
             }
           - |
             package lib.exempt_container

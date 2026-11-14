@@ -16,7 +16,7 @@ metadata:
   name: k8spspreadonlyrootfilesystem
   annotations:
     metadata.gatekeeper.sh/title: "Read Only Root Filesystem"
-    metadata.gatekeeper.sh/version: 1.1.1
+    metadata.gatekeeper.sh/version: 1.1.2
     description: >-
       Requires the use of a read-only root file system by pod containers.
       Corresponds to the `readOnlyRootFilesystem` field in a
@@ -81,7 +81,7 @@ spec:
                 container.securityContext.readOnlyRootFilesystem != true)
               ).map(container, container.name)
           validations:
-          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badContainers) == 0'
+          - expression: '(has(request.operation) && request.operation == "UPDATE" && !(has(request.subResource) && request.subResource == "ephemeralcontainers")) || size(variables.badContainers) == 0'
             messageExpression: '"only read-only root filesystem container is allowed: " + variables.badContainers.join(", ")'
             
       - engine: Rego
@@ -129,6 +129,14 @@ spec:
 
               is_update(review) {
                   review.operation == "UPDATE"
+                  not is_ephemeral_containers_update(review)
+              }
+
+              # Ephemeral containers can only be added with an UPDATE on the
+              # pods/ephemeralcontainers subresource (kubectl debug). That UPDATE carries
+              # new containers and must be validated like a CREATE.
+              is_ephemeral_containers_update(review) {
+                  review.subResource == "ephemeralcontainers"
               }
             - |
               package lib.exempt_container

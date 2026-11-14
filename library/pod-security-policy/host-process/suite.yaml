@@ -31,3 +31,7 @@ tests:
     object: samples/psp-host-process/update.yaml
     assertions:
     - violations: no
+  - name: update-ephemeral-containers
+    object: samples/psp-host-process/update_ephemeral.yaml
+    assertions:
+    - violations: yes

@@ -23,3 +23,7 @@ tests:
     object: samples/psp-selinux-v2/update.yaml
     assertions:
     - violations: no
+  - name: update-ephemeral-containers
+    object: samples/psp-selinux-v2/update_ephemeral.yaml
+    assertions:
+    - violations: yes
