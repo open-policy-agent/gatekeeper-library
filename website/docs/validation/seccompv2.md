@@ -18,7 +18,7 @@ metadata:
   name: k8spspseccompv2
   annotations:
     metadata.gatekeeper.sh/title: "Seccomp V2"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.0.2
     metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Controls the seccomp profile used by containers. Corresponds to the
@@ -91,7 +91,7 @@ spec:
           - name: exemptImagePrefixes
             expression: |
               !has(variables.params.exemptImages) ? [] :
-                variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+                variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).substring(0, size(image) - 1))
           - name: exemptImageExplicit
             expression: |
               !has(variables.params.exemptImages) ? [] : 

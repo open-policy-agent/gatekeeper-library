@@ -18,7 +18,7 @@ metadata:
   name: k8spsphostprobeslifecycle
   annotations:
     metadata.gatekeeper.sh/title: "Host Probes and Lifecycle Hooks"
-    metadata.gatekeeper.sh/version: 1.0.1
+    metadata.gatekeeper.sh/version: 1.0.2
     metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Disallows specifying the host field in probes and lifecycle hooks.
@@ -70,7 +70,7 @@ spec:
           - name: exemptImagePrefixes
             expression: |
               !has(variables.params.exemptImages) ? [] :
-                variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).replace("*", ""))
+                variables.params.exemptImages.filter(image, image.endsWith("*")).map(image, string(image).substring(0, size(image) - 1))
           - name: exemptImageExplicit
             expression: |
               !has(variables.params.exemptImages) ? [] : 

@@ -5,14 +5,14 @@ variables:
   expression: '!has(variables.anyObject.spec.securityContext) ? [] : !has(variables.anyObject.spec.securityContext.sysctls) ? [] : variables.anyObject.spec.securityContext.sysctls'
 - name: allowedSysctlPrefixes
   expression: |
-    !has(variables.params.allowedSysctls) ? [] : variables.params.allowedSysctls.filter(sysctl, sysctl.endsWith("*")).map(sysctl, string(sysctl).replace("*", ""))
+    !has(variables.params.allowedSysctls) ? [] : variables.params.allowedSysctls.filter(sysctl, sysctl.endsWith("*")).map(sysctl, string(sysctl).substring(0, size(sysctl) - 1))
 - name: allowedSysctlExplicit
   expression: |
     !has(variables.params.allowedSysctls) ? [] : 
       variables.params.allowedSysctls.filter(sysctl, !sysctl.endsWith("*"))
 - name: forbiddenSysctlPrefixes
   expression: |
-    !has(variables.params.forbiddenSysctls) ? [] : variables.params.forbiddenSysctls.filter(sysctl, sysctl.endsWith("*")).map(sysctl, string(sysctl).replace("*", ""))
+    !has(variables.params.forbiddenSysctls) ? [] : variables.params.forbiddenSysctls.filter(sysctl, sysctl.endsWith("*")).map(sysctl, string(sysctl).substring(0, size(sysctl) - 1))
 - name: forbiddenSysctlExplicit
   expression: |
     !has(variables.params.forbiddenSysctls) ? [] : 
