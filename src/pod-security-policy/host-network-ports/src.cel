@@ -24,8 +24,8 @@ variables:
     (variables.containers + variables.initContainers + variables.ephemeralContainers).filter(container,
       !(container.image in variables.exemptImages) && has(container.ports) &&
       (
-        (container.ports.all(port, has(port.hostPort) && has(variables.params.min) && port.hostPort < variables.params.min)) ||
-        (container.ports.all(port, has(port.hostPort) && has(variables.params.max) && port.hostPort > variables.params.max))
+        (container.ports.exists(port, has(port.hostPort) && has(variables.params.min) && port.hostPort < variables.params.min)) ||
+        (container.ports.exists(port, has(port.hostPort) && has(variables.params.max) && port.hostPort > variables.params.max))
       )
     )
 - name: isUpdate

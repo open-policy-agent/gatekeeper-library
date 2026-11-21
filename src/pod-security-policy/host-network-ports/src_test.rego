@@ -46,6 +46,16 @@ test_update {
     results := violation with input as inp
     count(results) == 0
 }
+test_input_mixed_containerport_and_outofrange_hostport_not_allowed {
+    inp := { "review": input_review_mixed_containerport_and_outofrange_hostport, "parameters": input_parameters_ports}
+    results := violation with input as inp
+    count(results) > 0
+}
+test_input_mixed_inrange_and_outofrange_hostports_not_allowed {
+    inp := { "review": input_review_mixed_inrange_and_outofrange_hostports, "parameters": input_parameters_ports}
+    results := violation with input as inp
+    count(results) > 0
+}
 
 input_review = {
     "object": {
@@ -117,6 +127,30 @@ input_review_with_hostnetwork_port_outofrange = {
       }
     }
 }
+
+input_review_mixed_containerport_and_outofrange_hostport = {
+    "object": {
+        "metadata": {
+            "name": "nginx"
+        },
+        "spec": {
+            "hostNetwork": true,
+            "containers": input_containers_mixed_containerport_and_outofrange_hostport
+      }
+    }
+}
+
+input_review_mixed_inrange_and_outofrange_hostports = {
+    "object": {
+        "metadata": {
+            "name": "nginx"
+        },
+        "spec": {
+            "hostNetwork": true,
+            "containers": input_containers_mixed_inrange_and_outofrange_hostports
+      }
+    }
+}
 input_containers_one = [
 {
     "name": "nginx",
@@ -158,6 +192,37 @@ input_containers_many_port_outofrange = [
       "containerPort": 9200,
       "hostPort": 9200
     }]
+}]
+
+input_containers_mixed_containerport_and_outofrange_hostport = [
+{
+    "name": "nginx",
+    "image": "nginx",
+    "ports": [
+      {
+        "containerPort": 80
+      },
+      {
+        "containerPort": 9001,
+        "hostPort": 9001
+      }
+    ]
+}]
+
+input_containers_mixed_inrange_and_outofrange_hostports = [
+{
+    "name": "nginx",
+    "image": "nginx",
+    "ports": [
+      {
+        "containerPort": 80,
+        "hostPort": 80
+      },
+      {
+        "containerPort": 9001,
+        "hostPort": 9001
+      }
+    ]
 }]
 
 input_parameters_ports = {
