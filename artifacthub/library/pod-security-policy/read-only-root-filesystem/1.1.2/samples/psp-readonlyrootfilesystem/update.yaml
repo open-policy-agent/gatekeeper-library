@@ -1,0 +1,17 @@
+kind: AdmissionReview
+apiVersion: admission.k8s.io/v1beta1
+request:
+  operation: "UPDATE"
+  object:
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: nginx-readonlyrootfilesystem-disallowed
+      labels:
+        app: nginx-readonlyrootfilesystem
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        securityContext:
+          readOnlyRootFilesystem: false

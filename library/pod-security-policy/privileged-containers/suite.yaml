@@ -27,3 +27,7 @@ tests:
     object: samples/psp-privileged-container/example_allowed_exempt.yaml
     assertions:
     - violations: no
+  - name: update-ephemeral-containers
+    object: samples/psp-privileged-container/update_ephemeral.yaml
+    assertions:
+    - violations: yes

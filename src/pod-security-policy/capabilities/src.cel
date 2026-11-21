@@ -51,9 +51,9 @@ variables:
       ]
     )
 validations:
-- expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.disallowedCapabilitiesByContainer) == 0'
+- expression: '(has(request.operation) && request.operation == "UPDATE" && !(has(request.subResource) && request.subResource == "ephemeralcontainers")) || size(variables.disallowedCapabilitiesByContainer) == 0'
   messageExpression: |
     "containers have disallowed capabilities: " + variables.disallowedCapabilitiesByContainer.map(pair, "{container: " + pair[0] + ", capabilities: [" + pair[1] + "]}").join(", ")
-- expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.missingDropCapabilitiesByContainer) == 0'
+- expression: '(has(request.operation) && request.operation == "UPDATE" && !(has(request.subResource) && request.subResource == "ephemeralcontainers")) || size(variables.missingDropCapabilitiesByContainer) == 0'
   messageExpression: |
     "containers are not dropping all required capabilities: " + variables.missingDropCapabilitiesByContainer.map(pair, "{container: " + pair[0] + ", capabilities: [" + pair[1].join(", ") + "]}").join(", ")

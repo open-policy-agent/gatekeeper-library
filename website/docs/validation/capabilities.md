@@ -18,7 +18,7 @@ metadata:
   name: k8spspcapabilities
   annotations:
     metadata.gatekeeper.sh/title: "Capabilities"
-    metadata.gatekeeper.sh/version: 1.1.3
+    metadata.gatekeeper.sh/version: 1.1.4
     metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Controls Linux capabilities on containers. Corresponds to the
@@ -118,10 +118,10 @@ spec:
                 ]
               )
           validations:
-          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.disallowedCapabilitiesByContainer) == 0'
+          - expression: '(has(request.operation) && request.operation == "UPDATE" && !(has(request.subResource) && request.subResource == "ephemeralcontainers")) || size(variables.disallowedCapabilitiesByContainer) == 0'
             messageExpression: |
               "containers have disallowed capabilities: " + variables.disallowedCapabilitiesByContainer.map(pair, "{container: " + pair[0] + ", capabilities: [" + pair[1] + "]}").join(", ")
-          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.missingDropCapabilitiesByContainer) == 0'
+          - expression: '(has(request.operation) && request.operation == "UPDATE" && !(has(request.subResource) && request.subResource == "ephemeralcontainers")) || size(variables.missingDropCapabilitiesByContainer) == 0'
             messageExpression: |
               "containers are not dropping all required capabilities: " + variables.missingDropCapabilitiesByContainer.map(pair, "{container: " + pair[0] + ", capabilities: [" + pair[1].join(", ") + "]}").join(", ")
       - engine: Rego
@@ -211,6 +211,14 @@ spec:
 
             is_update(review) {
                 review.operation == "UPDATE"
+                not is_ephemeral_containers_update(review)
+            }
+
+            # Ephemeral containers can only be added with an UPDATE on the
+            # pods/ephemeralcontainers subresource (kubectl debug). That UPDATE carries
+            # new containers and must be validated like a CREATE.
+            is_ephemeral_containers_update(review) {
+                review.subResource == "ephemeralcontainers"
             }
           - |
             package lib.exempt_container

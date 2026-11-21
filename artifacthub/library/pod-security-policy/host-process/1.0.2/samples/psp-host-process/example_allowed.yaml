@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-host-process-allowed
+  labels:
+    app: nginx-host-process
+spec:
+  containers:
+  - name: nginx
+    image: nginx

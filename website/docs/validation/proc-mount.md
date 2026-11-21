@@ -18,7 +18,7 @@ metadata:
   name: k8spspprocmount
   annotations:
     metadata.gatekeeper.sh/title: "Proc Mount"
-    metadata.gatekeeper.sh/version: 1.1.3
+    metadata.gatekeeper.sh/version: 1.1.4
     metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Controls the allowed `procMount` types for the container. Corresponds to
@@ -105,7 +105,7 @@ spec:
                 )
               ).map(container, "ProcMount type is not allowed, container: " + container.name +". Allowed procMount types: " + variables.allowedProcMount)
           validations:
-          - expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badContainers) == 0'
+          - expression: '(has(request.operation) && request.operation == "UPDATE" && !(has(request.subResource) && request.subResource == "ephemeralcontainers")) || size(variables.badContainers) == 0'
             messageExpression: 'variables.badContainers.join("\n")' 
       - engine: Rego
         source:
@@ -177,6 +177,14 @@ spec:
 
               is_update(review) {
                   review.operation == "UPDATE"
+                  not is_ephemeral_containers_update(review)
+              }
+
+              # Ephemeral containers can only be added with an UPDATE on the
+              # pods/ephemeralcontainers subresource (kubectl debug). That UPDATE carries
+              # new containers and must be validated like a CREATE.
+              is_ephemeral_containers_update(review) {
+                  review.subResource == "ephemeralcontainers"
               }
             - |
               package lib.exempt_container

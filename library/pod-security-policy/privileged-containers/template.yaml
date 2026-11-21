@@ -4,7 +4,7 @@ metadata:
   name: k8spspprivilegedcontainer
   annotations:
     metadata.gatekeeper.sh/title: "Privileged Container"
-    metadata.gatekeeper.sh/version: 1.1.3
+    metadata.gatekeeper.sh/version: 1.1.4
     metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Controls the ability of any container to enable privileged mode.
@@ -68,7 +68,7 @@ spec:
                 (has(container.securityContext) && has(container.securityContext.privileged) && container.securityContext.privileged)
               ).map(container, "Privileged container is not allowed: " + container.name +", securityContext.privileged: true")
           - name: isUpdate
-            expression: has(request.operation) && request.operation == "UPDATE"
+            expression: has(request.operation) && request.operation == "UPDATE" && !(has(request.subResource) && request.subResource == "ephemeralcontainers")
           validations:
           - expression: variables.isUpdate || size(variables.badContainers) == 0
             messageExpression: 'variables.badContainers.join(", ")' 
@@ -107,6 +107,14 @@ spec:
 
               is_update(review) {
                   review.operation == "UPDATE"
+                  not is_ephemeral_containers_update(review)
+              }
+
+              # Ephemeral containers can only be added with an UPDATE on the
+              # pods/ephemeralcontainers subresource (kubectl debug). That UPDATE carries
+              # new containers and must be validated like a CREATE.
+              is_ephemeral_containers_update(review) {
+                  review.subResource == "ephemeralcontainers"
               }
             - |
               package lib.exempt_container

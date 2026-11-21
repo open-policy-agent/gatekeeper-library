@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+    name: nginx-selinux-disallowed
+    labels:
+        app: nginx-selinux
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    securityContext:
+      seLinuxOptions:
+        type: svirt_lxc_net_t
+        user: sysadm_u
+        role: sysadm_r

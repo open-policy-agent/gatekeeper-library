@@ -4,7 +4,7 @@ metadata:
   name: k8spspselinuxv2
   annotations:
     metadata.gatekeeper.sh/title: "SELinux V2"
-    metadata.gatekeeper.sh/version: 1.0.4
+    metadata.gatekeeper.sh/version: 1.0.5
     metadata.gatekeeper.sh/bundle: "pod-security-baseline, pod-security-restricted"
     description: >-
       Defines an allow-list of seLinuxOptions configurations for pod
@@ -122,6 +122,14 @@ spec:
 
           is_update(review) {
               review.operation == "UPDATE"
+              not is_ephemeral_containers_update(review)
+          }
+
+          # Ephemeral containers can only be added with an UPDATE on the
+          # pods/ephemeralcontainers subresource (kubectl debug). That UPDATE carries
+          # new containers and must be validated like a CREATE.
+          is_ephemeral_containers_update(review) {
+              review.subResource == "ephemeralcontainers"
           }
         - |
           package lib.exempt_container

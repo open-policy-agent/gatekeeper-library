@@ -29,5 +29,5 @@ variables:
       )
     )
 validations:
-- expression: '(has(request.operation) && request.operation == "UPDATE") || size(variables.badContainers) == 0'
+- expression: '(has(request.operation) && request.operation == "UPDATE" && !(has(request.subResource) && request.subResource == "ephemeralcontainers")) || size(variables.badContainers) == 0'
   messageExpression: '"Privilege escalation container is not allowed: " + variables.badContainers.map(c, c.image).join(", ")'
