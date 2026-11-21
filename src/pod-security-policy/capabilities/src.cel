@@ -22,32 +22,32 @@ variables:
       variables.exemptImagePrefixes.exists(exemption, string(container.image).startsWith(exemption))
     ).map(container, container.image)
 - name: allowedCapabilities
-  expression: 'has(variables.params.allowedCapabilities) ? variables.params.allowedCapabilities : []'
+  expression: '!has(variables.params.allowedCapabilities) ? [] : variables.params.allowedCapabilities.map(c, c.lowerAscii())'
 - name: allCapabilitiesAllowed
   expression: '"*" in variables.allowedCapabilities'
 - name: disallowedCapabilitiesByContainer
   expression: |
     variables.allContainers.map(container, !(container.image in variables.exemptImages) &&
       !variables.allCapabilitiesAllowed && has(container.securityContext) && has(container.securityContext.capabilities) && has(container.securityContext.capabilities.add) &&
-        container.securityContext.capabilities.add.exists(capability, !(capability in variables.allowedCapabilities)),
-      [container.name, dyn(container.securityContext.capabilities.add.filter(capability, !(capability in variables.allowedCapabilities)).join(", "))]
+        container.securityContext.capabilities.add.exists(capability, !(capability.lowerAscii() in variables.allowedCapabilities)),
+      [container.name, dyn(container.securityContext.capabilities.add.filter(capability, !(capability.lowerAscii() in variables.allowedCapabilities)).join(", "))]
     )
 - name: requiredDropCapabilities
-  expression: 'has(variables.params.requiredDropCapabilities) ? variables.params.requiredDropCapabilities : []'
+  expression: '!has(variables.params.requiredDropCapabilities) ? [] : variables.params.requiredDropCapabilities.map(c, c.lowerAscii())'
 - name: missingDropCapabilitiesByContainer
   expression: |
     variables.allContainers.map(container, !(container.image in variables.exemptImages) &&
       size(variables.requiredDropCapabilities) > 0 && (
         !has(container.securityContext) || !has(container.securityContext.capabilities) || !has(container.securityContext.capabilities.drop) || (
           !(container.securityContext.capabilities.drop.exists(capability, capability.lowerAscii() == "all")) &&
-          variables.requiredDropCapabilities.exists(capability, !(capability in container.securityContext.capabilities.drop))
+          variables.requiredDropCapabilities.exists(capability, !(container.securityContext.capabilities.drop.exists(c, c.lowerAscii() == capability)))
         )
       ),
       [container.name, 
         !has(container.securityContext) ? variables.requiredDropCapabilities :
           !has(container.securityContext.capabilities) ? variables.requiredDropCapabilities :
             !has(container.securityContext.capabilities.drop) ? variables.requiredDropCapabilities : 
-              variables.requiredDropCapabilities.filter(capability, !(capability in container.securityContext.capabilities.drop))
+              variables.requiredDropCapabilities.filter(capability, !(container.securityContext.capabilities.drop.exists(c, c.lowerAscii() == capability)))
       ]
     )
 validations:
